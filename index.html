@@ -58,24 +58,134 @@
       margin: 0 auto;
     }
 
-    header {
-      text-align: center;
+    /* APP HEADER & GLOBAL MASTER VOLUME CONTROLS */
+    .app-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.25rem;
       margin-bottom: 1.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.15rem 1.6rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .header-titles {
+      flex: 1 1 450px;
+      text-align: left;
+    }
+
+    .header-audio-deck {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .master-volume-control {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.55rem 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .volume-mute-btn {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .volume-mute-btn:hover {
+      background: #1e293b;
+      border-color: #38bdf8;
+      transform: scale(1.05);
+    }
+
+    .volume-slider-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .volume-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .master-volume-text {
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .master-volume-slider {
+      accent-color: #38bdf8;
+      cursor: pointer;
+      width: 120px;
+      height: 6px;
+      border-radius: 4px;
+    }
+
+    .repertoire-volume-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .repertoire-volume-control .volume-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .repertoire-volume-control .volume-mute-btn {
+      width: 28px;
+      height: 28px;
+      font-size: 0.95rem;
+    }
+
+    .repertoire-volume-control .master-volume-slider {
+      width: 80px;
     }
 
     h1 {
-      font-size: 2.3rem;
+      font-size: 2.1rem;
       font-weight: 800;
       letter-spacing: -0.025em;
       background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #34d399 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.35rem;
     }
 
     .subtitle {
       color: var(--text-muted);
-      font-size: 1.02rem;
+      font-size: 0.98rem;
     }
 
     /* CURRICULUM DECK */
@@ -1465,9 +1575,23 @@
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Piano Practice Lab & Educational Music Reader</h1>
-      <p class="subtitle">Multi-mode piano academy: interactive score reading, sight-reading drills, ear training, scale studio & metronome</p>
+    <header class="app-header">
+      <div class="header-titles">
+        <h1>Piano Practice Lab & Educational Music Reader</h1>
+        <p class="subtitle">Multi-mode piano academy: interactive score reading, sight-reading drills, ear training, scale studio & metronome</p>
+      </div>
+      <div class="header-audio-deck">
+        <div class="master-volume-control" title="Master Audio Output Volume (Controls all modes, notes, MIDI synth, preview & metronome)">
+          <button class="volume-mute-btn master-volume-icon" title="Mute / Unmute Audio Output" aria-label="Toggle Mute Audio">🔊</button>
+          <div class="volume-slider-wrap">
+            <div class="volume-info">
+              <span>Master Volume</span>
+              <span class="master-volume-text">80%</span>
+            </div>
+            <input type="range" class="master-volume-slider" min="0" max="1" step="0.01" value="0.8" aria-label="Master Volume">
+          </div>
+        </div>
+      </div>
     </header>
 
     <!-- TOP EDUCATIONAL MODE NAVIGATION DECK -->
@@ -1614,6 +1738,13 @@
             <button class="tempo-preset-btn" data-speed="60" title="Practice slowly">🐢 60</button>
             <button class="tempo-preset-btn" data-speed="96" title="Normal speed">🚶 96</button>
             <button class="tempo-preset-btn" data-speed="120" title="Brisk speed">🐇 120</button>
+          </div>
+
+          <div class="repertoire-volume-control" title="Master Audio Output Volume">
+            <button class="volume-mute-btn master-volume-icon" title="Mute / Unmute Audio Output" aria-label="Toggle Mute Audio">🔊</button>
+            <span class="volume-label">Vol:</span>
+            <input type="range" class="master-volume-slider rep-vol-slider" min="0" max="1" step="0.01" value="0.8" aria-label="Master Volume Slider">
+            <span class="master-volume-text rep-vol-text">80%</span>
           </div>
 
           <!-- Section A-B Loop Practice -->
@@ -1926,9 +2057,15 @@
             <div class="beat-light"></div>
           </div>
 
-          <div style="display:flex; justify-content:center; gap:0.85rem;">
+          <div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:0.85rem;">
             <button id="metroStartBtn" class="play-btn" style="padding:0.75rem 2rem; font-size:1.05rem;">▶ Start Metronome</button>
             <button id="metroTapTempoBtn" class="range-shift-btn" style="padding:0.75rem 1.4rem;">🥁 Tap Tempo</button>
+            <div class="repertoire-volume-control" title="Metronome & Master Volume">
+              <button class="volume-mute-btn master-volume-icon" title="Mute / Unmute Audio Output" aria-label="Toggle Mute Audio">🔊</button>
+              <span class="volume-label">Vol:</span>
+              <input type="range" class="master-volume-slider rep-vol-slider" min="0" max="1" step="0.01" value="0.8" aria-label="Metronome Volume Slider">
+              <span class="master-volume-text rep-vol-text">80%</span>
+            </div>
           </div>
         </div>
 
@@ -2220,6 +2357,10 @@
 
     // Audio & State
     let audioCtx = null;
+    let masterGainNode = null;
+    let currentMasterVolume = 0.8;
+    let isMasterMuted = false;
+    let preMuteVolume = 0.8;
     let playbackTimeouts = [];
     let currentSong = null;
     const liveOscillators = new Map();
@@ -2238,8 +2379,87 @@
     let attackCounter = 0;
 
     function initAudio() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGainNode = audioCtx.createGain();
+        masterGainNode.gain.setValueAtTime(isMasterMuted ? 0 : currentMasterVolume, audioCtx.currentTime);
+        masterGainNode.connect(audioCtx.destination);
+      }
       if (audioCtx.state === "suspended") audioCtx.resume();
+    }
+
+    function setMasterVolume(val) {
+      currentMasterVolume = Math.max(0, Math.min(1, parseFloat(val)));
+      if (currentMasterVolume > 0 && isMasterMuted) {
+        isMasterMuted = false;
+      }
+      initAudio();
+      if (masterGainNode && audioCtx) {
+        masterGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+        masterGainNode.gain.setValueAtTime(isMasterMuted ? 0 : currentMasterVolume, audioCtx.currentTime);
+      }
+      updateVolumeUI();
+      try {
+        localStorage.setItem("piano_master_volume", currentMasterVolume.toString());
+      } catch(e) {}
+    }
+
+    function toggleMasterMute() {
+      initAudio();
+      if (isMasterMuted) {
+        isMasterMuted = false;
+        currentMasterVolume = preMuteVolume > 0 ? preMuteVolume : 0.8;
+      } else {
+        isMasterMuted = true;
+        preMuteVolume = currentMasterVolume > 0 ? currentMasterVolume : 0.8;
+      }
+      if (masterGainNode && audioCtx) {
+        masterGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+        masterGainNode.gain.setValueAtTime(isMasterMuted ? 0 : currentMasterVolume, audioCtx.currentTime);
+      }
+      updateVolumeUI();
+    }
+
+    function updateVolumeUI() {
+      const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
+      const pct = Math.round(effectiveVol * 100);
+
+      document.querySelectorAll(".master-volume-slider").forEach(el => {
+        el.value = effectiveVol;
+      });
+
+      document.querySelectorAll(".master-volume-text").forEach(el => {
+        el.textContent = `${pct}%`;
+      });
+
+      const icon = isMasterMuted || pct === 0 ? "🔇" : (pct < 50 ? "🔉" : "🔊");
+      document.querySelectorAll(".master-volume-icon").forEach(el => {
+        el.textContent = icon;
+        el.title = isMasterMuted ? "Unmute Audio Output" : "Mute Audio Output";
+      });
+    }
+
+    function initMasterVolume() {
+      try {
+        const saved = localStorage.getItem("piano_master_volume");
+        if (saved !== null) {
+          const parsed = parseFloat(saved);
+          if (!isNaN(parsed)) currentMasterVolume = Math.max(0, Math.min(1, parsed));
+        }
+      } catch(e) {}
+      updateVolumeUI();
+
+      document.querySelectorAll(".master-volume-slider").forEach(slider => {
+        slider.addEventListener("input", (e) => {
+          setMasterVolume(e.target.value);
+        });
+      });
+
+      document.querySelectorAll(".volume-mute-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          toggleMasterMute();
+        });
+      });
     }
 
     function playTone(freq, duration = 0.35) {
@@ -2257,7 +2477,7 @@
       gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
 
       osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      gain.connect(masterGainNode || audioCtx.destination);
 
       osc.start(audioCtx.currentTime);
       osc.stop(audioCtx.currentTime + duration);
@@ -2277,7 +2497,7 @@
       gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.015);
 
       osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      gain.connect(masterGainNode || audioCtx.destination);
       osc.start(audioCtx.currentTime);
 
       liveOscillators.set(noteNumber, { osc, gain });
@@ -4531,7 +4751,7 @@
       gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
 
       osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      gain.connect(masterGainNode || audioCtx.destination);
       osc.start(time);
       osc.stop(time + 0.05);
 
@@ -4708,6 +4928,7 @@
     renderCatalog(songDatabase);
     updateLayerToggleClasses();
     initWebMIDI();
+    initMasterVolume();
 
     // Boot up educational modes
     initModeNavigation();

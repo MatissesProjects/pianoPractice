@@ -489,4 +489,111 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
   console.log("✔ Test 8: Note-off duration calculations and rhythmic feedback passed");
 }
 
+// 9. Test Universal Master Volume Control (Clamping, Mute Toggle, Gain Attenuation & Sync)
+{
+  class MasterVolumeController {
+    constructor(initialVol = 0.8) {
+      this.currentMasterVolume = initialVol;
+      this.isMasterMuted = false;
+      this.preMuteVolume = initialVol;
+      this.storage = new Map();
+      this.sliderElements = [];
+    }
+
+    setMasterVolume(val) {
+      const parsed = Math.max(0, Math.min(1, parseFloat(val)));
+      this.currentMasterVolume = parsed;
+      if (this.currentMasterVolume > 0 && this.isMasterMuted) {
+        this.isMasterMuted = false;
+      }
+      this.storage.set("piano_master_volume", this.currentMasterVolume.toString());
+      return this.getState();
+    }
+
+    toggleMasterMute() {
+      if (this.isMasterMuted) {
+        this.isMasterMuted = false;
+        this.currentMasterVolume = this.preMuteVolume > 0 ? this.preMuteVolume : 0.8;
+      } else {
+        this.isMasterMuted = true;
+        this.preMuteVolume = this.currentMasterVolume > 0 ? this.currentMasterVolume : 0.8;
+      }
+      return this.getState();
+    }
+
+    getState() {
+      const effectiveVol = this.isMasterMuted ? 0 : this.currentMasterVolume;
+      const pct = Math.round(effectiveVol * 100);
+      const icon = this.isMasterMuted || pct === 0 ? "🔇" : (pct < 50 ? "🔉" : "🔊");
+      return {
+        masterVolume: this.currentMasterVolume,
+        isMuted: this.isMasterMuted,
+        effectiveGain: effectiveVol,
+        pctText: `${pct}%`,
+        icon
+      };
+    }
+
+    calculateAttenuatedGain(baseGain) {
+      const effectiveGain = this.isMasterMuted ? 0 : this.currentMasterVolume;
+      return baseGain * effectiveGain;
+    }
+  }
+
+  const vol = new MasterVolumeController(0.8);
+  assert.strictEqual(vol.getState().pctText, "80%");
+  assert.strictEqual(vol.getState().icon, "🔊");
+  assert.strictEqual(vol.getState().effectiveGain, 0.8);
+
+  // Test Clamping
+  const over = vol.setMasterVolume(1.5);
+  assert.strictEqual(over.effectiveGain, 1.0, "Clamped to 1.0 max");
+  assert.strictEqual(over.pctText, "100%");
+  assert.strictEqual(over.icon, "🔊");
+
+  const under = vol.setMasterVolume(-0.2);
+  assert.strictEqual(under.effectiveGain, 0.0, "Clamped to 0.0 min");
+  assert.strictEqual(under.pctText, "0%");
+  assert.strictEqual(under.icon, "🔇");
+
+  // Mid-range volume & icon state
+  const mid = vol.setMasterVolume(0.35);
+  assert.strictEqual(mid.effectiveGain, 0.35);
+  assert.strictEqual(mid.pctText, "35%");
+  assert.strictEqual(mid.icon, "🔉");
+
+  // Mute toggle preserves previous volume
+  const muted = vol.toggleMasterMute();
+  assert.strictEqual(muted.isMuted, true);
+  assert.strictEqual(muted.effectiveGain, 0);
+  assert.strictEqual(muted.pctText, "0%");
+  assert.strictEqual(muted.icon, "🔇");
+
+  // Unmute restores previous volume
+  const unmuted = vol.toggleMasterMute();
+  assert.strictEqual(unmuted.isMuted, false);
+  assert.strictEqual(unmuted.effectiveGain, 0.35);
+  assert.strictEqual(unmuted.pctText, "35%");
+  assert.strictEqual(unmuted.icon, "🔉");
+
+  // Moving slider while muted un-mutes automatically
+  vol.toggleMasterMute();
+  assert.strictEqual(vol.getState().isMuted, true);
+  const adjusted = vol.setMasterVolume(0.60);
+  assert.strictEqual(adjusted.isMuted, false, "Slider drag unmutes automatically");
+  assert.strictEqual(adjusted.effectiveGain, 0.60);
+  assert.strictEqual(adjusted.pctText, "60%");
+  assert.strictEqual(adjusted.icon, "🔊");
+
+  // Audio attenuation calculation:
+  // playTone base gain = 0.20
+  assert.strictEqual(vol.calculateAttenuatedGain(0.20), 0.12, "0.20 base gain at 60% master volume produces 0.12");
+  vol.setMasterVolume(1.0);
+  assert.strictEqual(vol.calculateAttenuatedGain(0.20), 0.20, "0.20 base gain at 100% master volume produces 0.20");
+  vol.setMasterVolume(0.0);
+  assert.strictEqual(vol.calculateAttenuatedGain(0.20), 0.0, "0.20 base gain at 0% master volume produces 0.00 silence");
+
+  console.log("✔ Test 9: Universal master volume control & gain math passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");

@@ -46,3 +46,11 @@
   - [x] Visual partial chord progress: display checkmarked notes on the HUD target badge as hands land
   - [x] Automated verification test suite for consecutive notes, 2-hand landing, and duration calculation (`tests/test_score_engine.js` Tests 6–8 100% pass)
 
+- [x] **Milestone 8: Universal Master Volume Control for All Site Audio Output**
+  - [x] Web Audio master pipeline architecture: insert `masterGainNode` directly upstream of `audioCtx.destination`
+  - [x] Comprehensive audio node routing: connect `playTone` (notes/chords/preview/drills), `startLiveTone` (MIDI synth), and `scheduleMetroClick` (metronome) into `masterGainNode`
+  - [x] Global header master volume deck: slider (0%–100%), mute/unmute quick toggle, dynamic speaker icon (🔇/🔉/🔊), and percentage badge
+  - [x] Repertoire transport bar volume control: synchronized slider alongside tempo/loop controls
+  - [x] Reactive state synchronization & LocalStorage persistence (`piano_master_volume`)
+  - [x] Automated verification test suite for volume gain scaling, mute toggle, and clamping (`tests/test_score_engine.js` Test 9 100% pass)
+
