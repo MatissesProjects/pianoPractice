@@ -2130,7 +2130,7 @@
     function getDiatonicStep(pitchStr) {
       if (!pitchStr || pitchStr === "-") return null;
       const clean = pitchStr.trim();
-      const match = clean.match(/^([A-G])([#b]?)([1-7])?$/);
+      const match = clean.match(/^([A-G])([#b]?)([0-8])?$/);
       if (!match) return null;
       const letter = match[1];
       const oct = match[3] ? parseInt(match[3], 10) : 4;
@@ -2140,7 +2140,7 @@
     function getNoteFreq(noteStr) {
       if (!noteStr || noteStr === "-") return null;
       const clean = noteStr.trim();
-      const match = clean.match(/^([A-G][#b]?)([1-7])?$/);
+      const match = clean.match(/^([A-G][#b]?)([0-8])?$/);
       if (!match) return null;
       const pitch = match[1];
       const oct = match[2] ? parseInt(match[2], 10) : 4;
@@ -2232,6 +2232,7 @@
     let isWaitPracticeMode = true;
     let currentPracticeStep = 0;
     let songNoteSteps = []; // Parsed sequence of steps { rh, lh, dyad, expectedPitches: [] }
+    let currentSongMeasures = []; // Parsed sequence of measures with beat-aligned onset items
 
     function initAudio() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2287,10 +2288,146 @@
       liveOscillators.delete(noteNumber);
     }
 
-    // MULTI-SYSTEM (WRAPPING) SCORE RENDERER
+    // MULTI-SYSTEM (WRAPPING) SCORE RENDERER & TIMELINE ENGINE
+    function buildScoreModel(song, showRH, showLH, showDyads) {
+      if (!song) return { measures: [], steps: [] };
+
+      const rhM = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const lhM = (song.lh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const dyadM = (song.dyads || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const rhFM = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const lhFM = (song.lhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const dyadFM = (song.dyadsF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+
+      const totalMeasures = Math.max(rhM.length, lhM.length, dyadM.length);
+      const measures = [];
+      const steps = [];
+      let stepGlobalIdx = 0;
+
+      for (let m = 0; m < totalMeasures; m++) {
+        const mRH = rhM[m] || [];
+        const mLH = lhM[m] || [];
+        const mDyad = dyadM[m] || [];
+        const mRHF = rhFM[m] || [];
+        const mLHF = lhFM[m] || [];
+        const mDyadF = dyadFM[m] || [];
+
+        const measureItems = [];
+
+        if (showDyads) {
+          mDyad.forEach((t, k) => {
+            const parsed = parseToken(t);
+            const item = {
+              stepIndex: stepGlobalIdx,
+              index: stepGlobalIdx,
+              measure: m + 1,
+              dyad: parsed,
+              dyadF: mDyadF[k] || "",
+              expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
+              beats: parsed.beats
+            };
+            item.displayLabel = item.expectedPitches.join(" + ");
+            measureItems.push(item);
+            steps.push(item);
+            stepGlobalIdx++;
+          });
+        } else if (showRH && !showLH) {
+          mRH.forEach((t, k) => {
+            const parsed = parseToken(t);
+            const item = {
+              stepIndex: stepGlobalIdx,
+              index: stepGlobalIdx,
+              measure: m + 1,
+              rh: parsed,
+              rhF: mRHF[k] || "",
+              expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
+              beats: parsed.beats
+            };
+            item.displayLabel = item.expectedPitches.join(" + ");
+            measureItems.push(item);
+            steps.push(item);
+            stepGlobalIdx++;
+          });
+        } else if (showLH && !showRH) {
+          mLH.forEach((t, k) => {
+            const parsed = parseToken(t);
+            const item = {
+              stepIndex: stepGlobalIdx,
+              index: stepGlobalIdx,
+              measure: m + 1,
+              lh: parsed,
+              lhF: mLHF[k] || "",
+              expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
+              beats: parsed.beats
+            };
+            item.displayLabel = item.expectedPitches.join(" + ");
+            measureItems.push(item);
+            steps.push(item);
+            stepGlobalIdx++;
+          });
+        } else if (showRH && showLH) {
+          let rhBeat = 0;
+          const rhEvents = mRH.map((t, k) => {
+            const p = parseToken(t);
+            const ev = { ...p, f: mRHF[k] || "", startBeat: rhBeat };
+            rhBeat += p.beats;
+            return ev;
+          });
+
+          let lhBeat = 0;
+          const lhEvents = mLH.map((t, k) => {
+            const p = parseToken(t);
+            const ev = { ...p, f: mLHF[k] || "", startBeat: lhBeat };
+            lhBeat += p.beats;
+            return ev;
+          });
+
+          const onsets = Array.from(new Set([
+            ...rhEvents.map(e => e.startBeat),
+            ...lhEvents.map(e => e.startBeat)
+          ])).sort((a, b) => a - b);
+
+          onsets.forEach((b, k) => {
+            const rhEv = rhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+            const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+            const expected = [];
+            if (rhEv && rhEv.pitch && rhEv.pitch !== "-") {
+              rhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expected.push(p));
+            }
+            if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
+              lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expected.push(p));
+            }
+
+            const nextB = onsets[k + 1];
+            const stepBeats = nextB !== undefined ? (nextB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1);
+
+            const item = {
+              stepIndex: stepGlobalIdx,
+              index: stepGlobalIdx,
+              measure: m + 1,
+              startBeat: b,
+              rh: rhEv,
+              lh: lhEv,
+              expectedPitches: expected,
+              displayLabel: expected.join(" + "),
+              beats: stepBeats
+            };
+            measureItems.push(item);
+            steps.push(item);
+            stepGlobalIdx++;
+          });
+        }
+
+        measures.push(measureItems);
+      }
+
+      return { measures, steps };
+    }
+
     function renderSheetMusicScore() {
       if (!currentSong) return;
       const svg = document.getElementById("scoreSvg");
+      if (!svg) return;
       svg.innerHTML = "";
 
       const showRH = document.getElementById("toggleRH").checked;
@@ -2301,35 +2438,10 @@
 
       document.getElementById("sheetPieceTitle").textContent = currentSong.title;
 
-      // Group song notes into measures
-      let rhRaw = currentSong.rh.split(/\s+/);
-      let lhRaw = currentSong.lh.split(/\s+/);
-      let dyadRaw = currentSong.dyads.split(/\s+/);
-      let rhF = currentSong.rhF ? currentSong.rhF.split(/\s+/) : [];
-      let lhF = currentSong.lhF ? currentSong.lhF.split(/\s+/) : [];
-      let dyadF = currentSong.dyadsF ? currentSong.dyadsF.split(/\s+/) : [];
-
-      let measures = [];
-      let currentMeasure = [];
-      let stepGlobalIdx = 0;
-
-      for (let i = 0; i < rhRaw.length; i++) {
-        if (rhRaw[i] === "|") {
-          measures.push(currentMeasure);
-          currentMeasure = [];
-          continue;
-        }
-        currentMeasure.push({
-          stepIndex: stepGlobalIdx++,
-          rh: parseToken(rhRaw[i]),
-          lh: parseToken(lhRaw[i] || "-"),
-          dyad: parseToken(dyadRaw[i] || rhRaw[i]),
-          rhF: rhF[i] || "",
-          lhF: lhF[i] || "",
-          dyadF: dyadF[i] || ""
-        });
+      if (!currentSongMeasures || currentSongMeasures.length === 0) {
+        parseSongSteps();
       }
-      if (currentMeasure.length > 0) measures.push(currentMeasure);
+      const measures = currentSongMeasures;
 
       // Multi-System Geometry: 2 measures per system row for maximum readability
       const measuresPerSystem = 2;
@@ -2340,10 +2452,10 @@
 
       const staffLineSpacing = 10;
       const isGrandStaff = (showRH && showLH && !showDyads);
-      const systemHeight = isGrandStaff ? 260 : 160;
+      const systemHeight = isGrandStaff ? 275 : 160;
 
       const numSystems = Math.ceil(measures.length / measuresPerSystem);
-      const totalSvgHeight = numSystems * systemHeight + 50;
+      const totalSvgHeight = numSystems * systemHeight + 60;
 
       svg.setAttribute("width", scoreWidth);
       svg.setAttribute("height", totalSvgHeight);
@@ -2351,9 +2463,9 @@
       // Build Systems
       for (let s = 0; s < numSystems; s++) {
         const systemTopY = 30 + s * systemHeight;
-        const trebleTopY = systemTopY + 12;
+        const trebleTopY = (showRH || showDyads) ? (systemTopY + 12) : 0;
         const trebleBottomY = trebleTopY + 4 * staffLineSpacing; // y = trebleTopY + 40
-        const bassTopY = isGrandStaff ? (trebleBottomY + 75) : 0;
+        const bassTopY = isGrandStaff ? (trebleBottomY + 80) : (showLH ? (systemTopY + 12) : 0);
         const bassBottomY = bassTopY + 4 * staffLineSpacing;
 
         // Draw Staff Lines for this system
@@ -2404,7 +2516,7 @@
             timeSig.textContent = currentSong.timeSig || "4/4";
             svg.appendChild(timeSig);
           }
-          if (isGrandStaff) {
+          if (showLH && !showDyads) {
             const timeSigB = document.createElementNS("http://www.w3.org/2000/svg", "text");
             timeSigB.setAttribute("x", leftMargin + 2);
             timeSigB.setAttribute("y", bassTopY + 24);
@@ -2416,7 +2528,7 @@
 
         // Left System Bar Line & Bracket
         const startY = (showRH || showDyads) ? trebleTopY : bassTopY;
-        const endY = isGrandStaff ? bassBottomY : ((showRH || showDyads) ? trebleBottomY : bassBottomY);
+        const endY = (showLH && !showDyads) ? bassBottomY : trebleBottomY;
         const initBar = document.createElementNS("http://www.w3.org/2000/svg", "line");
         initBar.setAttribute("x1", leftMargin - 42);
         initBar.setAttribute("y1", startY);
@@ -2450,19 +2562,12 @@
           bLine.setAttribute("class", "bar-line");
           svg.appendChild(bLine);
 
-          // Distribute notes inside the measure
+          // Distribute onsets inside the measure
           const noteCount = mObj.length;
           const noteStepX = (availableMeasureWidth - 45) / Math.max(1, noteCount);
 
           mObj.forEach((item, nIdx) => {
-            const cx = measureStartX + 12 + nIdx * noteStepX;
-            let pitchToDraw = item.rh.pitch;
-            let beats = item.rh.beats;
-
-            if (showDyads) {
-              pitchToDraw = item.dyad.pitch;
-              beats = item.dyad.beats;
-            }
+            const cx = measureStartX + 14 + nIdx * noteStepX;
 
             const noteGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             noteGroup.setAttribute("class", "note-group");
@@ -2471,64 +2576,97 @@
 
             // Click listener on score
             noteGroup.addEventListener("click", () => {
-              checkAndPlayNote(item.stepIndex);
+              currentPracticeStep = item.stepIndex;
+              highlightActiveScoreNote(currentPracticeStep);
+              if (item.expectedPitches && item.expectedPitches.length > 0) {
+                item.expectedPitches.forEach(p => playSingleNoteAudit(p));
+              }
             });
 
             // 1. Render Treble / Dyad Notes
-            if (showRH || showDyads) {
-              const pitches = pitchToDraw.split("+");
+            if (showDyads && item.dyad) {
+              const pitches = item.dyad.pitch.split("+").filter(p => p !== "-");
               pitches.forEach(p => {
-                if (p !== "-") renderNoteheadOnly(noteGroup, p, beats, cx, trebleBottomY, 2);
+                renderNoteheadOnly(noteGroup, p, item.dyad.beats, cx, trebleBottomY, 2);
               });
-
-              // 2. Vertically Stacked Cheat Labels (Positioned at y = trebleBottomY + 38 to completely avoid Middle C ledger line)
-              if (showCheat && pitchToDraw !== "-") {
+              if (showCheat && pitches.length > 0) {
                 const sorted = [...pitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
                 const startYCheat = trebleBottomY + 38;
                 const lineSpacing = 13.5;
-
                 sorted.forEach((p, pIdx) => {
                   const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
                   label.setAttribute("x", cx);
                   label.setAttribute("y", startYCheat + pIdx * lineSpacing);
                   label.setAttribute("class", `cheat-text-composite ${pitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
-                  label.textContent = p.replace(/[1-7]/g, "").replace("#", "♯").replace("b", "♭");
+                  label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                   noteGroup.appendChild(label);
                 });
-
-                if (showFingers) {
-                  const fNum = showDyads ? item.dyadF : item.rhF;
-                  if (fNum && fNum !== "-") {
-                    const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    fLabel.setAttribute("x", cx);
-                    fLabel.setAttribute("y", startYCheat + sorted.length * lineSpacing + 2);
-                    fLabel.setAttribute("class", "cheat-finger-label");
-                    fLabel.textContent = fNum;
-                    noteGroup.appendChild(fLabel);
-                  }
+                if (showFingers && item.dyadF && item.dyadF !== "-") {
+                  const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                  fLabel.setAttribute("x", cx);
+                  fLabel.setAttribute("y", startYCheat + sorted.length * lineSpacing + 2);
+                  fLabel.setAttribute("class", "cheat-finger-label");
+                  fLabel.textContent = item.dyadF;
+                  noteGroup.appendChild(fLabel);
+                }
+              }
+            } else if (showRH && item.rh) {
+              const pitches = item.rh.pitch.split("+").filter(p => p !== "-");
+              pitches.forEach(p => {
+                renderNoteheadOnly(noteGroup, p, item.rh.beats, cx, trebleBottomY, 2);
+              });
+              if (showCheat && pitches.length > 0) {
+                const sorted = [...pitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
+                const startYCheat = trebleBottomY + 38;
+                const lineSpacing = 13.5;
+                sorted.forEach((p, pIdx) => {
+                  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                  label.setAttribute("x", cx);
+                  label.setAttribute("y", startYCheat + pIdx * lineSpacing);
+                  label.setAttribute("class", `cheat-text-composite ${pitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                  label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
+                  noteGroup.appendChild(label);
+                });
+                const fNum = item.rh.f || item.rhF;
+                if (showFingers && fNum && fNum !== "-") {
+                  const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                  fLabel.setAttribute("x", cx);
+                  fLabel.setAttribute("y", startYCheat + sorted.length * lineSpacing + 2);
+                  fLabel.setAttribute("class", "cheat-finger-label");
+                  fLabel.textContent = fNum;
+                  noteGroup.appendChild(fLabel);
                 }
               }
             }
 
-            // 3. Render Bass Notes
-            if (showLH && !showDyads && item.lh.pitch !== "-") {
-              renderNoteheadOnly(noteGroup, item.lh.pitch, item.lh.beats, cx, bassBottomY, -10);
+            // 2. Render Bass Notes
+            if (showLH && !showDyads && item.lh) {
+              const lhPitches = item.lh.pitch.split("+").filter(p => p !== "-");
+              lhPitches.forEach(p => {
+                renderNoteheadOnly(noteGroup, p, item.lh.beats, cx, bassBottomY, -10);
+              });
 
-              if (showCheat) {
+              if (showCheat && lhPitches.length > 0) {
+                const sortedB = [...lhPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
                 const startYBCheat = bassBottomY + 38;
-                const labelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                labelB.setAttribute("x", cx);
-                labelB.setAttribute("y", startYBCheat);
-                labelB.setAttribute("class", "cheat-text-composite cheat-single");
-                labelB.textContent = item.lh.pitch.replace(/[1-7]/g, "").replace("#", "♯").replace("b", "♭");
-                noteGroup.appendChild(labelB);
+                const lineSpacing = 13.5;
 
-                if (showFingers && item.lhF && item.lhF !== "-") {
+                sortedB.forEach((p, pIdx) => {
+                  const labelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                  labelB.setAttribute("x", cx);
+                  labelB.setAttribute("y", startYBCheat + pIdx * lineSpacing);
+                  labelB.setAttribute("class", `cheat-text-composite ${lhPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                  labelB.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
+                  noteGroup.appendChild(labelB);
+                });
+
+                const fNumB = item.lh.f || item.lhF;
+                if (showFingers && fNumB && fNumB !== "-") {
                   const fLabelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
                   fLabelB.setAttribute("x", cx);
-                  fLabelB.setAttribute("y", startYBCheat + 14);
+                  fLabelB.setAttribute("y", startYBCheat + sortedB.length * lineSpacing + 2);
                   fLabelB.setAttribute("class", "cheat-finger-label");
-                  fLabelB.textContent = item.lhF;
+                  fLabelB.textContent = fNumB;
                   noteGroup.appendChild(fLabelB);
                 }
               }
@@ -2566,8 +2704,8 @@
         group.appendChild(flat);
       }
 
-      // Ledger lines
-      if (refDiatonicStep === 2 && step <= 0) { // Below Treble Staff (Middle C)
+      // Ledger lines (Treble: ref=2, Bass: ref=-10)
+      if (refDiatonicStep === 2 && step <= 0) { // Below Treble Staff (Middle C, etc.)
         for (let s = 0; s >= step; s -= 2) {
           const lY = bottomStaffY - (s - refDiatonicStep) * halfStepPx;
           const lLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -2578,8 +2716,30 @@
           lLine.setAttribute("class", "ledger-line");
           group.appendChild(lLine);
         }
-      } else if (refDiatonicStep === -10 && step >= 0) { // Above Bass Staff
+      } else if (refDiatonicStep === 2 && step >= 12) { // Above Treble Staff
+        for (let s = 12; s <= step; s += 2) {
+          const lY = bottomStaffY - (s - refDiatonicStep) * halfStepPx;
+          const lLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          lLine.setAttribute("x1", cx - 11);
+          lLine.setAttribute("y1", lY);
+          lLine.setAttribute("x2", cx + 11);
+          lLine.setAttribute("y2", lY);
+          lLine.setAttribute("class", "ledger-line");
+          group.appendChild(lLine);
+        }
+      } else if (refDiatonicStep === -10 && step >= 0) { // Above Bass Staff (Middle C, etc.)
         for (let s = 0; s <= step; s += 2) {
+          const lY = bottomStaffY - (s - refDiatonicStep) * halfStepPx;
+          const lLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          lLine.setAttribute("x1", cx - 11);
+          lLine.setAttribute("y1", lY);
+          lLine.setAttribute("x2", cx + 11);
+          lLine.setAttribute("y2", lY);
+          lLine.setAttribute("class", "ledger-line");
+          group.appendChild(lLine);
+        }
+      } else if (refDiatonicStep === -10 && step <= -12) { // Below Bass Staff (E2, C2, etc.)
+        for (let s = -12; s >= step; s -= 2) {
           const lY = bottomStaffY - (s - refDiatonicStep) * halfStepPx;
           const lLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
           lLine.setAttribute("x1", cx - 11);
@@ -2682,52 +2842,9 @@
       const showLH = document.getElementById("toggleLH").checked;
       const showDyads = document.getElementById("toggleDyads").checked;
 
-      let rhRaw = currentSong.rh.split(/\s+/);
-      let lhRaw = currentSong.lh.split(/\s+/);
-      let dyadsRaw = currentSong.dyads ? currentSong.dyads.split(/\s+/) : [];
-
-      songNoteSteps = [];
-      let currentMeasure = 1;
-      let stepGlobalIdx = 0;
-
-      for (let i = 0; i < rhRaw.length; i++) {
-        if (rhRaw[i] === "|") {
-          currentMeasure++;
-          continue;
-        }
-
-        const rawRH = parseToken(rhRaw[i] || "-");
-        const rawLH = parseToken(lhRaw[i] || "-");
-        const rawDyad = parseToken(dyadsRaw[i] || rhRaw[i] || "-");
-
-        let expected = [];
-        let label = "";
-
-        if (showDyads) {
-          expected = rawDyad.pitch.split("+").filter(p => p !== "-");
-          label = expected.join(" + ");
-        } else if (showRH && showLH) {
-          if (rawRH.pitch !== "-") expected.push(rawRH.pitch);
-          if (rawLH.pitch !== "-") expected.push(rawLH.pitch);
-          label = expected.join(" + ");
-        } else if (showRH) {
-          if (rawRH.pitch !== "-") expected.push(rawRH.pitch);
-          label = rawRH.pitch;
-        } else if (showLH) {
-          if (rawLH.pitch !== "-") expected.push(rawLH.pitch);
-          label = rawLH.pitch;
-        }
-
-        songNoteSteps.push({
-          index: stepGlobalIdx++,
-          measure: currentMeasure,
-          rh: rawRH,
-          lh: rawLH,
-          dyad: rawDyad,
-          expectedPitches: expected,
-          displayLabel: label
-        });
-      }
+      const model = buildScoreModel(currentSong, showRH, showLH, showDyads);
+      songNoteSteps = model.steps;
+      currentSongMeasures = model.measures;
 
       // Reset practice stats for newly loaded piece
       practiceStats = { correct: 0, attempts: 0, cleanLoop: true };
@@ -2781,7 +2898,7 @@
       practiceStats.attempts++;
 
       // Verify Note Match
-      const isMatch = expected.includes(playedPitch);
+      const isMatch = expected.some(p => p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch)));
 
       if (isMatch) {
         // Correct note
@@ -3148,26 +3265,18 @@
       const showLH = document.getElementById("toggleLH").checked;
       const showDyads = document.getElementById("toggleDyads").checked;
 
-      let rhTokens = currentSong.rh.split(/\s+/).filter(t => t !== "|");
-      let lhTokens = currentSong.lh.split(/\s+/).filter(t => t !== "|");
-      let dyadsTokens = currentSong.dyads.split(/\s+/).filter(t => t !== "|");
+      if (!songNoteSteps || songNoteSteps.length === 0) {
+        parseSongSteps();
+      }
 
       const staffNotes = document.querySelectorAll(".note-group");
-      const steps = Math.max(rhTokens.length, lhTokens.length);
+      const steps = songNoteSteps.length;
 
       let accumulatedMs = 0;
 
       for (let i = 0; i < steps; i++) {
-        const rawRH = parseToken(rhTokens[i] || "-");
-        const rawLH = parseToken(lhTokens[i] || "-");
-        const rawDyad = parseToken(dyadsTokens[i] || rawRH);
-
-        let stepBeats = 1.0;
-        if (showDyads) stepBeats = rawDyad.beats || 1.0;
-        else if (showRH && showLH) stepBeats = Math.max(rawRH.beats || 1.0, rawLH.beats || 1.0);
-        else if (showRH) stepBeats = rawRH.beats || 1.0;
-        else if (showLH) stepBeats = rawLH.beats || 1.0;
-
+        const step = songNoteSteps[i];
+        const stepBeats = step.beats || 1.0;
         const stepDurationMs = stepBeats * beatMs;
         const noteSoundDuration = (stepBeats * (60 / bpm)) * 0.95;
 
@@ -3175,35 +3284,42 @@
           document.querySelectorAll(".piano-key").forEach(k => k.classList.remove("active-rh", "active-lh", "active-dyad"));
           staffNotes.forEach(g => g.classList.remove("active-target"));
 
-          if (staffNotes[i]) {
-            staffNotes[i].classList.add("active-target");
-            staffNotes[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const targetEl = document.getElementById(`staff_note_${step.stepIndex}`);
+          if (targetEl) {
+            targetEl.classList.add("active-target");
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
 
           let activePlaybackNotes = [];
 
           if (showDyads) {
-            if (rawDyad.pitch !== "-") {
-              const parts = rawDyad.pitch.split("+");
+            if (step.dyad && step.dyad.pitch && step.dyad.pitch !== "-") {
+              const parts = step.dyad.pitch.split("+").filter(p => p !== "-");
               parts.forEach(p => {
                 playTone(getNoteFreq(p), noteSoundDuration);
                 const num = NOTE_OFFSETS[p.replace(/[0-9]/g, "")] + (parseInt(p.slice(-1)) + 1) * 12;
                 activePlaybackNotes.push({ num, pitch: p });
               });
-              highlightPlaybackKey(rawDyad.pitch, "dyad", stepDurationMs);
+              highlightPlaybackKey(step.dyad.pitch, "dyad", stepDurationMs);
             }
           } else {
-            if (showRH && rawRH.pitch !== "-") {
-              playTone(getNoteFreq(rawRH.pitch), noteSoundDuration);
-              highlightPlaybackKey(rawRH.pitch, "rh", stepDurationMs);
-              const numR = NOTE_OFFSETS[rawRH.pitch.replace(/[0-9]/g, "")] + (parseInt(rawRH.pitch.slice(-1)) + 1) * 12;
-              activePlaybackNotes.push({ num: numR, pitch: rawRH.pitch });
+            if (showRH && step.rh && step.rh.pitch && step.rh.pitch !== "-") {
+              const partsRH = step.rh.pitch.split("+").filter(p => p !== "-");
+              partsRH.forEach(p => {
+                playTone(getNoteFreq(p), noteSoundDuration);
+                const numR = NOTE_OFFSETS[p.replace(/[0-9]/g, "")] + (parseInt(p.slice(-1)) + 1) * 12;
+                activePlaybackNotes.push({ num: numR, pitch: p });
+              });
+              highlightPlaybackKey(step.rh.pitch, "rh", stepDurationMs);
             }
-            if (showLH && rawLH.pitch !== "-") {
-              playTone(getNoteFreq(rawLH.pitch), noteSoundDuration);
-              highlightPlaybackKey(rawLH.pitch, "lh", stepDurationMs);
-              const numL = NOTE_OFFSETS[rawLH.pitch.replace(/[0-9]/g, "")] + (parseInt(rawLH.pitch.slice(-1)) + 1) * 12;
-              activePlaybackNotes.push({ num: numL, pitch: rawLH.pitch });
+            if (showLH && step.lh && step.lh.pitch && step.lh.pitch !== "-") {
+              const partsLH = step.lh.pitch.split("+").filter(p => p !== "-");
+              partsLH.forEach(p => {
+                playTone(getNoteFreq(p), noteSoundDuration);
+                const numL = NOTE_OFFSETS[p.replace(/[0-9]/g, "")] + (parseInt(p.slice(-1)) + 1) * 12;
+                activePlaybackNotes.push({ num: numL, pitch: p });
+              });
+              highlightPlaybackKey(step.lh.pitch, "lh", stepDurationMs);
             }
           }
 
