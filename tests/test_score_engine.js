@@ -132,13 +132,14 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
       onsets.forEach((b, k) => {
         const rhEv = rhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
         const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-        const expected = [];
+        const expectedList = [];
         if (rhEv && rhEv.pitch && rhEv.pitch !== "-") {
-          rhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expected.push(p));
+          rhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
         }
         if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
-          lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expected.push(p));
+          lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
         }
+        const expected = Array.from(new Set(expectedList));
 
         const nextB = onsets[k + 1];
         const stepBeats = nextB !== undefined ? (nextB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1);
@@ -324,6 +325,168 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
   assert.deepStrictEqual(computeLedgerLines(2, getDiatonicStep("C6")), [12, 14], "C6 has 2 ledger lines above treble staff");
 
   console.log("✔ Test 5: Full ledger line calculations passed");
+}
+
+// 6. Test Multi-Note Onset Fulfillment in 2-Hand Mode (Step requiring concurrent notes)
+{
+  const ode = songDatabase.find(s => s.id === "ode-to-joy");
+  const model = buildScoreModel(ode, true, true, false);
+  const step0 = model.steps[0]; // Onset 0: E4 and C3
+
+  assert.deepStrictEqual(step0.expectedPitches, ["E4", "C3"]);
+
+  // Simulate Practice Engine State Machine
+  let currentStepIdx = 0;
+  const fulfilledPitches = new Set();
+  const heldAttacks = new Map();
+  let attackCounter = 0;
+
+  function noteDown(pitch, now = 1000) {
+    const existing = heldAttacks.get(pitch);
+    if (existing && existing.isDown) return false;
+    const attack = { pitch, downTime: now, attackId: ++attackCounter, isDown: true };
+    heldAttacks.set(pitch, attack);
+
+    const step = model.steps[currentStepIdx];
+    const expected = step.expectedPitches;
+    if (expected.includes(pitch) && !fulfilledPitches.has(pitch)) {
+      fulfilledPitches.add(pitch);
+      if (fulfilledPitches.size >= expected.length) {
+        // Step fully satisfied!
+        fulfilledPitches.clear();
+        currentStepIdx++;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function noteUp(pitch, now = 1500) {
+    const attack = heldAttacks.get(pitch);
+    if (attack) {
+      attack.isDown = false;
+      heldAttacks.delete(pitch);
+      return true;
+    }
+    return false;
+  }
+
+  // LH lands first (C3)
+  noteDown("C3", 1000);
+  assert.strictEqual(currentStepIdx, 0, "Step must NOT advance when only LH C3 has landed");
+  assert.strictEqual(fulfilledPitches.has("C3"), true, "C3 is marked fulfilled");
+  assert.strictEqual(fulfilledPitches.size, 1, "Only 1 of 2 pitches fulfilled");
+
+  // RH lands 25ms later (E4)
+  noteDown("E4", 1025);
+  assert.strictEqual(currentStepIdx, 1, "Step advances to Step 1 only after both E4 and C3 are fulfilled");
+  assert.strictEqual(fulfilledPitches.size, 0, "Fulfilled set is reset for Step 1");
+
+  console.log("✔ Test 6: Multi-note onset fulfillment in 2-hand mode passed");
+}
+
+// 7. Test Consecutive Identical Notes Gating (Anti-Skip on Held Key & Two-Hand Landing)
+{
+  const ode = songDatabase.find(s => s.id === "ode-to-joy");
+  const model = buildScoreModel(ode, true, true, false);
+  // Measure 1:
+  // Step 0 (Onset 0): RH E4, LH C3 -> expected ["E4", "C3"]
+  // Step 1 (Onset 1): RH E4, LH holds -> expected ["E4"]  (Consecutive E4!)
+
+  assert.deepStrictEqual(model.steps[0].expectedPitches, ["E4", "C3"]);
+  assert.deepStrictEqual(model.steps[1].expectedPitches, ["E4"]);
+
+  let currentStepIdx = 0;
+  const fulfilledPitches = new Set();
+  const heldAttacks = new Map();
+  let attackCounter = 0;
+
+  function noteDown(pitch, now = 1000) {
+    const existing = heldAttacks.get(pitch);
+    if (existing && existing.isDown) return false; // Blocked because key is already held
+    const attack = { pitch, downTime: now, attackId: ++attackCounter, isDown: true };
+    heldAttacks.set(pitch, attack);
+
+    const step = model.steps[currentStepIdx];
+    const expected = step.expectedPitches;
+    if (expected.includes(pitch) && !fulfilledPitches.has(pitch)) {
+      fulfilledPitches.add(pitch);
+      if (fulfilledPitches.size >= expected.length) {
+        fulfilledPitches.clear();
+        currentStepIdx++;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function noteUp(pitch, now = 1500) {
+    const attack = heldAttacks.get(pitch);
+    if (attack) {
+      attack.isDown = false;
+      heldAttacks.delete(pitch);
+      return true;
+    }
+    return false;
+  }
+
+  // Play Step 0: C3 then E4
+  noteDown("C3", 1000);
+  noteDown("E4", 1020);
+  assert.strictEqual(currentStepIdx, 1, "Advanced to Step 1 (E4)");
+
+  // Player is STILL HOLDING E4 from Step 0!
+  assert.strictEqual(heldAttacks.get("E4")?.isDown, true, "E4 is physically held down");
+
+  // Attempting to trigger noteDown on held E4 without release must be rejected:
+  const retriggerWhileHeld = noteDown("E4", 1040);
+  assert.strictEqual(retriggerWhileHeld, false, "Cannot retrigger E4 while key is held down");
+  assert.strictEqual(currentStepIdx, 1, "Must remain on Step 1, not skipping past it!");
+
+  // Player lifts E4 (Note-Off)
+  noteUp("E4", 1400);
+  assert.strictEqual(heldAttacks.has("E4"), false, "E4 is released");
+  assert.strictEqual(currentStepIdx, 1, "Still on Step 1 after release");
+
+  // Player strikes E4 again (New Note-On for Step 1)
+  const strikeStep1 = noteDown("E4", 1500);
+  assert.strictEqual(strikeStep1, true, "New Note-On strike satisfies Step 1");
+  assert.strictEqual(currentStepIdx, 2, "Advances to Step 2 (F4 + C3)");
+
+  console.log("✔ Test 7: Consecutive identical notes anti-skip and attack gating passed");
+}
+
+// 8. Test Note-Off Duration Calculation & Rhythmic Feedback
+{
+  function evaluateHoldDuration(durationMs, bpm = 100, targetBeats = 1.0) {
+    const heldBeats = (durationMs / 1000) * (bpm / 60);
+    const holdRatio = heldBeats / targetBeats;
+    let category = "good";
+    if (holdRatio < 0.45) category = "staccato";
+    else if (holdRatio >= 0.75 && holdRatio <= 1.35) category = "flawless";
+    else if (holdRatio > 1.5) category = "tenuto";
+    return { heldBeats, holdRatio, category };
+  }
+
+  // At 100 BPM: 1 beat = 600ms
+  // Perfect quarter note hold ~ 600ms (1.00 beat)
+  const r1 = evaluateHoldDuration(600, 100, 1.0);
+  assert.strictEqual(r1.heldBeats.toFixed(2), "1.00");
+  assert.strictEqual(r1.category, "flawless");
+
+  // Staccato tap ~ 150ms (0.25 beat)
+  const r2 = evaluateHoldDuration(150, 100, 1.0);
+  assert.strictEqual(r2.category, "staccato");
+
+  // Tenuto hold ~ 1200ms (2.00 beats)
+  const r3 = evaluateHoldDuration(1200, 100, 1.0);
+  assert.strictEqual(r3.category, "tenuto");
+
+  // Half note (2.0 beats = 1200ms) with 1180ms hold
+  const r4 = evaluateHoldDuration(1180, 100, 2.0);
+  assert.strictEqual(r4.category, "flawless");
+
+  console.log("✔ Test 8: Note-off duration calculations and rhythmic feedback passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");

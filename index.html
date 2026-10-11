@@ -2233,6 +2233,9 @@
     let currentPracticeStep = 0;
     let songNoteSteps = []; // Parsed sequence of steps { rh, lh, dyad, expectedPitches: [] }
     let currentSongMeasures = []; // Parsed sequence of measures with beat-aligned onset items
+    let stepFulfilledPitches = new Set(); // Tracks satisfied pitches within current active practice step
+    const activeHeldKeyAttacks = new Map(); // pitch -> { downTime, attackId, isDown, consumedStepIndex }
+    let attackCounter = 0;
 
     function initAudio() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2390,13 +2393,14 @@
           onsets.forEach((b, k) => {
             const rhEv = rhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
             const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-            const expected = [];
+            const expectedList = [];
             if (rhEv && rhEv.pitch && rhEv.pitch !== "-") {
-              rhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expected.push(p));
+              rhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
             }
             if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
-              lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expected.push(p));
+              lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
             }
+            const expected = Array.from(new Set(expectedList));
 
             const nextB = onsets[k + 1];
             const stepBeats = nextB !== undefined ? (nextB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1);
@@ -2850,7 +2854,26 @@
       practiceStats = { correct: 0, attempts: 0, cleanLoop: true };
     }
 
+    function updateTargetBadgeDisplay(step, fulfilledSet) {
+      const targetBadge = document.getElementById("hudTargetBadge");
+      if (!targetBadge || !step) return;
+      if (!step.expectedPitches || step.expectedPitches.length <= 1) {
+        targetBadge.textContent = (step.displayLabel || "").replace(/#/g, "♯");
+        return;
+      }
+      const partsHtml = step.expectedPitches.map(p => {
+        const isDone = fulfilledSet && fulfilledSet.has(p);
+        const label = p.replace(/#/g, "♯");
+        if (isDone) {
+          return `<span style="color:#34d399; text-shadow:0 0 6px rgba(52,211,153,0.4);">${label}✓</span>`;
+        }
+        return `<span style="color:#f59e0b; font-weight:800;">${label}</span>`;
+      });
+      targetBadge.innerHTML = partsHtml.join(" <span style='color:var(--text-muted); font-weight:normal;'>+</span> ");
+    }
+
     function highlightActiveScoreNote(stepIdx) {
+      stepFulfilledPitches.clear();
       document.querySelectorAll(".note-group").forEach(g => g.classList.remove("active-target", "error-target"));
       const targetEl = document.getElementById(`staff_note_${stepIdx}`);
 
@@ -2869,87 +2892,123 @@
 
       // Update HUD
       const step = songNoteSteps[stepIdx];
-      const targetBadge = document.getElementById("hudTargetBadge");
       const progressText = document.getElementById("hudProgressText");
 
       if (step) {
-        targetBadge.textContent = step.displayLabel.replace(/#/g, "♯");
+        updateTargetBadgeDisplay(step, stepFulfilledPitches);
         progressText.textContent = `Note: ${stepIdx + 1} / ${songNoteSteps.length} (Meas ${step.measure})`;
       } else {
-        targetBadge.textContent = "DONE! 🎉";
+        const targetBadge = document.getElementById("hudTargetBadge");
+        if (targetBadge) targetBadge.textContent = "DONE! 🎉";
         document.getElementById("hudFeedbackText").textContent = "Magnificent! Piece completed!";
       }
     }
 
+    function handleNoteDown(pitchName, source = "input", meta = {}) {
+      const now = performance.now();
+      const existing = activeHeldKeyAttacks.get(pitchName);
+
+      // Prevent continuous holding without release from triggering duplicate note-on attacks
+      if (existing && existing.isDown) {
+        return;
+      }
+
+      const noteAttack = {
+        pitch: pitchName,
+        downTime: now,
+        attackId: ++attackCounter,
+        isDown: true,
+        consumedStepIndex: null,
+        source: source,
+        ...meta
+      };
+      activeHeldKeyAttacks.set(pitchName, noteAttack);
+
+      if (activeEducationalMode === "repertoire") {
+        checkAndPlayNoteOn(pitchName, noteAttack);
+      } else {
+        handleEducationalNoteInput(pitchName);
+      }
+    }
+
+    function handleNoteUp(pitchName, meta = {}) {
+      const now = performance.now();
+      const noteAttack = activeHeldKeyAttacks.get(pitchName);
+      if (noteAttack) {
+        noteAttack.isDown = false;
+        const durationMs = now - noteAttack.downTime;
+        const bpm = parseInt(document.getElementById("tempoSlider")?.value, 10) || 100;
+        const heldBeats = (durationMs / 1000) * (bpm / 60);
+
+        if (activeEducationalMode === "repertoire" && isWaitPracticeMode) {
+          checkAndPlayNoteOff(pitchName, heldBeats, durationMs);
+        }
+        activeHeldKeyAttacks.delete(pitchName);
+      }
+    }
+
     function checkAndPlayNote(playedPitch) {
+      handleNoteDown(playedPitch, "direct");
+      handleNoteUp(playedPitch);
+    }
+
+    function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
       if (!isWaitPracticeMode) {
-        // Direct auditory inspection when practice mode is off
         playSingleNoteAudit(playedPitch);
         return;
       }
 
       const currentStep = songNoteSteps[currentPracticeStep];
-      if (!currentStep || currentStep.expectedPitches.length === 0) return;
+      if (!currentStep || !currentStep.expectedPitches || currentStep.expectedPitches.length === 0) return;
 
       const expected = currentStep.expectedPitches;
       const targetBadge = document.getElementById("hudTargetBadge");
       const feedbackText = document.getElementById("hudFeedbackText");
 
+      // Verify if this strike matches an unfulfilled expected note of the current step
+      const matchedPitch = expected.find(p => {
+        if (stepFulfilledPitches.has(p)) return false;
+        return (p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch)));
+      });
+
       practiceStats.attempts++;
 
-      // Verify Note Match
-      const isMatch = expected.some(p => p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch)));
+      if (matchedPitch) {
+        // Satisfy this note in the current step
+        stepFulfilledPitches.add(matchedPitch);
+        if (noteAttack) noteAttack.consumedStepIndex = currentPracticeStep;
 
-      if (isMatch) {
-        // Correct note
         practiceStats.correct++;
         playSingleNoteAudit(playedPitch);
         targetBadge.classList.remove("error-flash");
-        feedbackText.style.color = "#34d399";
-        feedbackText.textContent = `✅ Perfect! ${playedPitch}`;
 
-        const isLoop = document.getElementById("toggleLoopSection")?.checked;
-        const startM = parseInt(document.getElementById("loopStartMeasure")?.value, 10) || 1;
-        const endM = parseInt(document.getElementById("loopEndMeasure")?.value, 10) || 999;
+        const isFullyFulfilled = (stepFulfilledPitches.size >= expected.length);
 
-        // Check if advancing past loop or end of song
-        let nextStepIdx = currentPracticeStep + 1;
-
-        if (isLoop) {
-          const nextStep = songNoteSteps[nextStepIdx];
-          // If next step goes beyond loop end measure or end of song
-          if (!nextStep || nextStep.measure > endM) {
-            // Find start step of loop
-            const loopStartStep = songNoteSteps.find(s => s.measure >= startM) || songNoteSteps[0];
-            nextStepIdx = loopStartStep.index;
-
-            // Tempo Ramp acceleration on flawless loop pass
-            if (practiceStats.cleanLoop && document.getElementById("toggleTempoRamp")?.checked) {
-              const slider = document.getElementById("tempoSlider");
-              const newTempo = Math.min(200, parseInt(slider.value, 10) + 5);
-              slider.value = newTempo;
-              document.getElementById("tempoText").textContent = `Tempo: ${newTempo} BPM`;
-              feedbackText.textContent = `⚡ Flawless loop! Tempo accelerated to ${newTempo} BPM!`;
-            } else {
-              feedbackText.textContent = `🔁 Looping measures ${startM}–${endM}...`;
-            }
-            practiceStats.cleanLoop = true;
-          }
-        } else {
-          // Normal Piece Completion
-          if (nextStepIdx >= songNoteSteps.length) {
-            const acc = Math.round((practiceStats.correct / Math.max(1, practiceStats.attempts)) * 100);
-            showPerformanceToast(acc, currentSong ? currentSong.title : "Piece");
-            nextStepIdx = 0; // Reset to start
-            feedbackText.textContent = `🎉 Fantastic job! Piece finished (${acc}% Accuracy)! Restarting...`;
-            practiceStats = { correct: 0, attempts: 0, cleanLoop: true };
-          }
+        if (!isFullyFulfilled) {
+          // Multi-hand or chord step: first hand landed, waiting for concurrent note(s)
+          const remaining = expected.filter(p => !stepFulfilledPitches.has(p));
+          feedbackText.style.color = "#38bdf8";
+          feedbackText.textContent = `🎵 ${playedPitch} locked (${stepFulfilledPitches.size}/${expected.length}) — now play ${remaining.join(" + ")}!`;
+          updateTargetBadgeDisplay(currentStep, stepFulfilledPitches);
+          return;
         }
 
-        currentPracticeStep = nextStepIdx;
-        highlightActiveScoreNote(currentPracticeStep);
+        // ALL notes of this step are fulfilled!
+        feedbackText.style.color = "#34d399";
+        feedbackText.textContent = `✅ Perfect! ${expected.join(" + ")}`;
+
+        // Advance to next step
+        advancePracticeStep();
       } else {
-        // Wrong note: mark loop as not clean, sound note, do not advance
+        // Did user restrike an already fulfilled note of this step while waiting for the other hand?
+        if (expected.some(p => p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch)))) {
+          const remaining = expected.filter(p => !stepFulfilledPitches.has(p));
+          feedbackText.style.color = "#fbbf24";
+          feedbackText.textContent = `⚠️ Already locked ${playedPitch} — still waiting for ${remaining.join(" + ")}!`;
+          return;
+        }
+
+        // Genuine wrong note
         practiceStats.cleanLoop = false;
         playTone(getNoteFreq(playedPitch), 0.2);
         targetBadge.classList.remove("error-flash");
@@ -2960,8 +3019,65 @@
         if (targetEl) targetEl.classList.add("error-target");
 
         feedbackText.style.color = "#f87171";
-        feedbackText.textContent = `❌ You played ${playedPitch} — try ${expected.join(" + ")}!`;
+        const remaining = expected.filter(p => !stepFulfilledPitches.has(p));
+        feedbackText.textContent = `❌ You played ${playedPitch} — try ${remaining.join(" + ")}!`;
       }
+    }
+
+    function checkAndPlayNoteOff(pitchName, heldBeats, durationMs) {
+      if (!isWaitPracticeMode) return;
+      const targetStep = songNoteSteps[currentPracticeStep > 0 ? currentPracticeStep - 1 : 0] || songNoteSteps[0];
+      const targetBeats = targetStep ? (targetStep.beats || 1.0) : 1.0;
+
+      const feedbackText = document.getElementById("hudFeedbackText");
+      if (feedbackText && feedbackText.style.color === "rgb(52, 211, 153)") { // Green "Perfect" state
+        const holdRatio = heldBeats / targetBeats;
+        let durationDesc = "Good duration!";
+        if (holdRatio < 0.45) durationDesc = "Staccato tap — hold longer for full beat value!";
+        else if (holdRatio >= 0.75 && holdRatio <= 1.35) durationDesc = "🎯 Flawless rhythmic hold!";
+        else if (holdRatio > 1.5) durationDesc = "Held longer than value (tenuto)";
+
+        feedbackText.textContent += ` • Held ${heldBeats.toFixed(2)}b / ${targetBeats}b (${durationDesc})`;
+      }
+    }
+
+    function advancePracticeStep() {
+      stepFulfilledPitches.clear();
+      const isLoop = document.getElementById("toggleLoopSection")?.checked;
+      const startM = parseInt(document.getElementById("loopStartMeasure")?.value, 10) || 1;
+      const endM = parseInt(document.getElementById("loopEndMeasure")?.value, 10) || 999;
+
+      let nextStepIdx = currentPracticeStep + 1;
+
+      if (isLoop) {
+        const nextStep = songNoteSteps[nextStepIdx];
+        if (!nextStep || nextStep.measure > endM) {
+          const loopStartStep = songNoteSteps.find(s => s.measure >= startM) || songNoteSteps[0];
+          nextStepIdx = loopStartStep.index;
+
+          if (practiceStats.cleanLoop && document.getElementById("toggleTempoRamp")?.checked) {
+            const slider = document.getElementById("tempoSlider");
+            const newTempo = Math.min(200, parseInt(slider.value, 10) + 5);
+            slider.value = newTempo;
+            document.getElementById("tempoText").textContent = `Tempo: ${newTempo} BPM`;
+            document.getElementById("hudFeedbackText").textContent = `⚡ Flawless loop! Tempo accelerated to ${newTempo} BPM!`;
+          } else {
+            document.getElementById("hudFeedbackText").textContent = `🔁 Looping measures ${startM}–${endM}...`;
+          }
+          practiceStats.cleanLoop = true;
+        }
+      } else {
+        if (nextStepIdx >= songNoteSteps.length) {
+          const acc = Math.round((practiceStats.correct / Math.max(1, practiceStats.attempts)) * 100);
+          showPerformanceToast(acc, currentSong ? currentSong.title : "Piece");
+          nextStepIdx = 0;
+          document.getElementById("hudFeedbackText").textContent = `🎉 Fantastic job! Piece finished (${acc}% Accuracy)! Restarting...`;
+          practiceStats = { correct: 0, attempts: 0, cleanLoop: true };
+        }
+      }
+
+      currentPracticeStep = nextStepIdx;
+      highlightActiveScoreNote(currentPracticeStep);
     }
 
     // SHIFTABLE PIANO KEYBOARD (With Middle C Marker)
@@ -2978,6 +3094,27 @@
       document.getElementById("rangeBadge").textContent = `C${currentBaseOctave} – C${topOctave}`;
       document.getElementById("rangePresetSelect").value = currentBaseOctave;
 
+      function bindKeyListeners(keyEl, noteId) {
+        const onDown = (e) => {
+          if (e.cancelable && e.type === "touchstart") e.preventDefault();
+          e.stopPropagation();
+          keyEl.classList.add("active-live");
+          handleNoteDown(noteId, "mouse");
+        };
+        const onUp = (e) => {
+          e.stopPropagation();
+          keyEl.classList.remove("active-live");
+          handleNoteUp(noteId);
+        };
+
+        keyEl.addEventListener("mousedown", onDown);
+        keyEl.addEventListener("mouseup", onUp);
+        keyEl.addEventListener("mouseleave", onUp);
+        keyEl.addEventListener("touchstart", onDown, { passive: false });
+        keyEl.addEventListener("touchend", onUp);
+        keyEl.addEventListener("touchcancel", onUp);
+      }
+
       octavesToBuild.forEach(oct => {
         WHITE_NOTES.forEach(noteName => {
           const whiteKeyId = `${noteName}${oct}`;
@@ -2986,10 +3123,7 @@
           whiteKey.dataset.note = whiteKeyId;
           whiteKey.textContent = whiteKeyId;
 
-          whiteKey.addEventListener("mousedown", (e) => {
-            e.stopPropagation();
-            handleEducationalNoteInput(whiteKeyId);
-          });
+          bindKeyListeners(whiteKey, whiteKeyId);
 
           if (HAS_BLACK[noteName]) {
             const blackKeyId = `${HAS_BLACK[noteName]}${oct}`;
@@ -2998,10 +3132,7 @@
             blackKey.dataset.note = blackKeyId;
             blackKey.textContent = HAS_BLACK[noteName];
 
-            blackKey.addEventListener("mousedown", (e) => {
-              e.stopPropagation();
-              handleEducationalNoteInput(blackKeyId);
-            });
+            bindKeyListeners(blackKey, blackKeyId);
 
             whiteKey.appendChild(blackKey);
           }
@@ -3014,7 +3145,7 @@
       topC.className = "piano-key white" + (`C${topOctave}` === "C4" ? " is-middle-c" : "");
       topC.dataset.note = `C${topOctave}`;
       topC.textContent = `C${topOctave}`;
-      topC.addEventListener("mousedown", () => handleEducationalNoteInput(`C${topOctave}`));
+      bindKeyListeners(topC, `C${topOctave}`);
       keyboard.appendChild(topC);
     }
 
@@ -3210,7 +3341,7 @@
         setChordPillDisplay(Array.from(activeHeldMidiNotes.values()));
 
         // PRACTICE & EDUCATIONAL NOTE INPUT
-        handleEducationalNoteInput(pitchName);
+        handleNoteDown(pitchName, "midi", { noteNumber, velocity });
       } 
       // Note Off Event
       else if (cmd === 8 || (cmd === 9 && velocity === 0)) {
@@ -3230,6 +3361,8 @@
         }
         document.getElementById("activeCount").textContent = activeHeldMidiNotes.size;
         setChordPillDisplay(Array.from(activeHeldMidiNotes.values()));
+
+        handleNoteUp(pitchName, { noteNumber });
       }
     }
 
