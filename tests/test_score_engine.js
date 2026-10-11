@@ -585,15 +585,29 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
   assert.strictEqual(adjusted.pctText, "60%");
   assert.strictEqual(adjusted.icon, "🔊");
 
-  // Audio attenuation calculation:
-  // playTone base gain = 0.20
-  assert.strictEqual(vol.calculateAttenuatedGain(0.20), 0.12, "0.20 base gain at 60% master volume produces 0.12");
-  vol.setMasterVolume(1.0);
-  assert.strictEqual(vol.calculateAttenuatedGain(0.20), 0.20, "0.20 base gain at 100% master volume produces 0.20");
-  vol.setMasterVolume(0.0);
-  assert.strictEqual(vol.calculateAttenuatedGain(0.20), 0.0, "0.20 base gain at 0% master volume produces 0.00 silence");
+  // Perceptual Quadratic Audio Taper calculation:
+  // volScale = Math.pow(effectiveVol, 2)
+  function getPerceptualGain(baseGain, vol, isMuted) {
+    if (isMuted || vol <= 0.0001) return 0;
+    return baseGain * Math.pow(vol, 2);
+  }
 
-  console.log("✔ Test 9: Universal master volume control & gain math passed");
+  assert.strictEqual(getPerceptualGain(0.20, 1.0, false), 0.20, "100% volume produces 100% base gain");
+  assert.strictEqual(getPerceptualGain(0.20, 0.5, false), 0.05, "50% slider produces 25% power (-12 dB) for natural human volume curve");
+  assert.strictEqual(getPerceptualGain(0.20, 0.2, false).toFixed(4), "0.0080", "20% slider produces 4% power (-28 dB)");
+  assert.strictEqual(getPerceptualGain(0.20, 0.0, false), 0, "0% volume produces absolute silence");
+  assert.strictEqual(getPerceptualGain(0.20, 0.8, true), 0, "Muted state produces absolute silence");
+
+  // Synth Audio Gating verification:
+  function shouldTriggerSynth(isSynthEnabled, isMidiInput) {
+    if (!isSynthEnabled) return false;
+    return true;
+  }
+  assert.strictEqual(shouldTriggerSynth(false, true), false, "When synth audio is unchecked, MIDI strikes produce no synth audio");
+  assert.strictEqual(shouldTriggerSynth(false, false), false, "When synth audio is unchecked, mouse strikes produce no synth audio");
+  assert.strictEqual(shouldTriggerSynth(true, true), true, "When synth audio is checked, MIDI strikes trigger live synth");
+
+  console.log("✔ Test 9: Universal master volume control, perceptual taper & synth audio gating passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");

@@ -52,5 +52,7 @@
   - [x] Global header master volume deck: slider (0%–100%), mute/unmute quick toggle, dynamic speaker icon (🔇/🔉/🔊), and percentage badge
   - [x] Repertoire transport bar volume control: synchronized slider alongside tempo/loop controls
   - [x] Reactive state synchronization & LocalStorage persistence (`piano_master_volume`)
+  - [x] Perceptual logarithmic/quadratic audio taper curve (`Math.pow(vol, 2)`) with real-time active oscillator updates
+  - [x] Synthesizer audio gating (`isSynthAudioEnabled`): prevent duplicate audit beeps on MIDI input and mute all synth audio when "Synth Audio" is unchecked
   - [x] Automated verification test suite for volume gain scaling, mute toggle, and clamping (`tests/test_score_engine.js` Test 9 100% pass)
 

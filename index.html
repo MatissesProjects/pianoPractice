@@ -2378,11 +2378,19 @@
     const activeHeldKeyAttacks = new Map(); // pitch -> { downTime, attackId, isDown, consumedStepIndex }
     let attackCounter = 0;
 
+    function isSynthAudioEnabled() {
+      const toggle = document.getElementById("midiSoundToggle");
+      return toggle ? toggle.checked : true;
+    }
+
     function initAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         masterGainNode = audioCtx.createGain();
-        masterGainNode.gain.setValueAtTime(isMasterMuted ? 0 : currentMasterVolume, audioCtx.currentTime);
+        const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
+        const volScale = Math.pow(effectiveVol, 2);
+        masterGainNode.gain.setValueAtTime(volScale, audioCtx.currentTime);
+        masterGainNode.gain.value = volScale;
         masterGainNode.connect(audioCtx.destination);
       }
       if (audioCtx.state === "suspended") audioCtx.resume();
@@ -2394,10 +2402,21 @@
         isMasterMuted = false;
       }
       initAudio();
+      const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
+      const volScale = Math.pow(effectiveVol, 2);
       if (masterGainNode && audioCtx) {
-        masterGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-        masterGainNode.gain.setValueAtTime(isMasterMuted ? 0 : currentMasterVolume, audioCtx.currentTime);
+        masterGainNode.gain.cancelScheduledValues(0);
+        masterGainNode.gain.setValueAtTime(volScale, audioCtx.currentTime);
+        masterGainNode.gain.value = volScale;
       }
+      // Dynamically update any active held notes in real time
+      liveOscillators.forEach(voice => {
+        if (voice.gain && voice.gain.gain) {
+          voice.gain.gain.cancelScheduledValues(0);
+          voice.gain.gain.setValueAtTime(0.2 * volScale, audioCtx.currentTime);
+          voice.gain.gain.value = 0.2 * volScale;
+        }
+      });
       updateVolumeUI();
       try {
         localStorage.setItem("piano_master_volume", currentMasterVolume.toString());
@@ -2413,10 +2432,20 @@
         isMasterMuted = true;
         preMuteVolume = currentMasterVolume > 0 ? currentMasterVolume : 0.8;
       }
+      const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
+      const volScale = Math.pow(effectiveVol, 2);
       if (masterGainNode && audioCtx) {
-        masterGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-        masterGainNode.gain.setValueAtTime(isMasterMuted ? 0 : currentMasterVolume, audioCtx.currentTime);
+        masterGainNode.gain.cancelScheduledValues(0);
+        masterGainNode.gain.setValueAtTime(volScale, audioCtx.currentTime);
+        masterGainNode.gain.value = volScale;
       }
+      liveOscillators.forEach(voice => {
+        if (voice.gain && voice.gain.gain) {
+          voice.gain.gain.cancelScheduledValues(0);
+          voice.gain.gain.setValueAtTime(0.2 * volScale, audioCtx.currentTime);
+          voice.gain.gain.value = 0.2 * volScale;
+        }
+      });
       updateVolumeUI();
     }
 
@@ -2453,6 +2482,9 @@
         slider.addEventListener("input", (e) => {
           setMasterVolume(e.target.value);
         });
+        slider.addEventListener("change", (e) => {
+          setMasterVolume(e.target.value);
+        });
       });
 
       document.querySelectorAll(".volume-mute-btn").forEach(btn => {
@@ -2460,10 +2492,30 @@
           toggleMasterMute();
         });
       });
+
+      // Synth Audio Mute Toggle listener
+      const synthToggle = document.getElementById("midiSoundToggle");
+      if (synthToggle) {
+        synthToggle.addEventListener("change", (e) => {
+          if (!e.target.checked) {
+            // Immediately cut off any ringing synthesizer oscillators
+            liveOscillators.forEach((voice, noteNum) => {
+              stopLiveTone(noteNum);
+            });
+          }
+          const labelSpan = synthToggle.parentElement?.querySelector("span");
+          if (labelSpan) {
+            labelSpan.textContent = e.target.checked ? "🔊 Synth Audio" : "🔇 Synth Audio";
+          }
+        });
+      }
     }
 
     function playTone(freq, duration = 0.35) {
       if (!freq) return;
+      const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
+      if (effectiveVol <= 0.0001) return; // Muted / zero volume
+
       initAudio();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -2471,9 +2523,12 @@
       osc.type = "sine";
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
+      const volScale = Math.pow(effectiveVol, 2);
+      const targetPeak = 0.2 * volScale;
+
       gain.gain.setValueAtTime(0, audioCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.02);
-      gain.gain.setValueAtTime(0.18, audioCtx.currentTime + Math.max(0.03, duration - 0.05));
+      gain.gain.linearRampToValueAtTime(targetPeak, audioCtx.currentTime + 0.02);
+      gain.gain.setValueAtTime(targetPeak * 0.9, audioCtx.currentTime + Math.max(0.03, duration - 0.05));
       gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
 
       osc.connect(gain);
@@ -2484,7 +2539,12 @@
     }
 
     function startLiveTone(noteNumber) {
+      if (!isSynthAudioEnabled()) return;
       if (liveOscillators.has(noteNumber)) return;
+
+      const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
+      if (effectiveVol <= 0.0001) return; // Muted / zero volume
+
       initAudio();
       const freq = 440 * Math.pow(2, (noteNumber - 69) / 12);
       const osc = audioCtx.createOscillator();
@@ -2493,8 +2553,11 @@
       osc.type = "sine";
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
+      const volScale = Math.pow(effectiveVol, 2);
+      const targetPeak = 0.2 * volScale;
+
       gain.gain.setValueAtTime(0, audioCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.015);
+      gain.gain.linearRampToValueAtTime(targetPeak, audioCtx.currentTime + 0.015);
 
       osc.connect(gain);
       gain.connect(masterGainNode || audioCtx.destination);
@@ -3173,8 +3236,10 @@
     }
 
     function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
+      const isFromMidi = noteAttack && noteAttack.source === "midi";
+
       if (!isWaitPracticeMode) {
-        playSingleNoteAudit(playedPitch);
+        playSingleNoteAudit(playedPitch, "rh", !isFromMidi);
         return;
       }
 
@@ -3199,7 +3264,8 @@
         if (noteAttack) noteAttack.consumedStepIndex = currentPracticeStep;
 
         practiceStats.correct++;
-        playSingleNoteAudit(playedPitch);
+        // If note was played via MIDI, startLiveTone already handles synthesis; only audit sound for non-MIDI if synth audio is enabled
+        playSingleNoteAudit(playedPitch, "rh", !isFromMidi);
         targetBadge.classList.remove("error-flash");
 
         const isFullyFulfilled = (stepFulfilledPitches.size >= expected.length);
@@ -3230,7 +3296,9 @@
 
         // Genuine wrong note
         practiceStats.cleanLoop = false;
-        playTone(getNoteFreq(playedPitch), 0.2);
+        if (isSynthAudioEnabled()) {
+          playTone(getNoteFreq(playedPitch), 0.2);
+        }
         targetBadge.classList.remove("error-flash");
         void targetBadge.offsetWidth;
         targetBadge.classList.add("error-flash");
@@ -3386,9 +3454,9 @@
       buildPianoKeyboard();
     });
 
-    function playSingleNoteAudit(noteStr, hand = "rh") {
+    function playSingleNoteAudit(noteStr, hand = "rh", playSound = true) {
       const freq = getNoteFreq(noteStr);
-      if (freq) playTone(freq, 0.4);
+      if (freq && playSound && isSynthAudioEnabled()) playTone(freq, 0.4);
       highlightPlaybackKey(noteStr, hand, 400);
 
       const num = NOTE_OFFSETS[noteStr.replace(/[0-9]/g, "")] + (parseInt(noteStr.slice(-1)) + 1) * 12;
@@ -3649,7 +3717,7 @@
             if (step.dyad && step.dyad.pitch && step.dyad.pitch !== "-") {
               const parts = step.dyad.pitch.split("+").filter(p => p !== "-");
               parts.forEach(p => {
-                playTone(getNoteFreq(p), noteSoundDuration);
+                if (isSynthAudioEnabled()) playTone(getNoteFreq(p), noteSoundDuration);
                 const num = NOTE_OFFSETS[p.replace(/[0-9]/g, "")] + (parseInt(p.slice(-1)) + 1) * 12;
                 activePlaybackNotes.push({ num, pitch: p });
               });
@@ -3659,7 +3727,7 @@
             if (showRH && step.rh && step.rh.pitch && step.rh.pitch !== "-") {
               const partsRH = step.rh.pitch.split("+").filter(p => p !== "-");
               partsRH.forEach(p => {
-                playTone(getNoteFreq(p), noteSoundDuration);
+                if (isSynthAudioEnabled()) playTone(getNoteFreq(p), noteSoundDuration);
                 const numR = NOTE_OFFSETS[p.replace(/[0-9]/g, "")] + (parseInt(p.slice(-1)) + 1) * 12;
                 activePlaybackNotes.push({ num: numR, pitch: p });
               });
@@ -3668,7 +3736,7 @@
             if (showLH && step.lh && step.lh.pitch && step.lh.pitch !== "-") {
               const partsLH = step.lh.pitch.split("+").filter(p => p !== "-");
               partsLH.forEach(p => {
-                playTone(getNoteFreq(p), noteSoundDuration);
+                if (isSynthAudioEnabled()) playTone(getNoteFreq(p), noteSoundDuration);
                 const numL = NOTE_OFFSETS[p.replace(/[0-9]/g, "")] + (parseInt(p.slice(-1)) + 1) * 12;
                 activePlaybackNotes.push({ num: numL, pitch: p });
               });
@@ -4742,18 +4810,25 @@
     }
 
     function scheduleMetroClick(time, beat) {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
+      const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
       const isDownbeat = (beat === 0);
-      osc.frequency.setValueAtTime(isDownbeat ? 1200 : 800, time);
-      gain.gain.setValueAtTime(0.3, time);
-      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
 
-      osc.connect(gain);
-      gain.connect(masterGainNode || audioCtx.destination);
-      osc.start(time);
-      osc.stop(time + 0.05);
+      if (effectiveVol > 0.0001) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.frequency.setValueAtTime(isDownbeat ? 1200 : 800, time);
+        const volScale = Math.pow(effectiveVol, 2);
+        const targetPeak = 0.3 * volScale;
+
+        gain.gain.setValueAtTime(targetPeak, time);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
+
+        osc.connect(gain);
+        gain.connect(masterGainNode || audioCtx.destination);
+        osc.start(time);
+        osc.stop(time + 0.05);
+      }
 
       // Trigger visual light
       const timeMs = (time - audioCtx.currentTime) * 1000;
