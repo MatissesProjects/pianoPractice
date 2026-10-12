@@ -323,6 +323,194 @@
     }
     .midi-select option { background: var(--bg-card); color: var(--text); }
 
+    /* CUSTOM MIDI CHANNEL SELECTOR & LIVE ACTIVITY MONITOR */
+    .midi-channel-picker-group {
+      position: relative;
+    }
+
+    .midi-channel-btn {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0;
+      outline: none;
+    }
+
+    .ch-btn-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #475569;
+      display: inline-block;
+      transition: background 0.15s, box-shadow 0.15s;
+    }
+
+    .ch-btn-led.live-signal {
+      background: #34d399 !important;
+      box-shadow: 0 0 10px #34d399, 0 0 4px #10b981 !important;
+    }
+
+    .ch-btn-arrow {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .midi-channel-btn.is-open .ch-btn-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* DROPDOWN MENU */
+    .midi-channel-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 1000;
+      width: 300px;
+      background: #090e1a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.15);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .channel-menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .menu-title {
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+    }
+    .menu-hint {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #34d399;
+    }
+
+    .channel-opt-btn {
+      background: #131c2e;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      color: #f1f5f9;
+      padding: 0.35rem 0.6rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .channel-opt-btn:hover {
+      background: #1e293b;
+      border-color: #38bdf8;
+    }
+    .channel-opt-btn.is-selected {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    .opt-left {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .ch-led {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #475569;
+      display: inline-block;
+      flex-shrink: 0;
+      transition: background 0.12s, box-shadow 0.12s;
+    }
+    .ch-led.live-signal {
+      background: #34d399 !important;
+      box-shadow: 0 0 10px #34d399, 0 0 4px #10b981 !important;
+    }
+    .ch-led.recent-signal {
+      background: #059669 !important;
+    }
+
+    .channel-opt-btn.channel-signal-pulse {
+      border-color: #34d399 !important;
+      background: rgba(52, 211, 153, 0.15) !important;
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.25);
+    }
+
+    .ch-badge {
+      font-size: 0.62rem;
+      font-family: ui-monospace, monospace;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      background: #1e293b;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .ch-badge.live {
+      background: #34d399 !important;
+      color: #064e3b !important;
+      font-weight: 800;
+      box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+    }
+    .ch-badge.active {
+      background: rgba(52, 211, 153, 0.2) !important;
+      color: #34d399 !important;
+    }
+
+    .channel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .channel-menu-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.4rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.68rem;
+    }
+    .footer-tip {
+      color: var(--text-muted);
+      font-size: 0.67rem;
+    }
+    .reset-activity-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.67rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0.1rem 0.2rem;
+    }
+    .reset-activity-btn:hover { color: #f8fafc; }
+
     /* PRACTICE STAGE */
     .practice-stage {
       background: var(--bg-surface);
@@ -715,6 +903,7 @@
 
     .piano-range-controls {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 0.5rem;
     }
@@ -723,9 +912,9 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       color: var(--text);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      padding: 0.35rem 0.75rem;
+      padding: 0.3rem 0.6rem;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.15s;
@@ -1661,9 +1850,17 @@
           </select>
         </div>
 
-        <div class="midi-select-group">
+        <div class="midi-select-group midi-channel-picker-group" id="midiChannelPickerGroup">
           <span class="midi-label">Channel:</span>
-          <select id="midiChannelSelect" class="midi-select">
+          
+          <button type="button" id="midiChannelBtn" class="midi-channel-btn" aria-haspopup="listbox" aria-expanded="false" title="Click to view live MIDI channel activity & switch channel">
+            <span class="ch-btn-led" id="midiChannelGlobalLed"></span>
+            <span id="midiChannelBtnText">All Channels (Omni)</span>
+            <span class="ch-btn-arrow">▾</span>
+          </button>
+
+          <!-- Hidden synced select for programmatic access & test compatibility -->
+          <select id="midiChannelSelect" class="midi-select" style="display: none;">
             <option value="all">All Channels (Omni)</option>
             <option value="1">Channel 1</option>
             <option value="2">Channel 2</option>
@@ -1682,6 +1879,32 @@
             <option value="15">Channel 15</option>
             <option value="16">Channel 16</option>
           </select>
+
+          <!-- Dropdown Menu Panel -->
+          <div id="midiChannelMenu" class="midi-channel-menu" style="display: none;">
+            <div class="channel-menu-header">
+              <span class="menu-title">SELECT MIDI CHANNEL</span>
+              <span class="menu-hint">🟢 Live Activity Monitor</span>
+            </div>
+
+            <!-- Omni Option -->
+            <button type="button" class="channel-opt-btn omni-opt is-selected" data-channel="all" id="chOpt_all">
+              <div class="opt-left">
+                <span class="ch-led" id="chLed_all"></span>
+                <span class="ch-name">All Channels (Omni)</span>
+              </div>
+              <span class="ch-badge" id="chBadge_all">OMNI</span>
+            </button>
+
+            <div class="channel-grid" id="channelGridContainer">
+              <!-- Dynamically populated 16 channels -->
+            </div>
+
+            <div class="channel-menu-footer">
+              <span class="footer-tip">💡 Play keys to see active channel</span>
+              <button type="button" class="reset-activity-btn" id="resetChannelActivityBtn" title="Reset activity markers">Clear Activity</button>
+            </div>
+          </div>
         </div>
 
         <label class="layer-toggle" title="Mute synthesizer audio if your loopback already drives a DAW like Ableton">
@@ -1807,16 +2030,39 @@
       <div class="piano-section">
         <div class="piano-header">
           <div class="piano-range-controls">
-            <span class="section-label">Keyboard Range:</span>
-            <button class="range-shift-btn" id="shiftDownBtn">◀ Shift Down</button>
-            <span class="range-indicator-badge" id="rangeBadge">C2 – C5</span>
-            <button class="range-shift-btn" id="shiftUpBtn">Shift Up ▶</button>
-            <select id="rangePresetSelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.6rem; border:1px solid var(--border); border-radius:6px;">
-              <option value="1">C1 – C4 (Low Bass)</option>
-              <option value="2" selected>C2 – C5 (Default Standard)</option>
-              <option value="3">C3 – C6 (High Treble)</option>
-              <option value="4">C4 – C7 (Upper Register)</option>
+            <span class="section-label">Keyboard:</span>
+            <select id="keyboardPresetSelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.6rem; border:1px solid var(--border); border-radius:6px; font-weight:600;">
+              <option value="88">88 Keys (Full Grand: A0 – C8)</option>
+              <option value="76">76 Keys (Stage: E1 – G7)</option>
+              <option value="73">73 Keys (Stage: E1 – E7)</option>
+              <option value="61">61 Keys (Standard: C2 – C7)</option>
+              <option value="49">49 Keys (Studio: C2 – C6)</option>
+              <option value="37" selected>37 Keys (Default: C2 – C5)</option>
+              <option value="32">32 Keys (Mini Synth: F2 – C5)</option>
+              <option value="25">25 Keys (Mini: C3 – C5)</option>
+              <option value="custom">Custom...</option>
             </select>
+
+            <div style="display:inline-flex; align-items:center; gap:0.25rem;">
+              <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Keys:</span>
+              <input type="number" id="keyCountInput" min="12" max="88" value="37" style="width:54px; background:var(--bg-card); border:1px solid var(--border); border-radius:6px; color:var(--text); padding:0.3rem 0.4rem; font-family:ui-monospace,monospace; font-weight:700; font-size:0.8rem; text-align:center;" />
+            </div>
+
+            <div style="display:inline-flex; align-items:center; gap:0.25rem;">
+              <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Start:</span>
+              <select id="startKeySelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.5rem; border:1px solid var(--border); border-radius:6px; font-family:ui-monospace,monospace; font-size:0.8rem; font-weight:700;">
+              </select>
+            </div>
+
+            <div style="display:inline-flex; align-items:center; gap:0.2rem;">
+              <button class="range-shift-btn" id="shiftKeyDownOctBtn" title="Shift Start 1 Octave Down">◀ Oct</button>
+              <button class="range-shift-btn" id="shiftKeyDownBtn" title="Shift Start 1 Semitone Left">◀ Key</button>
+              <span class="range-indicator-badge" id="rangeBadge">C2 – C5 (37 Keys)</span>
+              <button class="range-shift-btn" id="shiftKeyUpBtn" title="Shift Start 1 Semitone Right">Key ▶</button>
+              <button class="range-shift-btn" id="shiftKeyUpOctBtn" title="Shift Start 1 Octave Up">Oct ▶</button>
+            </div>
+
+            <button class="range-shift-btn" id="centerMidCBtn" title="Scroll View to Middle C" style="color:#38bdf8; border-color:#0284c7;">🎯 Center Mid C</button>
           </div>
 
           <div class="piano-legend">
@@ -2390,8 +2636,9 @@
     const liveOscillators = new Map();
     const activeHeldMidiNotes = new Map();
 
-    // Default Keyboard Range: C2 to C5
-    let currentBaseOctave = 2;
+    // Configurable Keyboard Visualizer Range & Offset
+    let currentStartMidi = 36; // C2 (MIDI 36) default
+    let currentKeyCount = 37;  // 37 keys (C2 – C5) default
 
     // WAIT-FOR-ME INTERACTIVE PRACTICE STATE
     let isWaitPracticeMode = true;
@@ -3397,19 +3644,70 @@
       highlightActiveScoreNote(currentPracticeStep);
     }
 
-    // SHIFTABLE PIANO KEYBOARD (With Middle C Marker)
+    // SHIFTABLE & CUSTOMIZABLE PIANO KEYBOARD ENGINE
     const WHITE_NOTES = ["C", "D", "E", "F", "G", "A", "B"];
     const HAS_BLACK = { "C": "C#", "D": "D#", "F": "F#", "G": "G#", "A": "A#" };
 
+    const KEYBOARD_PRESETS = [
+      { id: "88", name: "88 Keys (Full Grand: A0 – C8)", count: 88, startMidi: 21 },
+      { id: "76", name: "76 Keys (Stage: E1 – G7)", count: 76, startMidi: 28 },
+      { id: "73", name: "73 Keys (Stage: E1 – E7)", count: 73, startMidi: 28 },
+      { id: "61", name: "61 Keys (Standard: C2 – C7)", count: 61, startMidi: 36 },
+      { id: "49", name: "49 Keys (Studio: C2 – C6)", count: 49, startMidi: 36 },
+      { id: "37", name: "37 Keys (Default: C2 – C5)", count: 37, startMidi: 36 },
+      { id: "32", name: "32 Keys (Mini Synth: F2 – C5)", count: 32, startMidi: 41 },
+      { id: "25", name: "25 Keys (Mini: C3 – C5)", count: 25, startMidi: 48 }
+    ];
+
+    function populateStartKeySelect() {
+      const select = document.getElementById("startKeySelect");
+      if (!select) return;
+      select.innerHTML = "";
+      for (let m = 21; m <= 84; m++) {
+        const pitch = midiNumberToPitch(m);
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = m === 60 ? `${pitch} (Mid C)` : pitch;
+        select.appendChild(opt);
+      }
+    }
+
+    function updateKeyboardControlsUI() {
+      const presetSelect = document.getElementById("keyboardPresetSelect");
+      const keyCountInput = document.getElementById("keyCountInput");
+      const startKeySelect = document.getElementById("startKeySelect");
+
+      if (keyCountInput) keyCountInput.value = currentKeyCount;
+      if (startKeySelect) startKeySelect.value = currentStartMidi;
+
+      if (presetSelect) {
+        const match = KEYBOARD_PRESETS.find(p => p.count === currentKeyCount && p.startMidi === currentStartMidi);
+        presetSelect.value = match ? match.id : "custom";
+      }
+
+      try {
+        localStorage.setItem("piano_key_count", currentKeyCount.toString());
+        localStorage.setItem("piano_start_midi", currentStartMidi.toString());
+      } catch (err) {}
+    }
+
     function buildPianoKeyboard() {
       const keyboard = document.getElementById("pianoKeyboard");
+      if (!keyboard) return;
       keyboard.innerHTML = "";
 
-      const octavesToBuild = [currentBaseOctave, currentBaseOctave + 1, currentBaseOctave + 2];
-      const topOctave = currentBaseOctave + 3;
+      const minMidi = Math.max(21, Math.min(108, currentStartMidi));
+      const count = Math.max(12, Math.min(88, currentKeyCount));
+      const maxMidi = Math.min(108, minMidi + count - 1);
+      const actualCount = maxMidi - minMidi + 1;
 
-      document.getElementById("rangeBadge").textContent = `C${currentBaseOctave} – C${topOctave}`;
-      document.getElementById("rangePresetSelect").value = currentBaseOctave;
+      const startPitch = midiNumberToPitch(minMidi);
+      const endPitch = midiNumberToPitch(maxMidi);
+
+      const rangeBadge = document.getElementById("rangeBadge");
+      if (rangeBadge) {
+        rangeBadge.textContent = `${startPitch} – ${endPitch} (${actualCount} Keys)`;
+      }
 
       function bindKeyListeners(keyEl, noteId) {
         const onDown = (e) => {
@@ -3432,56 +3730,154 @@
         keyEl.addEventListener("touchcancel", onUp);
       }
 
-      octavesToBuild.forEach(oct => {
-        WHITE_NOTES.forEach(noteName => {
-          const whiteKeyId = `${noteName}${oct}`;
-          const whiteKey = document.createElement("div");
-          whiteKey.className = "piano-key white" + (whiteKeyId === "C4" ? " is-middle-c" : "");
-          whiteKey.dataset.note = whiteKeyId;
-          whiteKey.textContent = whiteKeyId;
+      // If the first key is black, provide an invisible leading white anchor
+      const isStartBlack = [1, 3, 6, 8, 10].includes(minMidi % 12);
+      if (isStartBlack) {
+        const dummyKey = document.createElement("div");
+        dummyKey.className = "piano-key white leading-dummy";
+        dummyKey.style.cssText = "width:22px; visibility:hidden; pointer-events:none; border:none; background:transparent; box-shadow:none;";
 
-          bindKeyListeners(whiteKey, whiteKeyId);
+        const blackKeyId = midiNumberToPitch(minMidi);
+        const blackKey = document.createElement("div");
+        blackKey.className = "piano-key black";
+        blackKey.dataset.note = blackKeyId;
+        blackKey.textContent = blackKeyId.replace(/[0-9]/g, "");
+        bindKeyListeners(blackKey, blackKeyId);
+        dummyKey.appendChild(blackKey);
+        keyboard.appendChild(dummyKey);
+      }
 
-          if (HAS_BLACK[noteName]) {
-            const blackKeyId = `${HAS_BLACK[noteName]}${oct}`;
-            const blackKey = document.createElement("div");
-            blackKey.className = "piano-key black";
-            blackKey.dataset.note = blackKeyId;
-            blackKey.textContent = HAS_BLACK[noteName];
+      for (let m = minMidi; m <= maxMidi; m++) {
+        const semi = m % 12;
+        const isBlack = [1, 3, 6, 8, 10].includes(semi);
+        if (isBlack) continue; // black keys are appended inside their preceding white key
 
-            bindKeyListeners(blackKey, blackKeyId);
+        const whiteKeyId = midiNumberToPitch(m);
+        const whiteKey = document.createElement("div");
+        whiteKey.className = "piano-key white" + (whiteKeyId === "C4" ? " is-middle-c" : "");
+        whiteKey.dataset.note = whiteKeyId;
+        whiteKey.textContent = whiteKeyId;
+        bindKeyListeners(whiteKey, whiteKeyId);
 
-            whiteKey.appendChild(blackKey);
-          }
+        const nextMidi = m + 1;
+        const nextSemi = nextMidi % 12;
+        const isNextBlack = [1, 3, 6, 8, 10].includes(nextSemi);
+        if (isNextBlack && nextMidi <= maxMidi) {
+          const blackKeyId = midiNumberToPitch(nextMidi);
+          const blackKey = document.createElement("div");
+          blackKey.className = "piano-key black";
+          blackKey.dataset.note = blackKeyId;
+          blackKey.textContent = blackKeyId.replace(/[0-9]/g, "");
+          bindKeyListeners(blackKey, blackKeyId);
+          whiteKey.appendChild(blackKey);
+        }
 
-          keyboard.appendChild(whiteKey);
-        });
-      });
-
-      const topC = document.createElement("div");
-      topC.className = "piano-key white" + (`C${topOctave}` === "C4" ? " is-middle-c" : "");
-      topC.dataset.note = `C${topOctave}`;
-      topC.textContent = `C${topOctave}`;
-      bindKeyListeners(topC, `C${topOctave}`);
-      keyboard.appendChild(topC);
+        keyboard.appendChild(whiteKey);
+      }
     }
 
-    function shiftKeyboardOctave(direction) {
-      if (direction === -1 && currentBaseOctave > 1) {
-        currentBaseOctave--;
-        buildPianoKeyboard();
-      } else if (direction === 1 && currentBaseOctave < 4) {
-        currentBaseOctave++;
+    function shiftKeyboardStart(delta) {
+      const maxStart = 108 - currentKeyCount + 1;
+      const newStart = Math.max(21, Math.min(maxStart, currentStartMidi + delta));
+      if (newStart !== currentStartMidi) {
+        currentStartMidi = newStart;
+        updateKeyboardControlsUI();
         buildPianoKeyboard();
       }
     }
 
-    document.getElementById("shiftDownBtn").addEventListener("click", () => shiftKeyboardOctave(-1));
-    document.getElementById("shiftUpBtn").addEventListener("click", () => shiftKeyboardOctave(1));
-    document.getElementById("rangePresetSelect").addEventListener("change", (e) => {
-      currentBaseOctave = parseInt(e.target.value, 10);
+    function centerMiddleCView(smooth = true) {
+      const midC = document.querySelector(".piano-key.is-middle-c");
+      if (midC) {
+        midC.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "nearest", inline: "center" });
+      }
+    }
+
+    function initKeyboardControls() {
+      // Restore persisted preferences
+      try {
+        const savedCount = localStorage.getItem("piano_key_count");
+        if (savedCount) {
+          const parsed = parseInt(savedCount, 10);
+          if (!isNaN(parsed) && parsed >= 12 && parsed <= 88) currentKeyCount = parsed;
+        }
+        const savedStart = localStorage.getItem("piano_start_midi");
+        if (savedStart) {
+          const parsed = parseInt(savedStart, 10);
+          if (!isNaN(parsed) && parsed >= 21 && parsed <= 84) currentStartMidi = parsed;
+        }
+      } catch (err) {}
+
+      populateStartKeySelect();
+      updateKeyboardControlsUI();
       buildPianoKeyboard();
-    });
+
+      const presetSelect = document.getElementById("keyboardPresetSelect");
+      if (presetSelect) {
+        presetSelect.addEventListener("change", (e) => {
+          const val = e.target.value;
+          const found = KEYBOARD_PRESETS.find(p => p.id === val);
+          if (found) {
+            currentKeyCount = found.count;
+            currentStartMidi = found.startMidi;
+            updateKeyboardControlsUI();
+            buildPianoKeyboard();
+            if (currentKeyCount > 37) {
+              setTimeout(() => centerMiddleCView(false), 50);
+            }
+          }
+        });
+      }
+
+      const keyCountInput = document.getElementById("keyCountInput");
+      if (keyCountInput) {
+        keyCountInput.addEventListener("change", (e) => {
+          let count = parseInt(e.target.value, 10);
+          if (isNaN(count)) count = 37;
+          count = Math.max(12, Math.min(88, count));
+          currentKeyCount = count;
+          if (currentStartMidi + currentKeyCount - 1 > 108) {
+            currentStartMidi = Math.max(21, 108 - currentKeyCount + 1);
+          }
+          updateKeyboardControlsUI();
+          buildPianoKeyboard();
+        });
+      }
+
+      const startKeySelect = document.getElementById("startKeySelect");
+      if (startKeySelect) {
+        startKeySelect.addEventListener("change", (e) => {
+          let startMidi = parseInt(e.target.value, 10);
+          if (isNaN(startMidi)) startMidi = 36;
+          currentStartMidi = startMidi;
+          if (currentStartMidi + currentKeyCount - 1 > 108) {
+            currentKeyCount = 108 - currentStartMidi + 1;
+          }
+          updateKeyboardControlsUI();
+          buildPianoKeyboard();
+        });
+      }
+
+      const shiftKeyD = document.getElementById("shiftKeyDownBtn");
+      if (shiftKeyD) shiftKeyD.addEventListener("click", () => shiftKeyboardStart(-1));
+
+      const shiftKeyU = document.getElementById("shiftKeyUpBtn");
+      if (shiftKeyU) shiftKeyU.addEventListener("click", () => shiftKeyboardStart(1));
+
+      const shiftOctD = document.getElementById("shiftKeyDownOctBtn");
+      if (shiftOctD) shiftOctD.addEventListener("click", () => shiftKeyboardStart(-12));
+
+      const shiftOctU = document.getElementById("shiftKeyUpOctBtn");
+      if (shiftOctU) shiftOctU.addEventListener("click", () => shiftKeyboardStart(12));
+
+      const centerMidCBtn = document.getElementById("centerMidCBtn");
+      if (centerMidCBtn) centerMidCBtn.addEventListener("click", () => centerMiddleCView(true));
+
+      // Auto-center Middle C on initial load if keyboard is wide
+      if (currentKeyCount > 37) {
+        setTimeout(() => centerMiddleCView(false), 100);
+      }
+    }
 
     function playSingleNoteAudit(noteStr, hand = "rh", playSound = true) {
       const freq = getNoteFreq(noteStr);
@@ -3532,6 +3928,255 @@
       if (activeHeldMidiNotes.size > 0) {
         requestAnimationFrame(updateSustainRailsLoop);
       }
+    }
+
+    // REAL-TIME MIDI CHANNEL ACTIVITY MONITOR & INTERACTIVE SELECTOR
+    const midiChannelActivity = {};
+    for (let c = 1; c <= 16; c++) {
+      midiChannelActivity[c] = {
+        lastActiveTime: 0,
+        totalMessages: 0,
+        isActive: false,
+        timerId: null
+      };
+    }
+    let globalMidiLedTimer = null;
+
+    function recordMidiChannelActivity(channel, cmd) {
+      if (channel < 1 || channel > 16) return;
+      const now = performance.now();
+      const st = midiChannelActivity[channel];
+      if (!st) return;
+
+      st.lastActiveTime = now;
+      st.totalMessages++;
+      st.isActive = true;
+
+      if (st.timerId) clearTimeout(st.timerId);
+      st.timerId = setTimeout(() => {
+        st.isActive = false;
+        renderMidiChannelActivity();
+      }, 750);
+
+      // Flash global button LED
+      const globalLed = document.getElementById("midiChannelGlobalLed");
+      if (globalLed) {
+        globalLed.classList.add("live-signal");
+        if (globalMidiLedTimer) clearTimeout(globalMidiLedTimer);
+        globalMidiLedTimer = setTimeout(() => {
+          globalLed.classList.remove("live-signal");
+        }, 300);
+      }
+
+      renderMidiChannelActivity();
+    }
+
+    function renderMidiChannelActivity() {
+      let anyChannelActive = false;
+      let anyChannelRecent = false;
+
+      for (let c = 1; c <= 16; c++) {
+        const st = midiChannelActivity[c];
+        const led = document.getElementById(`chLed_${c}`);
+        const btn = document.getElementById(`chOpt_${c}`);
+        const badge = document.getElementById(`chBadge_${c}`);
+
+        if (st.isActive) {
+          anyChannelActive = true;
+          if (led) {
+            led.classList.add("live-signal");
+            led.classList.remove("recent-signal");
+          }
+          if (btn) btn.classList.add("channel-signal-pulse");
+          if (badge) {
+            badge.className = "ch-badge live";
+            badge.textContent = "LIVE";
+          }
+        } else if (st.totalMessages > 0) {
+          anyChannelRecent = true;
+          if (led) {
+            led.classList.remove("live-signal");
+            led.classList.add("recent-signal");
+          }
+          if (btn) btn.classList.remove("channel-signal-pulse");
+          if (badge) {
+            badge.className = "ch-badge active";
+            badge.textContent = "ACTIVE";
+          }
+        } else {
+          if (led) {
+            led.classList.remove("live-signal", "recent-signal");
+          }
+          if (btn) btn.classList.remove("channel-signal-pulse");
+          if (badge) {
+            badge.className = "ch-badge";
+            badge.textContent = "IDLE";
+          }
+        }
+      }
+
+      // Update Omni option
+      const omniLed = document.getElementById("chLed_all");
+      const omniBadge = document.getElementById("chBadge_all");
+      const omniBtn = document.getElementById("chOpt_all");
+
+      if (anyChannelActive) {
+        if (omniLed) {
+          omniLed.classList.add("live-signal");
+          omniLed.classList.remove("recent-signal");
+        }
+        if (omniBtn) omniBtn.classList.add("channel-signal-pulse");
+        if (omniBadge) {
+          omniBadge.className = "ch-badge live";
+          omniBadge.textContent = "LIVE";
+        }
+      } else if (anyChannelRecent) {
+        if (omniLed) {
+          omniLed.classList.remove("live-signal");
+          omniLed.classList.add("recent-signal");
+        }
+        if (omniBtn) omniBtn.classList.remove("channel-signal-pulse");
+        if (omniBadge) {
+          omniBadge.className = "ch-badge active";
+          omniBadge.textContent = "ACTIVE";
+        }
+      } else {
+        if (omniLed) omniLed.classList.remove("live-signal", "recent-signal");
+        if (omniBtn) omniBtn.classList.remove("channel-signal-pulse");
+        if (omniBadge) {
+          omniBadge.className = "ch-badge";
+          omniBadge.textContent = "OMNI";
+        }
+      }
+
+      // Sync native select option texts
+      const nativeSelect = document.getElementById("midiChannelSelect");
+      if (nativeSelect) {
+        Array.from(nativeSelect.options).forEach(opt => {
+          if (opt.value === "all") {
+            opt.textContent = anyChannelActive ? "All Channels (Omni) 🟢 LIVE" : (anyChannelRecent ? "All Channels (Omni) 🟢 Active" : "All Channels (Omni)");
+          } else {
+            const ch = parseInt(opt.value, 10);
+            const st = midiChannelActivity[ch];
+            if (st && st.isActive) {
+              opt.textContent = `Channel ${ch} 🟢 LIVE`;
+            } else if (st && st.totalMessages > 0) {
+              opt.textContent = `Channel ${ch} 🟢 (Active)`;
+            } else {
+              opt.textContent = `Channel ${ch}`;
+            }
+          }
+        });
+      }
+    }
+
+    function resetMidiChannelActivity() {
+      for (let c = 1; c <= 16; c++) {
+        const st = midiChannelActivity[c];
+        if (st.timerId) clearTimeout(st.timerId);
+        st.lastActiveTime = 0;
+        st.totalMessages = 0;
+        st.isActive = false;
+        st.timerId = null;
+      }
+      renderMidiChannelActivity();
+    }
+
+    function initMidiChannelPicker() {
+      const grid = document.getElementById("channelGridContainer");
+      if (grid) {
+        grid.innerHTML = "";
+        for (let c = 1; c <= 16; c++) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "channel-opt-btn";
+          btn.id = `chOpt_${c}`;
+          btn.dataset.channel = c.toString();
+
+          btn.innerHTML = `
+            <div class="opt-left">
+              <span class="ch-led" id="chLed_${c}"></span>
+              <span class="ch-name">Ch ${c}</span>
+            </div>
+            <span class="ch-badge" id="chBadge_${c}">IDLE</span>
+          `;
+
+          btn.addEventListener("click", () => {
+            selectMidiChannel(c.toString());
+          });
+
+          grid.appendChild(btn);
+        }
+      }
+
+      const omniBtn = document.getElementById("chOpt_all");
+      if (omniBtn) {
+        omniBtn.addEventListener("click", () => {
+          selectMidiChannel("all");
+        });
+      }
+
+      const triggerBtn = document.getElementById("midiChannelBtn");
+      const menu = document.getElementById("midiChannelMenu");
+
+      if (triggerBtn && menu) {
+        triggerBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isOpen = menu.style.display !== "none";
+          setMidiChannelMenuOpen(!isOpen);
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest("#midiChannelPickerGroup")) {
+            setMidiChannelMenuOpen(false);
+          }
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            setMidiChannelMenuOpen(false);
+          }
+        });
+      }
+
+      const resetBtn = document.getElementById("resetChannelActivityBtn");
+      if (resetBtn) {
+        resetBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          resetMidiChannelActivity();
+        });
+      }
+    }
+
+    function setMidiChannelMenuOpen(isOpen) {
+      const menu = document.getElementById("midiChannelMenu");
+      const triggerBtn = document.getElementById("midiChannelBtn");
+      if (!menu || !triggerBtn) return;
+
+      menu.style.display = isOpen ? "flex" : "none";
+      triggerBtn.classList.toggle("is-open", isOpen);
+      triggerBtn.setAttribute("aria-expanded", isOpen.toString());
+    }
+
+    function selectMidiChannel(val) {
+      const select = document.getElementById("midiChannelSelect");
+      const btnText = document.getElementById("midiChannelBtnText");
+
+      if (select) {
+        select.value = val;
+        select.dispatchEvent(new Event("change"));
+      }
+
+      if (btnText) {
+        btnText.textContent = val === "all" ? "All Channels (Omni)" : `Channel ${val}`;
+      }
+
+      const allButtons = document.querySelectorAll(".channel-opt-btn");
+      allButtons.forEach(b => {
+        b.classList.toggle("is-selected", b.dataset.channel === val);
+      });
+
+      setMidiChannelMenuOpen(false);
     }
 
     // Web MIDI Input
@@ -3603,8 +4248,13 @@
       const [status, data1, data2] = event.data;
       const cmd = status >> 4;
       const channel = (status & 0xF) + 1;
-      const filterCh = document.getElementById("midiChannelSelect").value;
 
+      // Track live incoming channel telemetry for voice messages (status < 0xF0)
+      if (status < 0xF0 && channel >= 1 && channel <= 16) {
+        recordMidiChannelActivity(channel, cmd);
+      }
+
+      const filterCh = document.getElementById("midiChannelSelect").value;
       if (filterCh !== "all" && channel !== parseInt(filterCh, 10)) return;
 
       const noteNumber = data1;
@@ -5115,12 +5765,13 @@
     }
 
     // Boot up
-    buildPianoKeyboard();
+    initKeyboardControls();
     renderFilterPills();
     populateDropdown(songDatabase);
     loadSong(songDatabase[0]);
     renderCatalog(songDatabase);
     updateLayerToggleClasses();
+    initMidiChannelPicker();
     initWebMIDI();
     initMasterVolume();
 

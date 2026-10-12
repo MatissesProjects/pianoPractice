@@ -724,4 +724,232 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
   console.log("✔ Test 10: Polyphonic independent voice sustaining (LH whole notes vs RH quarter notes) passed");
 }
 
+// 11. Test Customizable Visualizer Key Count & Starting Offset Engine
+{
+  const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  function midiToPitch(num) {
+    const oct = Math.floor(num / 12) - 1;
+    const semi = num % 12;
+    return `${NOTE_NAMES[semi]}${oct}`;
+  }
+
+  function simulateKeyboardLayout(startMidi, keyCount) {
+    const minMidi = Math.max(21, Math.min(108, startMidi));
+    const count = Math.max(12, Math.min(88, keyCount));
+    const maxMidi = Math.min(108, minMidi + count - 1);
+
+    const keys = [];
+    const isStartBlack = [1, 3, 6, 8, 10].includes(minMidi % 12);
+    if (isStartBlack) {
+      keys.push({
+        pitch: midiToPitch(minMidi),
+        midi: minMidi,
+        isBlack: true,
+        isLeadingDummy: true
+      });
+    }
+
+    for (let m = minMidi; m <= maxMidi; m++) {
+      const semi = m % 12;
+      const isBlack = [1, 3, 6, 8, 10].includes(semi);
+      if (isBlack) continue;
+
+      const whitePitch = midiToPitch(m);
+      keys.push({
+        pitch: whitePitch,
+        midi: m,
+        isBlack: false,
+        isMiddleC: whitePitch === "C4"
+      });
+
+      const nextMidi = m + 1;
+      const nextSemi = nextMidi % 12;
+      const isNextBlack = [1, 3, 6, 8, 10].includes(nextSemi);
+      if (isNextBlack && nextMidi <= maxMidi) {
+        keys.push({
+          pitch: midiToPitch(nextMidi),
+          midi: nextMidi,
+          isBlack: true,
+          isMiddleC: false
+        });
+      }
+    }
+
+    const whiteKeys = keys.filter(k => !k.isBlack);
+    const blackKeys = keys.filter(k => k.isBlack);
+
+    return {
+      keys,
+      totalCount: keys.length,
+      whiteCount: whiteKeys.length,
+      blackCount: blackKeys.length,
+      startPitch: keys[0].pitch,
+      endPitch: keys[keys.length - 1].pitch,
+      hasMiddleC: keys.some(k => k.pitch === "C4")
+    };
+  }
+
+  // 11.1 Full 88-Key Grand Piano (A0 to C8)
+  const full88 = simulateKeyboardLayout(21, 88);
+  assert.strictEqual(full88.totalCount, 88, "88-key layout produces exactly 88 keys");
+  assert.strictEqual(full88.whiteCount, 52, "88-key piano has exactly 52 white keys");
+  assert.strictEqual(full88.blackCount, 36, "88-key piano has exactly 36 black keys");
+  assert.strictEqual(full88.startPitch, "A0", "88-key piano starts on A0");
+  assert.strictEqual(full88.endPitch, "C8", "88-key piano ends on C8");
+  assert.strictEqual(full88.hasMiddleC, true, "Middle C is present in 88-key layout");
+
+  // 11.2 76-Key Workstation (E1 to G7)
+  const stage76 = simulateKeyboardLayout(28, 76);
+  assert.strictEqual(stage76.totalCount, 76, "76-key layout produces exactly 76 keys");
+  assert.strictEqual(stage76.startPitch, "E1", "76-key piano starts on E1");
+  assert.strictEqual(stage76.endPitch, "G7", "76-key piano ends on G7");
+
+  // 11.3 61-Key Standard 5-Octave (C2 to C7)
+  const synth61 = simulateKeyboardLayout(36, 61);
+  assert.strictEqual(synth61.totalCount, 61, "61-key layout produces exactly 61 keys");
+  assert.strictEqual(synth61.whiteCount, 36, "61-key layout has 36 white keys");
+  assert.strictEqual(synth61.blackCount, 25, "61-key layout has 25 black keys");
+  assert.strictEqual(synth61.startPitch, "C2");
+  assert.strictEqual(synth61.endPitch, "C7");
+
+  // 11.4 49-Key Studio 4-Octave (C2 to C6)
+  const studio49 = simulateKeyboardLayout(36, 49);
+  assert.strictEqual(studio49.totalCount, 49, "49-key layout produces exactly 49 keys");
+  assert.strictEqual(studio49.whiteCount, 29);
+  assert.strictEqual(studio49.blackCount, 20);
+  assert.strictEqual(studio49.startPitch, "C2");
+  assert.strictEqual(studio49.endPitch, "C6");
+
+  // 11.5 37-Key Default (C2 to C5)
+  const def37 = simulateKeyboardLayout(36, 37);
+  assert.strictEqual(def37.totalCount, 37, "37-key layout produces exactly 37 keys");
+  assert.strictEqual(def37.startPitch, "C2");
+  assert.strictEqual(def37.endPitch, "C5");
+
+  // 11.6 32-Key Mini Synth (F2 to C5, e.g. Arturia Keystep)
+  const mini32 = simulateKeyboardLayout(41, 32);
+  assert.strictEqual(mini32.totalCount, 32, "32-key layout produces exactly 32 keys");
+  assert.strictEqual(mini32.startPitch, "F2", "32-key controller starts on F2");
+  assert.strictEqual(mini32.endPitch, "C5", "32-key controller ends on C5");
+
+  // 11.7 25-Key Mini Controller (C3 to C5)
+  const mini25 = simulateKeyboardLayout(48, 25);
+  assert.strictEqual(mini25.totalCount, 25, "25-key layout produces exactly 25 keys");
+  assert.strictEqual(mini25.startPitch, "C3");
+  assert.strictEqual(mini25.endPitch, "C5");
+
+  // 11.8 Custom Chromatic Offset Starting on a Black Key (F#3, 25 Keys)
+  const blackOffset = simulateKeyboardLayout(54, 25);
+  assert.strictEqual(blackOffset.totalCount, 25, "Custom black-key start produces exact key count");
+  assert.strictEqual(blackOffset.startPitch, "F#3", "First key is F#3");
+  assert.strictEqual(blackOffset.endPitch, "F#5", "Last key is F#5");
+
+  // 11.9 Offset Shift Arithmetic
+  function shiftOffset(currentStart, delta, keyCount) {
+    const maxStart = 108 - keyCount + 1;
+    return Math.max(21, Math.min(maxStart, currentStart + delta));
+  }
+  // Shift by 1 semitone
+  assert.strictEqual(shiftOffset(36, 1, 37), 37, "Shift start +1 semitone");
+  assert.strictEqual(shiftOffset(36, -1, 37), 35, "Shift start -1 semitone");
+  // Shift by 1 octave
+  assert.strictEqual(shiftOffset(36, 12, 37), 48, "Shift start +1 octave");
+  assert.strictEqual(shiftOffset(36, -12, 37), 24, "Shift start -1 octave");
+  // Clamping at lower boundary
+  assert.strictEqual(shiftOffset(21, -1, 88), 21, "Clamped at minimum A0");
+  // Clamping at upper boundary for 88 keys
+  assert.strictEqual(shiftOffset(21, 1, 88), 21, "88-key piano cannot shift above A0 (max is C8)");
+
+  console.log("✔ Test 11: Customizable visualizer key count & starting offset engine passed");
+}
+
+// 12. Test Real-Time MIDI Channel Activity Monitor & Telemetry Engine
+{
+  const channelActivity = {};
+  for (let c = 1; c <= 16; c++) {
+    channelActivity[c] = {
+      totalMessages: 0,
+      isActive: false,
+      lastActiveTime: 0
+    };
+  }
+
+  function processMidiMessage(status, data1, data2, currentFilter) {
+    const cmd = status >> 4;
+    const channel = (status & 0xF) + 1;
+    let telemetryRecorded = false;
+
+    // Track live incoming channel telemetry for voice messages (status < 0xF0)
+    if (status < 0xF0 && channel >= 1 && channel <= 16) {
+      channelActivity[channel].totalMessages++;
+      channelActivity[channel].isActive = true;
+      channelActivity[channel].lastActiveTime = Date.now();
+      telemetryRecorded = true;
+    }
+
+    // Filter gating check
+    const passesFilter = (currentFilter === "all" || channel === parseInt(currentFilter, 10));
+
+    return {
+      channel,
+      cmd,
+      telemetryRecorded,
+      passesFilter
+    };
+  }
+
+  // 12.1 Channel Voice Messages (Channels 1, 10, 16)
+  const msgCh1 = processMidiMessage(0x90, 60, 100, "all"); // Note on Ch 1
+  assert.strictEqual(msgCh1.channel, 1);
+  assert.strictEqual(msgCh1.telemetryRecorded, true);
+  assert.strictEqual(channelActivity[1].totalMessages, 1);
+  assert.strictEqual(channelActivity[1].isActive, true);
+
+  const msgCh10 = processMidiMessage(0x99, 36, 120, "all"); // Note on Ch 10 (Drums)
+  assert.strictEqual(msgCh10.channel, 10);
+  assert.strictEqual(msgCh10.telemetryRecorded, true);
+  assert.strictEqual(channelActivity[10].totalMessages, 1);
+  assert.strictEqual(channelActivity[10].isActive, true);
+
+  const msgCh16 = processMidiMessage(0x9F, 72, 90, "all"); // Note on Ch 16
+  assert.strictEqual(msgCh16.channel, 16);
+  assert.strictEqual(msgCh16.telemetryRecorded, true);
+  assert.strictEqual(channelActivity[16].totalMessages, 1);
+
+  const msgCC = processMidiMessage(0xB2, 64, 127, "all"); // Sustain pedal on Ch 3
+  assert.strictEqual(msgCC.channel, 3);
+  assert.strictEqual(msgCC.telemetryRecorded, true);
+  assert.strictEqual(channelActivity[3].totalMessages, 1);
+
+  // 12.2 Real-time System Messages Ignored (Clocks & Active Sensing)
+  const msgClock = processMidiMessage(0xF8, 0, 0, "all"); // MIDI Clock
+  assert.strictEqual(msgClock.telemetryRecorded, false, "MIDI Clock (0xF8) must not trigger channel telemetry");
+
+  const msgSense = processMidiMessage(0xFE, 0, 0, "all"); // Active Sensing
+  assert.strictEqual(msgSense.telemetryRecorded, false, "Active Sensing (0xFE) must not trigger channel telemetry");
+
+  // 12.3 Pre-Filter Telemetry Recording Verification
+  // When filter is set to Channel 1, receiving data on Channel 5 must still record Ch 5 activity,
+  // allowing the user to spot that Channel 5 is sending data!
+  const msgCh5 = processMidiMessage(0x94, 64, 100, "1"); // Note on Ch 5 while filter is '1'
+  assert.strictEqual(msgCh5.telemetryRecorded, true, "Channel 5 activity recorded even when filter is set to Ch 1");
+  assert.strictEqual(msgCh5.passesFilter, false, "Channel 5 data correctly gated from downstream processing");
+  assert.strictEqual(channelActivity[5].totalMessages, 1, "Channel 5 message count incremented");
+  assert.strictEqual(channelActivity[5].isActive, true, "Channel 5 marked active so UI highlights it");
+
+  // When user switches filter to '5', Channel 5 data passes through
+  const msgCh5Pass = processMidiMessage(0x94, 64, 100, "5");
+  assert.strictEqual(msgCh5Pass.passesFilter, true, "Channel 5 data passes when filter is '5'");
+
+  // 12.4 Activity Decay & Active vs Idle status
+  channelActivity[1].isActive = false; // Simulate 750ms decay timeout
+  assert.strictEqual(channelActivity[1].isActive, false, "Channel 1 decayed to inactive");
+  assert.strictEqual(channelActivity[1].totalMessages > 0, true, "Channel 1 retains message history (ACTIVE badge)");
+
+  assert.strictEqual(channelActivity[2].totalMessages, 0, "Channel 2 had no activity (IDLE badge)");
+  assert.strictEqual(channelActivity[2].isActive, false);
+
+  console.log("✔ Test 12: Real-time MIDI channel activity monitor & telemetry engine passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");

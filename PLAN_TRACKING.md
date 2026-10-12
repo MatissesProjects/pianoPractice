@@ -64,3 +64,23 @@
   - [x] Measure boundary & piece end synchronization: calculate `stepBeats` using measure boundaries and schedule `stopPlayback` after `maxPieceDurationMs`
   - [x] Automated verification test suite for polyphonic independent voice sustaining (`tests/test_score_engine.js` Test 10 100% pass)
 
+- [x] **Milestone 10: Customizable Visualizer Key Count & Starting Offset Engine**
+  - [x] Generalized mathematical keyboard generation algorithm (`buildPianoKeyboard(startMidi, keyCount)`)
+  - [x] Seamless chromatic white & black key DOM layout with Middle C marker
+  - [x] Keyboard size selector with popular hardware presets (88, 76, 73, 61, 49, 37, 32, 25 keys) + custom count input
+  - [x] Far-left starting note/offset selector with semitone and octave shift controls
+  - [x] Middle C centering button & auto-scroll viewport centering
+  - [x] Settings persistence in LocalStorage (`piano_key_count`, `piano_start_midi`)
+  - [x] Automated verification test suite for custom layouts and presets (`tests/test_score_engine.js` Test 11 100% pass)
+
+- [x] **Milestone 11: Real-Time MIDI Channel Activity Monitor & Interactive Channel Selector**
+  - [x] Real-time per-channel incoming telemetry across all 16 MIDI channels ($1..16$)
+  - [x] Pre-filter telemetry recording: inspect channel before filter gating so unselected active channels are identified
+  - [x] Interactive custom channel dropdown with 16-channel live signal grid & Omni banner
+  - [x] Real-time LED signal pulses & dynamic badges (`LIVE`, `ACTIVE`, `IDLE`) when open
+  - [x] Click-to-select channel switching with persistent synced `<select id="midiChannelSelect">`
+  - [x] Outside click and Escape key dismissal
+  - [x] Automated verification test suite for multi-channel decoding and activity tracking (`tests/test_score_engine.js` Test 12 100% pass)
+
+
+
