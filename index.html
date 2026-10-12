@@ -619,6 +619,48 @@
     .layer-toggle.active-fingers { border-color: #facc15; color: #facc15; background: rgba(250, 204, 21, 0.15); }
     .layer-toggle.active-cheat { border-color: #ec4899; color: #ec4899; background: rgba(236, 72, 153, 0.15); }
 
+    .harmony-select-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.18s ease;
+    }
+    .harmony-select-wrap.active-harmony {
+      border-color: var(--dyad-color);
+      background: var(--dyad-bg);
+      color: var(--dyad-color);
+      box-shadow: 0 0 10px rgba(192, 132, 252, 0.25);
+    }
+    .harmony-select-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .harmony-type-select {
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .harmony-type-select:hover, .harmony-type-select:focus {
+      border-color: var(--dyad-color);
+      box-shadow: 0 0 6px rgba(192, 132, 252, 0.4);
+    }
+
     /* Controls Bar & Practice Mode Banner */
     .controls-bar {
       display: flex;
@@ -1958,6 +2000,18 @@
               <input type="checkbox" id="toggleDyads">
               <span>Harmonies (Dyads)</span>
             </label>
+            <div class="harmony-select-wrap" id="harmonySelectWrap" title="Select harmony interval level">
+              <span class="harmony-select-label">Level:</span>
+              <select id="harmonyTypeSelect" class="harmony-type-select" aria-label="Select Harmony Level">
+                <option value="song">Song Arrangement (Default)</option>
+                <option value="thirds">Thirds (3rds Above)</option>
+                <option value="thirds_below">Thirds (3rds Below)</option>
+                <option value="fifths">Fifths (5ths)</option>
+                <option value="sixths">Sixths (6ths)</option>
+                <option value="octaves">Octaves (8ves)</option>
+                <option value="triads">Full Triads (1-3-5)</option>
+              </select>
+            </div>
             <label class="layer-toggle active-cheat" id="toggleLabelCheat">
               <input type="checkbox" id="toggleCheat" checked>
               <span>🏷️ Note Cheat Sheet</span>
@@ -2495,9 +2549,9 @@
         config: { rh: true, lh: false, dyads: false, cheat: false, fingers: true, filter: "C 5-Finger" }
       },
       3: {
-        name: "Level 3: Harmonic Dyads (3rds/5ths)",
-        briefing: "<strong>Lesson 3: Harmonic Dyads</strong> — Master simultaneous double-stops (two notes struck together). Notice the cheat sheet displays both notes stacked vertically (e.g., E over C). Lock fingers 1+3 and 2+4 in parallel arches.",
-        config: { rh: true, lh: false, dyads: true, cheat: true, fingers: true, filter: "Harmonic / Dyads" }
+        name: "Level 3: Harmonic Dyads & Intervals",
+        briefing: "<strong>Lesson 3: Harmonic Dyads & Intervals</strong> — Master simultaneous multi-note harmonies! Choose your harmony interval (Thirds, Fifths, Sixths, Octaves, or Triads) using the Level selector. You can keep Left Hand active to practice 2-hand harmony coordination simultaneously.",
+        config: { rh: true, lh: false, dyads: true, cheat: true, fingers: true, filter: "Harmonic / Dyads", harmonyType: "thirds" }
       },
       4: {
         name: "Level 4: Left-Hand Bass Clef Foundation",
@@ -2516,13 +2570,13 @@
       },
       7: {
         name: "Level 7: Minor & Modal Exploration",
-        briefing: "<strong>Lesson 7: Minor & Modal</strong> — Explore rich tonalities: Aeolian natural minor, Dorian modes, and blues scales (e.g. Gymnopédie, Scarborough Fair, Greensleeves).",
-        config: { rh: true, lh: true, dyads: true, cheat: false, fingers: true, filter: "Minor / Modal" }
+        briefing: "<strong>Lesson 7: Minor & Modal</strong> — Explore rich tonalities: Aeolian natural minor, Dorian modes, and blues scales (e.g. Gymnopédie, Scarborough Fair, Greensleeves). Both Left Hand and Harmonies are fully active for grand staff polyphony.",
+        config: { rh: true, lh: true, dyads: true, cheat: false, fingers: true, filter: "Minor / Modal", harmonyType: "song" }
       },
       8: {
         name: "Level 8: Classical Master Repertoire",
-        briefing: "<strong>Lesson 8: Classical Fluency</strong> — The pinnacle: Performance-ready classical masterpieces (Für Elise, Bach Minuet in G, Canon in D) at brisk concert tempo without crutches.",
-        config: { rh: true, lh: true, dyads: true, cheat: false, fingers: false, filter: "Classical Mastery" }
+        briefing: "<strong>Lesson 8: Classical Fluency</strong> — The pinnacle: Performance-ready classical masterpieces (Für Elise, Bach Minuet in G, Canon in D) at brisk concert tempo with both hands active on grand staff harmony without crutches.",
+        config: { rh: true, lh: true, dyads: true, cheat: false, fingers: false, filter: "Classical Mastery", harmonyType: "song" }
       }
     };
 
@@ -2867,15 +2921,26 @@
     }
 
     // MULTI-SYSTEM (WRAPPING) SCORE RENDERER & TIMELINE ENGINE
-    function buildScoreModel(song, showRH, showLH, showDyads) {
+    function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") {
       if (!song) return { measures: [], steps: [] };
+
+      let dyadSource = song.dyads || "";
+      let dyadFSource = song.dyadsF || "";
+
+      if (showDyads && harmonyType && harmonyType !== "song") {
+        if (typeof MusicTheory !== "undefined" && MusicTheory.generateSongHarmonies) {
+          const gen = MusicTheory.generateSongHarmonies(song, harmonyType);
+          dyadSource = gen.dyads;
+          dyadFSource = gen.dyadsF;
+        }
+      }
 
       const rhM = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
       const lhM = (song.lh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-      const dyadM = (song.dyads || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const dyadM = (dyadSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
       const rhFM = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
       const lhFM = (song.lhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-      const dyadFM = (song.dyadsF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const dyadFM = (dyadFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
 
       const totalMeasures = Math.max(rhM.length, lhM.length, dyadM.length);
       const measures = [];
@@ -2892,7 +2957,66 @@
 
         const measureItems = [];
 
-        if (showDyads) {
+        if (showDyads && showLH) {
+          let dyadBeat = 0;
+          const dyadEvents = mDyad.map((t, k) => {
+            const p = parseToken(t);
+            const ev = { ...p, f: mDyadF[k] || "", startBeat: dyadBeat };
+            dyadBeat += p.beats;
+            return ev;
+          });
+
+          let lhBeat = 0;
+          const lhEvents = mLH.map((t, k) => {
+            const p = parseToken(t);
+            const ev = { ...p, f: mLHF[k] || "", startBeat: lhBeat };
+            lhBeat += p.beats;
+            return ev;
+          });
+
+          const onsets = Array.from(new Set([
+            ...dyadEvents.map(e => e.startBeat),
+            ...lhEvents.map(e => e.startBeat)
+          ])).sort((a, b) => a - b);
+
+          onsets.forEach((b, k) => {
+            const dyadEv = dyadEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+            const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+            const expectedList = [];
+            if (dyadEv && dyadEv.pitch && dyadEv.pitch !== "-") {
+              dyadEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
+            }
+            if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
+              lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
+            }
+            const expected = Array.from(new Set(expectedList));
+
+            const nextB = onsets[k + 1];
+            const maxMB = Math.max(
+              ...dyadEvents.map(e => e.startBeat + e.beats),
+              ...lhEvents.map(e => e.startBeat + e.beats),
+              0
+            );
+            const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(dyadEv ? dyadEv.beats : 1, lhEv ? lhEv.beats : 1));
+
+            const item = {
+              stepIndex: stepGlobalIdx,
+              index: stepGlobalIdx,
+              measure: m + 1,
+              startBeat: b,
+              dyad: dyadEv,
+              dyadF: dyadEv ? dyadEv.f : "",
+              lh: lhEv,
+              lhF: lhEv ? lhEv.f : "",
+              expectedPitches: expected,
+              displayLabel: expected.join(" + "),
+              beats: stepBeats
+            };
+            measureItems.push(item);
+            steps.push(item);
+            stepGlobalIdx++;
+          });
+        } else if (showDyads && !showLH) {
           mDyad.forEach((t, k) => {
             const parsed = parseToken(t);
             const item = {
@@ -3035,7 +3159,7 @@
       const availableMeasureWidth = (scoreWidth - leftMargin - rightMargin) / measuresPerSystem;
 
       const staffLineSpacing = 10;
-      const isGrandStaff = (showRH && showLH && !showDyads);
+      const isGrandStaff = ((showRH || showDyads) && showLH);
       const systemHeight = isGrandStaff ? 275 : 160;
 
       const numSystems = Math.ceil(measures.length / measuresPerSystem);
@@ -3067,7 +3191,7 @@
         }
 
         if (showRH || showDyads) draw5(trebleTopY);
-        if (showLH && !showDyads) draw5(bassTopY);
+        if (showLH) draw5(bassTopY);
 
         // Clefs on Every System Row
         if (showRH || showDyads) {
@@ -3080,7 +3204,7 @@
           svg.appendChild(tClef);
         }
 
-        if (showLH && !showDyads) {
+        if (showLH) {
           const bClef = document.createElementNS("http://www.w3.org/2000/svg", "text");
           bClef.setAttribute("x", leftMargin - 34);
           bClef.setAttribute("y", bassTopY + 26);
@@ -3100,7 +3224,7 @@
             timeSig.textContent = currentSong.timeSig || "4/4";
             svg.appendChild(timeSig);
           }
-          if (showLH && !showDyads) {
+          if (showLH) {
             const timeSigB = document.createElementNS("http://www.w3.org/2000/svg", "text");
             timeSigB.setAttribute("x", leftMargin + 2);
             timeSigB.setAttribute("y", bassTopY + 24);
@@ -3112,7 +3236,7 @@
 
         // Left System Bar Line & Bracket
         const startY = (showRH || showDyads) ? trebleTopY : bassTopY;
-        const endY = (showLH && !showDyads) ? bassBottomY : trebleBottomY;
+        const endY = showLH ? bassBottomY : trebleBottomY;
         const initBar = document.createElementNS("http://www.w3.org/2000/svg", "line");
         initBar.setAttribute("x1", leftMargin - 42);
         initBar.setAttribute("y1", startY);
@@ -3224,7 +3348,7 @@
             }
 
             // 2. Render Bass Notes
-            if (showLH && !showDyads && item.lh) {
+            if (showLH && item.lh) {
               const lhPitches = item.lh.pitch.split("+").filter(p => p !== "-");
               lhPitches.forEach(p => {
                 renderNoteheadOnly(noteGroup, p, item.lh.beats, cx, bassBottomY, -10);
@@ -3425,8 +3549,10 @@
       const showRH = document.getElementById("toggleRH").checked;
       const showLH = document.getElementById("toggleLH").checked;
       const showDyads = document.getElementById("toggleDyads").checked;
+      const harmSelect = document.getElementById("harmonyTypeSelect");
+      const harmonyType = harmSelect ? harmSelect.value : "song";
 
-      const model = buildScoreModel(currentSong, showRH, showLH, showDyads);
+      const model = buildScoreModel(currentSong, showRH, showLH, showDyads, harmonyType);
       songNoteSteps = model.steps;
       currentSongMeasures = model.measures;
 
@@ -4534,15 +4660,14 @@
         if (showDyads && step.dyad && step.dyad.pitch && step.dyad.pitch !== "-") {
           const dyadBeats = step.dyad.beats || stepBeats;
           maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + dyadBeats * beatMs);
-        } else {
-          if (showRH && step.rh && step.rh.pitch && step.rh.pitch !== "-") {
-            const rhBeats = step.rh.beats || stepBeats;
-            maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + rhBeats * beatMs);
-          }
-          if (showLH && step.lh && step.lh.pitch && step.lh.pitch !== "-") {
-            const lhBeats = step.lh.beats || stepBeats;
-            maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + lhBeats * beatMs);
-          }
+        } else if (showRH && step.rh && step.rh.pitch && step.rh.pitch !== "-") {
+          const rhBeats = step.rh.beats || stepBeats;
+          maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + rhBeats * beatMs);
+        }
+
+        if (showLH && step.lh && step.lh.pitch && step.lh.pitch !== "-") {
+          const lhBeats = step.lh.beats || stepBeats;
+          maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + lhBeats * beatMs);
         }
         maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + stepDurationMs);
 
@@ -4561,20 +4686,19 @@
             } else if (step.dyad && step.dyad.pitch === "-") {
               clearVoicePlayback("dyad");
             }
-          } else {
-            if (showRH) {
-              if (step.rh && step.rh.pitch && step.rh.pitch !== "-") {
-                triggerVoicePlayback("rh", step.rh, 4);
-              } else if (step.rh && step.rh.pitch === "-") {
-                clearVoicePlayback("rh");
-              }
+          } else if (showRH) {
+            if (step.rh && step.rh.pitch && step.rh.pitch !== "-") {
+              triggerVoicePlayback("rh", step.rh, 4);
+            } else if (step.rh && step.rh.pitch === "-") {
+              clearVoicePlayback("rh");
             }
-            if (showLH) {
-              if (step.lh && step.lh.pitch && step.lh.pitch !== "-") {
-                triggerVoicePlayback("lh", step.lh, 2);
-              } else if (step.lh && step.lh.pitch === "-") {
-                clearVoicePlayback("lh");
-              }
+          }
+
+          if (showLH) {
+            if (step.lh && step.lh.pitch && step.lh.pitch !== "-") {
+              triggerVoicePlayback("lh", step.lh, 2);
+            } else if (step.lh && step.lh.pitch === "-") {
+              clearVoicePlayback("lh");
             }
           }
         }, accumulatedMs);
@@ -4753,6 +4877,10 @@
         document.getElementById("toggleDyads").checked = data.config.dyads;
         document.getElementById("toggleCheat").checked = data.config.cheat;
         document.getElementById("toggleFingers").checked = data.config.fingers;
+        if (data.config.harmonyType && harmonyTypeSelect) {
+          harmonyTypeSelect.value = data.config.harmonyType;
+          localStorage.setItem("piano_harmony_type", data.config.harmonyType);
+        }
 
         updateLayerToggleClasses();
 
@@ -4772,6 +4900,21 @@
     const toggleDyads = document.getElementById("toggleDyads");
     const toggleCheat = document.getElementById("toggleCheat");
     const toggleFingers = document.getElementById("toggleFingers");
+    const harmonyTypeSelect = document.getElementById("harmonyTypeSelect");
+
+    if (harmonyTypeSelect) {
+      const savedHarmony = localStorage.getItem("piano_harmony_type");
+      if (savedHarmony && Array.from(harmonyTypeSelect.options).some(o => o.value === savedHarmony)) {
+        harmonyTypeSelect.value = savedHarmony;
+      }
+      harmonyTypeSelect.addEventListener("change", (e) => {
+        localStorage.setItem("piano_harmony_type", e.target.value);
+        if (!toggleDyads.checked) {
+          toggleDyads.checked = true;
+        }
+        updateLayerToggleClasses();
+      });
+    }
 
     function updateLayerToggleClasses() {
       document.getElementById("toggleLabelRH").classList.toggle("active-rh", toggleRH.checked);
@@ -4780,13 +4923,18 @@
       document.getElementById("toggleLabelCheat").classList.toggle("active-cheat", toggleCheat.checked);
       document.getElementById("toggleLabelFingers").classList.toggle("active-fingers", toggleFingers.checked);
 
+      const harmWrap = document.getElementById("harmonySelectWrap");
+      if (harmWrap) {
+        harmWrap.classList.toggle("active-harmony", toggleDyads.checked);
+      }
+
       parseSongSteps();
       renderSheetMusicScore();
     }
 
     [toggleRH, toggleLH, toggleDyads, toggleCheat, toggleFingers].forEach(t => {
       t.addEventListener("change", () => {
-        if (!toggleRH.checked && !toggleLH.checked) toggleRH.checked = true;
+        if (!toggleRH.checked && !toggleLH.checked && !toggleDyads.checked) toggleRH.checked = true;
         updateLayerToggleClasses();
       });
     });

@@ -84,5 +84,16 @@
   - [x] Outside click and Escape key dismissal
   - [x] Automated verification test suite for channel decoding, clean IDLE transition, and device reset (`tests/test_score_engine.js` Test 12 100% pass)
 
+- [x] **Milestone 12: Dual-Hand Harmony Practice & Multi-Level Harmony Engine**
+  - [x] Multi-level harmony generator (`theory.js`): Algorithmic generation for diatonic 3rds (above & below), 5ths, 6ths, octaves, and full triads with key-signature accidental awareness and fingerings
+  - [x] Simultaneous Left-Hand + Harmony Grand Staff alignment (`buildScoreModel`): Synchronize harmony treble events (`mDyad`) and bass clef events (`mLH`) on beat timeline without suppressing left hand
+  - [x] Dual-hand harmony sheet music score rendering (`renderSheetMusicScore`): Grand staff geometry, staves, bass clef, cheat sheet, and fingerings when both Harmonies and Left Hand are active
+  - [x] Dual-voice independent playback engine (`startPlayback`): Independent voice triggering, sustaining, and polyphonic chord pill updates for simultaneous dyad/triad treble and left-hand bass
+  - [x] Real-time practice mode note fulfillment (`handleNoteDown` & HUD): Support partial chord progression and simultaneous 2-hand fulfillment with multi-note harmonies and bass anchors
+  - [x] Interactive UI Harmony Level / Interval selector: Dropdown control in Hand & Score Toggles bar (Song Arrangement, Thirds Above, Thirds Below, Fifths, Sixths, Octaves, Triads) with LocalStorage persistence
+  - [x] Pedagogical lesson pathway & level update: Harmonize Level 3, Level 7, and Level 8 curriculum configs with interactive harmony selector
+  - [x] Comprehensive automated test suite (`tests/test_score_engine.js` Test 13): Verify dual-hand harmony alignment, all harmony interval levels, grand staff rendering, and playback across repertoire
+
+
 
 
