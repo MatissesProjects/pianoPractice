@@ -4,12 +4,14 @@
  */
 
 (function (root, factory) {
+  const exp = factory();
   if (typeof module === "object" && module.exports) {
-    module.exports = factory();
-  } else {
-    root.MusicTheory = factory();
+    module.exports = exp;
   }
-})(typeof self !== "undefined" ? self : this, function () {
+  if (root) {
+    root.MusicTheory = exp;
+  }
+})(typeof self !== "undefined" ? self : (typeof global !== "undefined" ? global : this), function () {
 
   const NOTE_NAMES_SHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
   const NOTE_NAMES_FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
@@ -391,6 +393,128 @@
     { key: "F", sharps: 0, flats: 1, relativeMinor: "Dm", accidentalsList: ["Bb"] }
   ];
 
+  // Multi-Level Harmony Generation Engine
+  const DIATONIC_LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+
+  function diatonicStepToPitch(step, accidentalMap = {}) {
+    if (typeof step !== "number" || isNaN(step)) return null;
+    const base = ((step % 7) + 7) % 7;
+    const oct = Math.floor(step / 7) + 4;
+    const letter = DIATONIC_LETTERS[base];
+    const acc = accidentalMap[letter] || "";
+    return `${letter}${acc}${oct}`;
+  }
+
+  function detectKeyAccidentals(song) {
+    const map = {};
+    if (!song) return map;
+    const allNotes = ((song.rh || "") + " " + (song.lh || "")).match(/[A-G][#b]?[0-8]/g) || [];
+    allNotes.forEach(n => {
+      const m = n.match(/^([A-G])([#b]?)/);
+      if (m && m[2]) {
+        map[m[1]] = m[2];
+      }
+    });
+    return map;
+  }
+
+  function harmonizePitch(pitchStr, harmonyType = "thirds", accidentalMap = {}) {
+    if (!pitchStr || pitchStr === "-") return "-";
+    const subPitches = pitchStr.split("+").filter(p => p !== "-");
+    if (subPitches.length === 0) return "-";
+    const root = subPitches[0];
+    const step = getDiatonicStep(root);
+    if (step === null) return pitchStr;
+
+    let harmPitches = [root];
+
+    if (harmonyType === "thirds") {
+      const p3 = diatonicStepToPitch(step + 2, accidentalMap);
+      harmPitches = [root, p3];
+    } else if (harmonyType === "thirds_below") {
+      const p3b = diatonicStepToPitch(step - 2, accidentalMap);
+      harmPitches = [p3b, root];
+    } else if (harmonyType === "fifths") {
+      const p5 = diatonicStepToPitch(step + 4, accidentalMap);
+      harmPitches = [root, p5];
+    } else if (harmonyType === "sixths") {
+      const p6 = diatonicStepToPitch(step + 5, accidentalMap);
+      harmPitches = [root, p6];
+    } else if (harmonyType === "octaves") {
+      const p8 = diatonicStepToPitch(step + 7, accidentalMap);
+      harmPitches = [root, p8];
+    } else if (harmonyType === "triads") {
+      const p3 = diatonicStepToPitch(step + 2, accidentalMap);
+      const p5 = diatonicStepToPitch(step + 4, accidentalMap);
+      harmPitches = [root, p3, p5];
+    }
+
+    const valid = harmPitches.filter(Boolean);
+    const sorted = [...new Set(valid)].sort((a, b) => {
+      const mA = pitchToMidi(a) ?? 0;
+      const mB = pitchToMidi(b) ?? 0;
+      return mA - mB;
+    });
+
+    return sorted.join("+");
+  }
+
+  function harmonizeToken(tokenStr, harmonyType = "thirds", accidentalMap = {}, fingerStr = "1") {
+    if (!tokenStr || tokenStr === "-" || tokenStr === "|") return { token: tokenStr, finger: "-" };
+    const parts = tokenStr.split(":");
+    const pitch = parts[0];
+    const beatsPart = parts[1] ? `:${parts[1]}` : "";
+    if (pitch === "-") return { token: `-${beatsPart}`, finger: "-" };
+
+    const harmonizedPitch = harmonizePitch(pitch, harmonyType, accidentalMap);
+
+    let finger = "1+3";
+    if (harmonyType === "fifths" || harmonyType === "sixths" || harmonyType === "octaves") {
+      finger = "1+5";
+    } else if (harmonyType === "triads") {
+      finger = "1+3+5";
+    }
+
+    return {
+      token: `${harmonizedPitch}${beatsPart}`,
+      finger: finger
+    };
+  }
+
+  function generateSongHarmonies(song, harmonyType = "thirds") {
+    if (!song) return { dyads: "", dyadsF: "" };
+    if (harmonyType === "song" && song.dyads) {
+      return { dyads: song.dyads, dyadsF: song.dyadsF || "" };
+    }
+
+    const accMap = detectKeyAccidentals(song);
+    const rhMeasures = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+    const rhFMeasures = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+
+    const dyadMeasures = [];
+    const dyadFMeasures = [];
+
+    rhMeasures.forEach((measureTokens, mIdx) => {
+      const fTokens = rhFMeasures[mIdx] || [];
+      const mDyad = [];
+      const mDyadF = [];
+
+      measureTokens.forEach((tok, tIdx) => {
+        const res = harmonizeToken(tok, harmonyType, accMap, fTokens[tIdx]);
+        mDyad.push(res.token);
+        mDyadF.push(res.finger);
+      });
+
+      dyadMeasures.push(mDyad.join(" "));
+      dyadFMeasures.push(mDyadF.join(" "));
+    });
+
+    return {
+      dyads: dyadMeasures.join(" | "),
+      dyadsF: dyadFMeasures.join(" | ")
+    };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -405,11 +529,17 @@
     midiToFreq,
     pitchToFreq,
     getDiatonicStep,
+    diatonicStepToPitch,
     areEnharmonicEquivalent,
     generateScale,
     generateChord,
     getInterval,
     getRandomFlashcard,
-    generateEarTrainingChallenge
+    generateEarTrainingChallenge,
+    detectKeyAccidentals,
+    harmonizePitch,
+    harmonizeToken,
+    generateSongHarmonies
   };
 });
+

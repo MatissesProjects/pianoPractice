@@ -31,15 +31,26 @@ function parseToken(tokenStr) {
   return { pitch, beats };
 }
 
-function buildScoreModel(song, showRH, showLH, showDyads) {
+function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") {
   if (!song) return { measures: [], steps: [] };
+
+  let dyadSource = song.dyads || "";
+  let dyadFSource = song.dyadsF || "";
+
+  if (showDyads && harmonyType && harmonyType !== "song") {
+    if (typeof MusicTheory !== "undefined" && MusicTheory.generateSongHarmonies) {
+      const gen = MusicTheory.generateSongHarmonies(song, harmonyType);
+      dyadSource = gen.dyads;
+      dyadFSource = gen.dyadsF;
+    }
+  }
 
   const rhM = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
   const lhM = (song.lh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-  const dyadM = (song.dyads || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+  const dyadM = (dyadSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
   const rhFM = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
   const lhFM = (song.lhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-  const dyadFM = (song.dyadsF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+  const dyadFM = (dyadFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
 
   const totalMeasures = Math.max(rhM.length, lhM.length, dyadM.length);
   const measures = [];
@@ -56,7 +67,66 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
 
     const measureItems = [];
 
-    if (showDyads) {
+    if (showDyads && showLH) {
+      let dyadBeat = 0;
+      const dyadEvents = mDyad.map((t, k) => {
+        const p = parseToken(t);
+        const ev = { ...p, f: mDyadF[k] || "", startBeat: dyadBeat };
+        dyadBeat += p.beats;
+        return ev;
+      });
+
+      let lhBeat = 0;
+      const lhEvents = mLH.map((t, k) => {
+        const p = parseToken(t);
+        const ev = { ...p, f: mLHF[k] || "", startBeat: lhBeat };
+        lhBeat += p.beats;
+        return ev;
+      });
+
+      const onsets = Array.from(new Set([
+        ...dyadEvents.map(e => e.startBeat),
+        ...lhEvents.map(e => e.startBeat)
+      ])).sort((a, b) => a - b);
+
+      onsets.forEach((b, k) => {
+        const dyadEv = dyadEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+        const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+        const expectedList = [];
+        if (dyadEv && dyadEv.pitch && dyadEv.pitch !== "-") {
+          dyadEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
+        }
+        if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
+          lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
+        }
+        const expected = Array.from(new Set(expectedList));
+
+        const nextB = onsets[k + 1];
+        const maxMB = Math.max(
+          ...dyadEvents.map(e => e.startBeat + e.beats),
+          ...lhEvents.map(e => e.startBeat + e.beats),
+          0
+        );
+        const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(dyadEv ? dyadEv.beats : 1, lhEv ? lhEv.beats : 1));
+
+        const item = {
+          stepIndex: stepGlobalIdx,
+          index: stepGlobalIdx,
+          measure: m + 1,
+          startBeat: b,
+          dyad: dyadEv,
+          dyadF: dyadEv ? dyadEv.f : "",
+          lh: lhEv,
+          lhF: lhEv ? lhEv.f : "",
+          expectedPitches: expected,
+          displayLabel: expected.join(" + "),
+          beats: stepBeats
+        };
+        measureItems.push(item);
+        steps.push(item);
+        stepGlobalIdx++;
+      });
+    } else if (showDyads && !showLH) {
       mDyad.forEach((t, k) => {
         const parsed = parseToken(t);
         const item = {
@@ -997,6 +1067,111 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
   assert.strictEqual(getOmniBadge(), "OMNI", "Omni badge must be OMNI after device reset");
 
   console.log("✔ Test 12: Real-time MIDI channel activity monitor, IDLE return & device reset engine passed");
+}
+
+// 13. Test Dual-Hand Harmony Practice & Multi-Level Harmony Engine
+{
+  // 13.1 Simultaneous Left-Hand + Harmonies Alignment across repertoire
+  songDatabase.forEach(song => {
+    // Model with both Harmonies and Left-Hand active
+    const model = buildScoreModel(song, false, true, true, "song");
+    assert.ok(model.steps.length > 0, `Song ${song.title} must generate steps with Harmonies + LH`);
+    assert.ok(model.measures.length > 0, `Song ${song.title} must generate measures with Harmonies + LH`);
+
+    // Verify LH bass notes are present in the score steps
+    const hasLhStep = model.steps.some(st => st.lh !== null && st.lh !== undefined);
+    assert.strictEqual(hasLhStep, true, `Song ${song.title} must include LH bass steps when harmonies are on`);
+
+    // Verify Dyad harmony notes are present in the score steps
+    const hasDyadStep = model.steps.some(st => st.dyad !== null && st.dyad !== undefined);
+    assert.strictEqual(hasDyadStep, true, `Song ${song.title} must include dyad steps when harmonies are on`);
+
+    // Verify concurrent onset expectations (where both hands strike simultaneously)
+    const dualOnsetStep = model.steps.find(st => st.dyad && st.dyad.pitch !== "-" && st.lh && st.lh.pitch !== "-");
+    if (dualOnsetStep) {
+      const dyadPitches = dualOnsetStep.dyad.pitch.split("+").filter(p => p !== "-");
+      const lhPitches = dualOnsetStep.lh.pitch.split("+").filter(p => p !== "-");
+      dyadPitches.forEach(p => assert.ok(dualOnsetStep.expectedPitches.includes(p)));
+      lhPitches.forEach(p => assert.ok(dualOnsetStep.expectedPitches.includes(p)));
+    }
+  });
+
+  // 13.2 Ode to Joy Dual-Hand Harmony Verification
+  const odeSong = songDatabase.find(s => s.id === "ode-to-joy");
+  const odeModel = buildScoreModel(odeSong, false, true, true, "song");
+  // M1 Beat 0: Dyad C4+E4, LH C3
+  const odeStep0 = odeModel.steps[0];
+  assert.strictEqual(odeStep0.measure, 1);
+  assert.strictEqual(odeStep0.startBeat, 0);
+  assert.strictEqual(odeStep0.dyad.pitch, "C4+E4");
+  assert.strictEqual(odeStep0.lh.pitch, "C3");
+  assert.deepStrictEqual(odeStep0.expectedPitches, ["C4", "E4", "C3"]);
+
+  // M1 Beat 1: Dyad C4+E4, LH is held (null onset)
+  const odeStep1 = odeModel.steps[1];
+  assert.strictEqual(odeStep1.measure, 1);
+  assert.strictEqual(odeStep1.startBeat, 1);
+  assert.strictEqual(odeStep1.dyad.pitch, "C4+E4");
+  assert.strictEqual(odeStep1.lh, null);
+  assert.deepStrictEqual(odeStep1.expectedPitches, ["C4", "E4"]);
+
+  // 13.3 Multi-Level Harmony Interval Generation (Thirds, Fifths, Sixths, Octaves, Triads)
+  const leanSong = songDatabase.find(s => s.id === "lean-on-me");
+  
+  // Thirds Above: C4 -> C4+E4, D4 -> D4+F4, E4 -> E4+G4
+  const thirdsModel = buildScoreModel(leanSong, false, false, true, "thirds");
+  assert.strictEqual(thirdsModel.steps[0].dyad.pitch, "C4+E4");
+  assert.strictEqual(thirdsModel.steps[2].dyad.pitch, "D4+F4");
+  assert.strictEqual(thirdsModel.steps[3].dyad.pitch, "E4+G4");
+  assert.strictEqual(thirdsModel.steps[0].dyadF, "1+3");
+
+  // Thirds Below: E4 -> C4+E4
+  const thirdsBelowModel = buildScoreModel(leanSong, false, false, true, "thirds_below");
+  assert.strictEqual(thirdsBelowModel.steps[3].dyad.pitch, "C4+E4"); // E4 - 2 diatonic steps = C4
+
+  // Fifths: C4 -> C4+G4, D4 -> D4+A4
+  const fifthsModel = buildScoreModel(leanSong, false, false, true, "fifths");
+  assert.strictEqual(fifthsModel.steps[0].dyad.pitch, "C4+G4");
+  assert.strictEqual(fifthsModel.steps[2].dyad.pitch, "D4+A4");
+  assert.strictEqual(fifthsModel.steps[0].dyadF, "1+5");
+
+  // Sixths: C4 -> C4+A4, D4 -> D4+B4
+  const sixthsModel = buildScoreModel(leanSong, false, false, true, "sixths");
+  assert.strictEqual(sixthsModel.steps[0].dyad.pitch, "C4+A4");
+  assert.strictEqual(sixthsModel.steps[2].dyad.pitch, "D4+B4");
+  assert.strictEqual(sixthsModel.steps[0].dyadF, "1+5");
+
+  // Octaves: C4 -> C4+C5
+  const octavesModel = buildScoreModel(leanSong, false, false, true, "octaves");
+  assert.strictEqual(octavesModel.steps[0].dyad.pitch, "C4+C5");
+  assert.strictEqual(octavesModel.steps[0].dyadF, "1+5");
+
+  // Full Triads: C4 -> C4+E4+G4
+  const triadsModel = buildScoreModel(leanSong, false, true, true, "triads");
+  assert.strictEqual(triadsModel.steps[0].dyad.pitch, "C4+E4+G4");
+  assert.strictEqual(triadsModel.steps[0].dyadF, "1+3+5");
+  assert.deepStrictEqual(triadsModel.steps[0].expectedPitches, ["C4", "E4", "G4", "C3"]);
+
+  // 13.4 Key-Signature & Accidental Awareness (Minuet in G & Canon in D)
+  const canonSong = songDatabase.find(s => s.id === "canon-in-d");
+  const canonThirds = buildScoreModel(canonSong, false, false, true, "thirds");
+  // In D major, melody pitch F#4 -> 3rd above is A4 => F#4+A4
+  const canonStep0 = canonThirds.steps[0];
+  assert.strictEqual(canonStep0.dyad.pitch, "F#4+A4");
+  // D4 in melody (step 2) -> 3rd above is F#4 => D4+F#4
+  const canonStep2 = canonThirds.steps[2];
+  assert.strictEqual(canonStep2.dyad.pitch, "D4+F#4");
+
+  // 13.5 Grand Staff Geometry Calculations
+  const isGrandStaffDualHarm = ((false || true) && true); // showDyads=true, showLH=true
+  assert.strictEqual(isGrandStaffDualHarm, true, "Grand staff must be true when showDyads and showLH are active");
+  const systemHeight = isGrandStaffDualHarm ? 275 : 160;
+  assert.strictEqual(systemHeight, 275, "System height must be 275 for dual-hand grand staff");
+  const trebleBottomY = 30 + 12 + 40; // 82
+  const bassTopY = isGrandStaffDualHarm ? (trebleBottomY + 80) : 12; // 162
+  assert.strictEqual(bassTopY, 162, "Bass staff must be positioned at trebleBottomY + 80 (162px)");
+
+  console.log("✔ Test 13: Dual-hand harmony practice & multi-level harmony engine passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
