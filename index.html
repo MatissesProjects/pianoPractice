@@ -2293,6 +2293,30 @@
       return `${NOTE_NAMES[semi]}${oct}`;
     }
 
+    function getPitchMidiNumber(pitchStr, defaultOct = 4) {
+      if (!pitchStr || pitchStr === "-") return null;
+      const match = pitchStr.trim().match(/^([A-G][#b]?)([0-8])?$/);
+      if (!match) return null;
+      const p = match[1];
+      const oct = match[2] ? parseInt(match[2], 10) : defaultOct;
+      const semi = NOTE_OFFSETS[p];
+      if (semi === undefined) return null;
+      return (oct + 1) * 12 + semi;
+    }
+
+    function findPianoKeyElement(pitchStr, defaultOct = 4) {
+      if (!pitchStr || pitchStr === "-") return null;
+      let keyEl = document.querySelector(`.piano-key[data-note="${pitchStr}"]`);
+      if (keyEl) return keyEl;
+      const num = getPitchMidiNumber(pitchStr, defaultOct);
+      if (num !== null) {
+        const canonical = midiNumberToPitch(num);
+        keyEl = document.querySelector(`.piano-key[data-note="${canonical}"]`);
+        if (keyEl) return keyEl;
+      }
+      return null;
+    }
+
     function parseToken(tokenStr) {
       if (!tokenStr || tokenStr === "|") return { pitch: tokenStr, beats: 0 };
       const parts = tokenStr.split(":");
@@ -2686,7 +2710,12 @@
             const expected = Array.from(new Set(expectedList));
 
             const nextB = onsets[k + 1];
-            const stepBeats = nextB !== undefined ? (nextB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1);
+            const maxMB = Math.max(
+              ...rhEvents.map(e => e.startBeat + e.beats),
+              ...lhEvents.map(e => e.startBeat + e.beats),
+              0
+            );
+            const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1));
 
             const item = {
               stepIndex: stepGlobalIdx,
@@ -3471,12 +3500,12 @@
         if (!clean.match(/[1-7]/)) {
           clean += (hand === "lh" ? "2" : "4");
         }
-        const keyEl = document.querySelector(`.piano-key[data-note="${clean}"]`);
+        const keyEl = findPianoKeyElement(clean, hand === "lh" ? 2 : 4);
         if (keyEl) {
           const activeClass = hand === "dyad" ? "active-dyad" : (hand === "lh" ? "active-lh" : "active-rh");
           keyEl.classList.add(activeClass);
           setTimeout(() => {
-            keyEl.classList.remove("active-rh", "active-lh", "active-dyad");
+            keyEl.classList.remove(activeClass);
           }, durationMs);
         }
       });
@@ -3693,16 +3722,114 @@
       const staffNotes = document.querySelectorAll(".note-group");
       const steps = songNoteSteps.length;
 
+      // Active polyphonic voice tracking across concurrent hands
+      const activeVoiceNotes = new Map(); // voiceKey -> Array<{ num, pitch }>
+      const voiceOffTimeouts = new Map(); // voiceKey -> timeoutId
+
+      function updatePlaybackChordPill() {
+        const combinedNotes = [];
+        const seenMidi = new Set();
+        for (const notes of activeVoiceNotes.values()) {
+          for (const n of notes) {
+            if (!seenMidi.has(n.num)) {
+              seenMidi.add(n.num);
+              combinedNotes.push(n);
+            }
+          }
+        }
+        setChordPillDisplay(combinedNotes);
+      }
+
+      function triggerVoicePlayback(voiceKey, voiceData, defaultOct) {
+        if (!voiceData || !voiceData.pitch || voiceData.pitch === "-") return;
+        const voiceBeats = voiceData.beats || 1.0;
+        const voiceDurationMs = voiceBeats * beatMs;
+        const voiceSoundDuration = (voiceBeats * (60 / bpm)) * 0.95;
+        const activeClass = voiceKey === "dyad" ? "active-dyad" : (voiceKey === "lh" ? "active-lh" : "active-rh");
+
+        // Clear previous keys and pending note-off timeout specifically for this voice
+        document.querySelectorAll(`.piano-key.${activeClass}`).forEach(k => k.classList.remove(activeClass));
+        if (voiceOffTimeouts.has(voiceKey)) {
+          clearTimeout(voiceOffTimeouts.get(voiceKey));
+          voiceOffTimeouts.delete(voiceKey);
+        }
+
+        const parts = voiceData.pitch.split("+").filter(p => p !== "-");
+        const voiceNotes = [];
+        const affectedKeyEls = [];
+
+        parts.forEach(p => {
+          let clean = p.trim();
+          if (!clean.match(/[1-7]/)) {
+            clean += defaultOct;
+          }
+          if (isSynthAudioEnabled()) {
+            playTone(getNoteFreq(clean), voiceSoundDuration);
+          }
+          const num = getPitchMidiNumber(clean, defaultOct);
+          if (num !== null) {
+            voiceNotes.push({ num, pitch: clean });
+          }
+          const keyEl = findPianoKeyElement(clean, defaultOct);
+          if (keyEl) {
+            keyEl.classList.add(activeClass);
+            affectedKeyEls.push(keyEl);
+          }
+        });
+
+        activeVoiceNotes.set(voiceKey, voiceNotes);
+        updatePlaybackChordPill();
+
+        const offTimer = setTimeout(() => {
+          affectedKeyEls.forEach(k => k.classList.remove(activeClass));
+          if (activeVoiceNotes.get(voiceKey) === voiceNotes) {
+            activeVoiceNotes.delete(voiceKey);
+            updatePlaybackChordPill();
+          }
+          voiceOffTimeouts.delete(voiceKey);
+        }, voiceDurationMs);
+
+        voiceOffTimeouts.set(voiceKey, offTimer);
+        playbackTimeouts.push(offTimer);
+      }
+
+      function clearVoicePlayback(voiceKey) {
+        const activeClass = voiceKey === "dyad" ? "active-dyad" : (voiceKey === "lh" ? "active-lh" : "active-rh");
+        document.querySelectorAll(`.piano-key.${activeClass}`).forEach(k => k.classList.remove(activeClass));
+        if (voiceOffTimeouts.has(voiceKey)) {
+          clearTimeout(voiceOffTimeouts.get(voiceKey));
+          voiceOffTimeouts.delete(voiceKey);
+        }
+        if (activeVoiceNotes.has(voiceKey)) {
+          activeVoiceNotes.delete(voiceKey);
+          updatePlaybackChordPill();
+        }
+      }
+
       let accumulatedMs = 0;
+      let maxPieceDurationMs = 0;
 
       for (let i = 0; i < steps; i++) {
         const step = songNoteSteps[i];
         const stepBeats = step.beats || 1.0;
         const stepDurationMs = stepBeats * beatMs;
-        const noteSoundDuration = (stepBeats * (60 / bpm)) * 0.95;
+
+        if (showDyads && step.dyad && step.dyad.pitch && step.dyad.pitch !== "-") {
+          const dyadBeats = step.dyad.beats || stepBeats;
+          maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + dyadBeats * beatMs);
+        } else {
+          if (showRH && step.rh && step.rh.pitch && step.rh.pitch !== "-") {
+            const rhBeats = step.rh.beats || stepBeats;
+            maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + rhBeats * beatMs);
+          }
+          if (showLH && step.lh && step.lh.pitch && step.lh.pitch !== "-") {
+            const lhBeats = step.lh.beats || stepBeats;
+            maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + lhBeats * beatMs);
+          }
+        }
+        maxPieceDurationMs = Math.max(maxPieceDurationMs, accumulatedMs + stepDurationMs);
 
         const t = setTimeout(() => {
-          document.querySelectorAll(".piano-key").forEach(k => k.classList.remove("active-rh", "active-lh", "active-dyad"));
           staffNotes.forEach(g => g.classList.remove("active-target"));
 
           const targetEl = document.getElementById(`staff_note_${step.stepIndex}`);
@@ -3711,46 +3838,38 @@
             targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
 
-          let activePlaybackNotes = [];
-
           if (showDyads) {
             if (step.dyad && step.dyad.pitch && step.dyad.pitch !== "-") {
-              const parts = step.dyad.pitch.split("+").filter(p => p !== "-");
-              parts.forEach(p => {
-                if (isSynthAudioEnabled()) playTone(getNoteFreq(p), noteSoundDuration);
-                const num = NOTE_OFFSETS[p.replace(/[0-9]/g, "")] + (parseInt(p.slice(-1)) + 1) * 12;
-                activePlaybackNotes.push({ num, pitch: p });
-              });
-              highlightPlaybackKey(step.dyad.pitch, "dyad", stepDurationMs);
+              triggerVoicePlayback("dyad", step.dyad, 4);
+            } else if (step.dyad && step.dyad.pitch === "-") {
+              clearVoicePlayback("dyad");
             }
           } else {
-            if (showRH && step.rh && step.rh.pitch && step.rh.pitch !== "-") {
-              const partsRH = step.rh.pitch.split("+").filter(p => p !== "-");
-              partsRH.forEach(p => {
-                if (isSynthAudioEnabled()) playTone(getNoteFreq(p), noteSoundDuration);
-                const numR = NOTE_OFFSETS[p.replace(/[0-9]/g, "")] + (parseInt(p.slice(-1)) + 1) * 12;
-                activePlaybackNotes.push({ num: numR, pitch: p });
-              });
-              highlightPlaybackKey(step.rh.pitch, "rh", stepDurationMs);
+            if (showRH) {
+              if (step.rh && step.rh.pitch && step.rh.pitch !== "-") {
+                triggerVoicePlayback("rh", step.rh, 4);
+              } else if (step.rh && step.rh.pitch === "-") {
+                clearVoicePlayback("rh");
+              }
             }
-            if (showLH && step.lh && step.lh.pitch && step.lh.pitch !== "-") {
-              const partsLH = step.lh.pitch.split("+").filter(p => p !== "-");
-              partsLH.forEach(p => {
-                if (isSynthAudioEnabled()) playTone(getNoteFreq(p), noteSoundDuration);
-                const numL = NOTE_OFFSETS[p.replace(/[0-9]/g, "")] + (parseInt(p.slice(-1)) + 1) * 12;
-                activePlaybackNotes.push({ num: numL, pitch: p });
-              });
-              highlightPlaybackKey(step.lh.pitch, "lh", stepDurationMs);
+            if (showLH) {
+              if (step.lh && step.lh.pitch && step.lh.pitch !== "-") {
+                triggerVoicePlayback("lh", step.lh, 2);
+              } else if (step.lh && step.lh.pitch === "-") {
+                clearVoicePlayback("lh");
+              }
             }
           }
-
-          setChordPillDisplay(activePlaybackNotes);
-          if (i === steps - 1) setTimeout(stopPlayback, stepDurationMs);
         }, accumulatedMs);
 
         playbackTimeouts.push(t);
         accumulatedMs += stepDurationMs;
       }
+
+      const endTimer = setTimeout(() => {
+        stopPlayback();
+      }, maxPieceDurationMs);
+      playbackTimeouts.push(endTimer);
     }
 
     // Mode Toggle (Wait Practice vs Auto Play)

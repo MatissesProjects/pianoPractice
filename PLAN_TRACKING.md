@@ -56,3 +56,11 @@
   - [x] Synthesizer audio gating (`isSynthAudioEnabled`): prevent duplicate audit beeps on MIDI input and mute all synth audio when "Synth Audio" is unchecked
   - [x] Automated verification test suite for volume gain scaling, mute toggle, and clamping (`tests/test_score_engine.js` Test 9 100% pass)
 
+- [x] **Milestone 9: Auto Play Preview Polyphonic Independent Voice Sustaining**
+  - [x] Independent voice audio duration: compute sound durations using each voice's actual note duration (`step.rh.beats`, `step.lh.beats`, `step.dyad.beats`) instead of step onset delta
+  - [x] Independent key lifecycle & illumination: isolate `.active-rh`, `.active-lh`, and `.active-dyad` so voice transitions (e.g. RH quarter notes) never clear sustained notes in the other hand (e.g. LH whole notes)
+  - [x] Enharmonic keyboard element lookup: resolve flat/sharp canonical pitch names (`findPianoKeyElement`)
+  - [x] Dynamic multi-voice chord pill tracking: maintain `activeVoiceNotes` map and update `setChordPillDisplay` on every onset and note-off
+  - [x] Measure boundary & piece end synchronization: calculate `stepBeats` using measure boundaries and schedule `stopPlayback` after `maxPieceDurationMs`
+  - [x] Automated verification test suite for polyphonic independent voice sustaining (`tests/test_score_engine.js` Test 10 100% pass)
+

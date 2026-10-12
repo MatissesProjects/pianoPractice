@@ -142,7 +142,12 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
         const expected = Array.from(new Set(expectedList));
 
         const nextB = onsets[k + 1];
-        const stepBeats = nextB !== undefined ? (nextB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1);
+        const maxMB = Math.max(
+          ...rhEvents.map(e => e.startBeat + e.beats),
+          ...lhEvents.map(e => e.startBeat + e.beats),
+          0
+        );
+        const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1));
 
         const item = {
           stepIndex: stepGlobalIdx,
@@ -608,6 +613,115 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
   assert.strictEqual(shouldTriggerSynth(true, true), true, "When synth audio is checked, MIDI strikes trigger live synth");
 
   console.log("✔ Test 9: Universal master volume control, perceptual taper & synth audio gating passed");
+}
+
+// 10. Test Polyphonic Independent Voice Sustaining (LH Whole Notes vs RH Quarter Notes)
+{
+  const marySong = songDatabase.find(s => s.id === "mary-had-a-little-lamb");
+  assert.ok(marySong, "Mary Had a Little Lamb exists in songDatabase");
+
+  const model = buildScoreModel(marySong, true, true, false);
+  const m1Steps = model.measures[0];
+  assert.strictEqual(m1Steps.length, 4, "Measure 1 has 4 onset steps");
+
+  // Step 0: Onset of LH whole note (C3:4) and RH quarter note (E4:1)
+  assert.strictEqual(m1Steps[0].startBeat, 0);
+  assert.strictEqual(m1Steps[0].rh.pitch, "E4");
+  assert.strictEqual(m1Steps[0].rh.beats, 1);
+  assert.strictEqual(m1Steps[0].lh.pitch, "C3");
+  assert.strictEqual(m1Steps[0].lh.beats, 4);
+
+  // Steps 1-3: RH steps through quarter notes while LH sustains (lh is null)
+  for (let s = 1; s <= 3; s++) {
+    assert.strictEqual(m1Steps[s].startBeat, s);
+    assert.ok(m1Steps[s].rh, `Step ${s} has RH onset`);
+    assert.strictEqual(m1Steps[s].lh, null, `Step ${s} has no new LH onset; LH is held`);
+  }
+
+  // Simulation of Independent Voice Playback Engine
+  const bpm = 100;
+  const beatMs = (60 / bpm) * 1000; // 600ms per beat
+  
+  // Track active keys and voice notes over simulated timeline
+  const activeKeys = {
+    "active-rh": new Set(),
+    "active-lh": new Set()
+  };
+  const activeVoiceNotes = new Map();
+
+  function triggerVoice(voiceKey, voiceData, defaultOct) {
+    if (!voiceData || !voiceData.pitch || voiceData.pitch === "-") return;
+    const voiceBeats = voiceData.beats || 1.0;
+    const voiceSoundDuration = (voiceBeats * (60 / bpm)) * 0.95;
+    const activeClass = voiceKey === "lh" ? "active-lh" : "active-rh";
+
+    // Clear previous keys for this voice
+    activeKeys[activeClass].clear();
+
+    const parts = voiceData.pitch.split("+").filter(p => p !== "-");
+    const voiceNotes = [];
+    parts.forEach(p => {
+      voiceNotes.push(p);
+      activeKeys[activeClass].add(p);
+    });
+
+    activeVoiceNotes.set(voiceKey, voiceNotes);
+
+    return {
+      voiceSoundDuration,
+      voiceDurationMs: voiceBeats * beatMs
+    };
+  }
+
+  function expireVoice(voiceKey, targetNotes) {
+    const activeClass = voiceKey === "lh" ? "active-lh" : "active-rh";
+    if (activeVoiceNotes.get(voiceKey) === targetNotes) {
+      activeVoiceNotes.delete(voiceKey);
+      activeKeys[activeClass].clear();
+    }
+  }
+
+  // At Beat 0 (t = 0): LH C3:4 and RH E4:1 start simultaneously
+  const lh0 = triggerVoice("lh", m1Steps[0].lh, 2);
+  const rh0 = triggerVoice("rh", m1Steps[0].rh, 4);
+
+  assert.strictEqual(lh0.voiceSoundDuration, (4 * (60 / bpm)) * 0.95, "LH sound duration covers full 4 beats");
+  assert.strictEqual(rh0.voiceSoundDuration, (1 * (60 / bpm)) * 0.95, "RH sound duration covers 1 beat");
+  assert.ok(activeKeys["active-lh"].has("C3"), "LH C3 key is active at Beat 0");
+  assert.ok(activeKeys["active-rh"].has("E4"), "RH E4 key is active at Beat 0");
+
+  // At Beat 1 (t = 600ms): RH transitions to D4:1, LH is holding without onset
+  // Notice: previous RH key expires or gets replaced, but LH C3 MUST NOT BE TOUCHED!
+  expireVoice("rh", activeVoiceNotes.get("rh"));
+  assert.strictEqual(activeKeys["active-rh"].size, 0, "Previous RH note released");
+  assert.ok(activeKeys["active-lh"].has("C3"), "LH C3 remains active and sustained across beat 1 transition");
+
+  const rh1 = triggerVoice("rh", m1Steps[1].rh, 4);
+  assert.ok(activeKeys["active-rh"].has("D4"), "RH D4 active at Beat 1");
+  assert.ok(activeKeys["active-lh"].has("C3"), "LH C3 STILL held at Beat 1");
+  assert.deepStrictEqual(activeVoiceNotes.get("lh"), ["C3"], "LH C3 voice note is maintained");
+  assert.deepStrictEqual(activeVoiceNotes.get("rh"), ["D4"], "RH D4 voice note is active");
+
+  // At Beat 2 (t = 1200ms): RH transitions to C4:1, LH continues holding
+  expireVoice("rh", activeVoiceNotes.get("rh"));
+  const rh2 = triggerVoice("rh", m1Steps[2].rh, 4);
+  assert.ok(activeKeys["active-rh"].has("C4"), "RH C4 active at Beat 2");
+  assert.ok(activeKeys["active-lh"].has("C3"), "LH C3 STILL held at Beat 2");
+
+  // At Beat 3 (t = 1800ms): RH transitions to D4:1, LH continues holding
+  expireVoice("rh", activeVoiceNotes.get("rh"));
+  const rh3 = triggerVoice("rh", m1Steps[3].rh, 4);
+  assert.ok(activeKeys["active-rh"].has("D4"), "RH D4 active at Beat 3");
+  assert.ok(activeKeys["active-lh"].has("C3"), "LH C3 STILL held at Beat 3");
+
+  // At Beat 4 (t = 2400ms): LH 4-beat duration expires, RH 1-beat duration expires
+  expireVoice("rh", activeVoiceNotes.get("rh"));
+  expireVoice("lh", activeVoiceNotes.get("lh"));
+  assert.strictEqual(activeKeys["active-rh"].size, 0, "RH keys cleared at end of measure");
+  assert.strictEqual(activeKeys["active-lh"].size, 0, "LH keys cleared when whole note completes at beat 4");
+  assert.strictEqual(activeVoiceNotes.size, 0, "All voices cleared");
+
+  console.log("✔ Test 10: Polyphonic independent voice sustaining (LH whole notes vs RH quarter notes) passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
