@@ -478,6 +478,26 @@
       color: #34d399 !important;
     }
 
+    .refresh-devices-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      border-radius: 6px;
+      padding: 0.35rem 0.55rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+    .refresh-devices-btn:hover {
+      background: #334155;
+      color: #f8fafc;
+      border-color: #475569;
+    }
+
     .channel-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1848,6 +1868,7 @@
           <select id="midiDeviceSelect" class="midi-select">
             <option value="">No MIDI Device Found</option>
           </select>
+          <button type="button" id="refreshMidiDevicesBtn" class="refresh-devices-btn" title="Rescan MIDI devices and reset activity">🔄</button>
         </div>
 
         <div class="midi-select-group midi-channel-picker-group" id="midiChannelPickerGroup">
@@ -3937,12 +3958,13 @@
         lastActiveTime: 0,
         totalMessages: 0,
         isActive: false,
-        timerId: null
+        timerId: null,
+        heldNotes: new Set()
       };
     }
     let globalMidiLedTimer = null;
 
-    function recordMidiChannelActivity(channel, cmd) {
+    function recordMidiChannelActivity(channel, cmd, noteNumber, velocity) {
       if (channel < 1 || channel > 16) return;
       const now = performance.now();
       const st = midiChannelActivity[channel];
@@ -3950,22 +3972,56 @@
 
       st.lastActiveTime = now;
       st.totalMessages++;
-      st.isActive = true;
 
-      if (st.timerId) clearTimeout(st.timerId);
-      st.timerId = setTimeout(() => {
-        st.isActive = false;
-        renderMidiChannelActivity();
-      }, 750);
+      if (cmd === 9 && velocity > 0) {
+        // Note On
+        if (noteNumber !== undefined) {
+          st.heldNotes.add(noteNumber);
+        }
+        st.isActive = true;
+        if (st.timerId) clearTimeout(st.timerId);
+        // Safety decay fallback in case device disconnects or drops Note Off
+        st.timerId = setTimeout(() => {
+          st.heldNotes.clear();
+          st.isActive = false;
+          renderMidiChannelActivity();
+        }, 3000);
+      } else if (cmd === 8 || (cmd === 9 && velocity === 0)) {
+        // Note Off
+        if (noteNumber !== undefined) {
+          st.heldNotes.delete(noteNumber);
+        }
+        if (st.heldNotes.size === 0) {
+          if (st.timerId) clearTimeout(st.timerId);
+          // Return to IDLE 200ms after all notes on this channel are released
+          st.timerId = setTimeout(() => {
+            st.isActive = false;
+            renderMidiChannelActivity();
+          }, 200);
+        }
+      } else {
+        // CC, Pitch Bend, Program Change, etc.
+        st.isActive = true;
+        if (st.timerId) clearTimeout(st.timerId);
+        st.timerId = setTimeout(() => {
+          if (st.heldNotes.size === 0) {
+            st.isActive = false;
+            renderMidiChannelActivity();
+          }
+        }, 300);
+      }
 
-      // Flash global button LED
+      // Flash global button LED while receiving data
       const globalLed = document.getElementById("midiChannelGlobalLed");
       if (globalLed) {
         globalLed.classList.add("live-signal");
         if (globalMidiLedTimer) clearTimeout(globalMidiLedTimer);
         globalMidiLedTimer = setTimeout(() => {
-          globalLed.classList.remove("live-signal");
-        }, 300);
+          const anyActive = Object.values(midiChannelActivity).some(s => s.isActive);
+          if (!anyActive && globalLed) {
+            globalLed.classList.remove("live-signal");
+          }
+        }, 250);
       }
 
       renderMidiChannelActivity();
@@ -3973,7 +4029,6 @@
 
     function renderMidiChannelActivity() {
       let anyChannelActive = false;
-      let anyChannelRecent = false;
 
       for (let c = 1; c <= 16; c++) {
         const st = midiChannelActivity[c];
@@ -3992,18 +4047,8 @@
             badge.className = "ch-badge live";
             badge.textContent = "LIVE";
           }
-        } else if (st.totalMessages > 0) {
-          anyChannelRecent = true;
-          if (led) {
-            led.classList.remove("live-signal");
-            led.classList.add("recent-signal");
-          }
-          if (btn) btn.classList.remove("channel-signal-pulse");
-          if (badge) {
-            badge.className = "ch-badge active";
-            badge.textContent = "ACTIVE";
-          }
         } else {
+          // Clean return to IDLE when done (no lingering ACTIVE status)
           if (led) {
             led.classList.remove("live-signal", "recent-signal");
           }
@@ -4030,16 +4075,6 @@
           omniBadge.className = "ch-badge live";
           omniBadge.textContent = "LIVE";
         }
-      } else if (anyChannelRecent) {
-        if (omniLed) {
-          omniLed.classList.remove("live-signal");
-          omniLed.classList.add("recent-signal");
-        }
-        if (omniBtn) omniBtn.classList.remove("channel-signal-pulse");
-        if (omniBadge) {
-          omniBadge.className = "ch-badge active";
-          omniBadge.textContent = "ACTIVE";
-        }
       } else {
         if (omniLed) omniLed.classList.remove("live-signal", "recent-signal");
         if (omniBtn) omniBtn.classList.remove("channel-signal-pulse");
@@ -4054,19 +4089,23 @@
       if (nativeSelect) {
         Array.from(nativeSelect.options).forEach(opt => {
           if (opt.value === "all") {
-            opt.textContent = anyChannelActive ? "All Channels (Omni) 🟢 LIVE" : (anyChannelRecent ? "All Channels (Omni) 🟢 Active" : "All Channels (Omni)");
+            opt.textContent = anyChannelActive ? "All Channels (Omni) 🟢 LIVE" : "All Channels (Omni)";
           } else {
             const ch = parseInt(opt.value, 10);
             const st = midiChannelActivity[ch];
             if (st && st.isActive) {
               opt.textContent = `Channel ${ch} 🟢 LIVE`;
-            } else if (st && st.totalMessages > 0) {
-              opt.textContent = `Channel ${ch} 🟢 (Active)`;
             } else {
               opt.textContent = `Channel ${ch}`;
             }
           }
         });
+      }
+
+      // Turn off trigger button LED if all channels are idle
+      const globalLed = document.getElementById("midiChannelGlobalLed");
+      if (globalLed && !anyChannelActive) {
+        globalLed.classList.remove("live-signal");
       }
     }
 
@@ -4074,11 +4113,19 @@
       for (let c = 1; c <= 16; c++) {
         const st = midiChannelActivity[c];
         if (st.timerId) clearTimeout(st.timerId);
+        if (st.heldNotes) st.heldNotes.clear();
         st.lastActiveTime = 0;
         st.totalMessages = 0;
         st.isActive = false;
         st.timerId = null;
       }
+      if (globalMidiLedTimer) {
+        clearTimeout(globalMidiLedTimer);
+        globalMidiLedTimer = null;
+      }
+      const globalLed = document.getElementById("midiChannelGlobalLed");
+      if (globalLed) globalLed.classList.remove("live-signal");
+
       renderMidiChannelActivity();
     }
 
@@ -4208,6 +4255,9 @@
       const prevVal = select.value;
       select.innerHTML = "";
 
+      // Cleanly reset channel activity when device list refreshes
+      resetMidiChannelActivity();
+
       if (!midiAccess) return;
 
       const inputs = Array.from(midiAccess.inputs.values());
@@ -4234,7 +4284,13 @@
 
     function attachMidiListener(deviceId) {
       if (selectedMidiInput) selectedMidiInput.onmidimessage = null;
-      if (!midiAccess || !deviceId) return;
+      // Reset channel activity when switching to another MIDI port or device
+      resetMidiChannelActivity();
+
+      if (!midiAccess || !deviceId) {
+        document.getElementById("midiStatusText").textContent = "No MIDI device selected";
+        return;
+      }
 
       const input = midiAccess.inputs.get(deviceId);
       if (input) {
@@ -4248,17 +4304,17 @@
       const [status, data1, data2] = event.data;
       const cmd = status >> 4;
       const channel = (status & 0xF) + 1;
+      const noteNumber = data1;
+      const velocity = data2 !== undefined ? data2 : 0;
 
       // Track live incoming channel telemetry for voice messages (status < 0xF0)
       if (status < 0xF0 && channel >= 1 && channel <= 16) {
-        recordMidiChannelActivity(channel, cmd);
+        recordMidiChannelActivity(channel, cmd, noteNumber, velocity);
       }
 
       const filterCh = document.getElementById("midiChannelSelect").value;
       if (filterCh !== "all" && channel !== parseInt(filterCh, 10)) return;
 
-      const noteNumber = data1;
-      const velocity = data2 !== undefined ? data2 : 0;
       const pitchName = midiNumberToPitch(noteNumber);
 
       // Note On Event
@@ -4333,9 +4389,20 @@
       }
     }
 
-    document.getElementById("midiDeviceSelect").addEventListener("change", (e) => {
-      attachMidiListener(e.target.value);
-    });
+    const midiDeviceSelect = document.getElementById("midiDeviceSelect");
+    if (midiDeviceSelect) {
+      midiDeviceSelect.addEventListener("change", (e) => {
+        resetMidiChannelActivity();
+        attachMidiListener(e.target.value);
+      });
+    }
+
+    const refreshMidiDevicesBtn = document.getElementById("refreshMidiDevicesBtn");
+    if (refreshMidiDevicesBtn) {
+      refreshMidiDevicesBtn.addEventListener("click", () => {
+        updateMidiDeviceList();
+      });
+    }
 
     // Auto Playback Transport (Preview Mode)
     function stopPlayback() {

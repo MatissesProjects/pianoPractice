@@ -77,10 +77,12 @@
   - [x] Real-time per-channel incoming telemetry across all 16 MIDI channels ($1..16$)
   - [x] Pre-filter telemetry recording: inspect channel before filter gating so unselected active channels are identified
   - [x] Interactive custom channel dropdown with 16-channel live signal grid & Omni banner
-  - [x] Real-time LED signal pulses & dynamic badges (`LIVE`, `ACTIVE`, `IDLE`) when open
+  - [x] Polyphonic note lifecycle & clean return to `IDLE`: track held notes per channel, extinguishes LED and resets badge to `IDLE` 200ms after all notes are released (no lingering `ACTIVE` badge)
+  - [x] Device change & rescan reset: automatically reset all 16 channels, Omni, and global indicators to `IDLE` on device selection change, MIDI device list updates, or manual rescan
+  - [x] One-click MIDI device rescan button (`🔄` `#refreshMidiDevicesBtn`) to refresh port list and reset channel activity
   - [x] Click-to-select channel switching with persistent synced `<select id="midiChannelSelect">`
   - [x] Outside click and Escape key dismissal
-  - [x] Automated verification test suite for multi-channel decoding and activity tracking (`tests/test_score_engine.js` Test 12 100% pass)
+  - [x] Automated verification test suite for channel decoding, clean IDLE transition, and device reset (`tests/test_score_engine.js` Test 12 100% pass)
 
 
 

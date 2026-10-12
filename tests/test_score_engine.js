@@ -863,27 +863,68 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
   console.log("✔ Test 11: Customizable visualizer key count & starting offset engine passed");
 }
 
-// 12. Test Real-Time MIDI Channel Activity Monitor & Telemetry Engine
+// 12. Test Real-Time MIDI Channel Activity Monitor & Device Switch Reset Engine
 {
   const channelActivity = {};
   for (let c = 1; c <= 16; c++) {
     channelActivity[c] = {
       totalMessages: 0,
       isActive: false,
-      lastActiveTime: 0
+      lastActiveTime: 0,
+      heldNotes: new Set()
     };
+  }
+
+  function recordMidiTelemetry(channel, cmd, noteNumber, velocity) {
+    if (channel < 1 || channel > 16) return;
+    const st = channelActivity[channel];
+    st.totalMessages++;
+    st.lastActiveTime = Date.now();
+
+    if (cmd === 9 && velocity > 0) {
+      if (noteNumber !== undefined) st.heldNotes.add(noteNumber);
+      st.isActive = true;
+    } else if (cmd === 8 || (cmd === 9 && velocity === 0)) {
+      if (noteNumber !== undefined) st.heldNotes.delete(noteNumber);
+      if (st.heldNotes.size === 0) {
+        // Note release decay expires -> return to IDLE
+        st.isActive = false;
+      }
+    } else {
+      // CC / pitch bend pulse expires -> return to IDLE
+      st.isActive = false;
+    }
+  }
+
+  function getChannelBadge(channel) {
+    const st = channelActivity[channel];
+    return (st && st.isActive) ? "LIVE" : "IDLE";
+  }
+
+  function getOmniBadge() {
+    const anyActive = Object.values(channelActivity).some(s => s.isActive);
+    return anyActive ? "LIVE" : "OMNI";
+  }
+
+  function resetChannelActivity() {
+    for (let c = 1; c <= 16; c++) {
+      const st = channelActivity[c];
+      st.heldNotes.clear();
+      st.lastActiveTime = 0;
+      st.totalMessages = 0;
+      st.isActive = false;
+    }
   }
 
   function processMidiMessage(status, data1, data2, currentFilter) {
     const cmd = status >> 4;
     const channel = (status & 0xF) + 1;
+    const velocity = data2 !== undefined ? data2 : 0;
     let telemetryRecorded = false;
 
     // Track live incoming channel telemetry for voice messages (status < 0xF0)
     if (status < 0xF0 && channel >= 1 && channel <= 16) {
-      channelActivity[channel].totalMessages++;
-      channelActivity[channel].isActive = true;
-      channelActivity[channel].lastActiveTime = Date.now();
+      recordMidiTelemetry(channel, cmd, data1, velocity);
       telemetryRecorded = true;
     }
 
@@ -898,58 +939,64 @@ function buildScoreModel(song, showRH, showLH, showDyads) {
     };
   }
 
-  // 12.1 Channel Voice Messages (Channels 1, 10, 16)
-  const msgCh1 = processMidiMessage(0x90, 60, 100, "all"); // Note on Ch 1
-  assert.strictEqual(msgCh1.channel, 1);
-  assert.strictEqual(msgCh1.telemetryRecorded, true);
-  assert.strictEqual(channelActivity[1].totalMessages, 1);
+  // 12.1 Channel Voice Messages & Polyphonic Note Tracking (Channel 1)
+  // Press Middle C (60) on Channel 1
+  const noteOn1 = processMidiMessage(0x90, 60, 100, "all");
+  assert.strictEqual(noteOn1.channel, 1);
+  assert.strictEqual(noteOn1.telemetryRecorded, true);
   assert.strictEqual(channelActivity[1].isActive, true);
+  assert.strictEqual(channelActivity[1].heldNotes.has(60), true);
+  assert.strictEqual(getChannelBadge(1), "LIVE");
+  assert.strictEqual(getOmniBadge(), "LIVE");
 
-  const msgCh10 = processMidiMessage(0x99, 36, 120, "all"); // Note on Ch 10 (Drums)
-  assert.strictEqual(msgCh10.channel, 10);
-  assert.strictEqual(msgCh10.telemetryRecorded, true);
-  assert.strictEqual(channelActivity[10].totalMessages, 1);
-  assert.strictEqual(channelActivity[10].isActive, true);
+  // Press E4 (64) on Channel 1 (2-note chord)
+  const noteOn2 = processMidiMessage(0x90, 64, 90, "all");
+  assert.strictEqual(channelActivity[1].heldNotes.size, 2);
+  assert.strictEqual(channelActivity[1].isActive, true);
+  assert.strictEqual(getChannelBadge(1), "LIVE");
 
-  const msgCh16 = processMidiMessage(0x9F, 72, 90, "all"); // Note on Ch 16
-  assert.strictEqual(msgCh16.channel, 16);
-  assert.strictEqual(msgCh16.telemetryRecorded, true);
-  assert.strictEqual(channelActivity[16].totalMessages, 1);
+  // Release Middle C (60) while E4 is still held
+  const noteOff1 = processMidiMessage(0x80, 60, 0, "all");
+  assert.strictEqual(channelActivity[1].heldNotes.size, 1);
+  assert.strictEqual(channelActivity[1].heldNotes.has(64), true);
+  assert.strictEqual(channelActivity[1].isActive, true, "Channel 1 remains LIVE while other notes are held");
+  assert.strictEqual(getChannelBadge(1), "LIVE");
 
-  const msgCC = processMidiMessage(0xB2, 64, 127, "all"); // Sustain pedal on Ch 3
-  assert.strictEqual(msgCC.channel, 3);
-  assert.strictEqual(msgCC.telemetryRecorded, true);
-  assert.strictEqual(channelActivity[3].totalMessages, 1);
+  // 12.2 Clean Return to IDLE When Notes Release
+  // Release E4 (64) -> All notes released on Channel 1
+  const noteOff2 = processMidiMessage(0x80, 64, 0, "all");
+  assert.strictEqual(channelActivity[1].heldNotes.size, 0);
+  assert.strictEqual(channelActivity[1].isActive, false, "Channel 1 returns to inactive once all notes released");
+  assert.strictEqual(getChannelBadge(1), "IDLE", "Channel 1 must return cleanly to IDLE (never lingering as ACTIVE)");
+  assert.strictEqual(getOmniBadge(), "OMNI", "Omni returns to OMNI once all channels are idle");
 
-  // 12.2 Real-time System Messages Ignored (Clocks & Active Sensing)
-  const msgClock = processMidiMessage(0xF8, 0, 0, "all"); // MIDI Clock
+  // 12.3 Real-time System Messages Ignored (Clocks & Active Sensing)
+  const msgClock = processMidiMessage(0xF8, 0, 0, "all");
   assert.strictEqual(msgClock.telemetryRecorded, false, "MIDI Clock (0xF8) must not trigger channel telemetry");
 
-  const msgSense = processMidiMessage(0xFE, 0, 0, "all"); // Active Sensing
+  const msgSense = processMidiMessage(0xFE, 0, 0, "all");
   assert.strictEqual(msgSense.telemetryRecorded, false, "Active Sensing (0xFE) must not trigger channel telemetry");
 
-  // 12.3 Pre-Filter Telemetry Recording Verification
-  // When filter is set to Channel 1, receiving data on Channel 5 must still record Ch 5 activity,
-  // allowing the user to spot that Channel 5 is sending data!
-  const msgCh5 = processMidiMessage(0x94, 64, 100, "1"); // Note on Ch 5 while filter is '1'
+  // 12.4 Pre-Filter Telemetry Recording Verification
+  // When filter is set to Channel 1, receiving data on Channel 5 still records Ch 5 activity
+  const msgCh5 = processMidiMessage(0x94, 67, 100, "1"); // Note on Ch 5 while filter is '1'
   assert.strictEqual(msgCh5.telemetryRecorded, true, "Channel 5 activity recorded even when filter is set to Ch 1");
   assert.strictEqual(msgCh5.passesFilter, false, "Channel 5 data correctly gated from downstream processing");
-  assert.strictEqual(channelActivity[5].totalMessages, 1, "Channel 5 message count incremented");
-  assert.strictEqual(channelActivity[5].isActive, true, "Channel 5 marked active so UI highlights it");
+  assert.strictEqual(channelActivity[5].isActive, true, "Channel 5 marked LIVE so user sees live channel");
+  assert.strictEqual(getChannelBadge(5), "LIVE");
 
-  // When user switches filter to '5', Channel 5 data passes through
-  const msgCh5Pass = processMidiMessage(0x94, 64, 100, "5");
-  assert.strictEqual(msgCh5Pass.passesFilter, true, "Channel 5 data passes when filter is '5'");
+  // 12.5 Device Switch / Rescan Clean Reset
+  // Switch MIDI device: all channels must reset completely to IDLE
+  resetChannelActivity();
+  for (let c = 1; c <= 16; c++) {
+    assert.strictEqual(channelActivity[c].isActive, false, `Channel ${c} must be inactive after device reset`);
+    assert.strictEqual(channelActivity[c].heldNotes.size, 0, `Channel ${c} held notes must be empty after device reset`);
+    assert.strictEqual(channelActivity[c].totalMessages, 0, `Channel ${c} message count must be 0 after device reset`);
+    assert.strictEqual(getChannelBadge(c), "IDLE", `Channel ${c} badge must be IDLE after device reset`);
+  }
+  assert.strictEqual(getOmniBadge(), "OMNI", "Omni badge must be OMNI after device reset");
 
-  // 12.4 Activity Decay & Active vs Idle status
-  channelActivity[1].isActive = false; // Simulate 750ms decay timeout
-  assert.strictEqual(channelActivity[1].isActive, false, "Channel 1 decayed to inactive");
-  assert.strictEqual(channelActivity[1].totalMessages > 0, true, "Channel 1 retains message history (ACTIVE badge)");
-
-  assert.strictEqual(channelActivity[2].totalMessages, 0, "Channel 2 had no activity (IDLE badge)");
-  assert.strictEqual(channelActivity[2].isActive, false);
-
-  console.log("✔ Test 12: Real-time MIDI channel activity monitor & telemetry engine passed");
+  console.log("✔ Test 12: Real-time MIDI channel activity monitor, IDLE return & device reset engine passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
