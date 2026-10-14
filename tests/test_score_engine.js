@@ -127,51 +127,60 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
         stepGlobalIdx++;
       });
     } else if (showDyads && !showLH) {
+      let dyadBeat = 0;
       mDyad.forEach((t, k) => {
         const parsed = parseToken(t);
         const item = {
           stepIndex: stepGlobalIdx,
           index: stepGlobalIdx,
           measure: m + 1,
+          startBeat: dyadBeat,
           dyad: parsed,
           dyadF: mDyadF[k] || "",
           expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
           beats: parsed.beats
         };
+        dyadBeat += parsed.beats;
         item.displayLabel = item.expectedPitches.join(" + ");
         measureItems.push(item);
         steps.push(item);
         stepGlobalIdx++;
       });
     } else if (showRH && !showLH) {
+      let rhBeat = 0;
       mRH.forEach((t, k) => {
         const parsed = parseToken(t);
         const item = {
           stepIndex: stepGlobalIdx,
           index: stepGlobalIdx,
           measure: m + 1,
+          startBeat: rhBeat,
           rh: parsed,
           rhF: mRHF[k] || "",
           expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
           beats: parsed.beats
         };
+        rhBeat += parsed.beats;
         item.displayLabel = item.expectedPitches.join(" + ");
         measureItems.push(item);
         steps.push(item);
         stepGlobalIdx++;
       });
     } else if (showLH && !showRH) {
+      let lhBeat = 0;
       mLH.forEach((t, k) => {
         const parsed = parseToken(t);
         const item = {
           stepIndex: stepGlobalIdx,
           index: stepGlobalIdx,
           measure: m + 1,
+          startBeat: lhBeat,
           lh: parsed,
           lhF: mLHF[k] || "",
           expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
           beats: parsed.beats
         };
+        lhBeat += parsed.beats;
         item.displayLabel = item.expectedPitches.join(" + ");
         measureItems.push(item);
         steps.push(item);
@@ -1352,6 +1361,136 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   engine.handleMidiMessage(0xB0, 64, 0);   // Release pedal
 
   console.log("✔ Test 15: Velocity-sensitive timbre scaling & CC 64 sustain pedal engine passed");
+}
+
+// ==========================================
+// TEST 16: Proportional Beat Spacing, Rest Glyphs & Roman Numeral Harmonic Analysis
+// ==========================================
+{
+  // 16.1 Verify Beat-Proportional Spacing calculation
+  const NOTE_OFFSETS = window.MusicTheory.NOTE_OFFSETS;
+
+  function calculateNoteX(item, measureStartX, availableInnerX, totalMeasureBeats, nIdx, noteCount) {
+    const beatVal = (typeof item.startBeat === "number" && !isNaN(item.startBeat))
+      ? item.startBeat
+      : (nIdx * (totalMeasureBeats / Math.max(1, noteCount)));
+    const beatFraction = Math.max(0, Math.min(1, beatVal / totalMeasureBeats));
+    return measureStartX + 18 + beatFraction * availableInnerX;
+  }
+
+  const testSong = {
+    id: "rhythm-sync-test",
+    title: "Rhythm Sync Test",
+    rh: "C4:2.0 E4:1.0 G4:1.0 | C5:3.0 -:1.0",
+    lh: "C3:4.0 | C3:2.0 G3:2.0",
+    meter: 4
+  };
+
+  const model = buildScoreModel(testSong, true, true, false);
+  assert.strictEqual(model.measures.length, 2, "Must build 2 measures");
+
+  const m1 = model.measures[0];
+  // In Measure 1:
+  // Onsets: C4+C3 at beat 0; E4 at beat 2; G4 at beat 3
+  assert.strictEqual(m1.length, 3, "Measure 1 should have 3 rhythm steps");
+  assert.strictEqual(m1[0].startBeat, 0, "First step at beat 0");
+  assert.strictEqual(m1[1].startBeat, 2, "Second step at beat 2 (after half note)");
+  assert.strictEqual(m1[2].startBeat, 3, "Third step at beat 3 (after quarter note)");
+
+  const startX = 50;
+  const availW = 200;
+  const x0 = calculateNoteX(m1[0], startX, availW, 4, 0, 3);
+  const x1 = calculateNoteX(m1[1], startX, availW, 4, 1, 3);
+  const x2 = calculateNoteX(m1[2], startX, availW, 4, 2, 3);
+
+  // Proportional:
+  // x0 = 50 + 18 + (0/4)*200 = 68
+  // x1 = 50 + 18 + (2/4)*200 = 68 + 100 = 168 (exactly at the half-way point of the measure!)
+  // x2 = 50 + 18 + (3/4)*200 = 68 + 150 = 218 (at 3/4 point)
+  assert.strictEqual(Math.round(x0), 68, "Beat 0 coordinate");
+  assert.strictEqual(Math.round(x1), 168, "Beat 2 coordinate is exactly midpoint");
+  assert.strictEqual(Math.round(x2), 218, "Beat 3 coordinate is at 3/4 distance");
+
+  // 16.2 Verify Rhythmic Rest Glyphs
+  function getRestGlyph(beats) {
+    if (beats >= 3.5) return "𝄻"; // Whole rest
+    if (beats >= 1.75) return "𝄼"; // Half rest
+    if (beats <= 0.75) return "𝄾"; // Eighth rest
+    return "𝄽"; // Quarter rest
+  }
+
+  assert.strictEqual(getRestGlyph(4.0), "𝄻", "Whole rest (4 beats)");
+  assert.strictEqual(getRestGlyph(2.0), "𝄼", "Half rest (2 beats)");
+  assert.strictEqual(getRestGlyph(1.0), "𝄽", "Quarter rest (1 beat)");
+  assert.strictEqual(getRestGlyph(0.5), "𝄾", "Eighth rest (0.5 beat)");
+
+  // Measure 2 has a 1-beat rest at beat 3
+  const m2 = model.measures[1];
+  const restItem = m2.find(item => item.rh && item.rh.pitch === "-");
+  assert.ok(restItem, "Measure 2 contains rest token '-'");
+  assert.strictEqual(restItem.startBeat, 3, "Rest occurs at beat 3");
+  assert.strictEqual(getRestGlyph(restItem.rh.beats), "𝄽", "Quarter rest glyph for 1.0 beat");
+
+  // 16.3 Verify Harmonic Roman Numeral Analysis
+  function getRomanNumeralAnalysis(chordInfo, song) {
+    if (!chordInfo || !chordInfo.name || !song) return null;
+    let tonic = "C";
+    if (song.category && song.category.includes("C 5-Finger")) tonic = "C";
+    else if (song.id === "canon-in-d") tonic = "D";
+    else if (song.id === "bach-minuet-g" || (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5"))) tonic = "G";
+    else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-no-1")) tonic = "D";
+    else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves"))) tonic = "A";
+    else if (song.id && song.id.includes("amazing-grace-f")) tonic = "F";
+    else {
+      const firstBass = song.lh ? song.lh.match(/([A-G][#b]?)/) : null;
+      if (firstBass) tonic = firstBass[1];
+      else {
+        const firstMel = song.rh ? song.rh.match(/([A-G][#b]?)/) : null;
+        if (firstMel) tonic = firstMel[1];
+      }
+    }
+
+    const tonicSemi = NOTE_OFFSETS[tonic] ?? 0;
+    const rootMatch = chordInfo.name.match(/^([A-G][#b]?)/);
+    if (!rootMatch) return null;
+    const chordRoot = rootMatch[1];
+    const chordSemi = NOTE_OFFSETS[chordRoot];
+    if (chordSemi === undefined) return null;
+
+    const diff = (chordSemi - tonicSemi + 12) % 12;
+    const isMinor = chordInfo.name.includes("Minor") || chordInfo.name.includes("m7") || chordInfo.type === "Minor Triad";
+
+    const majorNumerals = {
+      0: "I", 1: "♭II", 2: "ii", 3: "♭III", 4: "iii", 5: "IV",
+      6: "♯IV", 7: "V", 8: "♭VI", 9: "vi", 10: "♭VII", 11: "vii°"
+    };
+
+    let base = majorNumerals[diff] || "I";
+    if (isMinor) base = base.toLowerCase();
+    else if (chordInfo.type === "Major Triad") base = base.toUpperCase();
+
+    if (chordInfo.name.includes("7")) base += "7";
+    return base;
+  }
+
+  // Canon in D (Tonic D)
+  const canonSong = { id: "canon-in-d", title: "Canon in D" };
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "D Major", type: "Major Triad" }, canonSong), "I");
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "A Major", type: "Major Triad" }, canonSong), "V");
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "B Minor", type: "Minor Triad" }, canonSong), "vi");
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "F# Minor", type: "Minor Triad" }, canonSong), "iii");
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "G Major", type: "Major Triad" }, canonSong), "IV");
+
+  // C Major Piece (Tonic C)
+  const cSong = { id: "c-primer", category: "C 5-Finger", title: "Primer" };
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "C Major", type: "Major Triad" }, cSong), "I");
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "G Major", type: "Major Triad" }, cSong), "V");
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "A Minor", type: "Minor Triad" }, cSong), "vi");
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "F Major", type: "Major Triad" }, cSong), "IV");
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "D Minor", type: "Minor Triad" }, cSong), "ii");
+  assert.strictEqual(getRomanNumeralAnalysis({ name: "G7", type: "Dominant 7th" }, cSong), "V7");
+
+  console.log("✔ Test 16: Beat-proportional spacing, rest glyphs & Roman numeral harmonic badges passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");

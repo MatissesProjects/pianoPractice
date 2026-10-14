@@ -944,6 +944,20 @@
     }
     .note-group.error-target .notestem { stroke: #ef4444 !important; }
 
+    /* Rests and Harmonic Badges */
+    .rest-glyph {
+      font-size: 26px;
+      fill: var(--paper-ink, #1e293b);
+      user-select: none;
+      pointer-events: none;
+      opacity: 0.85;
+    }
+    .harmonic-badge-group text {
+      letter-spacing: 0.02em;
+      user-select: none;
+      pointer-events: none;
+    }
+
     /* SHIFTABLE PIANO KEYBOARD SECTION */
     .piano-section {
       margin-bottom: 1.5rem;
@@ -2935,6 +2949,47 @@
       liveOscillators.delete(noteNumber);
     }
 
+    function getRomanNumeralAnalysis(chordInfo, song) {
+      if (!chordInfo || !chordInfo.name || !song) return null;
+      let tonic = "C";
+      if (song.category && song.category.includes("C 5-Finger")) tonic = "C";
+      else if (song.id === "canon-in-d") tonic = "D";
+      else if (song.id === "bach-minuet-g" || (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5"))) tonic = "G";
+      else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-no-1")) tonic = "D";
+      else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves"))) tonic = "A";
+      else if (song.id && song.id.includes("amazing-grace-f")) tonic = "F";
+      else {
+        const firstBass = song.lh ? song.lh.match(/([A-G][#b]?)/) : null;
+        if (firstBass) tonic = firstBass[1];
+        else {
+          const firstMel = song.rh ? song.rh.match(/([A-G][#b]?)/) : null;
+          if (firstMel) tonic = firstMel[1];
+        }
+      }
+
+      const tonicSemi = NOTE_OFFSETS[tonic] ?? 0;
+      const rootMatch = chordInfo.name.match(/^([A-G][#b]?)/);
+      if (!rootMatch) return null;
+      const chordRoot = rootMatch[1];
+      const chordSemi = NOTE_OFFSETS[chordRoot];
+      if (chordSemi === undefined) return null;
+
+      const diff = (chordSemi - tonicSemi + 12) % 12;
+      const isMinor = chordInfo.name.includes("Minor") || chordInfo.name.includes("m7") || chordInfo.type === "Minor Triad";
+
+      const majorNumerals = {
+        0: "I", 1: "♭II", 2: "ii", 3: "♭III", 4: "iii", 5: "IV",
+        6: "♯IV", 7: "V", 8: "♭VI", 9: "vi", 10: "♭VII", 11: "vii°"
+      };
+
+      let base = majorNumerals[diff] || "I";
+      if (isMinor) base = base.toLowerCase();
+      else if (chordInfo.type === "Major Triad") base = base.toUpperCase();
+
+      if (chordInfo.name.includes("7")) base += "7";
+      return base;
+    }
+
     // MULTI-SYSTEM (WRAPPING) SCORE RENDERER & TIMELINE ENGINE
     function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") {
       if (!song) return { measures: [], steps: [] };
@@ -3032,51 +3087,60 @@
             stepGlobalIdx++;
           });
         } else if (showDyads && !showLH) {
+          let dyadBeat = 0;
           mDyad.forEach((t, k) => {
             const parsed = parseToken(t);
             const item = {
               stepIndex: stepGlobalIdx,
               index: stepGlobalIdx,
               measure: m + 1,
+              startBeat: dyadBeat,
               dyad: parsed,
               dyadF: mDyadF[k] || "",
               expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
               beats: parsed.beats
             };
+            dyadBeat += parsed.beats;
             item.displayLabel = item.expectedPitches.join(" + ");
             measureItems.push(item);
             steps.push(item);
             stepGlobalIdx++;
           });
         } else if (showRH && !showLH) {
+          let rhBeat = 0;
           mRH.forEach((t, k) => {
             const parsed = parseToken(t);
             const item = {
               stepIndex: stepGlobalIdx,
               index: stepGlobalIdx,
               measure: m + 1,
+              startBeat: rhBeat,
               rh: parsed,
               rhF: mRHF[k] || "",
               expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
               beats: parsed.beats
             };
+            rhBeat += parsed.beats;
             item.displayLabel = item.expectedPitches.join(" + ");
             measureItems.push(item);
             steps.push(item);
             stepGlobalIdx++;
           });
         } else if (showLH && !showRH) {
+          let lhBeat = 0;
           mLH.forEach((t, k) => {
             const parsed = parseToken(t);
             const item = {
               stepIndex: stepGlobalIdx,
               index: stepGlobalIdx,
               measure: m + 1,
+              startBeat: lhBeat,
               lh: parsed,
               lhF: mLHF[k] || "",
               expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
               beats: parsed.beats
             };
+            lhBeat += parsed.beats;
             item.displayLabel = item.expectedPitches.join(" + ");
             measureItems.push(item);
             steps.push(item);
@@ -3285,12 +3349,77 @@
           bLine.setAttribute("class", "bar-line");
           svg.appendChild(bLine);
 
-          // Distribute onsets inside the measure
+          // Distribute onsets inside the measure with beat-proportional spacing
           const noteCount = mObj.length;
-          const noteStepX = (availableMeasureWidth - 45) / Math.max(1, noteCount);
+          let measureBeats = 4;
+          if (currentSong && currentSong.timeSig) {
+            const [numStr, denStr] = currentSong.timeSig.split("/");
+            const num = parseFloat(numStr) || 4;
+            const den = parseFloat(denStr) || 4;
+            measureBeats = num * (4 / den);
+          }
+          const maxItemBeat = mObj.reduce((maxB, it) => Math.max(maxB, (it.startBeat || 0) + (it.beats || 1)), 0);
+          const totalMeasureBeats = Math.max(measureBeats, maxItemBeat || 1);
+          const availableInnerX = availableMeasureWidth - 48;
+
+          // Harmonic Roman Numeral Analysis on Beat 0 of Measure
+          if ((showRH || showDyads) && mObj.length > 0) {
+            const firstItem = mObj[0];
+            const chordPitches = [];
+            if (firstItem.dyad && firstItem.dyad.pitch && firstItem.dyad.pitch !== "-") {
+              firstItem.dyad.pitch.split("+").filter(p => p !== "-").forEach(p => chordPitches.push(p));
+            } else if (firstItem.rh && firstItem.rh.pitch && firstItem.rh.pitch !== "-") {
+              firstItem.rh.pitch.split("+").filter(p => p !== "-").forEach(p => chordPitches.push(p));
+            }
+            if (firstItem.lh && firstItem.lh.pitch && firstItem.lh.pitch !== "-") {
+              firstItem.lh.pitch.split("+").filter(p => p !== "-").forEach(p => chordPitches.push(p));
+            }
+
+            if (chordPitches.length > 0) {
+              const activeNotes = chordPitches.map(p => ({
+                num: getPitchMidiNumber(p) || 60,
+                pitch: p
+              }));
+              const chordInfo = identifyActiveChord(activeNotes);
+              if (chordInfo && chordInfo.name) {
+                const romanNumeral = getRomanNumeralAnalysis(chordInfo, currentSong);
+                const badgeGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                badgeGroup.setAttribute("class", "harmonic-badge-group");
+
+                const badgeBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                badgeBg.setAttribute("x", measureStartX + 8);
+                badgeBg.setAttribute("y", startY - 22);
+                badgeBg.setAttribute("height", "15");
+                badgeBg.setAttribute("rx", "4");
+                badgeBg.setAttribute("fill", "rgba(56, 189, 248, 0.12)");
+                badgeBg.setAttribute("stroke", "rgba(56, 189, 248, 0.35)");
+                badgeBg.setAttribute("stroke-width", "0.8");
+
+                const badgeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                badgeText.setAttribute("x", measureStartX + 12);
+                badgeText.setAttribute("y", startY - 11);
+                badgeText.setAttribute("font-family", "system-ui, -apple-system, sans-serif");
+                badgeText.setAttribute("font-size", "9.5");
+                badgeText.setAttribute("font-weight", "700");
+                badgeText.setAttribute("fill", "#38bdf8");
+                badgeText.textContent = romanNumeral ? `${chordInfo.name} (${romanNumeral})` : chordInfo.name;
+
+                const textWidth = badgeText.textContent.length * 5.6 + 8;
+                badgeBg.setAttribute("width", Math.max(30, textWidth));
+
+                badgeGroup.appendChild(badgeBg);
+                badgeGroup.appendChild(badgeText);
+                svg.appendChild(badgeGroup);
+              }
+            }
+          }
 
           mObj.forEach((item, nIdx) => {
-            const cx = measureStartX + 14 + nIdx * noteStepX;
+            const beatVal = (typeof item.startBeat === "number" && !isNaN(item.startBeat))
+              ? item.startBeat
+              : (nIdx * (totalMeasureBeats / Math.max(1, noteCount)));
+            const beatFraction = Math.max(0, Math.min(1, beatVal / totalMeasureBeats));
+            const cx = measureStartX + 18 + beatFraction * availableInnerX;
 
             const noteGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             noteGroup.setAttribute("class", "note-group");
@@ -3308,19 +3437,20 @@
 
             // 1. Render Treble / Dyad Notes
             if (showDyads && item.dyad) {
-              const pitches = item.dyad.pitch.split("+").filter(p => p !== "-");
+              const pitches = item.dyad.pitch.split("+");
               pitches.forEach(p => {
                 renderNoteheadOnly(noteGroup, p, item.dyad.beats, cx, trebleBottomY, 2);
               });
-              if (showCheat && pitches.length > 0) {
-                const sorted = [...pitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
+              const actualPitches = pitches.filter(p => p !== "-");
+              if (showCheat && actualPitches.length > 0) {
+                const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
                 const startYCheat = trebleBottomY + 38;
                 const lineSpacing = 13.5;
                 sorted.forEach((p, pIdx) => {
                   const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
                   label.setAttribute("x", cx);
                   label.setAttribute("y", startYCheat + pIdx * lineSpacing);
-                  label.setAttribute("class", `cheat-text-composite ${pitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                  label.setAttribute("class", `cheat-text-composite ${actualPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
                   label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                   noteGroup.appendChild(label);
                 });
@@ -3334,19 +3464,20 @@
                 }
               }
             } else if (showRH && item.rh) {
-              const pitches = item.rh.pitch.split("+").filter(p => p !== "-");
+              const pitches = item.rh.pitch.split("+");
               pitches.forEach(p => {
                 renderNoteheadOnly(noteGroup, p, item.rh.beats, cx, trebleBottomY, 2);
               });
-              if (showCheat && pitches.length > 0) {
-                const sorted = [...pitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
+              const actualPitches = pitches.filter(p => p !== "-");
+              if (showCheat && actualPitches.length > 0) {
+                const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
                 const startYCheat = trebleBottomY + 38;
                 const lineSpacing = 13.5;
                 sorted.forEach((p, pIdx) => {
                   const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
                   label.setAttribute("x", cx);
                   label.setAttribute("y", startYCheat + pIdx * lineSpacing);
-                  label.setAttribute("class", `cheat-text-composite ${pitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                  label.setAttribute("class", `cheat-text-composite ${actualPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
                   label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                   noteGroup.appendChild(label);
                 });
@@ -3364,13 +3495,14 @@
 
             // 2. Render Bass Notes
             if (showLH && item.lh) {
-              const lhPitches = item.lh.pitch.split("+").filter(p => p !== "-");
+              const lhPitches = item.lh.pitch.split("+");
               lhPitches.forEach(p => {
                 renderNoteheadOnly(noteGroup, p, item.lh.beats, cx, bassBottomY, -10);
               });
 
-              if (showCheat && lhPitches.length > 0) {
-                const sortedB = [...lhPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
+              const actualLHPitches = lhPitches.filter(p => p !== "-");
+              if (showCheat && actualLHPitches.length > 0) {
+                const sortedB = [...actualLHPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
                 const startYBCheat = bassBottomY + 38;
                 const lineSpacing = 13.5;
 
@@ -3378,7 +3510,7 @@
                   const labelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
                   labelB.setAttribute("x", cx);
                   labelB.setAttribute("y", startYBCheat + pIdx * lineSpacing);
-                  labelB.setAttribute("class", `cheat-text-composite ${lhPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                  labelB.setAttribute("class", `cheat-text-composite ${actualLHPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
                   labelB.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                   noteGroup.appendChild(labelB);
                 });
@@ -3405,6 +3537,22 @@
     }
 
     function renderNoteheadOnly(group, pitchStr, beats, cx, bottomStaffY, refDiatonicStep) {
+      if (!pitchStr) return;
+      if (pitchStr === "-") {
+        const restY = bottomStaffY - 20;
+        const restEl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        restEl.setAttribute("x", cx);
+        restEl.setAttribute("y", restY + 7);
+        restEl.setAttribute("text-anchor", "middle");
+        restEl.setAttribute("class", "rest-glyph");
+        let glyph = "𝄽";
+        if (beats >= 3.5) glyph = "𝄻";
+        else if (beats >= 1.75) glyph = "𝄼";
+        else if (beats <= 0.75) glyph = "𝄾";
+        restEl.textContent = glyph;
+        group.appendChild(restEl);
+        return;
+      }
       const step = getDiatonicStep(pitchStr);
       if (step === null) return;
 

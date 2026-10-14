@@ -106,10 +106,10 @@
   - [x] Upgrade synthesizer to velocity-sensitive dual-oscillator electric piano timbre with hammer-attack filter envelope
   - [x] Implement MIDI CC 64 Sustain Pedal support with smooth voice decay on pedal release
 
-- [ ] **Milestone 15: Score Rendering Enhancements & Harmonic Analysis (`FIXES.MD` Part 2.3)**
-  - [ ] Beat-proportional horizontal spacing across all measures in `renderSheetMusicScore`
-  - [ ] Rhythmic rest glyph rendering (`𝄽`, `𝄻`, `𝄾`) on staves
-  - [ ] Harmonic Roman Numeral analysis badge on Beat 0 of each measure
+- [x] **Milestone 15: Score Rendering Enhancements & Harmonic Analysis (`FIXES.MD` Part 2.3)**
+  - [x] Beat-proportional horizontal spacing across all measures in `renderSheetMusicScore`
+  - [x] Rhythmic rest glyph rendering (`𝄽`, `𝄻`, `𝄾`) on staves
+  - [x] Harmonic Roman Numeral analysis badge on Beat 0 of each measure
 
 - [ ] **Milestone 16: Voice-Leading Gym, Rhythm Flow Mode, & Adaptive SRS (`FIXES.MD` Part 2.4, 2.5, 2.6)**
   - [ ] Chord Progressions & Voice-Leading Gym in Scales/Theory Studio with smooth inversion solver and interactive check
