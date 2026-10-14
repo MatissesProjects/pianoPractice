@@ -1223,5 +1223,137 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 14: Unique song IDs & dynamic category pill derivation passed");
 }
 
+// 15. Test Velocity-Sensitive Timbre Scaling & CC 64 Sustain Pedal Engine
+{
+  class MockSynthVoiceEngine {
+    constructor() {
+      this.isSustainPedalDown = false;
+      this.pedaledNotes = new Set();
+      this.activeHeldMidiNotes = new Set();
+      this.liveOscillators = new Map();
+      this.currentMasterVolume = 0.8;
+      this.isMasterMuted = false;
+    }
+
+    startLiveTone(noteNumber, velocity = 100) {
+      if (this.liveOscillators.has(noteNumber)) {
+        this.stopLiveTone(noteNumber, true);
+      }
+      const effectiveVol = this.isMasterMuted ? 0 : this.currentMasterVolume;
+      if (effectiveVol <= 0.0001) return null;
+
+      const velNorm = Math.max(0.15, Math.min(1, velocity / 127));
+      const volScale = Math.pow(effectiveVol, 2) * velNorm;
+      const freq = 440 * Math.pow(2, (noteNumber - 69) / 12);
+      const filterCutoff = freq * (2.5 + velNorm * 6);
+
+      const voice = {
+        noteNumber,
+        velocity,
+        velNorm,
+        volScale,
+        filterCutoff,
+        isRinging: true
+      };
+      this.liveOscillators.set(noteNumber, voice);
+      return voice;
+    }
+
+    stopLiveTone(noteNumber, forceImmediate = false) {
+      if (this.isSustainPedalDown && !forceImmediate) {
+        this.pedaledNotes.add(noteNumber);
+        return false;
+      }
+      const voice = this.liveOscillators.get(noteNumber);
+      if (!voice) return false;
+      voice.isRinging = false;
+      this.liveOscillators.delete(noteNumber);
+      return true;
+    }
+
+    handleMidiMessage(status, data1, data2) {
+      const cmd = status >> 4;
+      const velocity = data2 !== undefined ? data2 : 0;
+      const noteNumber = data1;
+
+      // CC 64 Sustain Pedal
+      if (cmd === 11 && data1 === 64) {
+        this.isSustainPedalDown = (velocity >= 64);
+        if (!this.isSustainPedalDown) {
+          this.pedaledNotes.forEach(num => {
+            if (!this.activeHeldMidiNotes.has(num)) {
+              this.stopLiveTone(num, true);
+            }
+          });
+          this.pedaledNotes.clear();
+        }
+        return { type: "pedal", down: this.isSustainPedalDown };
+      }
+
+      // Note On
+      if (cmd === 9 && velocity > 0) {
+        this.activeHeldMidiNotes.add(noteNumber);
+        const voice = this.startLiveTone(noteNumber, velocity);
+        return { type: "note_on", voice };
+      }
+
+      // Note Off
+      if (cmd === 8 || (cmd === 9 && velocity === 0)) {
+        this.activeHeldMidiNotes.delete(noteNumber);
+        const stopped = this.stopLiveTone(noteNumber);
+        return { type: "note_off", stopped };
+      }
+
+      return null;
+    }
+  }
+
+  const engine = new MockSynthVoiceEngine();
+
+  // 15.1 Verify Velocity Scaling & Filter Cutoff
+  const softStrike = engine.startLiveTone(60, 30); // Middle C soft
+  const hardStrike = engine.startLiveTone(60, 120); // Middle C forte
+
+  assert.ok(hardStrike.volScale > softStrike.volScale * 2.5, "Hard strike volume must exceed soft strike");
+  assert.ok(hardStrike.filterCutoff > softStrike.filterCutoff * 1.5, "Hard strike filter must be brighter");
+
+  // 15.2 Verify Note-Off without pedal stops immediately
+  engine.handleMidiMessage(0x90, 60, 100); // Note On C4
+  assert.strictEqual(engine.liveOscillators.has(60), true, "Voice 60 active");
+  engine.handleMidiMessage(0x80, 60, 0); // Note Off C4
+  assert.strictEqual(engine.liveOscillators.has(60), false, "Voice 60 stopped immediately without pedal");
+
+  // 15.3 Verify CC 64 Sustain Pedal keeps notes ringing after key release
+  engine.handleMidiMessage(0xB0, 64, 127); // Pedal Down (CC 64 = 127)
+  assert.strictEqual(engine.isSustainPedalDown, true, "Sustain pedal is down");
+
+  engine.handleMidiMessage(0x90, 64, 90); // Note On E4
+  assert.strictEqual(engine.liveOscillators.has(64), true, "Voice 64 active");
+
+  engine.handleMidiMessage(0x80, 64, 0); // Note Off E4 (Key released, but pedal down!)
+  assert.strictEqual(engine.pedaledNotes.has(64), true, "Voice 64 registered in pedaledNotes");
+  assert.strictEqual(engine.liveOscillators.has(64), true, "Voice 64 remains sounding because pedal is down");
+
+  // Release pedal (CC 64 = 0)
+  engine.handleMidiMessage(0xB0, 64, 0); // Pedal Up
+  assert.strictEqual(engine.isSustainPedalDown, false, "Sustain pedal is released");
+  assert.strictEqual(engine.pedaledNotes.size, 0, "Pedaled notes cleared");
+  assert.strictEqual(engine.liveOscillators.has(64), false, "Voice 64 stops when pedal is released");
+
+  // 15.4 Re-strike cleanly while pedaled
+  engine.handleMidiMessage(0xB0, 64, 127); // Pedal Down
+  engine.handleMidiMessage(0x90, 67, 100); // Note On G4
+  engine.handleMidiMessage(0x80, 67, 0);   // Note Off G4 (kept by pedal)
+  assert.strictEqual(engine.pedaledNotes.has(67), true);
+
+  // Re-strike G4
+  engine.handleMidiMessage(0x90, 67, 110); // Re-strike Note On G4
+  assert.strictEqual(engine.liveOscillators.has(67), true, "G4 restrikes cleanly without oscillator leaks");
+  engine.handleMidiMessage(0xB0, 64, 0);   // Release pedal
+
+  console.log("✔ Test 15: Velocity-sensitive timbre scaling & CC 64 sustain pedal engine passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
+
 

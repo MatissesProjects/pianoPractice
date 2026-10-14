@@ -102,9 +102,9 @@
   - [x] Fix scale enharmonic collisions via diatonic letter speller (`spellPitchOnLetter`)
   - [x] Add authentic 12-key standard conservatory fingerings (`MAJOR_SCALE_FINGERINGS` & `MINOR_SCALE_FINGERINGS`)
 
-- [ ] **Milestone 14: Instrument Synthesis & Expressive MIDI Input (`FIXES.MD` Part 2.1 & 2.2)**
-  - [ ] Upgrade synthesizer to velocity-sensitive dual-oscillator electric piano timbre with hammer-attack filter envelope
-  - [ ] Implement MIDI CC 64 Sustain Pedal support with smooth voice decay on pedal release
+- [x] **Milestone 14: Instrument Synthesis & Expressive MIDI Input (`FIXES.MD` Part 2.1 & 2.2)**
+  - [x] Upgrade synthesizer to velocity-sensitive dual-oscillator electric piano timbre with hammer-attack filter envelope
+  - [x] Implement MIDI CC 64 Sustain Pedal support with smooth voice decay on pedal release
 
 - [ ] **Milestone 15: Score Rendering Enhancements & Harmonic Analysis (`FIXES.MD` Part 2.3)**
   - [ ] Beat-proportional horizontal spacing across all measures in `renderSheetMusicScore`

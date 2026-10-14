@@ -2824,8 +2824,10 @@
           if (!e.target.checked) {
             // Immediately cut off any ringing synthesizer oscillators
             liveOscillators.forEach((voice, noteNum) => {
-              stopLiveTone(noteNum);
+              stopLiveTone(noteNum, true);
             });
+            pedaledNotes.clear();
+            isSustainPedalDown = false;
           }
           const labelSpan = synthToggle.parentElement?.querySelector("span");
           if (labelSpan) {
@@ -2862,39 +2864,74 @@
       osc.stop(audioCtx.currentTime + duration);
     }
 
-    function startLiveTone(noteNumber) {
-      if (!isSynthAudioEnabled()) return;
-      if (liveOscillators.has(noteNumber)) return;
+    let isSustainPedalDown = false;
+    const pedaledNotes = new Set(); // MIDI note numbers kept ringing by pedal
 
+    function startLiveTone(noteNumber, velocity = 100) {
+      if (!isSynthAudioEnabled()) return;
+      if (liveOscillators.has(noteNumber)) {
+        stopLiveTone(noteNumber, true); // Re-strike cleanly if pedaled
+      }
       const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
-      if (effectiveVol <= 0.0001) return; // Muted / zero volume
+      if (effectiveVol <= 0.0001) return;
 
       initAudio();
+      const now = audioCtx.currentTime;
       const freq = 440 * Math.pow(2, (noteNumber - 69) / 12);
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
+      const velNorm = Math.max(0.15, Math.min(1, velocity / 127));
+      const volScale = Math.pow(effectiveVol, 2) * velNorm;
 
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      const voiceGain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = "lowpass";
+      // Brighter filter cutoff on harder key strikes
+      filter.frequency.setValueAtTime(freq * (2.5 + velNorm * 6), now);
+      filter.frequency.exponentialRampToValueAtTime(freq * 1.8, now + 1.2);
 
-      const volScale = Math.pow(effectiveVol, 2);
-      const targetPeak = 0.2 * volScale;
+      // Fundamental (triangle) + 2nd harmonic (sine overtone)
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const g2 = audioCtx.createGain();
 
-      gain.gain.setValueAtTime(0, audioCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(targetPeak, audioCtx.currentTime + 0.015);
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(freq, now);
 
-      osc.connect(gain);
-      gain.connect(masterGainNode || audioCtx.destination);
-      osc.start(audioCtx.currentTime);
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(freq * 2, now);
+      g2.gain.setValueAtTime(0.28 * velNorm, now);
+      g2.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
 
-      liveOscillators.set(noteNumber, { osc, gain });
+      const peak = 0.25 * volScale;
+      voiceGain.gain.setValueAtTime(0.0001, now);
+      voiceGain.gain.linearRampToValueAtTime(peak, now + 0.008); // Crisp hammer attack
+      voiceGain.gain.exponentialRampToValueAtTime(peak * 0.45, now + 0.4); // Natural piano decay
+      voiceGain.gain.exponentialRampToValueAtTime(0.001, now + 4.5);
+
+      osc1.connect(filter);
+      osc2.connect(g2);
+      g2.connect(filter);
+      filter.connect(voiceGain);
+      voiceGain.connect(masterGainNode || audioCtx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+
+      liveOscillators.set(noteNumber, { osc: osc1, osc2, gain: voiceGain, filter });
     }
 
-    function stopLiveTone(noteNumber) {
+    function stopLiveTone(noteNumber, forceImmediate = false) {
+      if (isSustainPedalDown && !forceImmediate) {
+        pedaledNotes.add(noteNumber);
+        return;
+      }
       const voice = liveOscillators.get(noteNumber);
       if (!voice) return;
-      voice.gain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
-      voice.osc.stop(audioCtx.currentTime + 0.05);
+      const now = audioCtx.currentTime;
+      voice.gain.gain.cancelScheduledValues(now);
+      voice.gain.gain.setValueAtTime(voice.gain.gain.value || 0.05, now);
+      voice.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+      voice.osc.stop(now + 0.07);
+      if (voice.osc2) voice.osc2.stop(now + 0.07);
       liveOscillators.delete(noteNumber);
     }
 
@@ -4419,6 +4456,18 @@
       const filterCh = document.getElementById("midiChannelSelect").value;
       if (filterCh !== "all" && channel !== parseInt(filterCh, 10)) return;
 
+      // Sustain Pedal Handling (CC 64)
+      if (cmd === 11 && data1 === 64) {
+        isSustainPedalDown = (velocity >= 64);
+        if (!isSustainPedalDown) {
+          pedaledNotes.forEach(num => {
+            if (!activeHeldMidiNotes.has(num)) stopLiveTone(num, true);
+          });
+          pedaledNotes.clear();
+        }
+        return;
+      }
+
       const pitchName = midiNumberToPitch(noteNumber);
 
       // Note On Event
@@ -4426,7 +4475,7 @@
         const keyEl = document.querySelector(`.piano-key[data-note="${pitchName}"]`);
         if (keyEl) keyEl.classList.add("active-live");
 
-        if (document.getElementById("midiSoundToggle").checked) startLiveTone(noteNumber);
+        if (document.getElementById("midiSoundToggle").checked) startLiveTone(noteNumber, velocity);
 
         if (!activeHeldMidiNotes.has(noteNumber)) {
           const lane = document.createElement("div");
