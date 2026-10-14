@@ -137,4 +137,50 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 9: Circle of Fifths table passed");
 }
 
-console.log("=== ALL 9 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// 10. Test Optional-Octave Parsing & Deduplication Support
+{
+  assert.strictEqual(MusicTheory.pitchToMidi("C"), 60, "Default octave for C is 4 (MIDI 60)");
+  assert.strictEqual(MusicTheory.pitchToMidi("A", 4), 69, "Default octave for A is 4 (MIDI 69)");
+  assert.strictEqual(MusicTheory.pitchToMidi("C", 3), 48, "Custom default octave 3 for C yields MIDI 48");
+  assert.strictEqual(MusicTheory.getDiatonicStep("C"), 0, "Default octave diatonic step for C is 0");
+  assert.strictEqual(MusicTheory.getDiatonicStep("E", 4), 2, "Default octave diatonic step for E is 2");
+  assert.strictEqual(MusicTheory.getDiatonicStep("C", 3), -7, "Default octave 3 for C yields diatonic step -7");
+  assert.ok(Math.abs(MusicTheory.pitchToFreq("A") - 440) < 0.001, "pitchToFreq without octave defaults to A4 (440Hz)");
+
+  console.log("✔ Test 10: Optional-octave parsing & deduplication support passed");
+}
+
+// 11. Test Degree-Aware Enharmonic Scale Spelling & Authentic 12-Key Fingerings
+{
+  // D Harmonic Minor: D-E-F-G-A-Bb-C#-D (never A#)
+  const dHarmMinor = MusicTheory.generateScale("D", "harmonic_minor", 4);
+  const dPitches = dHarmMinor.notes.map(n => n.pitch);
+  assert.deepStrictEqual(dPitches, ["D4", "E4", "F4", "G4", "A4", "Bb4", "C#5", "D5"], "D Harmonic Minor avoids A# enharmonic collision");
+
+  // G Harmonic Minor: G-A-Bb-C-D-Eb-F#-G (never A# or D#)
+  const gHarmMinor = MusicTheory.generateScale("G", "harmonic_minor", 4);
+  const gPitches = gHarmMinor.notes.map(n => n.pitch);
+  assert.deepStrictEqual(gPitches, ["G4", "A4", "Bb4", "C5", "D5", "Eb5", "F#5", "G5"], "G Harmonic Minor has clean Bb and Eb degrees");
+
+  // F Major: F-G-A-Bb-C-D-E-F with standard RH fingering 1-2-3-4-1-2-3-4
+  const fMajor = MusicTheory.generateScale("F", "major", 4);
+  const fPitches = fMajor.notes.map(n => n.pitch);
+  assert.deepStrictEqual(fPitches, ["F4", "G4", "A4", "Bb4", "C5", "D5", "E5", "F5"], "F Major uses Bb degree");
+  const fRhFingers = fMajor.notes.map(n => n.rhFinger);
+  assert.deepStrictEqual(fRhFingers, [1, 2, 3, 4, 1, 2, 3, 4], "F Major standard RH fingering avoids thumb on Bb");
+
+  // Bb Major: standard RH fingering 4-1-2-3-1-2-3-4
+  const bbMajor = MusicTheory.generateScale("Bb", "major", 4);
+  const bbRhFingers = bbMajor.notes.map(n => n.rhFinger);
+  assert.deepStrictEqual(bbRhFingers, [4, 1, 2, 3, 1, 2, 3, 4], "Bb Major authentic standard fingering");
+
+  // Eb Major: standard RH fingering 3-1-2-3-4-1-2-3
+  const ebMajor = MusicTheory.generateScale("Eb", "major", 4);
+  const ebRhFingers = ebMajor.notes.map(n => n.rhFinger);
+  assert.deepStrictEqual(ebRhFingers, [3, 1, 2, 3, 4, 1, 2, 3], "Eb Major authentic standard fingering");
+
+  console.log("✔ Test 11: Degree-aware enharmonic scale spelling & 12-key fingerings passed");
+}
+
+console.log("=== ALL 11 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+

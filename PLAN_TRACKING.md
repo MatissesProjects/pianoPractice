@@ -94,6 +94,24 @@
   - [x] Pedagogical lesson pathway & level update: Harmonize Level 3, Level 7, and Level 8 curriculum configs with interactive harmony selector
   - [x] Comprehensive automated test suite (`tests/test_score_engine.js` Test 13): Verify dual-hand harmony alignment, all harmony interval levels, grand staff rendering, and playback across repertoire
 
+- [x] **Milestone 13: Core Structural Cleanup & Essential Bug Fixes (`FIXES.MD` Part 1)**
+  - [x] Un-nest `.piano-section` & `.sustain-stage` from `#panelRepertoire` as shared persistent dock across all 6 modes
+  - [x] Rename duplicate song IDs in `songs.js` (`fur-elise-motif`, `scarborough-fair-primer`, `amazing-grace-f`, `greensleeves-primer`)
+  - [x] Make `renderFilterPills()` dynamic from `songDatabase` (exposing "Classical Mastery" and all categories)
+  - [x] Deduplicate music theory functions in `index.html` by bridging to `theory.js` with optional-octave regex
+  - [x] Fix scale enharmonic collisions via diatonic letter speller (`spellPitchOnLetter`)
+  - [x] Add authentic 12-key standard conservatory fingerings (`MAJOR_SCALE_FINGERINGS` & `MINOR_SCALE_FINGERINGS`)
 
+- [ ] **Milestone 14: Instrument Synthesis & Expressive MIDI Input (`FIXES.MD` Part 2.1 & 2.2)**
+  - [ ] Upgrade synthesizer to velocity-sensitive dual-oscillator electric piano timbre with hammer-attack filter envelope
+  - [ ] Implement MIDI CC 64 Sustain Pedal support with smooth voice decay on pedal release
 
+- [ ] **Milestone 15: Score Rendering Enhancements & Harmonic Analysis (`FIXES.MD` Part 2.3)**
+  - [ ] Beat-proportional horizontal spacing across all measures in `renderSheetMusicScore`
+  - [ ] Rhythmic rest glyph rendering (`𝄽`, `𝄻`, `𝄾`) on staves
+  - [ ] Harmonic Roman Numeral analysis badge on Beat 0 of each measure
 
+- [ ] **Milestone 16: Voice-Leading Gym, Rhythm Flow Mode, & Adaptive SRS (`FIXES.MD` Part 2.4, 2.5, 2.6)**
+  - [ ] Chord Progressions & Voice-Leading Gym in Scales/Theory Studio with smooth inversion solver and interactive check
+  - [ ] 🥁 Tempo Flow Mode: Metronome-synced auto playhead in Repertoire Lab with timing window grading (±45ms / ±95ms)
+  - [ ] Adaptive Spaced-Repetition System (SRS) for Sight-Reading & Ear Training with latency/error weighting and mastery indicators

@@ -1174,4 +1174,54 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 13: Dual-hand harmony practice & multi-level harmony engine passed");
 }
 
+// 14. Test Unique Song IDs & Dynamic Category Pill Derivation
+{
+  // 14.1 Verify all song IDs are strictly unique
+  const idCounts = {};
+  songDatabase.forEach(song => {
+    idCounts[song.id] = (idCounts[song.id] || 0) + 1;
+  });
+  const duplicates = Object.entries(idCounts).filter(([id, count]) => count > 1);
+  assert.strictEqual(duplicates.length, 0, `No duplicate song IDs allowed, found: ${JSON.stringify(duplicates)}`);
+
+  // 14.2 Verify specific renamed primer arrangements vs classical mastery
+  const furEliseMotif = songDatabase.find(s => s.id === "fur-elise-motif");
+  assert.ok(furEliseMotif, "Für Elise (Hook Motif) must be accessible with id 'fur-elise-motif'");
+
+  const furEliseMastery = songDatabase.find(s => s.id === "fur-elise");
+  assert.ok(furEliseMastery, "Classical Mastery Für Elise must be accessible with id 'fur-elise'");
+  assert.strictEqual(furEliseMastery.category, "Classical Mastery");
+
+  const scarboroughPrimer = songDatabase.find(s => s.id === "scarborough-fair-primer");
+  assert.ok(scarboroughPrimer, "Scarborough Fair primer must be accessible");
+
+  const greensleevesPrimer = songDatabase.find(s => s.id === "greensleeves-primer");
+  assert.ok(greensleevesPrimer, "Greensleeves primer must be accessible");
+
+  const amazingGraceF = songDatabase.find(s => s.id === "amazing-grace-f");
+  assert.ok(amazingGraceF, "Amazing Grace (Key of F) must be accessible");
+
+  // 14.3 Verify Dynamic Category Pills includes all categories
+  const uniqueCats = [...new Set(songDatabase.map(s => s.category).filter(Boolean))];
+  assert.ok(uniqueCats.includes("Classical Mastery"), "Dynamic categories must include Classical Mastery");
+  assert.ok(uniqueCats.includes("C 5-Finger"), "Dynamic categories must include C 5-Finger");
+  assert.ok(uniqueCats.includes("Harmonic / Dyads"), "Dynamic categories must include Harmonic / Dyads");
+  assert.ok(uniqueCats.includes("Extended Scale"), "Dynamic categories must include Extended Scale");
+  assert.ok(uniqueCats.includes("Minor / Modal"), "Dynamic categories must include Minor / Modal");
+
+  const dynamicCategories = [
+    { key: "all", label: `All (${songDatabase.length})` },
+    ...uniqueCats.map(cat => ({
+      key: cat,
+      label: `${cat} (${songDatabase.filter(s => s.category === cat).length})`
+    }))
+  ];
+  assert.strictEqual(dynamicCategories.length, uniqueCats.length + 1);
+  const masteryEntry = dynamicCategories.find(c => c.key === "Classical Mastery");
+  assert.ok(masteryEntry.label.includes("Classical Mastery ("));
+
+  console.log("✔ Test 14: Unique song IDs & dynamic category pill derivation passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
+

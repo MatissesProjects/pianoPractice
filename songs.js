@@ -280,8 +280,8 @@ window.songDatabase = [
     "tip": "Keep the upbeat swings cheerful and bright across fingers 1 through 5."
   },
   {
-    "id": "amazing-grace",
-    "title": "Amazing Grace",
+    "id": "amazing-grace-f",
+    "title": "Amazing Grace (Key of F)",
     "category": "Harmonic / Dyads",
     "tempo": 75,
     "timeSig": "3/4",
@@ -462,7 +462,7 @@ window.songDatabase = [
     "tip": "Heroic jump of a fifth (C to G) followed by the dramatic octave jump to C5."
   },
   {
-    "id": "fur-elise",
+    "id": "fur-elise-motif",
     "title": "Für Elise (Hook Motif)",
     "category": "Minor / Modal",
     "tempo": 128,
@@ -504,8 +504,8 @@ window.songDatabase = [
     "tip": "Henry Mancini's chromatic sneak: Slide effortlessly from black keys onto adjacent white keys."
   },
   {
-    "id": "scarborough-fair",
-    "title": "Scarborough Fair",
+    "id": "scarborough-fair-primer",
+    "title": "Scarborough Fair (Primer)",
     "category": "Minor / Modal",
     "tempo": 92,
     "timeSig": "3/4",
@@ -518,8 +518,8 @@ window.songDatabase = [
     "tip": "Traditional D Dorian folk mode. Notice the natural B giving it an antique modal character."
   },
   {
-    "id": "greensleeves",
-    "title": "Greensleeves",
+    "id": "greensleeves-primer",
+    "title": "Greensleeves (Primer)",
     "category": "Minor / Modal",
     "tempo": 104,
     "timeSig": "6/8",

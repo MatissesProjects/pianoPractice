@@ -1392,6 +1392,14 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* SHARED BOTTOM PIANO DOCK */
+    .shared-piano-dock {
+      margin-top: 1.5rem;
+    }
+    .repertoire-catalog-section {
+      margin-top: 1.5rem;
+    }
+
     /* SECTION A-B LOOP CONTROLS */
     .loop-controls-bar {
       display: inline-flex;
@@ -2101,89 +2109,11 @@
         <svg class="score-svg" id="scoreSvg" width="940" height="600"></svg>
       </div>
 
-      <!-- SHIFTABLE PIANO KEYBOARD SECTION (C2 - C5 BY DEFAULT) -->
-      <div class="piano-section">
-        <div class="piano-header">
-          <div class="piano-range-controls">
-            <span class="section-label">Keyboard:</span>
-            <select id="keyboardPresetSelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.6rem; border:1px solid var(--border); border-radius:6px; font-weight:600;">
-              <option value="88">88 Keys (Full Grand: A0 – C8)</option>
-              <option value="76">76 Keys (Stage: E1 – G7)</option>
-              <option value="73">73 Keys (Stage: E1 – E7)</option>
-              <option value="61">61 Keys (Standard: C2 – C7)</option>
-              <option value="49">49 Keys (Studio: C2 – C6)</option>
-              <option value="37" selected>37 Keys (Default: C2 – C5)</option>
-              <option value="32">32 Keys (Mini Synth: F2 – C5)</option>
-              <option value="25">25 Keys (Mini: C3 – C5)</option>
-              <option value="custom">Custom...</option>
-            </select>
-
-            <div style="display:inline-flex; align-items:center; gap:0.25rem;">
-              <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Keys:</span>
-              <input type="number" id="keyCountInput" min="12" max="88" value="37" style="width:54px; background:var(--bg-card); border:1px solid var(--border); border-radius:6px; color:var(--text); padding:0.3rem 0.4rem; font-family:ui-monospace,monospace; font-weight:700; font-size:0.8rem; text-align:center;" />
-            </div>
-
-            <div style="display:inline-flex; align-items:center; gap:0.25rem;">
-              <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Start:</span>
-              <select id="startKeySelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.5rem; border:1px solid var(--border); border-radius:6px; font-family:ui-monospace,monospace; font-size:0.8rem; font-weight:700;">
-              </select>
-            </div>
-
-            <div style="display:inline-flex; align-items:center; gap:0.2rem;">
-              <button class="range-shift-btn" id="shiftKeyDownOctBtn" title="Shift Start 1 Octave Down">◀ Oct</button>
-              <button class="range-shift-btn" id="shiftKeyDownBtn" title="Shift Start 1 Semitone Left">◀ Key</button>
-              <span class="range-indicator-badge" id="rangeBadge">C2 – C5 (37 Keys)</span>
-              <button class="range-shift-btn" id="shiftKeyUpBtn" title="Shift Start 1 Semitone Right">Key ▶</button>
-              <button class="range-shift-btn" id="shiftKeyUpOctBtn" title="Shift Start 1 Octave Up">Oct ▶</button>
-            </div>
-
-            <button class="range-shift-btn" id="centerMidCBtn" title="Scroll View to Middle C" style="color:#38bdf8; border-color:#0284c7;">🎯 Center Mid C</button>
-          </div>
-
-          <div class="piano-legend">
-            <div class="legend-item"><div class="dot live"></div> Live MIDI</div>
-            <div class="legend-item"><div class="dot rh"></div> Right Hand</div>
-            <div class="legend-item"><div class="dot lh"></div> Left Hand</div>
-            <div class="legend-item"><div class="dot dyad"></div> Dyads</div>
-          </div>
-        </div>
-        <div class="piano-scroll">
-          <div class="piano-keyboard" id="pianoKeyboard"></div>
-        </div>
-      </div>
-
-      <!-- GUITAR HERO STYLE POLYPHONIC SUSTAIN STAGE -->
-      <div class="sustain-stage">
-        <div class="sustain-header">
-          <div class="sustain-title">
-            <span>🎸 Live Sustain & Chord Recognizer</span>
-            <span id="activeChordPill" class="chord-pill" style="display: none;">Single Note</span>
-          </div>
-          <div style="font-size: 0.8rem; color: var(--text-muted);">
-            Active Held Keys: <span id="activeCount" style="color: #fbbf24; font-weight: 700;">0</span>
-          </div>
-        </div>
-
-        <div class="sustain-lanes-container" id="sustainLanesContainer">
-          <div class="empty-lane-placeholder" id="emptyPlaceholder">
-            Press keys or chords on your MIDI keyboard or loopback to see real-time traveling sustain ribbons, timing, and chord naming...
-          </div>
-        </div>
-      </div>
-
       <div class="stage-tips" id="stageTips">
         Play the note highlighted in amber. If you make a mistake, the app waits for you! Click any note on the sheet music or piano to test.
       </div>
     </div>
-
-    <!-- Song Catalog Search & Filter -->
-    <div class="catalog-header">
-      <input type="text" id="catalogSearch" class="search-box" placeholder="Search by song name or style...">
-      <div class="filter-pills" id="filterPillsContainer"></div>
-    </div>
-
-    <div class="song-grid" id="catalogGrid"></div>
-    </div> <!-- end panelRepertoire -->
+  </div> <!-- end panelRepertoire -->
 
     <!-- 2. SIGHT-READING FLASHCARD SPEED DRILL PANEL -->
     <div id="panelSightReading" class="edu-view-panel">
@@ -2474,6 +2404,88 @@
       </div>
     </div>
 
+    <!-- SHARED PERSISTENT BOTTOM DOCK (Across all 6 educational modes) -->
+    <div class="shared-piano-dock" id="sharedPianoDock">
+      <!-- SHIFTABLE PIANO KEYBOARD SECTION (C2 - C5 BY DEFAULT) -->
+      <div class="piano-section">
+        <div class="piano-header">
+          <div class="piano-range-controls">
+            <span class="section-label">Keyboard:</span>
+            <select id="keyboardPresetSelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.6rem; border:1px solid var(--border); border-radius:6px; font-weight:600;">
+              <option value="88">88 Keys (Full Grand: A0 – C8)</option>
+              <option value="76">76 Keys (Stage: E1 – G7)</option>
+              <option value="73">73 Keys (Stage: E1 – E7)</option>
+              <option value="61">61 Keys (Standard: C2 – C7)</option>
+              <option value="49">49 Keys (Studio: C2 – C6)</option>
+              <option value="37" selected>37 Keys (Default: C2 – C5)</option>
+              <option value="32">32 Keys (Mini Synth: F2 – C5)</option>
+              <option value="25">25 Keys (Mini: C3 – C5)</option>
+              <option value="custom">Custom...</option>
+            </select>
+
+            <div style="display:inline-flex; align-items:center; gap:0.25rem;">
+              <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Keys:</span>
+              <input type="number" id="keyCountInput" min="12" max="88" value="37" style="width:54px; background:var(--bg-card); border:1px solid var(--border); border-radius:6px; color:var(--text); padding:0.3rem 0.4rem; font-family:ui-monospace,monospace; font-weight:700; font-size:0.8rem; text-align:center;" />
+            </div>
+
+            <div style="display:inline-flex; align-items:center; gap:0.25rem;">
+              <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Start:</span>
+              <select id="startKeySelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.5rem; border:1px solid var(--border); border-radius:6px; font-family:ui-monospace,monospace; font-size:0.8rem; font-weight:700;">
+              </select>
+            </div>
+
+            <div style="display:inline-flex; align-items:center; gap:0.2rem;">
+              <button class="range-shift-btn" id="shiftKeyDownOctBtn" title="Shift Start 1 Octave Down">◀ Oct</button>
+              <button class="range-shift-btn" id="shiftKeyDownBtn" title="Shift Start 1 Semitone Left">◀ Key</button>
+              <span class="range-indicator-badge" id="rangeBadge">C2 – C5 (37 Keys)</span>
+              <button class="range-shift-btn" id="shiftKeyUpBtn" title="Shift Start 1 Semitone Right">Key ▶</button>
+              <button class="range-shift-btn" id="shiftKeyUpOctBtn" title="Shift Start 1 Octave Up">Oct ▶</button>
+            </div>
+
+            <button class="range-shift-btn" id="centerMidCBtn" title="Scroll View to Middle C" style="color:#38bdf8; border-color:#0284c7;">🎯 Center Mid C</button>
+          </div>
+
+          <div class="piano-legend">
+            <div class="legend-item"><div class="dot live"></div> Live MIDI</div>
+            <div class="legend-item"><div class="dot rh"></div> Right Hand</div>
+            <div class="legend-item"><div class="dot lh"></div> Left Hand</div>
+            <div class="legend-item"><div class="dot dyad"></div> Dyads</div>
+          </div>
+        </div>
+        <div class="piano-scroll">
+          <div class="piano-keyboard" id="pianoKeyboard"></div>
+        </div>
+      </div>
+
+      <!-- GUITAR HERO STYLE POLYPHONIC SUSTAIN STAGE -->
+      <div class="sustain-stage">
+        <div class="sustain-header">
+          <div class="sustain-title">
+            <span>🎸 Live Sustain & Chord Recognizer</span>
+            <span id="activeChordPill" class="chord-pill" style="display: none;">Single Note</span>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">
+            Active Held Keys: <span id="activeCount" style="color: #fbbf24; font-weight: 700;">0</span>
+          </div>
+        </div>
+
+        <div class="sustain-lanes-container" id="sustainLanesContainer">
+          <div class="empty-lane-placeholder" id="emptyPlaceholder">
+            Press keys or chords on your MIDI keyboard or loopback to see real-time traveling sustain ribbons, timing, and chord naming...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPERTOIRE SONG CATALOG (Displayed in Repertoire Mode) -->
+    <div id="repertoireCatalogSection" class="repertoire-catalog-section">
+      <div class="catalog-header">
+        <input type="text" id="catalogSearch" class="search-box" placeholder="Search by song name or style...">
+        <div class="filter-pills" id="filterPillsContainer"></div>
+      </div>
+      <div class="song-grid" id="catalogGrid"></div>
+    </div>
+
     <!-- Session Performance Toast -->
     <div class="perf-toast" id="perfToast">
       <div class="perf-stars" id="perfStars">⭐⭐⭐</div>
@@ -2580,50 +2592,16 @@
       }
     };
 
-    // Diatonic Step Calculations
-    const DIATONIC_BASE = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
-    const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-    const NOTE_OFFSETS = { 'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11 };
-
-    function getDiatonicStep(pitchStr) {
-      if (!pitchStr || pitchStr === "-") return null;
-      const clean = pitchStr.trim();
-      const match = clean.match(/^([A-G])([#b]?)([0-8])?$/);
-      if (!match) return null;
-      const letter = match[1];
-      const oct = match[3] ? parseInt(match[3], 10) : 4;
-      return (oct - 4) * 7 + DIATONIC_BASE[letter];
-    }
-
-    function getNoteFreq(noteStr) {
-      if (!noteStr || noteStr === "-") return null;
-      const clean = noteStr.trim();
-      const match = clean.match(/^([A-G][#b]?)([0-8])?$/);
-      if (!match) return null;
-      const pitch = match[1];
-      const oct = match[2] ? parseInt(match[2], 10) : 4;
-      const semi = NOTE_OFFSETS[pitch];
-      if (semi === undefined) return null;
-      const midi = (oct + 1) * 12 + semi;
-      return 440 * Math.pow(2, (midi - 69) / 12);
-    }
-
-    function midiNumberToPitch(num) {
-      const oct = Math.floor(num / 12) - 1;
-      const semi = num % 12;
-      return `${NOTE_NAMES[semi]}${oct}`;
-    }
-
-    function getPitchMidiNumber(pitchStr, defaultOct = 4) {
-      if (!pitchStr || pitchStr === "-") return null;
-      const match = pitchStr.trim().match(/^([A-G][#b]?)([0-8])?$/);
-      if (!match) return null;
-      const p = match[1];
-      const oct = match[2] ? parseInt(match[2], 10) : defaultOct;
-      const semi = NOTE_OFFSETS[p];
-      if (semi === undefined) return null;
-      return (oct + 1) * 12 + semi;
-    }
+    // Deduplicated Music Theory Core Engine from window.MusicTheory
+    const {
+      DIATONIC_BASE,
+      NOTE_OFFSETS,
+      NOTE_NAMES_SHARP: NOTE_NAMES,
+      getDiatonicStep,
+      pitchToFreq: getNoteFreq,
+      midiToPitch: midiNumberToPitch,
+      pitchToMidi: getPitchMidiNumber
+    } = (typeof MusicTheory !== "undefined" ? MusicTheory : window.MusicTheory);
 
     function findPianoKeyElement(pitchStr, defaultOct = 4) {
       if (!pitchStr || pitchStr === "-") return null;
@@ -4823,12 +4801,13 @@
       const container = document.getElementById("filterPillsContainer");
       container.innerHTML = "";
 
+      const uniqueCats = [...new Set(songDatabase.map(s => s.category).filter(Boolean))];
       const categories = [
         { key: "all", label: `All (${songDatabase.length})` },
-        { key: "C 5-Finger", label: `C 5-Finger (${songDatabase.filter(s => s.category === "C 5-Finger").length})` },
-        { key: "Harmonic / Dyads", label: `Harmonic / Dyads (${songDatabase.filter(s => s.category === "Harmonic / Dyads").length})` },
-        { key: "Extended Scale", label: `Extended Scale (${songDatabase.filter(s => s.category === "Extended Scale").length})` },
-        { key: "Minor / Modal", label: `Minor / Modal (${songDatabase.filter(s => s.category === "Minor / Modal").length})` }
+        ...uniqueCats.map(cat => ({
+          key: cat,
+          label: `${cat} (${songDatabase.filter(s => s.category === cat).length})`
+        }))
       ];
 
       categories.forEach(cat => {
@@ -5020,6 +4999,11 @@
           Object.keys(panels).forEach(k => {
             if (panels[k]) panels[k].classList.toggle("active-panel", k === targetMode);
           });
+
+          const repCatalog = document.getElementById("repertoireCatalogSection");
+          if (repCatalog) {
+            repCatalog.style.display = (targetMode === "repertoire") ? "block" : "none";
+          }
 
           // Trigger view initializations
           if (targetMode === "sight-reading") {

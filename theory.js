@@ -115,15 +115,70 @@
 
   // Diatonic letter steps for staff geometry
   const DIATONIC_BASE = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
+  const DIATONIC_LETTERS = ["C", "D", "E", "F", "G", "A", "B"];
 
-  function pitchToMidi(pitchStr) {
+  // Conservatory Authentic 12-Key Standard Fingerings (RH: 1=Thumb..5=Pinky, LH: 5=Pinky..1=Thumb)
+  const MAJOR_SCALE_FINGERINGS = {
+    "C":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "G":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "D":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "A":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "E":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "B":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [4, 3, 2, 1, 4, 3, 2, 1] },
+    "F#": { rh: [2, 3, 4, 1, 2, 3, 1, 2], lh: [4, 3, 2, 1, 3, 2, 1, 4] },
+    "Gb": { rh: [2, 3, 4, 1, 2, 3, 1, 2], lh: [4, 3, 2, 1, 3, 2, 1, 4] },
+    "Db": { rh: [2, 3, 1, 2, 3, 4, 1, 2], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "C#": { rh: [2, 3, 1, 2, 3, 4, 1, 2], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "Ab": { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "G#": { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "Eb": { rh: [3, 1, 2, 3, 4, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "D#": { rh: [3, 1, 2, 3, 4, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "Bb": { rh: [4, 1, 2, 3, 1, 2, 3, 4], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "A#": { rh: [4, 1, 2, 3, 1, 2, 3, 4], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "F":  { rh: [1, 2, 3, 4, 1, 2, 3, 4], lh: [5, 4, 3, 2, 1, 3, 2, 1] }
+  };
+
+  const MINOR_SCALE_FINGERINGS = {
+    "C":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "G":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "D":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "A":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "E":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [5, 4, 3, 2, 1, 3, 2, 1] },
+    "B":  { rh: [1, 2, 3, 1, 2, 3, 4, 5], lh: [4, 3, 2, 1, 4, 3, 2, 1] },
+    "F#": { rh: [2, 3, 1, 2, 3, 1, 2, 3], lh: [4, 3, 2, 1, 3, 2, 1, 4] },
+    "Gb": { rh: [2, 3, 1, 2, 3, 1, 2, 3], lh: [4, 3, 2, 1, 3, 2, 1, 4] },
+    "Db": { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "C#": { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 4, 3, 2, 1, 3] },
+    "Ab": { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 3, 2, 1, 4, 3] },
+    "G#": { rh: [3, 4, 1, 2, 3, 1, 2, 3], lh: [3, 2, 1, 3, 2, 1, 4, 3] },
+    "Eb": { rh: [2, 1, 2, 3, 4, 1, 2, 3], lh: [2, 1, 4, 3, 2, 1, 3, 2] },
+    "D#": { rh: [2, 1, 2, 3, 4, 1, 2, 3], lh: [2, 1, 4, 3, 2, 1, 3, 2] },
+    "Bb": { rh: [2, 1, 2, 3, 1, 2, 3, 4], lh: [2, 1, 3, 2, 1, 4, 3, 2] },
+    "A#": { rh: [2, 1, 2, 3, 1, 2, 3, 4], lh: [2, 1, 3, 2, 1, 4, 3, 2] },
+    "F":  { rh: [1, 2, 3, 4, 1, 2, 3, 4], lh: [5, 4, 3, 2, 1, 3, 2, 1] }
+  };
+
+  function spellPitchOnLetter(targetMidi, targetLetter) {
+    const naturalSemi = NOTE_OFFSETS[targetLetter];
+    for (let oct = 0; oct <= 8; oct++) {
+      const baseMidi = (oct + 1) * 12 + naturalSemi;
+      const diff = targetMidi - baseMidi;
+      if (Math.abs(diff) <= 2) {
+        const acc = diff === 1 ? "#" : diff === -1 ? "b" : diff === 2 ? "##" : diff === -2 ? "bb" : "";
+        return `${targetLetter}${acc}${oct}`;
+      }
+    }
+    return midiToPitch(targetMidi, false);
+  }
+
+  function pitchToMidi(pitchStr, defaultOct = 4) {
     if (!pitchStr || pitchStr === "-") return null;
     const clean = pitchStr.trim();
-    const match = clean.match(/^([A-G])([#b]?)([0-8])$/);
+    const match = clean.match(/^([A-G])([#b]?)([0-8])?$/);
     if (!match) return null;
     const letter = match[1];
     const acc = match[2] || "";
-    const oct = parseInt(match[3], 10);
+    const oct = match[3] !== undefined ? parseInt(match[3], 10) : defaultOct;
     const key = letter + acc;
     const semi = NOTE_OFFSETS[key];
     if (semi === undefined) return null;
@@ -143,18 +198,18 @@
     return 440 * Math.pow(2, (midiNum - 69) / 12);
   }
 
-  function pitchToFreq(pitchStr) {
-    const midi = pitchToMidi(pitchStr);
+  function pitchToFreq(pitchStr, defaultOct = 4) {
+    const midi = pitchToMidi(pitchStr, defaultOct);
     return midi !== null ? midiToFreq(midi) : null;
   }
 
-  function getDiatonicStep(pitchStr) {
+  function getDiatonicStep(pitchStr, defaultOct = 4) {
     if (!pitchStr || pitchStr === "-") return null;
     const clean = pitchStr.trim();
-    const match = clean.match(/^([A-G])([#b]?)([0-8])$/);
+    const match = clean.match(/^([A-G])([#b]?)([0-8])?$/);
     if (!match) return null;
     const letter = match[1];
-    const oct = parseInt(match[3], 10);
+    const oct = match[3] !== undefined ? parseInt(match[3], 10) : defaultOct;
     return (oct - 4) * 7 + DIATONIC_BASE[letter];
   }
 
@@ -172,16 +227,31 @@
     const baseMidi = (octave + 1) * 12 + rootSemi;
     const useFlat = rootPitch.includes("b") || ["F", "Bb", "Eb", "Ab", "Db"].includes(rootPitch);
 
+    const isHeptatonic = formula.intervals.length === 8; // 7 degrees + octave
+    const rootLetter = rootPitch.charAt(0);
+    const rootLetterIdx = DIATONIC_LETTERS.indexOf(rootLetter);
+
+    const isMinorFamily = ["natural_minor", "harmonic_minor", "dorian"].includes(scaleType);
+    const keyFingers = isHeptatonic
+      ? (isMinorFamily ? MINOR_SCALE_FINGERINGS[rootPitch] : MAJOR_SCALE_FINGERINGS[rootPitch])
+      : null;
+
     const notes = formula.intervals.map((interval, idx) => {
       const noteMidi = baseMidi + interval;
-      const pitch = midiToPitch(noteMidi, useFlat);
+      let pitch;
+      if (isHeptatonic && rootLetterIdx !== -1) {
+        const targetLetter = DIATONIC_LETTERS[(rootLetterIdx + idx) % 7];
+        pitch = spellPitchOnLetter(noteMidi, targetLetter);
+      } else {
+        pitch = midiToPitch(noteMidi, useFlat);
+      }
       return {
         step: idx + 1,
         midi: noteMidi,
         pitch: pitch,
         freq: midiToFreq(noteMidi),
-        rhFinger: formula.rhFinger[idx] || 1,
-        lhFinger: formula.lhFinger[idx] || 5
+        rhFinger: keyFingers ? keyFingers.rh[idx] : (formula.rhFinger[idx] || 1),
+        lhFinger: keyFingers ? keyFingers.lh[idx] : (formula.lhFinger[idx] || 5)
       };
     });
 
@@ -394,8 +464,6 @@
   ];
 
   // Multi-Level Harmony Generation Engine
-  const DIATONIC_LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-
   function diatonicStepToPitch(step, accidentalMap = {}) {
     if (typeof step !== "number" || isNaN(step)) return null;
     const base = ((step % 7) + 7) % 7;
@@ -519,11 +587,16 @@
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
     NOTE_OFFSETS,
+    DIATONIC_BASE,
+    DIATONIC_LETTERS,
+    MAJOR_SCALE_FINGERINGS,
+    MINOR_SCALE_FINGERINGS,
     INTERVAL_NAMES,
     SCALE_FORMULAS,
     CHORD_TYPES,
     CIRCLE_OF_FIFTHS,
     FLASHCARD_PRESETS,
+    spellPitchOnLetter,
     pitchToMidi,
     midiToPitch,
     midiToFreq,
