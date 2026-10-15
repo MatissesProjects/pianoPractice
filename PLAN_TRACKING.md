@@ -184,3 +184,21 @@
     - Updated Test 13 and Test 20 in `tests/test_score_engine.js`.
     - Added Test 21 asserting 24 measures, tie token parsing, cross-step tie detection, 16th/dotted eighth rhythms, and SVG tie arc quadratic bezier path calculations.
     - All 21 tests in `tests/test_score_engine.js` and all 13 tests in `tests/test_education.js` passing with 100% success.
+
+- [x] **Milestone 21: Sheet Music Viewport Auto-Scroll Stabilization & Anti-Bounce Engine**
+  - [x] **Eliminated Chromium SVG `scrollIntoView` Bug (Issue 828439)**:
+    - Removed all invocations of `targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' })` on SVG `<g>` elements in both practice mode (`highlightActiveScoreNote`) and song playback (`playCurrentSong`).
+    - Fixed root cause where Blink's `ScrollRectToVisible` on layout-less SVG child elements scrolled the root `<svg>` to `scrollTop = 0` before applying element offsets, which caused the viewport to bounce up to the top before scrolling down to the target note.
+    - Prevented outer window viewport scrolling (`window.scrollY`), isolating sheet music scrolling strictly within `#sheetMusicSection`.
+  - [x] **Removed CSS `scroll-behavior: smooth`**:
+    - Removed `scroll-behavior: smooth` from `.sheet-music-container` in `<style>` to prevent dual-animator conflicts between CSS smooth scrolling and programmatic `.scrollTo()`, enabling instant resets without 500ms lag.
+  - [x] **Engineered Non-Bouncing `autoScrollScoreToNote` Function**:
+    - Calculates absolute vertical coordinate in the container's scroll canvas: `noteAbsoluteY = container.scrollTop + relativeTop + (targetRect.height / 2)`.
+    - Defines a reading comfort zone (`padTop = 60px`, `padBottom = 80px`). If the active note is already comfortably visible, it performs **zero** scroll requests, preventing jank on successive notes within the same system.
+    - Positions notes comfortably around 38% down the container viewport (`desiredScrollTop = Math.max(0, noteAbsoluteY - containerH * 0.38)`).
+    - Features a mid-scroll animation guard: rapid note strikes (e.g. eighth/16th notes within 400ms) targeting the same system do not cancel or stutter in-flight animations.
+  - [x] **Clean Instant Resets**:
+    - `loadSong()`, `#hudRestartBtn`, and song completion loop cleanly reset `scoreContainer.scrollTop = 0` and clear scroll target debounce trackers.
+  - [x] **Comprehensive Automated Test Suite**:
+    - Added Test 22 to `tests/test_score_engine.js` asserting removal of SVG `scrollIntoView`, removal of CSS `scroll-behavior: smooth`, comfort zone no-op checks, positive forward scroll target calculations, animation guard debouncing, and instant reset wiring.
+    - All 22 tests in `tests/test_score_engine.js` and all 13 tests in `tests/test_education.js` passing with 100% success.

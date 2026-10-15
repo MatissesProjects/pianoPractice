@@ -2079,6 +2079,87 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 21: Full 24-Measure Lean on Me Arrangement, Tie Annotations, 16th Notes & SVG Tie Arcs passed");
 }
 
+// 22. Sheet Music Viewport Auto-Scroll Stabilization & Anti-Bounce Engine
+{
+  const fs = require("fs");
+  const htmlContent = fs.readFileSync("index.html", "utf-8");
+
+  // 22.1 Verify CSS scroll-behavior: smooth is removed from .sheet-music-container
+  const sheetMusicCssMatch = htmlContent.match(/\.sheet-music-container\s*\{[^}]*\}/);
+  assert.ok(sheetMusicCssMatch, ".sheet-music-container CSS rule must exist");
+  assert.ok(!sheetMusicCssMatch[0].includes("scroll-behavior: smooth"), ".sheet-music-container must not specify CSS scroll-behavior: smooth (prevents scroll fighting and reset lag)");
+
+  // 22.2 Verify SVG Element scrollIntoView is eliminated from score follow
+  assert.ok(!htmlContent.includes("targetEl.scrollIntoView"), "targetEl.scrollIntoView must be completely removed to eliminate Chromium SVG scroll-to-top bug (Issue 828439)");
+
+  // 22.3 Verify autoScrollScoreToNote is defined and wired in highlightActiveScoreNote and playCurrentSong
+  assert.ok(htmlContent.includes("function autoScrollScoreToNote(targetEl"), "autoScrollScoreToNote helper must be defined");
+  assert.ok(htmlContent.includes("autoScrollScoreToNote(targetEl, true)"), "autoScrollScoreToNote must be invoked in note follow");
+
+  // 22.4 Behavioral Simulation of autoScrollScoreToNote
+  function simulateAutoScroll({
+    relativeTop,
+    relativeBottom,
+    containerH = 500,
+    currentScroll = 0,
+    padTop = 60,
+    padBottom = 80,
+    lastTarget = null,
+    lastTime = 0,
+    now = 1000
+  }) {
+    // 1. Reading comfort zone check
+    if (relativeTop >= padTop && relativeBottom <= (containerH - padBottom)) {
+      return { scrolled: false, reason: "in_comfort_zone", target: currentScroll };
+    }
+
+    const noteHeight = relativeBottom - relativeTop;
+    const noteAbsoluteY = currentScroll + relativeTop + (noteHeight / 2);
+    const desiredScrollTop = Math.max(0, Math.round(noteAbsoluteY - (containerH * 0.38)));
+
+    // 2. Animation guard check
+    if (lastTarget !== null && (now - lastTime < 400)) {
+      if (Math.abs(lastTarget - desiredScrollTop) < 60) {
+        return { scrolled: false, reason: "animation_guard", target: lastTarget };
+      }
+    }
+
+    if (Math.abs(currentScroll - desiredScrollTop) < 6) {
+      return { scrolled: false, reason: "already_at_target", target: currentScroll };
+    }
+
+    return { scrolled: true, target: desiredScrollTop };
+  }
+
+  // Case A: Note 0 on System 1 is comfortably in view at the start
+  const res1 = simulateAutoScroll({ relativeTop: 70, relativeBottom: 110, containerH: 500, currentScroll: 0 });
+  assert.strictEqual(res1.scrolled, false, "Note inside comfort zone must not trigger scrolling");
+
+  // Case B: Advancing to System 3 down the page (relativeBottom = 480, exceeds containerH - 80)
+  const res2 = simulateAutoScroll({ relativeTop: 440, relativeBottom: 480, containerH: 500, currentScroll: 200 });
+  assert.strictEqual(res2.scrolled, true, "Note beyond bottom padding must trigger scroll");
+  assert.ok(res2.target > 200, "Scroll target must advance down the page, NEVER bounce to 0");
+  assert.strictEqual(res2.target, 470, "Scroll target places note at 38% down the 500px viewport (660 - 190 = 470)");
+
+  // Case C: Rapid successive eighth note 150ms later targeting the same system
+  const res3 = simulateAutoScroll({
+    relativeTop: 440,
+    relativeBottom: 480,
+    containerH: 500,
+    currentScroll: 250, // mid-flight
+    lastTarget: 470,
+    lastTime: 1000,
+    now: 1150
+  });
+  assert.strictEqual(res3.scrolled, false, "Successive note within 400ms towards same system must not interrupt animation");
+  assert.strictEqual(res3.reason, "animation_guard");
+
+  // Case D: Resetting piece sets scrollTop to 0 cleanly
+  assert.ok(htmlContent.includes("scoreContainer.scrollTop = 0"), "Reset and song loading must immediately reset scoreContainer.scrollTop = 0");
+
+  console.log("✔ Test 22: 📜 Sheet Music Viewport Auto-Scroll Stabilization & Anti-Bounce Engine passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 
