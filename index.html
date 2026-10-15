@@ -1712,6 +1712,140 @@
     .finger-badge .fb-rh { color: #38bdf8; font-size: 0.72rem; font-weight: 700; }
     .finger-badge .fb-lh { color: #34d399; font-size: 0.72rem; font-weight: 700; }
 
+    /* VOICE-LEADING GYM & PROGRESSION STUDIO */
+    .scale-submode-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+    }
+    .scale-submode-tabs .tab-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 0.5rem 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .scale-submode-tabs .tab-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+    }
+    .vl-progression-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .vl-chord-card {
+      background: #090e1a;
+      border: 1.5px solid #1e293b;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      min-width: 130px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .vl-chord-card:hover {
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+    .vl-chord-card.active {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.08);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
+      transform: translateY(-2px);
+    }
+    .vl-chord-card.completed {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .vl-numeral {
+      font-family: Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+    .vl-chord-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-top: 0.15rem;
+    }
+    .vl-voicing-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #94a3b8;
+      margin-top: 0.3rem;
+    }
+    .vl-movement-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #a855f7;
+      margin-top: 0.2rem;
+    }
+    .vl-arrow {
+      color: #64748b;
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+    .vl-smoothness-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.82rem;
+      color: #c084fc;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    /* TEMPO FLOW MODE */
+    #tempoFlowToggle.active-practice {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      border-color: #f59e0b;
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.45);
+    }
+    .timing-badge-perfect { color: #10b981; font-weight: 800; text-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+    .timing-badge-good { color: #38bdf8; font-weight: 700; }
+    .timing-badge-early { color: #fbbf24; font-weight: 700; }
+    .timing-badge-late { color: #fb923c; font-weight: 700; }
+    .timing-badge-miss { color: #ef4444; font-weight: 700; }
+
+    /* SRS MASTERY BADGES */
+    .srs-stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: #38bdf8;
+    }
+    .srs-badge-mastered { color: #38bdf8; background: rgba(56, 189, 248, 0.15); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.7rem; font-weight: 700; }
+    .srs-badge-needs-practice { color: #f43f5e; background: rgba(244, 63, 94, 0.15); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.7rem; font-weight: 700; }
+    .srs-badge-learning { color: #f59e0b; background: rgba(245, 158, 11, 0.15); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.7rem; font-weight: 700; }
+
     /* RHYTHM & METRONOME WORKSHOP */
     .rhythm-studio-box {
       background: var(--bg-surface);
@@ -2050,6 +2184,7 @@
       <div class="controls-bar">
         <div class="left-controls">
           <button class="mode-switch-btn active-practice" id="practiceModeToggle">🎯 Wait-for-Me Practice Mode</button>
+          <button class="mode-switch-btn" id="tempoFlowToggle" title="Metronome-synced auto-advancing playhead with timing window accuracy grading">🥁 Tempo Flow Mode</button>
           <button id="mainPlayBtn" class="play-btn">▶ Auto Play Preview</button>
           
           <div class="tempo-control">
@@ -2156,6 +2291,7 @@
             <div class="stat-pill"><span>🔥 Streak:</span><span id="srStreakDisplay" class="stat-val">0</span></div>
             <div class="stat-pill"><span>🏆 Best Streak:</span><span id="srBestStreakDisplay" class="stat-val">0</span></div>
             <div class="stat-pill"><span>⭐ Solved:</span><span id="srSolvedDisplay" class="stat-val">0</span></div>
+            <div class="stat-pill srs-stat-pill" id="srSrsPill" title="Adaptive Spaced Repetition mastery"><span>🧠 SRS:</span><span id="srSrsStatsDisplay" class="stat-val">Adaptive</span></div>
           </div>
         </div>
 
@@ -2218,63 +2354,138 @@
     <!-- 4. SCALES, CHORDS & THEORY STUDIO PANEL -->
     <div id="panelScales" class="edu-view-panel">
       <div class="scale-studio-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem;">
+        <!-- Submode Navigation Tabs -->
+        <div class="scale-submode-tabs">
+          <button id="btnSubmodeScales" class="tab-btn active">🎼 Scale & Fingering Explorer</button>
+          <button id="btnSubmodeVoiceLeading" class="tab-btn">🎹 Chord Progressions & Voice-Leading Gym</button>
+        </div>
+
+        <!-- 4A. SCALES & FINGERINGS EXPLORER SUBVIEW -->
+        <div id="subviewScales">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem;">
+            <div>
+              <h2 style="font-size:1.35rem; font-weight:800; color:#38bdf8;">Interactive Scale & Fingering Explorer</h2>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Visualize key formulas, correct fingerings for both hands, and test your scale fluency.</p>
+            </div>
+            <div style="display:flex; gap:0.65rem; align-items:center;">
+              <button id="scaleListenBtn" class="play-btn">▶ Listen to Scale</button>
+              <button id="scalePracticeBtn" class="mode-switch-btn active-practice">🎯 Practice Scale</button>
+            </div>
+          </div>
+
+          <!-- 12 Tonics Selector -->
           <div>
-            <h2 style="font-size:1.35rem; font-weight:800; color:#38bdf8;">Interactive Scale & Fingering Explorer</h2>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Visualize key formulas, correct fingerings for both hands, and test your scale fluency.</p>
+            <span class="section-label" style="display:block; margin-bottom:0.4rem;">Select Root Tonic:</span>
+            <div class="tonic-selector-row" id="tonicSelectorRow">
+              <button class="tonic-btn active" data-tonic="C">C</button>
+              <button class="tonic-btn" data-tonic="Db">C♯ / D♭</button>
+              <button class="tonic-btn" data-tonic="D">D</button>
+              <button class="tonic-btn" data-tonic="Eb">D♯ / E♭</button>
+              <button class="tonic-btn" data-tonic="E">E</button>
+              <button class="tonic-btn" data-tonic="F">F</button>
+              <button class="tonic-btn" data-tonic="F#">F♯ / G♭</button>
+              <button class="tonic-btn" data-tonic="G">G</button>
+              <button class="tonic-btn" data-tonic="Ab">G♯ / A♭</button>
+              <button class="tonic-btn" data-tonic="A">A</button>
+              <button class="tonic-btn" data-tonic="Bb">A♯ / B♭</button>
+              <button class="tonic-btn" data-tonic="B">B</button>
+            </div>
           </div>
-          <div style="display:flex; gap:0.65rem; align-items:center;">
-            <button id="scaleListenBtn" class="play-btn">▶ Listen to Scale</button>
-            <button id="scalePracticeBtn" class="mode-switch-btn active-practice">🎯 Practice Scale</button>
+
+          <!-- Scale Formulas -->
+          <div>
+            <span class="section-label" style="display:block; margin-bottom:0.4rem;">Select Musical Mode / Scale:</span>
+            <div class="scale-formula-pills" id="scaleFormulaPills">
+              <button class="scale-pill-btn active" data-scale="major">Major (Ionian)</button>
+              <button class="scale-pill-btn" data-scale="natural_minor">Natural Minor (Aeolian)</button>
+              <button class="scale-pill-btn" data-scale="harmonic_minor">Harmonic Minor</button>
+              <button class="scale-pill-btn" data-scale="major_pentatonic">Major Pentatonic</button>
+              <button class="scale-pill-btn" data-scale="minor_pentatonic">Minor Pentatonic</button>
+              <button class="scale-pill-btn" data-scale="blues">Blues Scale</button>
+              <button class="scale-pill-btn" data-scale="dorian">Dorian Mode</button>
+              <button class="scale-pill-btn" data-scale="mixolydian">Mixolydian</button>
+            </div>
+          </div>
+
+          <!-- Scale Sheet Music Card -->
+          <div class="scale-diagram-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
+              <span style="font-family:Georgia,serif; font-size:1.25rem; font-weight:700; color:var(--paper-ink);" id="scaleDisplayTitle">C Major (Ionian)</span>
+              <span style="font-size:0.85rem; color:#64748b;" id="scaleFormulaFormula">Formula: W - W - H - W - W - W - H</span>
+            </div>
+            <svg id="scaleScoreSvg" width="900" height="150" style="display:block; margin:0 auto;"></svg>
+            <div class="fingering-row" id="scaleFingeringRow"></div>
+          </div>
+
+          <div class="curriculum-insight" id="scaleDescriptionText">
+            Bright and uplifting; the bedrock foundation of Western music harmony.
           </div>
         </div>
 
-        <!-- 12 Tonics Selector -->
-        <div>
-          <span class="section-label" style="display:block; margin-bottom:0.4rem;">Select Root Tonic:</span>
-          <div class="tonic-selector-row" id="tonicSelectorRow">
-            <button class="tonic-btn active" data-tonic="C">C</button>
-            <button class="tonic-btn" data-tonic="Db">C♯ / D♭</button>
-            <button class="tonic-btn" data-tonic="D">D</button>
-            <button class="tonic-btn" data-tonic="Eb">D♯ / E♭</button>
-            <button class="tonic-btn" data-tonic="E">E</button>
-            <button class="tonic-btn" data-tonic="F">F</button>
-            <button class="tonic-btn" data-tonic="F#">F♯ / G♭</button>
-            <button class="tonic-btn" data-tonic="G">G</button>
-            <button class="tonic-btn" data-tonic="Ab">G♯ / A♭</button>
-            <button class="tonic-btn" data-tonic="A">A</button>
-            <button class="tonic-btn" data-tonic="Bb">A♯ / B♭</button>
-            <button class="tonic-btn" data-tonic="B">B</button>
+        <!-- 4B. CHORD PROGRESSIONS & VOICE-LEADING GYM SUBVIEW -->
+        <div id="subviewVoiceLeading" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem;">
+            <div>
+              <h2 style="font-size:1.35rem; font-weight:800; color:#c084fc;">Chord Progressions & Smooth Voice-Leading Gym</h2>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Connect chords with minimal finger displacement using mathematically optimized inversions and voice leading.</p>
+            </div>
+            <div style="display:flex; gap:0.65rem; align-items:center;">
+              <button id="vlListenBtn" class="play-btn">▶ Listen to Progression</button>
+              <button id="vlPracticeBtn" class="mode-switch-btn active-practice">🎯 Practice Progression</button>
+            </div>
           </div>
-        </div>
 
-        <!-- Scale Formulas -->
-        <div>
-          <span class="section-label" style="display:block; margin-bottom:0.4rem;">Select Musical Mode / Scale:</span>
-          <div class="scale-formula-pills" id="scaleFormulaPills">
-            <button class="scale-pill-btn active" data-scale="major">Major (Ionian)</button>
-            <button class="scale-pill-btn" data-scale="natural_minor">Natural Minor (Aeolian)</button>
-            <button class="scale-pill-btn" data-scale="harmonic_minor">Harmonic Minor</button>
-            <button class="scale-pill-btn" data-scale="major_pentatonic">Major Pentatonic</button>
-            <button class="scale-pill-btn" data-scale="minor_pentatonic">Minor Pentatonic</button>
-            <button class="scale-pill-btn" data-scale="blues">Blues Scale</button>
-            <button class="scale-pill-btn" data-scale="dorian">Dorian Mode</button>
-            <button class="scale-pill-btn" data-scale="mixolydian">Mixolydian</button>
+          <!-- Key Selector -->
+          <div>
+            <span class="section-label" style="display:block; margin-bottom:0.4rem;">Select Key Center:</span>
+            <div class="tonic-selector-row" id="vlKeySelectorRow">
+              <button class="tonic-btn active" data-key="C">C Maj</button>
+              <button class="tonic-btn" data-key="G">G Maj</button>
+              <button class="tonic-btn" data-key="D">D Maj</button>
+              <button class="tonic-btn" data-key="A">A Maj</button>
+              <button class="tonic-btn" data-key="E">E Maj</button>
+              <button class="tonic-btn" data-key="F">F Maj</button>
+              <button class="tonic-btn" data-key="Bb">B♭ Maj</button>
+              <button class="tonic-btn" data-key="Eb">E♭ Maj</button>
+              <button class="tonic-btn" data-key="Am">A Min</button>
+              <button class="tonic-btn" data-key="Dm">D Min</button>
+              <button class="tonic-btn" data-key="Em">E Min</button>
+            </div>
           </div>
-        </div>
 
-        <!-- Scale Sheet Music Card -->
-        <div class="scale-diagram-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
-            <span style="font-family:Georgia,serif; font-size:1.25rem; font-weight:700; color:var(--paper-ink);" id="scaleDisplayTitle">C Major (Ionian)</span>
-            <span style="font-size:0.85rem; color:#64748b;" id="scaleFormulaFormula">Formula: W - W - H - W - W - W - H</span>
+          <!-- Progression Archetype Pills -->
+          <div>
+            <span class="section-label" style="display:block; margin-bottom:0.4rem;">Select Progression Archetype:</span>
+            <div class="scale-formula-pills" id="vlProgressionPills">
+              <button class="scale-pill-btn active" data-prog="pop_anthem">Pop Anthem (I – V – vi – IV)</button>
+              <button class="scale-pill-btn" data-prog="jazz_turnaround">Jazz Turnaround (ii7 – V7 – Imaj7)</button>
+              <button class="scale-pill-btn" data-prog="classical_cadence">Classical Cadence (I – IV – I6/4 – V7 – I)</button>
+              <button class="scale-pill-btn" data-prog="andalusian">Andalusian Cadence (i – VII – VI – V)</button>
+              <button class="scale-pill-btn" data-prog="doo_wop">50s Doo-Wop (I – vi – IV – V)</button>
+            </div>
           </div>
-          <svg id="scaleScoreSvg" width="900" height="150" style="display:block; margin:0 auto;"></svg>
-          <div class="fingering-row" id="scaleFingeringRow"></div>
-        </div>
 
-        <div class="curriculum-insight" id="scaleDescriptionText">
-          Bright and uplifting; the bedrock foundation of Western music harmony.
+          <!-- Progression Sequence Cards -->
+          <div class="vl-progression-cards" id="vlProgressionCards"></div>
+
+          <!-- Voice Leading Smoothness Badge -->
+          <div class="vl-smoothness-badge" id="vlSmoothnessBadge">
+            <span>✨</span>
+            <span id="vlSmoothnessText">Voice-Leading Efficiency: Calculating...</span>
+          </div>
+
+          <!-- Grand Staff Voicing Score Card -->
+          <div class="scale-diagram-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
+              <span style="font-family:Georgia,serif; font-size:1.25rem; font-weight:700; color:var(--paper-ink);" id="vlDisplayTitle">C Major – Pop Anthem</span>
+              <span style="font-size:0.85rem; color:#64748b;" id="vlVoicingFormula">LH: Bass Root | RH: Smooth Triad Inversions</span>
+            </div>
+            <svg id="vlScoreSvg" width="900" height="180" style="display:block; margin:0 auto;"></svg>
+          </div>
+
+          <div class="curriculum-insight" id="vlDescriptionText">
+            Voice leading minimizes physical distance on the keyboard so chord changes sound smooth and connected.
+          </div>
         </div>
       </div>
     </div>
@@ -3794,7 +4005,11 @@
       activeHeldKeyAttacks.set(pitchName, noteAttack);
 
       if (activeEducationalMode === "repertoire") {
-        checkAndPlayNoteOn(pitchName, noteAttack);
+        if (typeof isTempoFlowActive !== "undefined" && isTempoFlowActive) {
+          verifyTempoFlowInput(pitchName, noteAttack);
+        } else {
+          checkAndPlayNoteOn(pitchName, noteAttack);
+        }
       } else {
         handleEducationalNoteInput(pitchName);
       }
@@ -4891,6 +5106,9 @@
     // Mode Toggle (Wait Practice vs Auto Play)
     const practiceModeToggle = document.getElementById("practiceModeToggle");
     practiceModeToggle.addEventListener("click", () => {
+      if (typeof isTempoFlowActive !== "undefined" && isTempoFlowActive) {
+        stopTempoFlow();
+      }
       isWaitPracticeMode = !isWaitPracticeMode;
       practiceModeToggle.classList.toggle("active-practice", isWaitPracticeMode);
       practiceModeToggle.textContent = isWaitPracticeMode ? "🎯 Wait-for-Me Practice Mode" : "⏸ Practice Mode: Off";
@@ -4899,6 +5117,190 @@
       currentPracticeStep = 0;
       highlightActiveScoreNote(0);
     });
+
+    // ==========================================
+    // 🥁 TEMPO FLOW MODE (METRONOME-SYNCED PLAYHEAD & TIMING EVALUATION)
+    // ==========================================
+    let isTempoFlowActive = false;
+    let tempoFlowTimeouts = [];
+    let tempoFlowStepStartTime = 0;
+    let tempoFlowStepFulfilled = false;
+    let tempoFlowStats = { total: 0, perfect: 0, good: 0, lateOrEarly: 0, missed: 0 };
+
+    const tempoFlowToggle = document.getElementById("tempoFlowToggle");
+    if (tempoFlowToggle) {
+      tempoFlowToggle.addEventListener("click", () => {
+        if (isTempoFlowActive) {
+          stopTempoFlow();
+        } else {
+          startTempoFlow();
+        }
+      });
+    }
+
+    function stopTempoFlow() {
+      isTempoFlowActive = false;
+      tempoFlowTimeouts.forEach(t => clearTimeout(t));
+      tempoFlowTimeouts = [];
+      if (tempoFlowToggle) {
+        tempoFlowToggle.classList.remove("active-practice");
+        tempoFlowToggle.textContent = "🥁 Tempo Flow Mode";
+      }
+      document.getElementById("practiceHud").style.display = "flex";
+      highlightActiveScoreNote(0);
+      document.getElementById("hudFeedbackText").textContent = "Tempo Flow stopped. Ready to play.";
+    }
+
+    function startTempoFlow() {
+      if (isWaitPracticeMode) {
+        isWaitPracticeMode = false;
+        practiceModeToggle.classList.remove("active-practice");
+        practiceModeToggle.textContent = "⏸ Practice Mode: Off";
+      }
+      stopPlayback();
+
+      isTempoFlowActive = true;
+      tempoFlowTimeouts.forEach(t => clearTimeout(t));
+      tempoFlowTimeouts = [];
+      tempoFlowStats = { total: 0, perfect: 0, good: 0, lateOrEarly: 0, missed: 0 };
+
+      if (tempoFlowToggle) {
+        tempoFlowToggle.classList.add("active-practice");
+        tempoFlowToggle.textContent = "⏹ Stop Flow Mode";
+      }
+
+      document.getElementById("practiceHud").style.display = "flex";
+      const targetBadge = document.getElementById("hudTargetBadge");
+      const feedbackText = document.getElementById("hudFeedbackText");
+
+      const bpm = parseInt(document.getElementById("tempoSlider")?.value, 10) || 100;
+      const beatMs = (60 / bpm) * 1000;
+
+      // 4-beat Audio-Visual Count-In
+      const countBeats = [
+        { num: 4, freq: 880, label: "4" },
+        { num: 3, freq: 440, label: "3" },
+        { num: 2, freq: 440, label: "2" },
+        { num: 1, freq: 440, label: "1" },
+        { num: 0, freq: 1046.5, label: "GO! 🔥" }
+      ];
+
+      currentPracticeStep = 0;
+      highlightActiveScoreNote(0);
+
+      countBeats.forEach((b, idx) => {
+        const t = setTimeout(() => {
+          if (!isTempoFlowActive) return;
+          playTone(b.freq, 0.12);
+          if (targetBadge) targetBadge.textContent = b.num > 0 ? `${b.num}` : "GO!";
+          feedbackText.style.color = b.num === 0 ? "#10b981" : "#f59e0b";
+          feedbackText.textContent = `🥁 Metronome Count-in: ${b.label}... Get ready!`;
+
+          if (idx === countBeats.length - 1) {
+            runTempoFlowSequence();
+          }
+        }, idx * beatMs);
+        tempoFlowTimeouts.push(t);
+      });
+    }
+
+    function runTempoFlowSequence() {
+      if (!isTempoFlowActive) return;
+      const bpm = parseInt(document.getElementById("tempoSlider")?.value, 10) || 100;
+      const beatMs = (60 / bpm) * 1000;
+      const steps = songNoteSteps.length;
+      let accumulatedMs = 0;
+
+      for (let i = 0; i < steps; i++) {
+        const stepIdx = i;
+        const step = songNoteSteps[stepIdx];
+        const stepBeats = step.beats || 1.0;
+        const stepDurationMs = stepBeats * beatMs;
+
+        const t = setTimeout(() => {
+          if (!isTempoFlowActive) return;
+          if (stepIdx > 0 && !tempoFlowStepFulfilled) {
+            const prevStep = songNoteSteps[stepIdx - 1];
+            if (prevStep && prevStep.expectedPitches && prevStep.expectedPitches.length > 0) {
+              tempoFlowStats.missed++;
+            }
+          }
+
+          currentPracticeStep = stepIdx;
+          tempoFlowStepFulfilled = false;
+          tempoFlowStepStartTime = performance.now();
+          tempoFlowStats.total++;
+
+          highlightActiveScoreNote(stepIdx);
+
+          const targetBadge = document.getElementById("hudTargetBadge");
+          if (targetBadge) {
+            targetBadge.textContent = step.displayLabel || (step.expectedPitches ? step.expectedPitches.join(" + ") : "--");
+          }
+          document.getElementById("hudProgressText").textContent = `Step: ${stepIdx + 1} / ${steps}`;
+
+          // Subtle metronome click on each step onset
+          playTone(stepIdx % 4 === 0 ? 880 : 440, 0.04);
+        }, accumulatedMs);
+
+        tempoFlowTimeouts.push(t);
+        accumulatedMs += stepDurationMs;
+      }
+
+      const endTimer = setTimeout(() => {
+        if (!isTempoFlowActive) return;
+        if (!tempoFlowStepFulfilled && steps > 0) {
+          tempoFlowStats.missed++;
+        }
+        finishTempoFlow();
+      }, accumulatedMs);
+      tempoFlowTimeouts.push(endTimer);
+    }
+
+    function verifyTempoFlowInput(playedPitch, noteAttack = null) {
+      if (!isTempoFlowActive) return;
+      const step = songNoteSteps[currentPracticeStep];
+      if (!step || !step.expectedPitches || step.expectedPitches.length === 0) return;
+
+      const isMatch = step.expectedPitches.some(p => p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch)));
+      const isFromMidi = noteAttack && noteAttack.source === "midi";
+      playSingleNoteAudit(playedPitch, "rh", !isFromMidi);
+
+      if (isMatch) {
+        const now = performance.now();
+        const diffMs = Math.abs(now - tempoFlowStepStartTime);
+        const feedbackText = document.getElementById("hudFeedbackText");
+
+        tempoFlowStepFulfilled = true;
+        if (diffMs <= 45) {
+          tempoFlowStats.perfect++;
+          feedbackText.innerHTML = `<span class="timing-badge-perfect">🔥 PERFECT TIMING! (±${Math.round(diffMs)}ms)</span>`;
+        } else if (diffMs <= 95) {
+          tempoFlowStats.good++;
+          feedbackText.innerHTML = `<span class="timing-badge-good">✨ GOOD! (±${Math.round(diffMs)}ms)</span>`;
+        } else {
+          tempoFlowStats.lateOrEarly++;
+          const sign = (now > tempoFlowStepStartTime) ? "LATE" : "EARLY";
+          feedbackText.innerHTML = `<span class="timing-badge-early">⚠️ ${sign} (+${Math.round(diffMs)}ms)</span>`;
+        }
+      }
+    }
+
+    function finishTempoFlow() {
+      const { perfect, good, lateOrEarly, missed, total } = tempoFlowStats;
+      const maxPts = Math.max(1, total) * 100;
+      const earned = perfect * 100 + good * 75 + lateOrEarly * 40;
+      const accuracy = Math.min(100, Math.round((earned / maxPts) * 100));
+
+      const feedbackText = document.getElementById("hudFeedbackText");
+      feedbackText.innerHTML = `🏆 <strong>Tempo Flow Complete!</strong> Accuracy: <strong>${accuracy}%</strong> (🔥 Perfect: ${perfect}, ✨ Good: ${good}, ⚠️ Late/Early: ${lateOrEarly}, ❌ Miss: ${missed})`;
+
+      if (tempoFlowToggle) {
+        tempoFlowToggle.classList.remove("active-practice");
+        tempoFlowToggle.textContent = "🥁 Tempo Flow Mode";
+      }
+      isTempoFlowActive = false;
+    }
 
     document.getElementById("hudRestartBtn").addEventListener("click", () => {
       currentPracticeStep = 0;
@@ -5159,8 +5561,14 @@
         verifySightReadingInput(pitchName);
       } else if (activeEducationalMode === "ear-training") {
         verifyEarTrainingPitchInput(pitchName);
-      } else if (activeEducationalMode === "scales" && isScalePracticeActive) {
-        verifyScalePracticeInput(pitchName);
+      } else if (activeEducationalMode === "scales") {
+        if (typeof isVoiceLeadingActive !== "undefined" && isVoiceLeadingActive && isVlPracticeActive) {
+          verifyVoiceLeadingInput(pitchName);
+        } else if (isScalePracticeActive) {
+          verifyScalePracticeInput(pitchName);
+        } else {
+          checkAndPlayNote(pitchName);
+        }
       } else if (activeEducationalMode === "rhythm") {
         registerRhythmTap();
       } else {
@@ -5186,9 +5594,15 @@
           if (targetMode === activeEducationalMode) return;
 
           // Cleanup previous mode
-          if (activeEducationalMode === "repertoire") stopPlayback();
+          if (activeEducationalMode === "repertoire") {
+            stopPlayback();
+            if (typeof isTempoFlowActive !== "undefined" && isTempoFlowActive) stopTempoFlow();
+          }
           if (activeEducationalMode === "rhythm" && metroIsPlaying) stopMetronome();
           if (activeEducationalMode === "sight-reading") stopSightReadingDrill();
+          if (activeEducationalMode === "scales" && typeof isVlPracticeActive !== "undefined" && isVlPracticeActive) {
+            toggleVoiceLeadingPractice();
+          }
 
           activeEducationalMode = targetMode;
 
@@ -5208,7 +5622,11 @@
           } else if (targetMode === "ear-training") {
             if (!earCurrentChallenge) loadEarChallenge();
           } else if (targetMode === "scales") {
-            updateScaleDisplay();
+            if (typeof isVoiceLeadingActive !== "undefined" && isVoiceLeadingActive) {
+              updateVoiceLeadingDisplay();
+            } else {
+              updateScaleDisplay();
+            }
           } else if (targetMode === "theory") {
             renderCircleOfFifthsSvg();
           }
@@ -5295,12 +5713,35 @@
       if (startBtn) startBtn.textContent = "▶ Start Drill";
     }
 
+    let srCardShownTime = performance.now();
+
+    function updateSRSHudDisplay() {
+      if (!window.MusicTheory || !window.MusicTheory.getAllSRSStats) return;
+      const stats = window.MusicTheory.getAllSRSStats();
+      const keys = Object.keys(stats);
+      const el = document.getElementById("srSrsStatsDisplay");
+      if (!el) return;
+      if (keys.length === 0) {
+        el.textContent = "Adaptive Ready";
+        return;
+      }
+      let mastered = 0, practice = 0;
+      keys.forEach(k => {
+        const lvl = window.MusicTheory.getSRSMasteryLevel(k);
+        if (lvl === "mastered") mastered++;
+        else if (lvl === "needs_practice") practice++;
+      });
+      el.textContent = `${mastered} Mastered / ${practice} Focus`;
+    }
+
     function nextSightReadingCard() {
       const preset = document.getElementById("srPresetSelect")?.value || "treble_basic";
       if (!window.MusicTheory) return;
-      srCurrentCard = window.MusicTheory.getRandomFlashcard(preset, srCurrentCard ? srCurrentCard.pitch : null);
+      srCurrentCard = window.MusicTheory.getRandomFlashcard(preset, srCurrentCard ? srCurrentCard.pitch : null, true);
+      srCardShownTime = performance.now();
       renderSightReadingSvg(srCurrentCard);
       document.getElementById("srPromptText").textContent = `Identify this note (${srCurrentCard.clef === 'treble' ? 'Treble 𝄞' : 'Bass 𝄢'}):`;
+      updateSRSHudDisplay();
     }
 
     function renderSightReadingSvg(card) {
@@ -5430,8 +5871,26 @@
       head.setAttribute("rx", "7.5");
       head.setAttribute("ry", "5.5");
       head.setAttribute("transform", `rotate(-20, ${noteX}, ${noteY})`);
-      head.setAttribute("fill", "#0f172a");
+
+      let headColor = "#0f172a";
+      if (card.srsMastery === "mastered") headColor = "#0284c7";
+      else if (card.srsMastery === "needs_practice") headColor = "#e11d48";
+      else if (card.srsMastery === "learning") headColor = "#d97706";
+      head.setAttribute("fill", headColor);
       svg.appendChild(head);
+
+      // SRS Mastery Indicator Badge in SVG
+      if (card.srsMastery && card.srsMastery !== "new") {
+        const srsBadge = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        srsBadge.setAttribute("x", width - 42);
+        srsBadge.setAttribute("y", staffTop - 6);
+        srsBadge.setAttribute("font-size", "10");
+        srsBadge.setAttribute("font-weight", "800");
+        srsBadge.setAttribute("text-anchor", "end");
+        srsBadge.setAttribute("fill", headColor);
+        srsBadge.textContent = card.srsMastery === "mastered" ? "⭐ Mastered" : (card.srsMastery === "needs_practice" ? "🔥 Focus Note" : "⚡ Learning");
+        svg.appendChild(srsBadge);
+      }
 
       // Notestem
       const stem = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -5461,6 +5920,12 @@
 
       // Check match: user can answer by letter ("C") or full pitch ("C4") or MIDI number
       const isMatch = (userAnswer === targetLetter) || (userAnswer === targetPitch) || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(userAnswer, targetPitch));
+
+      const responseMs = performance.now() - srCardShownTime;
+      if (window.MusicTheory && window.MusicTheory.recordSRSAttempt) {
+        window.MusicTheory.recordSRSAttempt(targetPitch, isMatch, responseMs);
+        updateSRSHudDisplay();
+      }
 
       playTone(srCurrentCard.freq, 0.25);
 
@@ -5674,6 +6139,7 @@
 
       document.getElementById("scaleListenBtn")?.addEventListener("click", playScaleSequence);
       document.getElementById("scalePracticeBtn")?.addEventListener("click", toggleScalePractice);
+      initVoiceLeadingModule();
     }
 
     function updateScaleDisplay() {
@@ -5863,6 +6329,327 @@
           document.getElementById("scaleDescriptionText").innerHTML = `✅ Nice! Now play <strong>${nextN.pitch}</strong> (RH Finger ${nextN.rhFinger}, LH Finger ${nextN.lhFinger})`;
         }
         highlightScalePracticeNote(scalePracticeStepIdx);
+      }
+    }
+
+    // ==========================================
+    // 🎹 CHORD PROGRESSIONS & VOICE-LEADING GYM ENGINE
+    // ==========================================
+    let currentVlKey = "C";
+    let currentVlProg = "pop_anthem";
+    let currentVlData = null;
+    let currentVlStepIdx = 0;
+    let isVlPracticeActive = false;
+    let isVoiceLeadingActive = false;
+    let vlFulfilledPitches = new Set();
+
+    function initVoiceLeadingModule() {
+      // Submode switcher
+      const btnScales = document.getElementById("btnSubmodeScales");
+      const btnVL = document.getElementById("btnSubmodeVoiceLeading");
+      const subviewScales = document.getElementById("subviewScales");
+      const subviewVL = document.getElementById("subviewVoiceLeading");
+
+      if (btnScales && btnVL) {
+        btnScales.addEventListener("click", () => {
+          btnScales.classList.add("active");
+          btnVL.classList.remove("active");
+          if (subviewScales) subviewScales.style.display = "block";
+          if (subviewVL) subviewVL.style.display = "none";
+          isVoiceLeadingActive = false;
+          updateScaleDisplay();
+        });
+
+        btnVL.addEventListener("click", () => {
+          btnVL.classList.add("active");
+          btnScales.classList.remove("active");
+          if (subviewScales) subviewScales.style.display = "none";
+          if (subviewVL) subviewVL.style.display = "block";
+          isVoiceLeadingActive = true;
+          updateVoiceLeadingDisplay();
+        });
+      }
+
+      // Key Selectors
+      document.querySelectorAll("#vlKeySelectorRow .tonic-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#vlKeySelectorRow .tonic-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentVlKey = btn.dataset.key;
+          currentVlStepIdx = 0;
+          updateVoiceLeadingDisplay();
+        });
+      });
+
+      // Progression Selectors
+      document.querySelectorAll("#vlProgressionPills .scale-pill-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#vlProgressionPills .scale-pill-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentVlProg = btn.dataset.prog;
+          currentVlStepIdx = 0;
+          updateVoiceLeadingDisplay();
+        });
+      });
+
+      document.getElementById("vlListenBtn")?.addEventListener("click", playVoiceLeadingProgression);
+      document.getElementById("vlPracticeBtn")?.addEventListener("click", toggleVoiceLeadingPractice);
+    }
+
+    function updateVoiceLeadingDisplay() {
+      if (!window.MusicTheory || !window.MusicTheory.optimizeProgressionVoiceLeading) return;
+      currentVlData = window.MusicTheory.optimizeProgressionVoiceLeading(currentVlKey, currentVlProg);
+      if (!currentVlData) return;
+
+      document.getElementById("vlDisplayTitle").textContent = `${currentVlKey} – ${currentVlData.progressionName}`;
+      document.getElementById("vlDescriptionText").textContent = currentVlData.description;
+
+      const efficiencyAdjective = currentVlData.totalMovement <= 5 ? "🌟 Buttery Smooth Voice-Leading!" : (currentVlData.totalMovement <= 10 ? "✨ Smooth Voice-Leading" : "🎵 Standard Inversions");
+      document.getElementById("vlSmoothnessText").textContent = `Voice-Leading Efficiency: ${currentVlData.totalMovement} semitones total finger motion across ${currentVlData.steps.length} chords (${efficiencyAdjective})`;
+
+      // Render cards
+      const cardsContainer = document.getElementById("vlProgressionCards");
+      if (cardsContainer) {
+        cardsContainer.innerHTML = "";
+        currentVlData.steps.forEach((step, idx) => {
+          const card = document.createElement("div");
+          card.className = `vl-chord-card ${idx === currentVlStepIdx ? 'active' : ''} ${idx < currentVlStepIdx ? 'completed' : ''}`;
+          card.id = `vl_card_${idx}`;
+          card.innerHTML = `
+            <div class="vl-numeral">${step.numeral}</div>
+            <div class="vl-chord-name">${step.chordName}</div>
+            <div class="vl-voicing-tag">${step.voicingName}</div>
+            <div class="vl-movement-tag">${idx === 0 ? 'Home Voicing' : `+${step.semitoneMovement} st`}</div>
+          `;
+          card.addEventListener("click", () => {
+            currentVlStepIdx = idx;
+            highlightVoiceLeadingStep(idx);
+            playChordVoicing(step);
+          });
+          cardsContainer.appendChild(card);
+
+          if (idx < currentVlData.steps.length - 1) {
+            const arrow = document.createElement("div");
+            arrow.className = "vl-arrow";
+            arrow.textContent = "→";
+            cardsContainer.appendChild(arrow);
+          }
+        });
+      }
+
+      renderVoiceLeadingSvg(currentVlData);
+      highlightVoiceLeadingStep(currentVlStepIdx);
+    }
+
+    function renderVoiceLeadingSvg(data) {
+      const svg = document.getElementById("vlScoreSvg");
+      if (!svg || !data) return;
+      svg.innerHTML = "";
+
+      const width = 900;
+      const trebleStaffTop = 32;
+      const spacing = 10;
+      const trebleStaffBottom = trebleStaffTop + 4 * spacing;
+      const bassStaffTop = trebleStaffBottom + 35;
+      const bassStaffBottom = bassStaffTop + 4 * spacing;
+
+      // Draw Staves
+      for (let i = 0; i < 5; i++) {
+        const lineT = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        lineT.setAttribute("x1", "30");
+        lineT.setAttribute("x2", `${width - 30}`);
+        lineT.setAttribute("y1", `${trebleStaffTop + i * spacing}`);
+        lineT.setAttribute("y2", `${trebleStaffTop + i * spacing}`);
+        lineT.setAttribute("stroke", "#475569");
+        lineT.setAttribute("stroke-width", "1");
+        svg.appendChild(lineT);
+
+        const lineB = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        lineB.setAttribute("x1", "30");
+        lineB.setAttribute("x2", `${width - 30}`);
+        lineB.setAttribute("y1", `${bassStaffTop + i * spacing}`);
+        lineB.setAttribute("y2", `${bassStaffTop + i * spacing}`);
+        lineB.setAttribute("stroke", "#475569");
+        lineB.setAttribute("stroke-width", "1");
+        svg.appendChild(lineB);
+      }
+
+      // Clef labels
+      const trebleLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      trebleLabel.setAttribute("x", "40");
+      trebleLabel.setAttribute("y", `${trebleStaffBottom - 10}`);
+      trebleLabel.setAttribute("font-size", "26");
+      trebleLabel.setAttribute("fill", "#64748b");
+      trebleLabel.textContent = "𝄞";
+      svg.appendChild(trebleLabel);
+
+      const bassLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      bassLabel.setAttribute("x", "40");
+      bassLabel.setAttribute("y", `${bassStaffBottom - 12}`);
+      bassLabel.setAttribute("font-size", "22");
+      bassLabel.setAttribute("fill", "#64748b");
+      bassLabel.textContent = "𝄢";
+      svg.appendChild(bassLabel);
+
+      const numSteps = data.steps.length;
+      const availWidth = width - 140;
+      const stepWidth = availWidth / numSteps;
+
+      data.steps.forEach((step, idx) => {
+        const cx = 100 + idx * stepWidth + stepWidth / 2;
+
+        if (idx > 0) {
+          const barline = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          barline.setAttribute("x1", `${100 + idx * stepWidth}`);
+          barline.setAttribute("x2", `${100 + idx * stepWidth}`);
+          barline.setAttribute("y1", `${trebleStaffTop}`);
+          barline.setAttribute("y2", `${bassStaffBottom}`);
+          barline.setAttribute("stroke", "#64748b");
+          barline.setAttribute("stroke-width", "1.5");
+          svg.appendChild(barline);
+        }
+
+        const nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        nameText.setAttribute("x", `${cx}`);
+        nameText.setAttribute("y", `${trebleStaffTop - 12}`);
+        nameText.setAttribute("font-size", "12");
+        nameText.setAttribute("font-weight", "800");
+        nameText.setAttribute("text-anchor", "middle");
+        nameText.setAttribute("fill", idx === currentVlStepIdx ? "#f59e0b" : "#38bdf8");
+        nameText.setAttribute("id", `vl_svg_name_${idx}`);
+        nameText.textContent = `${step.numeral} (${step.chordName})`;
+        svg.appendChild(nameText);
+
+        step.rhPitches.forEach(p => {
+          const dStep = window.MusicTheory.getDiatonicStep(p);
+          if (dStep !== null) {
+            const cy = trebleStaffBottom - (dStep - 2) * (spacing / 2);
+            const head = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+            head.setAttribute("cx", `${cx}`);
+            head.setAttribute("cy", `${cy}`);
+            head.setAttribute("rx", "6");
+            head.setAttribute("ry", "4.5");
+            head.setAttribute("transform", `rotate(-20, ${cx}, ${cy})`);
+            head.setAttribute("fill", idx === currentVlStepIdx ? "#f59e0b" : "#a855f7");
+            head.setAttribute("class", `vl-rh-head-${idx}`);
+            svg.appendChild(head);
+          }
+        });
+
+        const lhStep = window.MusicTheory.getDiatonicStep(step.lhPitch);
+        if (lhStep !== null) {
+          const cyB = bassStaffBottom - (lhStep - (-10)) * (spacing / 2);
+          const headB = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+          headB.setAttribute("cx", `${cx}`);
+          headB.setAttribute("cy", `${cyB}`);
+          headB.setAttribute("rx", "6.2");
+          headB.setAttribute("ry", "4.6");
+          headB.setAttribute("transform", `rotate(-20, ${cx}, ${cyB})`);
+          headB.setAttribute("fill", idx === currentVlStepIdx ? "#f59e0b" : "#34d399");
+          headB.setAttribute("class", `vl-lh-head-${idx}`);
+          svg.appendChild(headB);
+        }
+      });
+    }
+
+    function highlightVoiceLeadingStep(idx) {
+      if (!currentVlData || !currentVlData.steps[idx]) return;
+      const step = currentVlData.steps[idx];
+
+      document.querySelectorAll(".vl-chord-card").forEach((c, i) => {
+        c.classList.toggle("active", i === idx);
+        c.classList.toggle("completed", i < idx);
+      });
+
+      currentVlData.steps.forEach((s, i) => {
+        const isCur = (i === idx);
+        document.querySelectorAll(`.vl-rh-head-${i}`).forEach(h => h.setAttribute("fill", isCur ? "#f59e0b" : "#a855f7"));
+        document.querySelectorAll(`.vl-lh-head-${i}`).forEach(h => h.setAttribute("fill", isCur ? "#f59e0b" : "#34d399"));
+        const nameEl = document.getElementById(`vl_svg_name_${i}`);
+        if (nameEl) nameEl.setAttribute("fill", isCur ? "#f59e0b" : "#38bdf8");
+      });
+
+      document.querySelectorAll(".piano-key").forEach(k => k.classList.remove("active-rh", "active-lh", "active-dyad"));
+      const lhKey = document.querySelector(`.piano-key[data-note="${step.lhPitch}"]`);
+      if (lhKey) lhKey.classList.add("active-lh");
+      step.rhPitches.forEach(p => {
+        const key = document.querySelector(`.piano-key[data-note="${p}"]`);
+        if (key) key.classList.add("active-dyad");
+      });
+    }
+
+    function playChordVoicing(step) {
+      if (!step) return;
+      initAudio();
+      playTone(window.MusicTheory.pitchToFreq(step.lhPitch), 0.9);
+      step.rhPitches.forEach(p => {
+        playTone(window.MusicTheory.pitchToFreq(p), 0.9);
+      });
+    }
+
+    function playVoiceLeadingProgression() {
+      if (!currentVlData) return;
+      initAudio();
+      let delay = 0;
+      currentVlData.steps.forEach((step, idx) => {
+        setTimeout(() => {
+          highlightVoiceLeadingStep(idx);
+          playChordVoicing(step);
+        }, delay);
+        delay += 950;
+      });
+      setTimeout(() => {
+        highlightVoiceLeadingStep(currentVlStepIdx);
+      }, delay);
+    }
+
+    function toggleVoiceLeadingPractice() {
+      isVlPracticeActive = !isVlPracticeActive;
+      currentVlStepIdx = 0;
+      vlFulfilledPitches.clear();
+      const btn = document.getElementById("vlPracticeBtn");
+      if (btn) btn.textContent = isVlPracticeActive ? "■ Stop Practice" : "🎯 Practice Progression";
+      const desc = document.getElementById("vlDescriptionText");
+
+      if (isVlPracticeActive) {
+        highlightVoiceLeadingStep(0);
+        const s = currentVlData.steps[0];
+        desc.innerHTML = `<strong>Practice Started:</strong> Play the chord <strong>${s.chordName}</strong> (LH: ${s.lhPitch}, RH: ${s.rhPitches.join(" + ")})`;
+      } else {
+        updateVoiceLeadingDisplay();
+      }
+    }
+
+    function verifyVoiceLeadingInput(pitchName) {
+      if (!isVlPracticeActive || !currentVlData) return;
+      const targetStep = currentVlData.steps[currentVlStepIdx];
+      if (!targetStep) return;
+
+      const expected = [targetStep.lhPitch, ...targetStep.rhPitches];
+      const isMatch = expected.some(p => p === pitchName || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, pitchName)));
+      playTone(window.MusicTheory.pitchToFreq(pitchName), 0.35);
+
+      if (isMatch) {
+        vlFulfilledPitches.add(pitchName);
+        const desc = document.getElementById("vlDescriptionText");
+        const remaining = expected.filter(p => !vlFulfilledPitches.has(p) && !(window.MusicTheory && Array.from(vlFulfilledPitches).some(fp => window.MusicTheory.areEnharmonicEquivalent(fp, p))));
+
+        if (remaining.length === 0) {
+          playChordVoicing(targetStep);
+          currentVlStepIdx++;
+          vlFulfilledPitches.clear();
+
+          if (currentVlStepIdx >= currentVlData.steps.length) {
+            desc.innerHTML = `🎉 <strong>Full Progression Mastered!</strong> Magnificent smooth voice leading across all ${currentVlData.steps.length} chords!`;
+            currentVlStepIdx = 0;
+          } else {
+            const nextS = currentVlData.steps[currentVlStepIdx];
+            desc.innerHTML = `✅ Superb! Now play <strong>${nextS.chordName}</strong> (${nextS.numeral}) — LH: ${nextS.lhPitch}, RH: ${nextS.rhPitches.join(" + ")}`;
+          }
+          highlightVoiceLeadingStep(currentVlStepIdx);
+        } else {
+          desc.innerHTML = `🎵 Locked <strong>${pitchName}</strong> — now play: <strong>${remaining.join(" + ")}</strong>`;
+        }
       }
     }
 

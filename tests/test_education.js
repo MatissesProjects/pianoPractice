@@ -182,5 +182,113 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 11: Degree-aware enharmonic scale spelling & 12-key fingerings passed");
 }
 
-console.log("=== ALL 11 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// 12. Test Chord Progressions & Voice-Leading Optimizer
+{
+  assert.ok(MusicTheory.PROGRESSION_TEMPLATES, "PROGRESSION_TEMPLATES must exist");
+  assert.ok(MusicTheory.PROGRESSION_TEMPLATES.pop_anthem, "Pop anthem must exist");
+  assert.ok(MusicTheory.PROGRESSION_TEMPLATES.jazz_turnaround, "Jazz turnaround must exist");
+  assert.ok(MusicTheory.PROGRESSION_TEMPLATES.classical_cadence, "Classical cadence must exist");
+  assert.ok(MusicTheory.PROGRESSION_TEMPLATES.andalusian, "Andalusian cadence must exist");
+  assert.ok(MusicTheory.PROGRESSION_TEMPLATES.doo_wop, "Doo-wop cadence must exist");
+
+  // Verify Chord Info generation
+  const cChord = MusicTheory.getNumeralChordInfo("C", "I");
+  assert.strictEqual(cChord.chordName, "C", "C I chord is C Major");
+  assert.deepStrictEqual(cChord.pitchClasses, [0, 4, 7], "C pitch classes");
+  assert.strictEqual(cChord.lhBassPitch, "C3", "C3 bass anchor");
+
+  const gChord = MusicTheory.getNumeralChordInfo("C", "V");
+  assert.strictEqual(gChord.chordName, "G", "C V chord is G Major");
+  assert.deepStrictEqual(gChord.pitchClasses, [7, 11, 2], "G pitch classes");
+
+  const i64Chord = MusicTheory.getNumeralChordInfo("C", "I64");
+  assert.strictEqual(i64Chord.is64, true, "I64 flag set");
+  assert.strictEqual(i64Chord.lhBassPitch, "G2", "I64 has 5th in bass (G2)");
+
+  // Verify Voice-Leading Optimization (Pop Anthem: I - V - vi - IV)
+  const popResult = MusicTheory.optimizeProgressionVoiceLeading("C", "pop_anthem");
+  assert.strictEqual(popResult.steps.length, 4, "Pop Anthem has 4 steps");
+
+  // Step 0: C Major home voicing
+  assert.strictEqual(popResult.steps[0].numeral, "I");
+  assert.strictEqual(popResult.steps[0].semitoneMovement, 0, "First chord movement is 0");
+
+  // Step 1: G Major - verify minimal motion voice leading (smooth inversion)
+  // Instead of jumping up 21 semitones to root position [G4, B4, D5],
+  // it uses a close inversion (e.g. [B3, D4, G4]) with semitone movement <= 4!
+  assert.strictEqual(popResult.steps[1].numeral, "V");
+  assert.ok(popResult.steps[1].semitoneMovement <= 4, `G Major movement must be smooth (got ${popResult.steps[1].semitoneMovement} st)`);
+
+  // Total progression movement across all 4 chords
+  assert.ok(popResult.totalMovement <= 10, `Total progression finger movement must be highly efficient (got ${popResult.totalMovement} st)`);
+
+  // Verify Jazz Turnaround (ii7 - V7 - Imaj7 in D Major)
+  const jazzResult = MusicTheory.optimizeProgressionVoiceLeading("D", "jazz_turnaround");
+  assert.strictEqual(jazzResult.steps.length, 3, "Jazz turnaround has 3 steps");
+  assert.strictEqual(jazzResult.steps[0].chordName, "Em7", "ii7 in D is Em7");
+  assert.strictEqual(jazzResult.steps[1].chordName, "A7", "V7 in D is A7");
+  assert.strictEqual(jazzResult.steps[2].chordName, "Dmaj7", "Imaj7 in D is Dmaj7");
+
+  // Verify Andalusian Cadence (i - VII - VI - V in A Minor)
+  const andalusianResult = MusicTheory.optimizeProgressionVoiceLeading("Am", "andalusian");
+  assert.strictEqual(andalusianResult.steps.length, 4, "Andalusian has 4 steps");
+  assert.strictEqual(andalusianResult.steps[0].chordName, "Am", "i in Am is Am");
+  assert.strictEqual(andalusianResult.steps[1].chordName, "G", "VII in Am is G");
+  assert.strictEqual(andalusianResult.steps[2].chordName, "F", "VI in Am is F");
+  assert.strictEqual(andalusianResult.steps[3].chordName, "E", "V in Am is E");
+
+  console.log("✔ Test 12: Chord Progressions & Voice-Leading Optimizer passed");
+}
+
+// 13. Test Adaptive Spaced-Repetition (SRS) Engine & Weighted Selection
+{
+  const mockStorage = {};
+  global.localStorage = {
+    getItem: (k) => mockStorage[k] || null,
+    setItem: (k, v) => { mockStorage[k] = String(v); },
+    removeItem: (k) => { delete mockStorage[k]; }
+  };
+
+  MusicTheory.clearSRSStats();
+
+  // Initially unpracticed note
+  assert.strictEqual(MusicTheory.getSRSMasteryLevel("C4"), "new", "Initial state is 'new'");
+
+  // Record 5 fast, flawless attempts on C4
+  for (let i = 0; i < 5; i++) {
+    MusicTheory.recordSRSAttempt("C4", true, 600);
+  }
+  const cStats = MusicTheory.getSRSItemStats("C4");
+  assert.strictEqual(cStats.attempts, 5, "5 attempts recorded");
+  assert.strictEqual(cStats.errors, 0, "0 errors");
+  assert.strictEqual(MusicTheory.getSRSMasteryLevel("C4"), "mastered", "C4 is 'mastered'");
+
+  // Record 4 attempts with high error rate & slow response on F2
+  MusicTheory.recordSRSAttempt("F2", false, 2800);
+  MusicTheory.recordSRSAttempt("F2", false, 2400);
+  MusicTheory.recordSRSAttempt("F2", true, 2200);
+  MusicTheory.recordSRSAttempt("F2", false, 2600);
+
+  const fStats = MusicTheory.getSRSItemStats("F2");
+  assert.strictEqual(fStats.attempts, 4);
+  assert.strictEqual(fStats.errors, 3);
+  assert.strictEqual(MusicTheory.getSRSMasteryLevel("F2"), "needs_practice", "F2 is 'needs_practice'");
+
+  // Test Weighted Draw Distribution:
+  // With weights 3.5 (F2) vs 1.0 (C4), F2 should be drawn roughly 3.5x more often
+  const draws = { "C4": 0, "F2": 0, "other": 0 };
+  for (let d = 0; d < 1000; d++) {
+    const card = MusicTheory.getRandomFlashcard("grand_staff", null, true);
+    if (card.pitch === "C4") draws["C4"]++;
+    else if (card.pitch === "F2") draws["F2"]++;
+    else draws["other"]++;
+  }
+
+  // F2 (needs_practice, weight 3.5) must be drawn more frequently than C4 (mastered, weight 1.0)
+  assert.ok(draws["F2"] > draws["C4"] * 1.5, `Difficult note (${draws["F2"]}) drawn >1.5x more than mastered note (${draws["C4"]})`);
+
+  console.log("✔ Test 13: Adaptive Spaced-Repetition (SRS) Engine & Weighted Selection passed");
+}
+
+console.log("=== ALL 13 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
 

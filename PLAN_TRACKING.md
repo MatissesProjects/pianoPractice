@@ -111,7 +111,7 @@
   - [x] Rhythmic rest glyph rendering (`𝄽`, `𝄻`, `𝄾`) on staves
   - [x] Harmonic Roman Numeral analysis badge on Beat 0 of each measure
 
-- [ ] **Milestone 16: Voice-Leading Gym, Rhythm Flow Mode, & Adaptive SRS (`FIXES.MD` Part 2.4, 2.5, 2.6)**
-  - [ ] Chord Progressions & Voice-Leading Gym in Scales/Theory Studio with smooth inversion solver and interactive check
-  - [ ] 🥁 Tempo Flow Mode: Metronome-synced auto playhead in Repertoire Lab with timing window grading (±45ms / ±95ms)
-  - [ ] Adaptive Spaced-Repetition System (SRS) for Sight-Reading & Ear Training with latency/error weighting and mastery indicators
+- [x] **Milestone 16: Voice-Leading Gym, Rhythm Flow Mode, & Adaptive SRS (`FIXES.MD` Part 2.4, 2.5, 2.6)**
+  - [x] Chord Progressions & Voice-Leading Gym in Scales/Theory Studio with smooth inversion solver and interactive check
+  - [x] 🥁 Tempo Flow Mode: Metronome-synced auto playhead in Repertoire Lab with timing window grading (±45ms / ±95ms)
+  - [x] Adaptive Spaced-Repetition System (SRS) for Sight-Reading & Ear Training with latency/error weighting and mastery indicators

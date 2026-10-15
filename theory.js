@@ -349,14 +349,103 @@
     }
   };
 
-  function getRandomFlashcard(presetKey = "treble_basic", excludePitch = null) {
+  // ==========================================
+  // ADAPTIVE SPACED-REPETITION SYSTEM (SRS)
+  // ==========================================
+  const SRS_STORAGE_KEY = "piano_srs_stats";
+
+  function getSRSStorage() {
+    if (typeof localStorage === "undefined") return {};
+    try {
+      const data = localStorage.getItem(SRS_STORAGE_KEY);
+      return data ? JSON.parse(data) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveSRSStorage(data) {
+    if (typeof localStorage === "undefined") return;
+    try {
+      localStorage.setItem(SRS_STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  function recordSRSAttempt(pitchOrId, isCorrect, responseTimeMs = 1500) {
+    if (!pitchOrId) return;
+    const stats = getSRSStorage();
+    const cur = stats[pitchOrId] || { attempts: 0, errors: 0, correct: 0, avgResponseMs: 1500, streak: 0 };
+    cur.attempts++;
+    if (isCorrect) {
+      cur.correct++;
+      cur.streak++;
+    } else {
+      cur.errors++;
+      cur.streak = 0;
+    }
+    const cleanTime = Math.max(200, Math.min(10000, responseTimeMs));
+    cur.avgResponseMs = Math.round(cur.avgResponseMs * 0.65 + cleanTime * 0.35);
+    stats[pitchOrId] = cur;
+    saveSRSStorage(stats);
+    return cur;
+  }
+
+  function getSRSItemStats(pitchOrId) {
+    const stats = getSRSStorage();
+    return stats[pitchOrId] || { attempts: 0, errors: 0, correct: 0, avgResponseMs: 1500, streak: 0 };
+  }
+
+  function getAllSRSStats() {
+    return getSRSStorage();
+  }
+
+  function clearSRSStats() {
+    if (typeof localStorage !== "undefined") {
+      try { localStorage.removeItem(SRS_STORAGE_KEY); } catch (e) {}
+    }
+  }
+
+  function getSRSMasteryLevel(pitchOrId) {
+    const item = getSRSItemStats(pitchOrId);
+    if (!item || item.attempts < 2) return "new"; // Not enough data
+    const errorRate = item.errors / item.attempts;
+    if (errorRate <= 0.15 && item.avgResponseMs < 1400 && item.streak >= 2) return "mastered";
+    if (errorRate > 0.35 || item.avgResponseMs > 2000) return "needs_practice";
+    return "learning";
+  }
+
+  function getRandomFlashcard(presetKey = "treble_basic", excludePitch = null, useSRS = true) {
     const preset = FLASHCARD_PRESETS[presetKey] || FLASHCARD_PRESETS.treble_basic;
-    let pool = preset.pitches;
+    let pool = [...preset.pitches];
     if (excludePitch && pool.length > 1) {
       pool = pool.filter(p => p !== excludePitch);
     }
-    const randomIndex = Math.floor(Math.random() * pool.length);
-    const targetPitch = pool[randomIndex];
+
+    let targetPitch;
+    if (useSRS && pool.length > 1) {
+      // Weight selection so difficult notes (needs_practice) appear 3.5x more often
+      const weights = pool.map(pitch => {
+        const mastery = getSRSMasteryLevel(pitch);
+        if (mastery === "needs_practice") return 3.5;
+        if (mastery === "new") return 2.2;
+        if (mastery === "learning") return 1.8;
+        return 1.0; // mastered
+      });
+      const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+      let randVal = Math.random() * totalWeight;
+      for (let i = 0; i < pool.length; i++) {
+        randVal -= weights[i];
+        if (randVal <= 0) {
+          targetPitch = pool[i];
+          break;
+        }
+      }
+      if (!targetPitch) targetPitch = pool[pool.length - 1];
+    } else {
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      targetPitch = pool[randomIndex];
+    }
+
     const midi = pitchToMidi(targetPitch);
 
     let clef = preset.clef;
@@ -382,7 +471,9 @@
       freq: midiToFreq(midi),
       diatonicStep: getDiatonicStep(targetPitch),
       options: options,
-      presetName: preset.name
+      presetName: preset.name,
+      srsMastery: getSRSMasteryLevel(targetPitch),
+      srsStats: getSRSItemStats(targetPitch)
     };
   }
 
@@ -583,6 +674,216 @@
     };
   }
 
+  // ==========================================
+  // CHORD PROGRESSIONS & VOICE-LEADING GYM
+  // ==========================================
+  const PROGRESSION_TEMPLATES = {
+    pop_anthem: {
+      id: "pop_anthem",
+      name: "Pop Anthem (I – V – vi – IV)",
+      numerals: ["I", "V", "vi", "IV"],
+      description: "The most iconic progression in modern pop and rock (100+ global hit songs)."
+    },
+    jazz_turnaround: {
+      id: "jazz_turnaround",
+      name: "Jazz Turnaround (ii7 – V7 – Imaj7)",
+      numerals: ["ii7", "V7", "Imaj7"],
+      description: "The fundamental harmonic engine of standard jazz repertoire."
+    },
+    classical_cadence: {
+      id: "classical_cadence",
+      name: "Classical Cadence (I – IV – I64 – V7 – I)",
+      numerals: ["I", "IV", "I64", "V7", "I"],
+      description: "Standard conservatory voice-leading cadence with cadential 6/4 tonic resolution."
+    },
+    andalusian: {
+      id: "andalusian",
+      name: "Andalusian Cadence (i – VII – VI – V)",
+      numerals: ["i", "VII", "VI", "V"],
+      description: "Descending flamenco and dramatic classical minor cadence."
+    },
+    doo_wop: {
+      id: "doo_wop",
+      name: "50s Doo-Wop (I – vi – IV – V)",
+      numerals: ["I", "vi", "IV", "V"],
+      description: "Timeless 1950s rock, rhythm & blues, and soul progression."
+    }
+  };
+
+  // Convert key root and Roman numeral into detailed chord data
+  function getNumeralChordInfo(keyRoot = "C", numeral = "I") {
+    const isMinorKey = keyRoot.endsWith("m") || ["Am", "Dm", "Em"].includes(keyRoot);
+    const cleanKey = keyRoot.replace(/m$/, "");
+    const tonicSemi = NOTE_OFFSETS[cleanKey] ?? 0;
+    const useFlat = cleanKey.includes("b") || ["F", "Bb", "Eb", "Ab", "Db"].includes(cleanKey);
+
+    const majorScaleOffsets = [0, 2, 4, 5, 7, 9, 11];
+    const naturalMinorScaleOffsets = [0, 2, 3, 5, 7, 8, 10];
+    const scaleOffsets = isMinorKey ? naturalMinorScaleOffsets : majorScaleOffsets;
+
+    let degree = 0; // 0-based scale degree
+    let chordType = "major";
+    let is64 = false;
+
+    switch (numeral) {
+      case "I": degree = 0; chordType = "major"; break;
+      case "i": degree = 0; chordType = "minor"; break;
+      case "ii": degree = 1; chordType = "minor"; break;
+      case "ii7": degree = 1; chordType = "m7"; break;
+      case "iii": degree = 2; chordType = "minor"; break;
+      case "IV": degree = 3; chordType = "major"; break;
+      case "iv": degree = 3; chordType = "minor"; break;
+      case "V": degree = 4; chordType = "major"; break;
+      case "V7": degree = 4; chordType = "7"; break;
+      case "vi": degree = 5; chordType = "minor"; break;
+      case "VI": degree = 5; chordType = "major"; break;
+      case "VII": degree = 6; chordType = "major"; break;
+      case "vii°": degree = 6; chordType = "dim"; break;
+      case "Imaj7": degree = 0; chordType = "maj7"; break;
+      case "I64": degree = 0; chordType = "major"; is64 = true; break;
+      default: degree = 0; chordType = "major";
+    }
+
+    const rootSemi = (tonicSemi + scaleOffsets[degree]) % 12;
+    const rootName = useFlat ? NOTE_NAMES_FLAT[rootSemi] : NOTE_NAMES_SHARP[rootSemi];
+
+    let intervals = [0, 4, 7];
+    if (chordType === "minor") intervals = [0, 3, 7];
+    else if (chordType === "dim") intervals = [0, 3, 6];
+    else if (chordType === "7") intervals = [0, 4, 7, 10];
+    else if (chordType === "maj7") intervals = [0, 4, 7, 11];
+    else if (chordType === "m7") intervals = [0, 3, 7, 10];
+
+    // LH Bass pitch: normally root in octave 2 or 3; for I64 bass is 5th of triad
+    const bassDegreeOffset = is64 ? scaleOffsets[(degree + 4) % 7] : scaleOffsets[degree];
+    const bassSemi = (tonicSemi + bassDegreeOffset) % 12;
+    const bassName = (useFlat ? NOTE_NAMES_FLAT[bassSemi] : NOTE_NAMES_SHARP[bassSemi]) + (bassSemi < 5 ? "3" : "2");
+
+    const chordPitchClasses = intervals.map(int => (rootSemi + int) % 12);
+
+    return {
+      numeral,
+      keyRoot,
+      rootName,
+      chordType,
+      chordName: `${rootName}${chordType === 'minor' ? 'm' : chordType === '7' ? '7' : chordType === 'maj7' ? 'maj7' : chordType === 'm7' ? 'm7' : chordType === 'dim' ? 'dim' : ''}${is64 ? ' (6/4)' : ''}`,
+      rootSemi,
+      intervals,
+      pitchClasses: chordPitchClasses,
+      lhBassPitch: bassName,
+      is64
+    };
+  }
+
+  // Voice-Leading Optimizer: Minimizes total semitone finger displacement between successive chords
+  function optimizeProgressionVoiceLeading(keyRoot = "C", progressionKey = "pop_anthem") {
+    const template = PROGRESSION_TEMPLATES[progressionKey] || PROGRESSION_TEMPLATES.pop_anthem;
+    const chords = template.numerals.map(num => getNumeralChordInfo(keyRoot, num));
+
+    const voicedSteps = [];
+    let prevVoicingMidis = null;
+
+    for (let cIdx = 0; cIdx < chords.length; cIdx++) {
+      const chord = chords[cIdx];
+      const pcs = chord.pitchClasses;
+
+      if (cIdx === 0) {
+        // Initial chord: close root position centered in octave 4 (MIDI 60-68)
+        let rootMidi = 60 + ((chord.rootSemi - (60 % 12) + 12) % 12);
+        if (rootMidi > 67) rootMidi -= 12;
+        const rhMidis = chord.intervals.map(int => rootMidi + int);
+        prevVoicingMidis = rhMidis;
+
+        const useFlat = keyRoot.includes("b") || ["F", "Bb", "Eb", "Ab"].includes(keyRoot);
+        const rhPitches = rhMidis.map(m => midiToPitch(m, useFlat));
+
+        voicedSteps.push({
+          index: cIdx,
+          numeral: chord.numeral,
+          chordName: chord.chordName,
+          lhPitch: chord.lhBassPitch,
+          lhMidi: pitchToMidi(chord.lhBassPitch),
+          rhMidis: rhMidis,
+          rhPitches: rhPitches,
+          voicingName: "Root Position",
+          semitoneMovement: 0,
+          description: template.description
+        });
+      } else {
+        // Evaluate candidate voicings across inversions and octaves (MIDI 53 to 84)
+        const candidateVoicings = [];
+        const numVoices = chord.intervals.length;
+
+        for (let oct = 3; oct <= 5; oct++) {
+          const baseRoot = (oct + 1) * 12 + chord.rootSemi;
+          for (let inv = 0; inv < numVoices; inv++) {
+            const rawMidis = chord.intervals.map((int, i) => {
+              const noteM = baseRoot + int;
+              return i < inv ? noteM + 12 : noteM;
+            }).sort((a, b) => a - b);
+
+            if (rawMidis[0] >= 53 && rawMidis[rawMidis.length - 1] <= 84) {
+              candidateVoicings.push({
+                midis: rawMidis,
+                inversionName: inv === 0 ? "Root Position" : inv === 1 ? "1st Inversion" : inv === 2 ? "2nd Inversion" : "3rd Inversion"
+              });
+            }
+          }
+        }
+
+        // Minimize distance metric: sum |curr[i] - prev[i]|
+        let bestCandidate = candidateVoicings[0] || { midis: prevVoicingMidis, inversionName: "Root Position" };
+        let minCost = Infinity;
+
+        candidateVoicings.forEach(cand => {
+          let cost = 0;
+          const len = Math.min(cand.midis.length, prevVoicingMidis.length);
+          for (let v = 0; v < len; v++) {
+            cost += Math.abs(cand.midis[v] - prevVoicingMidis[v]);
+          }
+          if (cand.midis.length !== prevVoicingMidis.length) {
+            cost += Math.abs(cand.midis.length - prevVoicingMidis.length) * 4;
+          }
+          // Slight penalty for moving too far from middle C range (MIDI 65)
+          const avgPitch = cand.midis.reduce((s, m) => s + m, 0) / cand.midis.length;
+          cost += Math.abs(avgPitch - 65) * 0.25;
+
+          if (cost < minCost) {
+            minCost = cost;
+            bestCandidate = cand;
+          }
+        });
+
+        const useFlat = keyRoot.includes("b") || ["F", "Bb", "Eb", "Ab"].includes(keyRoot);
+        const rhPitches = bestCandidate.midis.map(m => midiToPitch(m, useFlat));
+
+        voicedSteps.push({
+          index: cIdx,
+          numeral: chord.numeral,
+          chordName: chord.chordName,
+          lhPitch: chord.lhBassPitch,
+          lhMidi: pitchToMidi(chord.lhBassPitch),
+          rhMidis: bestCandidate.midis,
+          rhPitches: rhPitches,
+          voicingName: bestCandidate.inversionName,
+          semitoneMovement: Math.round(minCost),
+          description: template.description
+        });
+
+        prevVoicingMidis = bestCandidate.midis;
+      }
+    }
+
+    return {
+      progressionId: progressionKey,
+      progressionName: template.name,
+      description: template.description,
+      key: keyRoot,
+      steps: voicedSteps,
+      totalMovement: voicedSteps.reduce((sum, s) => sum + s.semitoneMovement, 0)
+    };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -596,6 +897,7 @@
     CHORD_TYPES,
     CIRCLE_OF_FIFTHS,
     FLASHCARD_PRESETS,
+    PROGRESSION_TEMPLATES,
     spellPitchOnLetter,
     pitchToMidi,
     midiToPitch,
@@ -612,7 +914,14 @@
     detectKeyAccidentals,
     harmonizePitch,
     harmonizeToken,
-    generateSongHarmonies
+    generateSongHarmonies,
+    recordSRSAttempt,
+    getSRSItemStats,
+    getAllSRSStats,
+    clearSRSStats,
+    getSRSMasteryLevel,
+    getNumeralChordInfo,
+    optimizeProgressionVoiceLeading
   };
 });
 

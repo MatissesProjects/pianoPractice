@@ -1493,6 +1493,70 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 16: Beat-proportional spacing, rest glyphs & Roman numeral harmonic badges passed");
 }
 
+// ==========================================
+// TEST 17: 🥁 Tempo Flow Mode Playhead Timing Windows & Accuracy Scoring
+// ==========================================
+{
+  function classifyTimingOffset(diffMs, isLate = true) {
+    const absDiff = Math.abs(diffMs);
+    if (absDiff <= 45) return { grade: "PERFECT", pts: 100, badge: "🔥" };
+    if (absDiff <= 95) return { grade: "GOOD", pts: 75, badge: "✨" };
+    return { grade: isLate ? "LATE" : "EARLY", pts: 40, badge: "⚠️" };
+  }
+
+  function calculateFlowAccuracy(stats) {
+    const { perfect, good, lateOrEarly, missed, total } = stats;
+    const maxPts = Math.max(1, total) * 100;
+    const earned = perfect * 100 + good * 75 + lateOrEarly * 40;
+    return Math.min(100, Math.round((earned / maxPts) * 100));
+  }
+
+  // 17.1 Test Timing Window Classification
+  // Hit right on the beat (+12ms): PERFECT
+  assert.strictEqual(classifyTimingOffset(12).grade, "PERFECT");
+  // Hit boundary +44ms: PERFECT
+  assert.strictEqual(classifyTimingOffset(44).grade, "PERFECT");
+  // Hit +48ms: GOOD
+  assert.strictEqual(classifyTimingOffset(48).grade, "GOOD");
+  // Hit +92ms: GOOD
+  assert.strictEqual(classifyTimingOffset(92).grade, "GOOD");
+  // Hit +115ms: LATE
+  assert.strictEqual(classifyTimingOffset(115, true).grade, "LATE");
+  // Hit early -110ms: EARLY
+  assert.strictEqual(classifyTimingOffset(110, false).grade, "EARLY");
+
+  // 17.2 Test Accuracy Rating Formula
+  const allPerfect = { total: 10, perfect: 10, good: 0, lateOrEarly: 0, missed: 0 };
+  assert.strictEqual(calculateFlowAccuracy(allPerfect), 100, "10/10 Perfect is 100%");
+
+  const mixed = { total: 10, perfect: 8, good: 2, lateOrEarly: 0, missed: 0 };
+  // (8*100 + 2*75) / 1000 = 950 / 1000 = 95%
+  assert.strictEqual(calculateFlowAccuracy(mixed), 95, "8 Perfect, 2 Good is 95%");
+
+  const humanPlay = { total: 10, perfect: 4, good: 2, lateOrEarly: 2, missed: 2 };
+  // (4*100 + 2*75 + 2*40 + 0) / 1000 = (400 + 150 + 80) / 1000 = 630 / 1000 = 63%
+  assert.strictEqual(calculateFlowAccuracy(humanPlay), 63, "4 Perfect, 2 Good, 2 Late, 2 Miss is 63%");
+
+  // 17.3 Count-in & Step Duration Schedule
+  const bpm = 120;
+  const beatMs = (60 / bpm) * 1000; // 500ms
+  assert.strictEqual(beatMs, 500, "120 BPM = 500ms per beat");
+
+  const countInBeats = 4;
+  const countInDuration = countInBeats * beatMs; // 2000ms
+  assert.strictEqual(countInDuration, 2000, "4-beat count-in is 2000ms at 120 BPM");
+
+  const halfNoteStep = { beats: 2.0 };
+  const quarterNoteStep = { beats: 1.0 };
+  const eighthNoteStep = { beats: 0.5 };
+
+  assert.strictEqual(halfNoteStep.beats * beatMs, 1000, "Half note is 1000ms");
+  assert.strictEqual(quarterNoteStep.beats * beatMs, 500, "Quarter note is 500ms");
+  assert.strictEqual(eighthNoteStep.beats * beatMs, 250, "Eighth note is 250ms");
+
+  console.log("✔ Test 17: 🥁 Tempo Flow Mode timing windows, scoring & count-in passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 
