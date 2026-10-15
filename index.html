@@ -757,13 +757,18 @@
       background: #090e1a;
       border: 1px solid #1e293b;
       border-radius: 10px;
-      padding: 0.75rem 1.15rem;
+      padding: 0 1.15rem;
       margin-bottom: 1rem;
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
+      height: 52px;
+      min-height: 52px;
+      max-height: 52px;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     .hud-target {
@@ -772,22 +777,33 @@
       gap: 0.6rem;
       font-size: 0.9rem;
       font-weight: 700;
+      flex-shrink: 0;
+      white-space: nowrap;
+      color: #94a3b8;
     }
 
     .target-badge {
-      background: #f59e0b;
-      color: #0b1120;
-      padding: 0.25rem 0.75rem;
+      background: #0f172a;
+      border: 2px solid #f59e0b;
+      color: #f59e0b;
+      padding: 0.2rem 0.65rem;
       border-radius: 6px;
       font-family: ui-monospace, monospace;
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 900;
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
       transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 42px;
+      gap: 0.35rem;
+      line-height: 1.2;
     }
     .target-badge.error-flash {
-      background: #ef4444 !important;
-      color: white !important;
+      background: #7f1d1d !important;
+      border-color: #ef4444 !important;
+      color: #ffffff !important;
       box-shadow: 0 0 18px rgba(239, 68, 68, 0.8) !important;
       animation: shake 0.25s ease-in-out;
     }
@@ -799,9 +815,17 @@
     }
 
     .hud-feedback {
-      font-size: 0.85rem;
+      flex: 1;
+      min-width: 0;
+      font-size: 0.88rem;
       font-weight: 600;
       color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      line-height: 1.3;
+      padding: 0 0.5rem;
     }
 
     .hud-stats {
@@ -810,6 +834,8 @@
       gap: 0.75rem;
       font-size: 0.82rem;
       color: #cbd5e1;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .hud-restart-btn {
@@ -820,6 +846,7 @@
       padding: 0.35rem 0.75rem;
       border-radius: 6px;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     /* MULTI-SYSTEM VERTICAL SHEET MUSIC SCORE VIEW */
@@ -931,9 +958,12 @@
       filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.9));
     }
     .note-group.active-target .cheat-text-composite {
-      fill: #f59e0b !important;
+      fill: #b45309 !important;
       font-size: 13px !important;
       font-weight: 900 !important;
+    }
+    .dark-mode .note-group.active-target .cheat-text-composite {
+      fill: #fbbf24 !important;
     }
     .note-group.active-target .notestem { stroke: #f59e0b !important; }
 
@@ -2229,8 +2259,8 @@
         <div class="hud-target">
           <span>Target Note:</span>
           <span class="target-badge" id="hudTargetBadge">--</span>
-          <span class="hud-feedback" id="hudFeedbackText">Play the highlighted note to begin...</span>
         </div>
+        <div class="hud-feedback" id="hudFeedbackText" title="Play the highlighted note to begin...">Play the highlighted note to begin...</div>
         <div class="hud-stats">
           <span id="hudProgressText">Note: 1 / 32</span>
           <button class="hud-restart-btn" id="hudRestartBtn">↺ Restart Piece</button>
@@ -3945,19 +3975,21 @@
     function updateTargetBadgeDisplay(step, fulfilledSet) {
       const targetBadge = document.getElementById("hudTargetBadge");
       if (!targetBadge || !step) return;
-      if (!step.expectedPitches || step.expectedPitches.length <= 1) {
-        targetBadge.textContent = (step.displayLabel || "").replace(/#/g, "♯");
+
+      if (!step.expectedPitches || step.expectedPitches.length === 0) {
+        targetBadge.innerHTML = `<span style="color:#94a3b8; font-size:0.95rem;">𝄽 REST</span>`;
         return;
       }
+
       const partsHtml = step.expectedPitches.map(p => {
         const isDone = fulfilledSet && fulfilledSet.has(p);
         const label = p.replace(/#/g, "♯");
         if (isDone) {
-          return `<span style="color:#34d399; text-shadow:0 0 6px rgba(52,211,153,0.4);">${label}✓</span>`;
+          return `<span style="color:#34d399; font-weight:900; text-shadow:0 0 8px rgba(52,211,153,0.5);">${label}✓</span>`;
         }
-        return `<span style="color:#f59e0b; font-weight:800;">${label}</span>`;
+        return `<span style="color:#f59e0b; font-weight:900;">${label}</span>`;
       });
-      targetBadge.innerHTML = partsHtml.join(" <span style='color:var(--text-muted); font-weight:normal;'>+</span> ");
+      targetBadge.innerHTML = partsHtml.join("<span style='color:#94a3b8; font-weight:700; margin:0 4px;'>+</span>");
     }
 
     function highlightActiveScoreNote(stepIdx) {
@@ -5243,7 +5275,7 @@
 
           const targetBadge = document.getElementById("hudTargetBadge");
           if (targetBadge) {
-            targetBadge.textContent = step.displayLabel || (step.expectedPitches ? step.expectedPitches.join(" + ") : "--");
+            updateTargetBadgeDisplay(step, null);
           }
           document.getElementById("hudProgressText").textContent = `Step: ${stepIdx + 1} / ${steps}`;
 
@@ -5315,6 +5347,16 @@
       highlightActiveScoreNote(0);
       document.getElementById("hudFeedbackText").textContent = "Piece restarted! Play the first note...";
     });
+
+    const hudFeedbackEl = document.getElementById("hudFeedbackText");
+    if (hudFeedbackEl && typeof MutationObserver !== "undefined") {
+      const feedbackObserver = new MutationObserver(() => {
+        if (hudFeedbackEl.title !== hudFeedbackEl.textContent) {
+          hudFeedbackEl.title = hudFeedbackEl.textContent;
+        }
+      });
+      feedbackObserver.observe(hudFeedbackEl, { childList: true, characterData: true, subtree: true });
+    }
 
     // Dropdown Population & Filter Pills
     function populateDropdown(songsToUse = songDatabase) {

@@ -129,3 +129,12 @@
   - [x] Lifecycle Event Integration: Note-on, note-off, CC 64 sustain pedal toggle, and score click preview
   - [x] Comprehensive automated test suite (`tests/test_score_engine.js` Test 18: Tests 18.1–18.10 verifying all chord types, inversions, and non-clobbering lifecycles)
 
+- [x] **Milestone 18: Practice HUD Layout Stability & Target Note Badge High-Contrast Styling**
+  - [x] Fixed UI Bouncing: Restricted `.practice-hud` to fixed height (`52px`), `flex-wrap: nowrap`, and `overflow: hidden`, isolating `.hud-feedback` into a middle flex column with `white-space: nowrap; overflow: hidden; text-overflow: ellipsis;`
+  - [x] Dynamic Tooltip Synchronization: Added `MutationObserver` on `#hudFeedbackText` so long truncated messages reveal full details on hover
+  - [x] High-Contrast Target Note Badge: Replaced clashing orange-on-orange text with dark slate background (`#0f172a`), 2px glowing orange border (`#f59e0b`), bright amber text (`#f59e0b`), and emerald green checkmarks (`#34d399`) for satisfied notes
+  - [x] Rest & Accidental Support: Display `𝄽 REST` on empty pitch steps instead of blank rectangles, with authentic musical sharp glyphs (`♯`)
+  - [x] Score Notehead Contrast: Fixed paper cheat text contrast in light mode (`#b45309`) and dark mode (`#fbbf24`)
+  - [x] Comprehensive automated test suite (`tests/test_score_engine.js` Test 19: Tests 19.1–19.4 verifying high contrast, checkmarks, accidentals, and rests)
+
+

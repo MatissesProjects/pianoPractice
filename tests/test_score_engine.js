@@ -1735,7 +1735,65 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 18: 🎹 Real-Time Polyphonic Chord Recognizer, Inversion Engine & Non-Clobbering passed");
 }
 
+// ==========================================
+// TEST 19: 🎯 HUD Target Badge High-Contrast Rendering & Feedback Layout Stability
+// ==========================================
+{
+  function simulateUpdateTargetBadgeDisplay(step, fulfilledSet) {
+    if (!step) return "";
+    if (!step.expectedPitches || step.expectedPitches.length === 0) {
+      return `<span style="color:#94a3b8; font-size:0.95rem;">𝄽 REST</span>`;
+    }
+    const partsHtml = step.expectedPitches.map(p => {
+      const isDone = fulfilledSet && fulfilledSet.has(p);
+      const label = p.replace(/#/g, "♯");
+      if (isDone) {
+        return `<span style="color:#34d399; font-weight:900; text-shadow:0 0 8px rgba(52,211,153,0.5);">${label}✓</span>`;
+      }
+      return `<span style="color:#f59e0b; font-weight:900;">${label}</span>`;
+    });
+    return partsHtml.join("<span style='color:#94a3b8; font-weight:700; margin:0 4px;'>+</span>");
+  }
+
+  // 19.1 Single Note Unfulfilled & Fulfilled
+  const singleStep = { expectedPitches: ["C4"], displayLabel: "C4" };
+  const singleHtml = simulateUpdateTargetBadgeDisplay(singleStep, new Set());
+  assert.ok(singleHtml.includes("color:#f59e0b"), "Unfulfilled pitch must render in bold amber/orange #f59e0b");
+  assert.ok(singleHtml.includes("C4"), "Label C4 must be present");
+
+  const singleFulfilledHtml = simulateUpdateTargetBadgeDisplay(singleStep, new Set(["C4"]));
+  assert.ok(singleFulfilledHtml.includes("color:#34d399"), "Fulfilled pitch must render in emerald green #34d399");
+  assert.ok(singleFulfilledHtml.includes("C4✓"), "Label must include checkmark C4✓");
+
+  // 19.2 Multi-Note Chord Unfulfilled & Partial Fulfillment
+  const chordStep = { expectedPitches: ["C4", "G4"], displayLabel: "C4 + G4" };
+  const chordHtml = simulateUpdateTargetBadgeDisplay(chordStep, new Set());
+  assert.ok(chordHtml.includes("C4"), "Pitch C4 must be present");
+  assert.ok(chordHtml.includes("G4"), "Pitch G4 must be present");
+  assert.ok(chordHtml.includes("+"), "Separator + must be present");
+  // Ensure no invisible text
+  assert.strictEqual((chordHtml.match(/color:#f59e0b/g) || []).length, 2, "Both unfulfilled pitches must be explicitly colored #f59e0b");
+
+  const partialSet = new Set(["C4"]);
+  const partialHtml = simulateUpdateTargetBadgeDisplay(chordStep, partialSet);
+  assert.ok(partialHtml.includes("C4✓") && partialHtml.includes("color:#34d399"), "C4 must be green with checkmark");
+  assert.ok(partialHtml.includes("G4") && partialHtml.includes("color:#f59e0b"), "G4 must remain bright orange #f59e0b");
+
+  // 19.3 Enharmonics & Accidental Glyphs
+  const sharpStep = { expectedPitches: ["F#4", "C#5"], displayLabel: "F#4 + C#5" };
+  const sharpHtml = simulateUpdateTargetBadgeDisplay(sharpStep, new Set());
+  assert.ok(sharpHtml.includes("F♯4") && sharpHtml.includes("C♯5"), "Accidentals must be formatted with proper ♯ glyph");
+
+  // 19.4 Rest Measures / Empty Pitches
+  const restStep = { expectedPitches: [], displayLabel: "" };
+  const restHtml = simulateUpdateTargetBadgeDisplay(restStep, new Set());
+  assert.ok(restHtml.includes("REST"), "Rest step must display 𝄽 REST instead of empty rectangle");
+
+  console.log("✔ Test 19: 🎯 HUD Target Badge High-Contrast Rendering & Feedback Layout Stability passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
+
 
 
 
