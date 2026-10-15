@@ -860,7 +860,6 @@
       position: relative;
       max-height: 520px;
       overflow-y: auto;
-      scroll-behavior: smooth;
     }
 
     .sheet-music-container.dark-theme {
@@ -4268,7 +4267,61 @@
       targetBadge.innerHTML = partsHtml.join("<span style='color:#94a3b8; font-weight:700; margin:0 4px;'>+</span>");
     }
 
-    function highlightActiveScoreNote(stepIdx) {
+    let lastScoreScrollTarget = null;
+    let lastScoreScrollTime = 0;
+
+    function autoScrollScoreToNote(targetEl, smooth = true) {
+      if (!targetEl) return;
+      const container = document.getElementById("sheetMusicSection");
+      if (!container) return;
+
+      const targetRect = targetEl.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+
+      // If container or target has no layout (e.g. hidden), return
+      if (containerRect.height === 0 || targetRect.height === 0) return;
+
+      const relativeTop = targetRect.top - containerRect.top;
+      const relativeBottom = targetRect.bottom - containerRect.top;
+      const containerH = container.clientHeight;
+
+      // Reading comfort zone: if note is already comfortably visible, do not scroll
+      const padTop = 60;
+      const padBottom = 80;
+
+      if (relativeTop >= padTop && relativeBottom <= (containerH - padBottom)) {
+        return;
+      }
+
+      // Calculate absolute vertical coordinate in the container's scroll canvas
+      const noteAbsoluteY = container.scrollTop + relativeTop + (targetRect.height / 2);
+
+      // Position note comfortably around 38% down the container viewport
+      const desiredScrollTop = Math.max(0, Math.round(noteAbsoluteY - (containerH * 0.38)));
+
+      const now = performance.now();
+      // Mid-scroll animation guard: if already smoothly animating towards this target, do not interrupt
+      if (smooth && lastScoreScrollTarget !== null && (now - lastScoreScrollTime < 400)) {
+        if (Math.abs(lastScoreScrollTarget - desiredScrollTop) < 60) {
+          return;
+        }
+      }
+
+      if (Math.abs(container.scrollTop - desiredScrollTop) < 6) {
+        return;
+      }
+
+      lastScoreScrollTarget = desiredScrollTop;
+      lastScoreScrollTime = now;
+
+      // Direct container scroll (never touches window.scrollY, never triggers Chromium SVG scrollIntoView bug)
+      container.scrollTo({
+        top: desiredScrollTop,
+        behavior: smooth ? "smooth" : "auto"
+      });
+    }
+
+    function highlightActiveScoreNote(stepIdx, autoScroll = true) {
       stepFulfilledPitches.clear();
       document.querySelectorAll(".note-group").forEach(g => g.classList.remove("active-target", "error-target"));
       const targetEl = document.getElementById(`staff_note_${stepIdx}`);
@@ -4276,13 +4329,9 @@
       if (targetEl) {
         targetEl.classList.add("active-target");
         
-        // AUTO-SCROLL FOLLOW
-        const container = document.getElementById("sheetMusicSection");
-        const svgRect = targetEl.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-
-        if (svgRect.top < containerRect.top + 50 || svgRect.bottom > containerRect.bottom - 50) {
-          targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        // Anti-bounce direct container follow-scroll
+        if (autoScroll) {
+          autoScrollScoreToNote(targetEl, true);
         }
       }
 
@@ -4528,6 +4577,10 @@
           const acc = Math.round((practiceStats.correct / Math.max(1, practiceStats.attempts)) * 100);
           showPerformanceToast(acc, currentSong ? currentSong.title : "Piece");
           nextStepIdx = 0;
+          const scoreContainer = document.getElementById("sheetMusicSection");
+          if (scoreContainer) scoreContainer.scrollTop = 0;
+          lastScoreScrollTarget = 0;
+          lastScoreScrollTime = 0;
           document.getElementById("hudFeedbackText").textContent = `🎉 Fantastic job! Piece finished (${acc}% Accuracy)! Restarting...`;
           practiceStats = { correct: 0, attempts: 0, cleanLoop: true };
         }
@@ -5433,7 +5486,7 @@
           const targetEl = document.getElementById(`staff_note_${step.stepIndex}`);
           if (targetEl) {
             targetEl.classList.add("active-target");
-            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            autoScrollScoreToNote(targetEl, true);
           }
 
           if (showDyads) {
@@ -5670,7 +5723,11 @@
 
     document.getElementById("hudRestartBtn").addEventListener("click", () => {
       currentPracticeStep = 0;
-      highlightActiveScoreNote(0);
+      const scoreContainer = document.getElementById("sheetMusicSection");
+      if (scoreContainer) scoreContainer.scrollTop = 0;
+      lastScoreScrollTarget = 0;
+      lastScoreScrollTime = 0;
+      highlightActiveScoreNote(0, false);
       document.getElementById("hudFeedbackText").textContent = "Piece restarted! Play the first note...";
     });
 
@@ -5716,6 +5773,10 @@
       stopPlayback();
       currentSong = song;
       currentPracticeStep = 0;
+      const scoreContainer = document.getElementById("sheetMusicSection");
+      if (scoreContainer) scoreContainer.scrollTop = 0;
+      lastScoreScrollTarget = 0;
+      lastScoreScrollTime = 0;
       document.getElementById("songDropdown").value = song.id;
       document.getElementById("tempoSlider").value = song.tempo;
       document.getElementById("tempoText").textContent = `Tempo: ${song.tempo} BPM`;
