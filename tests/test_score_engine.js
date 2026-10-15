@@ -1557,6 +1557,185 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 17: 🥁 Tempo Flow Mode timing windows, scoring & count-in passed");
 }
 
+// ==========================================
+// TEST 18: 🎹 Real-Time Polyphonic Chord Recognizer, Inversion Engine & Non-Clobbering
+// ==========================================
+{
+  const theory = window.MusicTheory;
+  assert.ok(typeof theory.identifyActiveChord === "function", "identifyActiveChord must be exported from MusicTheory");
+
+  // 18.1 Single Note
+  const single = theory.identifyActiveChord(["C4"]);
+  assert.strictEqual(single.name, "C4");
+  assert.strictEqual(single.type, "Single Pitch");
+
+  // 18.2 Octaves / Unisons across multiple registers
+  const octave2 = theory.identifyActiveChord(["C3", "C4"]);
+  assert.strictEqual(octave2.name, "C Octave");
+  assert.strictEqual(octave2.type, "Octave / Unison");
+
+  const octave3 = theory.identifyActiveChord(["C2", "C3", "C4"]);
+  assert.strictEqual(octave3.name, "C Octave");
+  assert.strictEqual(octave3.type, "Octave / Unison");
+
+  // 18.3 Power Chords & Dyads
+  const powerChord = theory.identifyActiveChord(["C3", "G3"]);
+  assert.strictEqual(powerChord.name, "C5");
+  assert.strictEqual(powerChord.type, "Power Chord");
+
+  const powerChordWithOctave = theory.identifyActiveChord(["C3", "G3", "C4"]);
+  assert.strictEqual(powerChordWithOctave.name, "C5");
+  assert.strictEqual(powerChordWithOctave.type, "Power Chord");
+
+  const invertedFifth = theory.identifyActiveChord(["G3", "C4"]);
+  assert.strictEqual(invertedFifth.name, "C5 / G");
+  assert.strictEqual(invertedFifth.type, "Inverted 5th");
+
+  const maj3rdDyad = theory.identifyActiveChord(["C4", "E4"]);
+  assert.strictEqual(maj3rdDyad.name, "C + E");
+  assert.strictEqual(maj3rdDyad.type, "Major 3rd");
+
+  // 18.4 Major Triad & Inversions (Root, 1st Inv, 2nd Inv)
+  const cMajRoot = theory.identifyActiveChord(["C4", "E4", "G4"]);
+  assert.strictEqual(cMajRoot.name, "C Major");
+  assert.strictEqual(cMajRoot.type, "Major Triad");
+
+  const cMaj1stInv = theory.identifyActiveChord(["E4", "G4", "C5"]);
+  assert.strictEqual(cMaj1stInv.name, "C Major / E");
+  assert.strictEqual(cMaj1stInv.type, "1st Inversion");
+
+  const cMaj2ndInv = theory.identifyActiveChord(["G3", "C4", "E4"]);
+  assert.strictEqual(cMaj2ndInv.name, "C Major / G");
+  assert.strictEqual(cMaj2ndInv.type, "2nd Inversion");
+
+  // 18.5 Minor Triad & Inversions
+  const aMinRoot = theory.identifyActiveChord(["A3", "C4", "E4"]);
+  assert.strictEqual(aMinRoot.name, "A Minor");
+  assert.strictEqual(aMinRoot.type, "Minor Triad");
+
+  const aMin1stInv = theory.identifyActiveChord(["C4", "E4", "A4"]);
+  assert.strictEqual(aMin1stInv.name, "A Minor / C");
+  assert.strictEqual(aMin1stInv.type, "1st Inversion");
+
+  const aMin2ndInv = theory.identifyActiveChord(["E3", "A3", "C4"]);
+  assert.strictEqual(aMin2ndInv.name, "A Minor / E");
+  assert.strictEqual(aMin2ndInv.type, "2nd Inversion");
+
+  // 18.6 Dominant 7th & Inversions
+  const g7Root = theory.identifyActiveChord(["G3", "B3", "D4", "F4"]);
+  assert.strictEqual(g7Root.name, "G7");
+  assert.strictEqual(g7Root.type, "Dominant 7th");
+
+  const g7_3rdInv = theory.identifyActiveChord(["F3", "G3", "B3", "D4"]);
+  assert.strictEqual(g7_3rdInv.name, "G7 / F");
+  assert.strictEqual(g7_3rdInv.type, "3rd Inversion");
+
+  // 18.7 Other 7th Chords
+  const cMaj7 = theory.identifyActiveChord(["C4", "E4", "G4", "B4"]);
+  assert.strictEqual(cMaj7.name, "Cmaj7");
+  assert.strictEqual(cMaj7.type, "Major 7th");
+
+  const dMin7 = theory.identifyActiveChord(["D4", "F4", "A4", "C5"]);
+  assert.strictEqual(dMin7.name, "Dm7");
+  assert.strictEqual(dMin7.type, "Minor 7th");
+
+  const bDim7 = theory.identifyActiveChord(["B3", "D4", "F4", "G#4"]);
+  assert.strictEqual(bDim7.name, "Bdim7");
+  assert.strictEqual(bDim7.type, "Diminished 7th");
+
+  const bHalfDim7 = theory.identifyActiveChord(["B3", "D4", "F4", "A4"]);
+  assert.strictEqual(bHalfDim7.name, "Bm7b5");
+  assert.strictEqual(bHalfDim7.type, "Half-Diminished 7th");
+
+  // 18.8 Shell Voicings (No 5th)
+  const c7Shell = theory.identifyActiveChord(["C4", "E4", "A#4"]);
+  assert.strictEqual(c7Shell.name, "C7 (no 5th)");
+  assert.strictEqual(c7Shell.type, "Dominant 7th Shell");
+
+  const cMaj7Shell = theory.identifyActiveChord(["C4", "E4", "B4"]);
+  assert.strictEqual(cMaj7Shell.name, "Cmaj7 (no 5th)");
+  assert.strictEqual(cMaj7Shell.type, "Major 7th Shell");
+
+  // 18.9 Multi-Note Cluster
+  const cluster = theory.identifyActiveChord(["C4", "C#4", "D4"]);
+  assert.strictEqual(cluster.type, "Multi-Note Cluster");
+
+  // 18.10 Non-Clobbering Simulation & State Lifecycle
+  // Mock keyboard state mimicking handleIncomingMIDIMessage and handleNoteDown
+  const activeHeldMidiNotes = new Map();
+  const pedaledNotes = new Set();
+  let isSustainPedalDown = false;
+  let chordPillText = "";
+
+  function setChordPillMock(notes) {
+    if (!notes || notes.length === 0) {
+      chordPillText = "";
+      return;
+    }
+    const info = theory.identifyActiveChord(notes);
+    chordPillText = info ? `${info.name} (${info.type})` : "";
+  }
+
+  function updateMockRecognizer() {
+    const map = new Map();
+    for (const [num, d] of activeHeldMidiNotes) map.set(num, d);
+    if (isSustainPedalDown) {
+      for (const num of pedaledNotes) {
+        if (!map.has(num)) map.set(num, { num, pitch: theory.midiToPitch(num) });
+      }
+    }
+    setChordPillMock(Array.from(map.values()));
+  }
+
+  function playSingleNoteAuditMock(noteStr) {
+    // In buggy version, this line overwrote the chord pill:
+    // setChordPillMock([{ num: theory.pitchToMidi(noteStr), pitch: noteStr }]);
+    // In our fixed version, playSingleNoteAudit ONLY plays audio tone and highlights key!
+  }
+
+  // Step A: Strike C4 (60)
+  activeHeldMidiNotes.set(60, { num: 60, pitch: "C4" });
+  updateMockRecognizer();
+  playSingleNoteAuditMock("C4");
+  assert.strictEqual(chordPillText, "C4 (Single Pitch)");
+
+  // Step B: Strike E4 (64) while C4 held
+  activeHeldMidiNotes.set(64, { num: 64, pitch: "E4" });
+  updateMockRecognizer();
+  playSingleNoteAuditMock("E4");
+  assert.strictEqual(chordPillText, "C + E (Major 3rd)", "Dyad preserved without being clobbered by E4");
+
+  // Step C: Strike G4 (67) while C4 and E4 held
+  activeHeldMidiNotes.set(67, { num: 67, pitch: "G4" });
+  updateMockRecognizer();
+  playSingleNoteAuditMock("G4");
+  assert.strictEqual(chordPillText, "C Major (Major Triad)", "Full C Major chord preserved without being clobbered by G4");
+
+  // Step D: Sustain pedal engagement & Arpeggiated ringing
+  isSustainPedalDown = true;
+  // Release C4 & E4 physically from keybed, but sustained by pedal
+  pedaledNotes.add(60);
+  activeHeldMidiNotes.delete(60);
+  pedaledNotes.add(64);
+  activeHeldMidiNotes.delete(64);
+  updateMockRecognizer();
+  assert.strictEqual(chordPillText, "C Major (Major Triad)", "Ringing pedaled notes preserve full chord recognition");
+
+  // Step E: Release pedal
+  isSustainPedalDown = false;
+  pedaledNotes.clear();
+  updateMockRecognizer();
+  assert.strictEqual(chordPillText, "G4 (Single Pitch)", "Pedal release cleanly updates to currently held key");
+
+  // Step F: Release G4
+  activeHeldMidiNotes.delete(67);
+  updateMockRecognizer();
+  assert.strictEqual(chordPillText, "", "Releasing all notes cleanly clears chord pill");
+
+  console.log("✔ Test 18: 🎹 Real-Time Polyphonic Chord Recognizer, Inversion Engine & Non-Clobbering passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
+
 
 

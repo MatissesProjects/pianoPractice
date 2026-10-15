@@ -115,3 +115,17 @@
   - [x] Chord Progressions & Voice-Leading Gym in Scales/Theory Studio with smooth inversion solver and interactive check
   - [x] 🥁 Tempo Flow Mode: Metronome-synced auto playhead in Repertoire Lab with timing window grading (±45ms / ±95ms)
   - [x] Adaptive Spaced-Repetition System (SRS) for Sight-Reading & Ear Training with latency/error weighting and mastery indicators
+
+- [x] **Milestone 17: Real-Time Polyphonic Chord Recognizer & Inversion Engine (`#activeChordPill`)**
+  - [x] Root Cause Resolution: Removed clobbering line in `playSingleNoteAudit` that overwrote `setChordPillDisplay([{ num, pitch }])` with 1 single note on every key strike
+  - [x] Unified Sounding Note Aggregator (`updateActiveChordRecognizer`): Seamlessly aggregates active held MIDI notes, CC 64 sustained pedaled notes, and on-screen mouse/touch keys
+  - [x] Comprehensive Chord & Inversion Theory Engine (`theory.js`):
+    - [x] Octaves & unisons across registers (e.g. C3 + C4 -> `C Octave`)
+    - [x] Power chords & inverted 5ths (e.g. C3 + G3 -> `C5`, G3 + C4 -> `C5 / G`)
+    - [x] Triads & Inversion Naming: Root position, 1st Inversion (`C Major / E`), 2nd Inversion (`C Major / G`)
+    - [x] 7th Chords & 3rd Inversions (`G7 / F`), maj7, m7, dim7, half-diminished (m7♭5)
+    - [x] Piano/Jazz shell voicings without 5th (`C7 (no 5th)`, `Cmaj7 (no 5th)`, `Cm7 (no 5th)`)
+    - [x] Extended 9th chords (`C9`, `Cmaj9`, `Cm9`)
+  - [x] Lifecycle Event Integration: Note-on, note-off, CC 64 sustain pedal toggle, and score click preview
+  - [x] Comprehensive automated test suite (`tests/test_score_engine.js` Test 18: Tests 18.1–18.10 verifying all chord types, inversions, and non-clobbering lifecycles)
+

@@ -2825,7 +2825,8 @@
       getDiatonicStep,
       pitchToFreq: getNoteFreq,
       midiToPitch: midiNumberToPitch,
-      pitchToMidi: getPitchMidiNumber
+      pitchToMidi: getPitchMidiNumber,
+      identifyActiveChord
     } = (typeof MusicTheory !== "undefined" ? MusicTheory : window.MusicTheory);
 
     function findPianoKeyElement(pitchStr, defaultOct = 4) {
@@ -2849,58 +2850,60 @@
       return { pitch, beats };
     }
 
-    // CHORD RECOGNITION ENGINE
-    function identifyActiveChord(activeNotesArray) {
-      if (!activeNotesArray || activeNotesArray.length === 0) return null;
-      if (activeNotesArray.length === 1) return { name: activeNotesArray[0].pitch, type: "Single Pitch" };
-
-      const sorted = [...activeNotesArray].sort((a, b) => a.num - b.num);
-      const uniquePitchClasses = [...new Set(sorted.map(n => n.num % 12))];
-
-      if (uniquePitchClasses.length === 2) {
-        const diff = (uniquePitchClasses[1] - uniquePitchClasses[0] + 12) % 12;
-        const intervalNames = {
-          1: "Minor 2nd", 2: "Major 2nd", 3: "Minor 3rd", 4: "Major 3rd",
-          5: "Perfect 4th", 6: "Tritone", 7: "Perfect 5th",
-          8: "Minor 6th", 9: "Major 6th", 10: "Minor 7th", 11: "Major 7th"
-        };
-        const chordName = `${NOTE_NAMES[uniquePitchClasses[0]]} + ${NOTE_NAMES[uniquePitchClasses[1]]}`;
-        return { name: chordName, type: intervalNames[diff] || "Dyad" };
-      }
-
-      for (let r of uniquePitchClasses) {
-        const rootName = NOTE_NAMES[r];
-        const intervals = uniquePitchClasses.map(pc => (pc - r + 12) % 12).sort((a, b) => a - b);
-        const sig = intervals.join(",");
-
-        if (sig === "0,4,7") return { name: `${rootName} Major`, type: "Major Triad" };
-        if (sig === "0,3,7") return { name: `${rootName} Minor`, type: "Minor Triad" };
-        if (sig === "0,3,6") return { name: `${rootName} Diminished`, type: "Dim Triad" };
-        if (sig === "0,4,8") return { name: `${rootName} Augmented`, type: "Aug Triad" };
-        if (sig === "0,5,7") return { name: `${rootName}sus4`, type: "Suspended" };
-        if (sig === "0,2,7") return { name: `${rootName}sus2`, type: "Suspended" };
-        if (sig === "0,4,7,11") return { name: `${rootName}maj7`, type: "Major 7th" };
-        if (sig === "0,4,7,10") return { name: `${rootName}7 (Dominant)`, type: "Dominant 7th" };
-        if (sig === "0,3,7,10") return { name: `${rootName}m7`, type: "Minor 7th" };
-        if (sig === "0,3,6,9") return { name: `${rootName}dim7`, type: "Diminished 7th" };
-        if (sig === "0,4,7,9") return { name: `${rootName}6`, type: "6th Chord" };
-      }
-
-      const pitchPills = sorted.map(n => n.pitch).join(" + ");
-      return { name: pitchPills, type: "Multi-Note Cluster" };
-    }
-
     function setChordPillDisplay(notesArray) {
       const chordPill = document.getElementById("activeChordPill");
+      if (!chordPill) return;
       if (!notesArray || notesArray.length === 0) {
         chordPill.style.display = "none";
         return;
       }
-      const chordInfo = identifyActiveChord(notesArray);
+      const chordInfo = (typeof identifyActiveChord === "function") 
+        ? identifyActiveChord(notesArray) 
+        : (window.MusicTheory && window.MusicTheory.identifyActiveChord ? window.MusicTheory.identifyActiveChord(notesArray) : null);
       if (chordInfo) {
         chordPill.style.display = "inline-block";
         chordPill.textContent = `${chordInfo.name} (${chordInfo.type})`;
+      } else {
+        chordPill.style.display = "none";
       }
+    }
+
+    // LIVE SUSTAIN & CHORD RECOGNIZER ENGINE
+    function updateActiveChordRecognizer() {
+      // Allow preview playback to control chord pill exclusively during auto playback
+      if (typeof playbackTimeouts !== "undefined" && playbackTimeouts.length > 0) return;
+
+      const activeNotesMap = new Map();
+
+      // 1. Physical MIDI held keys
+      if (typeof activeHeldMidiNotes !== "undefined") {
+        for (const [num, noteData] of activeHeldMidiNotes) {
+          activeNotesMap.set(num, { num, pitch: noteData.pitch });
+        }
+      }
+
+      // 2. Ringing notes sustained by pedal (CC 64)
+      if (typeof isSustainPedalDown !== "undefined" && isSustainPedalDown && typeof pedaledNotes !== "undefined") {
+        for (const num of pedaledNotes) {
+          if (!activeNotesMap.has(num)) {
+            activeNotesMap.set(num, { num, pitch: midiNumberToPitch(num) });
+          }
+        }
+      }
+
+      // 3. Keys held via mouse / touch on on-screen interactive piano
+      if (typeof activeHeldKeyAttacks !== "undefined") {
+        for (const [pitchName, attack] of activeHeldKeyAttacks) {
+          if (attack && attack.isDown) {
+            const num = attack.noteNumber ?? (NOTE_OFFSETS[pitchName.replace(/[0-9]/g, "")] + (parseInt(pitchName.slice(-1), 10) + 1) * 12);
+            if (!activeNotesMap.has(num)) {
+              activeNotesMap.set(num, { num, pitch: pitchName });
+            }
+          }
+        }
+      }
+
+      setChordPillDisplay(Array.from(activeNotesMap.values()));
     }
 
     // Audio & State
@@ -3643,6 +3646,11 @@
               highlightActiveScoreNote(currentPracticeStep);
               if (item.expectedPitches && item.expectedPitches.length > 0) {
                 item.expectedPitches.forEach(p => playSingleNoteAudit(p));
+                const auditNotes = item.expectedPitches.map(pitchStr => ({
+                  pitch: pitchStr,
+                  num: NOTE_OFFSETS[pitchStr.replace(/[0-9]/g, "")] + (parseInt(pitchStr.slice(-1), 10) + 1) * 12
+                }));
+                setChordPillDisplay(auditNotes);
               }
             });
 
@@ -4003,6 +4011,7 @@
         ...meta
       };
       activeHeldKeyAttacks.set(pitchName, noteAttack);
+      updateActiveChordRecognizer();
 
       if (activeEducationalMode === "repertoire") {
         if (typeof isTempoFlowActive !== "undefined" && isTempoFlowActive) {
@@ -4028,6 +4037,7 @@
           checkAndPlayNoteOff(pitchName, heldBeats, durationMs);
         }
         activeHeldKeyAttacks.delete(pitchName);
+        updateActiveChordRecognizer();
       }
     }
 
@@ -4408,9 +4418,6 @@
       const freq = getNoteFreq(noteStr);
       if (freq && playSound && isSynthAudioEnabled()) playTone(freq, 0.4);
       highlightPlaybackKey(noteStr, hand, 400);
-
-      const num = NOTE_OFFSETS[noteStr.replace(/[0-9]/g, "")] + (parseInt(noteStr.slice(-1)) + 1) * 12;
-      setChordPillDisplay([{ num, pitch: noteStr }]);
     }
 
     function highlightPlaybackKey(noteStr, hand, durationMs = 350) {
@@ -4828,6 +4835,7 @@
           });
           pedaledNotes.clear();
         }
+        updateActiveChordRecognizer();
         return;
       }
 
@@ -4877,7 +4885,7 @@
           if (activeHeldMidiNotes.size === 1) requestAnimationFrame(updateSustainRailsLoop);
         }
         document.getElementById("activeCount").textContent = activeHeldMidiNotes.size;
-        setChordPillDisplay(Array.from(activeHeldMidiNotes.values()));
+        updateActiveChordRecognizer();
 
         // PRACTICE & EDUCATIONAL NOTE INPUT
         handleNoteDown(pitchName, "midi", { noteNumber, velocity });
@@ -4899,7 +4907,7 @@
           document.getElementById("emptyPlaceholder").style.display = "flex";
         }
         document.getElementById("activeCount").textContent = activeHeldMidiNotes.size;
-        setChordPillDisplay(Array.from(activeHeldMidiNotes.values()));
+        updateActiveChordRecognizer();
 
         handleNoteUp(pitchName, { noteNumber });
       }

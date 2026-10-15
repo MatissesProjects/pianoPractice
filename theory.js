@@ -884,6 +884,153 @@
     };
   }
 
+  // REAL-TIME POLYPHONIC CHORD RECOGNITION ENGINE
+  function identifyActiveChord(activeNotesArray) {
+    if (!activeNotesArray || activeNotesArray.length === 0) return null;
+
+    // Normalize input to array of { num: number, pitch: string }
+    const normalizedNotes = activeNotesArray.map(item => {
+      if (typeof item === "string") {
+        const num = pitchToMidi(item);
+        return { num, pitch: item };
+      }
+      if (item && typeof item.num === "number") {
+        return { num: item.num, pitch: item.pitch || midiToPitch(item.num) };
+      }
+      return null;
+    }).filter(Boolean);
+
+    if (normalizedNotes.length === 0) return null;
+    if (normalizedNotes.length === 1) {
+      const rootName = NOTE_NAMES_SHARP[normalizedNotes[0].num % 12];
+      return { name: normalizedNotes[0].pitch, type: "Single Pitch", root: rootName };
+    }
+
+    const sorted = [...normalizedNotes].sort((a, b) => a.num - b.num);
+    const bassPc = sorted[0].num % 12;
+    const bassName = NOTE_NAMES_SHARP[bassPc];
+    const uniquePitchClasses = [...new Set(sorted.map(n => n.num % 12))];
+
+    // 1. Octaves & Unisons (all notes share same pitch class)
+    if (uniquePitchClasses.length === 1) {
+      const rootName = NOTE_NAMES_SHARP[uniquePitchClasses[0]];
+      return { name: `${rootName} Octave`, type: "Octave / Unison", root: rootName };
+    }
+
+    // 2. Dyads & 2-Pitch-Class Combinations
+    if (uniquePitchClasses.length === 2) {
+      const p1 = sorted[0].num % 12;
+      const p2 = sorted.find(n => (n.num % 12) !== p1).num % 12;
+      const diff = (p2 - p1 + 12) % 12;
+
+      if (diff === 7) {
+        return { name: `${NOTE_NAMES_SHARP[p1]}5`, type: "Power Chord", root: NOTE_NAMES_SHARP[p1] };
+      }
+      if (diff === 5) {
+        return { name: `${NOTE_NAMES_SHARP[p2]}5 / ${NOTE_NAMES_SHARP[p1]}`, type: "Inverted 5th", root: NOTE_NAMES_SHARP[p2] };
+      }
+
+      const intervalNames = {
+        1: "Minor 2nd", 2: "Major 2nd", 3: "Minor 3rd", 4: "Major 3rd",
+        5: "Perfect 4th", 6: "Tritone", 7: "Perfect 5th",
+        8: "Minor 6th", 9: "Major 6th", 10: "Minor 7th", 11: "Major 7th"
+      };
+      const chordName = `${NOTE_NAMES_SHARP[p1]} + ${NOTE_NAMES_SHARP[p2]}`;
+      return { name: chordName, type: intervalNames[diff] || "Dyad", root: NOTE_NAMES_SHARP[p1] };
+    }
+
+    // 3. Triads, 7ths, 9ths, Shells & Inversions
+    const chordDefinitions = [
+      // Standard Triads
+      { sig: "0,4,7", nameSuffix: "Major", type: "Major Triad" },
+      { sig: "0,3,7", nameSuffix: "Minor", type: "Minor Triad" },
+      { sig: "0,3,6", nameSuffix: "Diminished", type: "Dim Triad" },
+      { sig: "0,4,8", nameSuffix: "Augmented", type: "Aug Triad" },
+      { sig: "0,5,7", nameSuffix: "sus4", type: "Suspended 4th" },
+      { sig: "0,2,7", nameSuffix: "sus2", type: "Suspended 2nd" },
+
+      // 7th Chords
+      { sig: "0,4,7,11", nameSuffix: "maj7", type: "Major 7th" },
+      { sig: "0,4,7,10", nameSuffix: "7", type: "Dominant 7th" },
+      { sig: "0,3,7,10", nameSuffix: "m7", type: "Minor 7th" },
+      { sig: "0,3,6,10", nameSuffix: "m7b5", type: "Half-Diminished 7th" },
+      { sig: "0,3,6,9", nameSuffix: "dim7", type: "Diminished 7th" },
+      { sig: "0,3,7,11", nameSuffix: "m(maj7)", type: "Minor-Major 7th" },
+      { sig: "0,4,8,10", nameSuffix: "aug7", type: "Augmented 7th" },
+      { sig: "0,2,7,10", nameSuffix: "7sus4", type: "Suspended 7th" },
+
+      // 6th Chords
+      { sig: "0,4,7,9", nameSuffix: "6", type: "6th Chord" },
+      { sig: "0,3,7,9", nameSuffix: "m6", type: "Minor 6th" },
+
+      // Added tone chords
+      { sig: "0,2,4,7", nameSuffix: "add9", type: "Add9 Chord" },
+      { sig: "0,2,3,7", nameSuffix: "m(add9)", type: "Minor Add9" },
+
+      // Shell Voicings (No 5th)
+      { sig: "0,4,10", nameSuffix: "7 (no 5th)", type: "Dominant 7th Shell" },
+      { sig: "0,4,11", nameSuffix: "maj7 (no 5th)", type: "Major 7th Shell" },
+      { sig: "0,3,10", nameSuffix: "m7 (no 5th)", type: "Minor 7th Shell" },
+
+      // Extended 9ths
+      { sig: "0,2,4,7,10", nameSuffix: "9", type: "Dominant 9th" },
+      { sig: "0,2,4,7,11", nameSuffix: "maj9", type: "Major 9th" },
+      { sig: "0,2,3,7,10", nameSuffix: "m9", type: "Minor 9th" }
+    ];
+
+    const matches = [];
+
+    for (let r of uniquePitchClasses) {
+      const rootName = NOTE_NAMES_SHARP[r];
+      const intervals = uniquePitchClasses.map(pc => (pc - r + 12) % 12).sort((a, b) => a - b);
+      const sig = intervals.join(",");
+
+      for (const def of chordDefinitions) {
+        if (sig === def.sig) {
+          const isRootPosition = (bassPc === r);
+          const separator = /^[0-9]|^(maj|m[0-9]|sus|dim|aug|add)/.test(def.nameSuffix) ? "" : " ";
+          let chordName = `${rootName}${separator}${def.nameSuffix}`.trim();
+          let chordType = def.type;
+
+          if (!isRootPosition) {
+            chordName = `${chordName} / ${bassName}`;
+            const bassInterval = (bassPc - r + 12) % 12;
+            if (bassInterval === 3 || bassInterval === 4) {
+              chordType = "1st Inversion";
+            } else if (bassInterval === 6 || bassInterval === 7 || bassInterval === 8) {
+              chordType = "2nd Inversion";
+            } else if (bassInterval === 9 || bassInterval === 10 || bassInterval === 11) {
+              chordType = "3rd Inversion";
+            } else {
+              chordType = "Slash Chord";
+            }
+          }
+
+          matches.push({
+            root: r,
+            rootName,
+            isRootPosition,
+            name: chordName,
+            type: chordType,
+            def
+          });
+        }
+      }
+    }
+
+    if (matches.length > 0) {
+      // Prioritize root-position match where bass matches candidate root
+      const rootPosMatch = matches.find(m => m.isRootPosition);
+      if (rootPosMatch) {
+        return { name: rootPosMatch.name, type: rootPosMatch.type, root: rootPosMatch.rootName };
+      }
+      return { name: matches[0].name, type: matches[0].type, root: matches[0].rootName };
+    }
+
+    const pitchPills = sorted.map(n => n.pitch).join(" + ");
+    return { name: pitchPills, type: "Multi-Note Cluster", root: bassName };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -921,7 +1068,8 @@
     clearSRSStats,
     getSRSMasteryLevel,
     getNumeralChordInfo,
-    optimizeProgressionVoiceLeading
+    optimizeProgressionVoiceLeading,
+    identifyActiveChord
   };
 });
 
