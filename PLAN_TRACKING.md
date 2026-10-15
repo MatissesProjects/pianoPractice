@@ -151,13 +151,14 @@
   - [x] Rest Support in Practice Mode & HUD:
     - Clear `REST` badge without broken Unicode boxes
     - Auto-advance rest steps in wait practice mode after rest duration elapses
-  - [x] "Lean on Me" Note Durations Corrected:
-    - RH: Opening C is a 2-beat hollow note (`C4:2`), first F in measure 2 is a 2-beat hollow note (`F4:2`)
-    - LH: Opening C is a 4-beat whole note (`C3:4`), first F in measure 2 is a 4-beat whole note (`F3:4`)
-    - Dyads: Opening gospel thirds are 2-beat hollow notes (`C4+E4:2` and `F4+A4:2`)
+  - [x] "Lean on Me" Note Durations & Chords Corrected (User Request):
+    - Restored complete melody notes with accurate half & quarter lengths:
+      - RH: Half note C, quarter C, quarter D, quarter E, quarter C+F, half note C+F (`C4:2 C4:1 D4:1 | E4:1 C4+F4:1 C4+F4:2 | C4+F4:2 C4+F4:1 E4:1 | D4:1 C4:1 C4:2 ...`)
+      - LH: Matching rhythmic root walk-up/walk-down (`C3:2 C3:1 D3:1 | E3:1 F3:1 F3:2 | F3:2 F3:1 E3:1 | D3:1 C3:1 C3:2 ...`)
+      - Dyads: Gospel thirds & fourths (`C4+E4:2 C4+E4:1 D4+F4:1 | E4+G4:1 C4+F4:1 C4+F4:2 ...`)
     - Updated in both `songs.js` and `starterFallbackDatabase` in `index.html`
   - [x] Full Repertoire Duration Audit (All 56 songs in `songDatabase`):
     - Audited every measure across all 56 songs against their time signature beats
     - Fixed 20 songs with rhythm mismatches (`when-the-saints`, `going-home`, `morning-mood`, `smoke-on-the-water`, `hallelujah`, `pink-panther`, `row-row-boat`, `greensleeves`, `fur-elise`, etc.)
     - Verified 0 remaining measure duration discrepancies across the entire database
-  - [x] Comprehensive Automated Test Suite (`tests/test_score_engine.js` Test 20: Tests 20.1–20.4 verifying SVG rest vector geometry, measure rest padding, Lean on Me note lengths, and full repertoire duration audit)
+  - [x] Comprehensive Automated Test Suite (`tests/test_score_engine.js` Test 20: Tests 20.1–20.4 verifying SVG rest vector geometry, measure rest padding, Lean on Me note lengths & chords, and full repertoire duration audit; Test 13: Multi-level harmony alignment)

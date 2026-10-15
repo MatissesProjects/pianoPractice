@@ -1176,27 +1176,30 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   // 13.3 Multi-Level Harmony Interval Generation (Thirds, Fifths, Sixths, Octaves, Triads)
   const leanSong = songDatabase.find(s => s.id === "lean-on-me");
   
-  // Thirds Above: C4 -> C4+E4, D4 -> D4+F4, E4 -> E4+G4
+  // Thirds Above: C4 -> C4+E4, C4 -> C4+E4, D4 -> D4+F4, E4 -> E4+G4
   const thirdsModel = buildScoreModel(leanSong, false, false, true, "thirds");
   assert.strictEqual(thirdsModel.steps[0].dyad.pitch, "C4+E4");
-  assert.strictEqual(thirdsModel.steps[1].dyad.pitch, "D4+F4");
-  assert.strictEqual(thirdsModel.steps[2].dyad.pitch, "E4+G4");
+  assert.strictEqual(thirdsModel.steps[1].dyad.pitch, "C4+E4");
+  assert.strictEqual(thirdsModel.steps[2].dyad.pitch, "D4+F4");
+  assert.strictEqual(thirdsModel.steps[3].dyad.pitch, "E4+G4");
   assert.strictEqual(thirdsModel.steps[0].dyadF, "1+3");
 
-  // Thirds Below: E4 -> C4+E4
+  // Thirds Below: E4 (step 3) -> C4+E4
   const thirdsBelowModel = buildScoreModel(leanSong, false, false, true, "thirds_below");
-  assert.strictEqual(thirdsBelowModel.steps[2].dyad.pitch, "C4+E4"); // E4 - 2 diatonic steps = C4
+  assert.strictEqual(thirdsBelowModel.steps[3].dyad.pitch, "C4+E4"); // E4 - 2 diatonic steps = C4
 
   // Fifths: C4 -> C4+G4, D4 -> D4+A4
   const fifthsModel = buildScoreModel(leanSong, false, false, true, "fifths");
   assert.strictEqual(fifthsModel.steps[0].dyad.pitch, "C4+G4");
-  assert.strictEqual(fifthsModel.steps[1].dyad.pitch, "D4+A4");
+  assert.strictEqual(fifthsModel.steps[1].dyad.pitch, "C4+G4");
+  assert.strictEqual(fifthsModel.steps[2].dyad.pitch, "D4+A4");
   assert.strictEqual(fifthsModel.steps[0].dyadF, "1+5");
 
   // Sixths: C4 -> C4+A4, D4 -> D4+B4
   const sixthsModel = buildScoreModel(leanSong, false, false, true, "sixths");
   assert.strictEqual(sixthsModel.steps[0].dyad.pitch, "C4+A4");
-  assert.strictEqual(sixthsModel.steps[1].dyad.pitch, "D4+B4");
+  assert.strictEqual(sixthsModel.steps[1].dyad.pitch, "C4+A4");
+  assert.strictEqual(sixthsModel.steps[2].dyad.pitch, "D4+B4");
   assert.strictEqual(sixthsModel.steps[0].dyadF, "1+5");
 
   // Octaves: C4 -> C4+C5
@@ -1919,20 +1922,26 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   const lean = songDatabase.find(s => s.id === "lean-on-me");
   assert.ok(lean, "Lean on Me must exist in database");
   
-  // RH: First C must be a 2-beat hollow note, and first F in measure 2 must be 2 beats
-  assert.ok(lean.rh.startsWith("C4:2 D4:1 E4:1 | F4:2"), "RH opening C and measure 2 F must be 2-beat hollow notes");
-  // LH: First C must be a 4-beat whole note, and first F in measure 2 must be 4 beats
-  assert.ok(lean.lh.startsWith("C3:4 | F3:4"), "LH opening C and measure 2 F must be 4-beat whole notes");
+  // RH: First C must be a 2-beat hollow note, followed by quarter notes C, D, E, F+C, and half note F+C
+  assert.ok(lean.rh.startsWith("C4:2 C4:1 D4:1 | E4:1 C4+F4:1 C4+F4:2"), "RH opening C (half), C (quarter), D (quarter), E (quarter), C4+F4 (quarter), C4+F4 (half)");
+  // LH: Walk up starting with C3:2 C3:1 D3:1
+  assert.ok(lean.lh.startsWith("C3:2 C3:1 D3:1 | E3:1 F3:1 F3:2"), "LH walk up starting with C3:2 C3:1 D3:1");
   // Dyads: First dyad must be 2 beats
-  assert.ok(lean.dyads.startsWith("C4+E4:2 D4+F4:1 E4+G4:1 | F4+A4:2"), "Dyads opening C4+E4 and measure 2 F4+A4 must be 2-beat hollow dyads");
+  assert.ok(lean.dyads.startsWith("C4+E4:2 C4+E4:1 D4+F4:1 | E4+G4:1 C4+F4:1 C4+F4:2"), "Dyads opening C4+E4 and measure 2 C4+F4");
 
   const leanModel = buildScoreModel(lean, true, true, false);
-  // Measure 1: Step 0 has RH beats=2 and LH beats=4
+  // Measure 1: Step 0 has RH beats=2 and LH beats=2
   assert.strictEqual(leanModel.measures[0][0].rh.beats, 2, "Lean on Me opening RH note is 2 beats");
-  assert.strictEqual(leanModel.measures[0][0].lh.beats, 4, "Lean on Me opening LH note is a 4-beat whole note");
-  // Measure 2: Step 0 has RH beats=2 and LH beats=4
-  assert.strictEqual(leanModel.measures[1][0].rh.beats, 2, "Lean on Me measure 2 RH note is 2 beats");
-  assert.strictEqual(leanModel.measures[1][0].lh.beats, 4, "Lean on Me measure 2 LH note is a 4-beat whole note");
+  assert.strictEqual(leanModel.measures[0][0].lh.beats, 2, "Lean on Me opening LH note is a 2-beat half note");
+  // Step 1: RH beats=1, LH beats=1
+  assert.strictEqual(leanModel.measures[0][1].rh.beats, 1, "Lean on Me step 1 RH note is 1 beat");
+  assert.strictEqual(leanModel.measures[0][1].lh.beats, 1, "Lean on Me step 1 LH note is 1 beat");
+  // Measure 2: Step 0 has RH beats=1 (E4) and LH beats=1 (E3)
+  assert.strictEqual(leanModel.measures[1][0].rh.beats, 1, "Lean on Me measure 2 RH note is 1 beat");
+  assert.strictEqual(leanModel.measures[1][0].lh.beats, 1, "Lean on Me measure 2 LH note is 1 beat");
+  // Measure 2: Step 2 has RH beats=2 (C4+F4) and LH beats=2 (F3)
+  assert.strictEqual(leanModel.measures[1][2].rh.beats, 2, "Lean on Me measure 2 step 2 RH note is 2 beats");
+  assert.strictEqual(leanModel.measures[1][2].lh.beats, 2, "Lean on Me measure 2 step 2 LH note is 2 beats");
 
   // 20.4 Full Repertoire Duration Audit (All 56 Songs)
   function getExpBeats(timeSig) {
