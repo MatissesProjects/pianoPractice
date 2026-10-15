@@ -138,3 +138,26 @@
   - [x] Comprehensive automated test suite (`tests/test_score_engine.js` Test 19: Tests 19.1–19.4 verifying high contrast, checkmarks, accidentals, and rests)
 
 
+- [x] **Milestone 19: Sheet Music Vector Rests, Lean on Me Durations, & Repertoire Rhythm Audit**
+  - [x] Authentic SVG Vector Rest Rendering: Replaced unrendered Unicode SMP musical glyphs with sharp, scalable SVG elements:
+    - Whole Rest: `<rect>` hanging down from Line 4 (`y = bottomStaffY - 30`, width 14, height 5)
+    - Half Rest: `<rect>` sitting on Line 3 (`y = bottomStaffY - 25`, width 14, height 5) + optional dot circle for dotted half
+    - Quarter Rest: Classic SVG vector path `<path d="..." />` spanning Lines 4 to 1 + optional dot circle for dotted quarter
+    - Eighth Rest: Classic SVG vector path `<path d="..." />` with hook + optional dot circle for dotted eighth
+    - Theme styling: `.rest-rect` and `.rest-glyph` use `fill: var(--paper-ink, #1e293b); stroke: none;`
+  - [x] Automatic Measure Rest Padding in `buildScoreModel`:
+    - Incomplete measures in a voice are automatically padded to measure length with rests
+    - Silent hands in a measure automatically synthesize a full-measure rest so staves are never left empty
+  - [x] Rest Support in Practice Mode & HUD:
+    - Clear `REST` badge without broken Unicode boxes
+    - Auto-advance rest steps in wait practice mode after rest duration elapses
+  - [x] "Lean on Me" Note Durations Corrected:
+    - RH: Opening C is a 2-beat hollow note (`C4:2`), first F in measure 2 is a 2-beat hollow note (`F4:2`)
+    - LH: Opening C is a 4-beat whole note (`C3:4`), first F in measure 2 is a 4-beat whole note (`F3:4`)
+    - Dyads: Opening gospel thirds are 2-beat hollow notes (`C4+E4:2` and `F4+A4:2`)
+    - Updated in both `songs.js` and `starterFallbackDatabase` in `index.html`
+  - [x] Full Repertoire Duration Audit (All 56 songs in `songDatabase`):
+    - Audited every measure across all 56 songs against their time signature beats
+    - Fixed 20 songs with rhythm mismatches (`when-the-saints`, `going-home`, `morning-mood`, `smoke-on-the-water`, `hallelujah`, `pink-panther`, `row-row-boat`, `greensleeves`, `fur-elise`, etc.)
+    - Verified 0 remaining measure duration discrepancies across the entire database
+  - [x] Comprehensive Automated Test Suite (`tests/test_score_engine.js` Test 20: Tests 20.1–20.4 verifying SVG rest vector geometry, measure rest padding, Lean on Me note lengths, and full repertoire duration audit)

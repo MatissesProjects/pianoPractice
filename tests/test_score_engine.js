@@ -52,15 +52,23 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   const lhFM = (song.lhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
   const dyadFM = (dyadFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
 
+  let expMeasureBeats = 4;
+  if (song.timeSig) {
+    const [numStr, denStr] = song.timeSig.split("/");
+    const num = parseFloat(numStr) || 4;
+    const den = parseFloat(denStr) || 4;
+    expMeasureBeats = num * (4 / den);
+  }
+
   const totalMeasures = Math.max(rhM.length, lhM.length, dyadM.length);
   const measures = [];
   const steps = [];
   let stepGlobalIdx = 0;
 
   for (let m = 0; m < totalMeasures; m++) {
-    const mRH = rhM[m] || [];
-    const mLH = lhM[m] || [];
-    const mDyad = dyadM[m] || [];
+    const mRH = [...(rhM[m] || [])];
+    const mLH = [...(lhM[m] || [])];
+    const mDyad = [...(dyadM[m] || [])];
     const mRHF = rhFM[m] || [];
     const mLHF = lhFM[m] || [];
     const mDyadF = dyadFM[m] || [];
@@ -83,6 +91,19 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
         lhBeat += p.beats;
         return ev;
       });
+
+      // Measure rest padding: if a hand is silent in this measure, synthesize a full measure rest
+      const isPickupDyadM0 = (m === 0 && dyadBeat < expMeasureBeats - 0.01 && lhBeat < expMeasureBeats - 0.01);
+      if (dyadEvents.length === 0 && lhEvents.length > 0) {
+        dyadEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
+      } else if (dyadEvents.length > 0 && dyadBeat < expMeasureBeats - 0.01 && !isPickupDyadM0) {
+        dyadEvents.push({ pitch: "-", beats: expMeasureBeats - dyadBeat, f: "", startBeat: dyadBeat });
+      }
+      if (lhEvents.length === 0 && dyadEvents.length > 0) {
+        lhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
+      } else if (lhEvents.length > 0 && lhBeat < expMeasureBeats - 0.01 && !isPickupDyadM0) {
+        lhEvents.push({ pitch: "-", beats: expMeasureBeats - lhBeat, f: "", startBeat: lhBeat });
+      }
 
       const onsets = Array.from(new Set([
         ...dyadEvents.map(e => e.startBeat),
@@ -119,7 +140,7 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
           lh: lhEv,
           lhF: lhEv ? lhEv.f : "",
           expectedPitches: expected,
-          displayLabel: expected.join(" + "),
+          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
           beats: stepBeats
         };
         measureItems.push(item);
@@ -127,9 +148,13 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
         stepGlobalIdx++;
       });
     } else if (showDyads && !showLH) {
+      if (mDyad.length === 0) {
+        mDyad.push(`-:${expMeasureBeats}`);
+      }
       let dyadBeat = 0;
       mDyad.forEach((t, k) => {
         const parsed = parseToken(t);
+        const expected = parsed.pitch.split("+").filter(p => p !== "-");
         const item = {
           stepIndex: stepGlobalIdx,
           index: stepGlobalIdx,
@@ -137,19 +162,23 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
           startBeat: dyadBeat,
           dyad: parsed,
           dyadF: mDyadF[k] || "",
-          expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
+          expectedPitches: expected,
+          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
           beats: parsed.beats
         };
         dyadBeat += parsed.beats;
-        item.displayLabel = item.expectedPitches.join(" + ");
         measureItems.push(item);
         steps.push(item);
         stepGlobalIdx++;
       });
     } else if (showRH && !showLH) {
+      if (mRH.length === 0) {
+        mRH.push(`-:${expMeasureBeats}`);
+      }
       let rhBeat = 0;
       mRH.forEach((t, k) => {
         const parsed = parseToken(t);
+        const expected = parsed.pitch.split("+").filter(p => p !== "-");
         const item = {
           stepIndex: stepGlobalIdx,
           index: stepGlobalIdx,
@@ -157,19 +186,23 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
           startBeat: rhBeat,
           rh: parsed,
           rhF: mRHF[k] || "",
-          expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
+          expectedPitches: expected,
+          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
           beats: parsed.beats
         };
         rhBeat += parsed.beats;
-        item.displayLabel = item.expectedPitches.join(" + ");
         measureItems.push(item);
         steps.push(item);
         stepGlobalIdx++;
       });
     } else if (showLH && !showRH) {
+      if (mLH.length === 0) {
+        mLH.push(`-:${expMeasureBeats}`);
+      }
       let lhBeat = 0;
       mLH.forEach((t, k) => {
         const parsed = parseToken(t);
+        const expected = parsed.pitch.split("+").filter(p => p !== "-");
         const item = {
           stepIndex: stepGlobalIdx,
           index: stepGlobalIdx,
@@ -177,11 +210,11 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
           startBeat: lhBeat,
           lh: parsed,
           lhF: mLHF[k] || "",
-          expectedPitches: parsed.pitch.split("+").filter(p => p !== "-"),
+          expectedPitches: expected,
+          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
           beats: parsed.beats
         };
         lhBeat += parsed.beats;
-        item.displayLabel = item.expectedPitches.join(" + ");
         measureItems.push(item);
         steps.push(item);
         stepGlobalIdx++;
@@ -202,6 +235,19 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
         lhBeat += p.beats;
         return ev;
       });
+
+      // Measure rest padding: if a hand is silent in this measure, synthesize a full measure rest
+      const isPickupM0 = (m === 0 && rhBeat < expMeasureBeats - 0.01 && lhBeat < expMeasureBeats - 0.01);
+      if (rhEvents.length === 0 && lhEvents.length > 0) {
+        rhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
+      } else if (rhEvents.length > 0 && rhBeat < expMeasureBeats - 0.01 && !isPickupM0) {
+        rhEvents.push({ pitch: "-", beats: expMeasureBeats - rhBeat, f: "", startBeat: rhBeat });
+      }
+      if (lhEvents.length === 0 && rhEvents.length > 0) {
+        lhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
+      } else if (lhEvents.length > 0 && lhBeat < expMeasureBeats - 0.01 && !isPickupM0) {
+        lhEvents.push({ pitch: "-", beats: expMeasureBeats - lhBeat, f: "", startBeat: lhBeat });
+      }
 
       const onsets = Array.from(new Set([
         ...rhEvents.map(e => e.startBeat),
@@ -236,7 +282,7 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
           rh: rhEv,
           lh: lhEv,
           expectedPitches: expected,
-          displayLabel: expected.join(" + "),
+          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
           beats: stepBeats
         };
         measureItems.push(item);
@@ -266,11 +312,14 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
 
     // Ensure no step has '|' or invalid pitches
     model.steps.forEach((step, sIdx) => {
-      assert.ok(step.expectedPitches.length > 0, `${song.title} step ${sIdx} has expected pitches`);
-      step.expectedPitches.forEach(p => {
-        assert.notStrictEqual(p, "|", `${song.title} step ${sIdx} must not contain '|'`);
-        assert.ok(getDiatonicStep(p) !== null, `${song.title} step ${sIdx} pitch ${p} has valid diatonic step`);
-      });
+      if (step.expectedPitches.length > 0) {
+        step.expectedPitches.forEach(p => {
+          assert.notStrictEqual(p, "|", `${song.title} step ${sIdx} must not contain '|'`);
+          assert.ok(getDiatonicStep(p) !== null, `${song.title} step ${sIdx} pitch ${p} has valid diatonic step`);
+        });
+      } else {
+        assert.strictEqual(step.displayLabel, "REST", `${song.title} step ${sIdx} rest step display label`);
+      }
     });
   });
   console.log("✔ Test 1: Left-hand solo mode across all 56 songs passed");
@@ -1130,24 +1179,24 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   // Thirds Above: C4 -> C4+E4, D4 -> D4+F4, E4 -> E4+G4
   const thirdsModel = buildScoreModel(leanSong, false, false, true, "thirds");
   assert.strictEqual(thirdsModel.steps[0].dyad.pitch, "C4+E4");
-  assert.strictEqual(thirdsModel.steps[2].dyad.pitch, "D4+F4");
-  assert.strictEqual(thirdsModel.steps[3].dyad.pitch, "E4+G4");
+  assert.strictEqual(thirdsModel.steps[1].dyad.pitch, "D4+F4");
+  assert.strictEqual(thirdsModel.steps[2].dyad.pitch, "E4+G4");
   assert.strictEqual(thirdsModel.steps[0].dyadF, "1+3");
 
   // Thirds Below: E4 -> C4+E4
   const thirdsBelowModel = buildScoreModel(leanSong, false, false, true, "thirds_below");
-  assert.strictEqual(thirdsBelowModel.steps[3].dyad.pitch, "C4+E4"); // E4 - 2 diatonic steps = C4
+  assert.strictEqual(thirdsBelowModel.steps[2].dyad.pitch, "C4+E4"); // E4 - 2 diatonic steps = C4
 
   // Fifths: C4 -> C4+G4, D4 -> D4+A4
   const fifthsModel = buildScoreModel(leanSong, false, false, true, "fifths");
   assert.strictEqual(fifthsModel.steps[0].dyad.pitch, "C4+G4");
-  assert.strictEqual(fifthsModel.steps[2].dyad.pitch, "D4+A4");
+  assert.strictEqual(fifthsModel.steps[1].dyad.pitch, "D4+A4");
   assert.strictEqual(fifthsModel.steps[0].dyadF, "1+5");
 
   // Sixths: C4 -> C4+A4, D4 -> D4+B4
   const sixthsModel = buildScoreModel(leanSong, false, false, true, "sixths");
   assert.strictEqual(sixthsModel.steps[0].dyad.pitch, "C4+A4");
-  assert.strictEqual(sixthsModel.steps[2].dyad.pitch, "D4+B4");
+  assert.strictEqual(sixthsModel.steps[1].dyad.pitch, "D4+B4");
   assert.strictEqual(sixthsModel.steps[0].dyadF, "1+5");
 
   // Octaves: C4 -> C4+C5
@@ -1790,6 +1839,143 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   assert.ok(restHtml.includes("REST"), "Rest step must display 𝄽 REST instead of empty rectangle");
 
   console.log("✔ Test 19: 🎯 HUD Target Badge High-Contrast Rendering & Feedback Layout Stability passed");
+}
+
+// 20. Test SVG Vector Rest Rendering, Lean on Me Durations & Full Repertoire Rhythm Audit
+{
+  // 20.1 Vector SVG Rest Generator Simulation
+  function simulateRenderNoteheadOnly(pitchStr, beats, cx, bottomStaffY) {
+    const elements = [];
+    if (pitchStr === "-") {
+      const cy = bottomStaffY - 20;
+      if (beats >= 3.5) {
+        elements.push({ type: "rect", x: cx - 7, y: bottomStaffY - 30, width: 14, height: 5, class: "rest-rect" });
+      } else if (beats >= 1.75) {
+        elements.push({ type: "rect", x: cx - 7, y: bottomStaffY - 25, width: 14, height: 5, class: "rest-rect" });
+        if (beats >= 2.75) {
+          elements.push({ type: "circle", cx: cx + 12, cy: bottomStaffY - 22.5, r: 2.2, class: "rest-rect" });
+        }
+      } else if (beats >= 0.85) {
+        elements.push({ type: "path", class: "rest-glyph", cy });
+        if (beats >= 1.4) {
+          elements.push({ type: "circle", cx: cx + 8, cy: cy + 5, r: 2.2, class: "rest-rect" });
+        }
+      } else {
+        elements.push({ type: "path", class: "rest-glyph", cy });
+        if (beats >= 0.7) {
+          elements.push({ type: "circle", cx: cx + 7, cy: cy - 4, r: 2.0, class: "rest-rect" });
+        }
+      }
+    }
+    return elements;
+  }
+
+  // Verify whole rest geometry: hangs downward from Line 4 (bottomStaffY - 30)
+  const wholeRest = simulateRenderNoteheadOnly("-", 4, 100, 120);
+  assert.strictEqual(wholeRest.length, 1);
+  assert.strictEqual(wholeRest[0].type, "rect");
+  assert.strictEqual(wholeRest[0].y, 90, "Whole rest must hang from Line 4 (y=90)");
+  assert.strictEqual(wholeRest[0].height, 5);
+
+  // Verify half rest geometry: sits on top of Line 3 (bottomStaffY - 20)
+  const halfRest = simulateRenderNoteheadOnly("-", 2, 100, 120);
+  assert.strictEqual(halfRest.length, 1);
+  assert.strictEqual(halfRest[0].type, "rect");
+  assert.strictEqual(halfRest[0].y, 95, "Half rest must sit on top of Line 3 (y=95)");
+  assert.strictEqual(halfRest[0].height, 5);
+
+  // Verify dotted half rest includes aug dot
+  const dottedHalf = simulateRenderNoteheadOnly("-", 3, 100, 120);
+  assert.strictEqual(dottedHalf.length, 2);
+  assert.strictEqual(dottedHalf[1].type, "circle", "Dotted half rest must include aug dot");
+
+  // Verify quarter rest and eighth rest generate vector paths
+  const quarterRest = simulateRenderNoteheadOnly("-", 1, 100, 120);
+  assert.strictEqual(quarterRest[0].type, "path");
+  assert.strictEqual(quarterRest[0].class, "rest-glyph");
+
+  const eighthRest = simulateRenderNoteheadOnly("-", 0.5, 100, 120);
+  assert.strictEqual(eighthRest[0].type, "path");
+  assert.strictEqual(eighthRest[0].class, "rest-glyph");
+
+  // 20.2 Measure Rest Padding in buildScoreModel
+  const songWithGap = {
+    title: "Test Piece",
+    timeSig: "4/4",
+    tempo: 90,
+    rh: "C4:2 | D4:4",
+    rhF: "1 | 2",
+    lh: "C3:4 | -:4",
+    lhF: "5 | -"
+  };
+  const gapModel = buildScoreModel(songWithGap, true, true, false);
+  // Measure 1: RH played 2 beats, should be padded with a half rest (beats=2)
+  const m1 = gapModel.measures[0];
+  const rhRests = m1.filter(item => item.rh && item.rh.pitch === "-");
+  assert.strictEqual(rhRests.length, 1, "Incomplete RH measure must be padded with a rest");
+  assert.strictEqual(rhRests[0].rh.beats, 2, "Padded rest must equal 2 beats (4 - 2)");
+
+  // 20.3 Lean on Me Note Durations (User Request Verification)
+  const lean = songDatabase.find(s => s.id === "lean-on-me");
+  assert.ok(lean, "Lean on Me must exist in database");
+  
+  // RH: First C must be a 2-beat hollow note, and first F in measure 2 must be 2 beats
+  assert.ok(lean.rh.startsWith("C4:2 D4:1 E4:1 | F4:2"), "RH opening C and measure 2 F must be 2-beat hollow notes");
+  // LH: First C must be a 4-beat whole note, and first F in measure 2 must be 4 beats
+  assert.ok(lean.lh.startsWith("C3:4 | F3:4"), "LH opening C and measure 2 F must be 4-beat whole notes");
+  // Dyads: First dyad must be 2 beats
+  assert.ok(lean.dyads.startsWith("C4+E4:2 D4+F4:1 E4+G4:1 | F4+A4:2"), "Dyads opening C4+E4 and measure 2 F4+A4 must be 2-beat hollow dyads");
+
+  const leanModel = buildScoreModel(lean, true, true, false);
+  // Measure 1: Step 0 has RH beats=2 and LH beats=4
+  assert.strictEqual(leanModel.measures[0][0].rh.beats, 2, "Lean on Me opening RH note is 2 beats");
+  assert.strictEqual(leanModel.measures[0][0].lh.beats, 4, "Lean on Me opening LH note is a 4-beat whole note");
+  // Measure 2: Step 0 has RH beats=2 and LH beats=4
+  assert.strictEqual(leanModel.measures[1][0].rh.beats, 2, "Lean on Me measure 2 RH note is 2 beats");
+  assert.strictEqual(leanModel.measures[1][0].lh.beats, 4, "Lean on Me measure 2 LH note is a 4-beat whole note");
+
+  // 20.4 Full Repertoire Duration Audit (All 56 Songs)
+  function getExpBeats(timeSig) {
+    if (!timeSig) return 4;
+    const parts = timeSig.split('/').map(Number);
+    const num = parts[0] || 4;
+    const den = parts[1] || 4;
+    return num * (4 / den);
+  }
+
+  let durationDiscrepancies = 0;
+  songDatabase.forEach(song => {
+    const expBeats = getExpBeats(song.timeSig);
+    const rhMeasures = (song.rh || '').split('|').map(m => m.trim().split(/\s+/).filter(Boolean));
+    const lhMeasures = (song.lh || '').split('|').map(m => m.trim().split(/\s+/).filter(Boolean));
+    const dyadMeasures = (song.dyads || '').split('|').map(m => m.trim().split(/\s+/).filter(Boolean));
+    const totalM = Math.max(rhMeasures.length, lhMeasures.length, dyadMeasures.length);
+
+    for (let m = 0; m < totalM; m++) {
+      const rh = rhMeasures[m] || [];
+      const lh = lhMeasures[m] || [];
+      const dy = dyadMeasures[m] || [];
+
+      const rhBeats = rh.reduce((sum, t) => sum + parseToken(t).beats, 0);
+      const lhBeats = lh.reduce((sum, t) => sum + parseToken(t).beats, 0);
+      const dyBeats = dy.reduce((sum, t) => sum + parseToken(t).beats, 0);
+
+      const isPickup = (m === 0 && ((rh.length > 0 && rhBeats < expBeats) || (lh.length > 0 && lhBeats < expBeats)));
+
+      const rhDiff = Math.abs(rhBeats - expBeats) > 0.01;
+      const lhDiff = Math.abs(lhBeats - expBeats) > 0.01;
+      const dyDiff = Math.abs(dyBeats - expBeats) > 0.01;
+      const syncDiff = (rh.length > 0 && lh.length > 0 && Math.abs(rhBeats - lhBeats) > 0.01);
+
+      if ((rhDiff && !isPickup) || (lhDiff && !isPickup) || (dyDiff && !isPickup) || (syncDiff && !isPickup)) {
+        durationDiscrepancies++;
+      }
+    }
+  });
+
+  assert.strictEqual(durationDiscrepancies, 0, "All 56 songs in songDatabase must have 0 measure duration discrepancies");
+
+  console.log("✔ Test 20: 🎼 SVG Vector Rest Rendering, Lean on Me Durations & Full Repertoire Rhythm Audit passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
