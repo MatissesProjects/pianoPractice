@@ -162,3 +162,25 @@
     - Fixed 20 songs with rhythm mismatches (`when-the-saints`, `going-home`, `morning-mood`, `smoke-on-the-water`, `hallelujah`, `pink-panther`, `row-row-boat`, `greensleeves`, `fur-elise`, etc.)
     - Verified 0 remaining measure duration discrepancies across the entire database
   - [x] Comprehensive Automated Test Suite (`tests/test_score_engine.js` Test 20: Tests 20.1–20.4 verifying SVG rest vector geometry, measure rest padding, Lean on Me note lengths & chords, and full repertoire duration audit; Test 13: Multi-level harmony alignment)
+
+- [x] **Milestone 20: Full 24-Measure "Lean on Me" Sheet Music Transcription, SVG Tie Arcs, 16th Note Engine, & Practice Holding**
+  - [x] **Full 24-Measure Transcription (`image.png`)**: Transcribed Bill Withers' *Lean on Me* (4/4 time, Tempo 80) across all 5 systems and 24 measures:
+    - Verse 1 (Measures 1–8): RH half note C4, eighths C-D-E leading into tied syncopated dyad `F4+A4:0.5~`; LH open fifth/octave chords `C3+G3+C4` and `F2+C3+F3` tied across barlines; G7 cadence (`G2+F3+B3`).
+    - Chorus (Measures 8–15): High-octave "Lean on me" melody (`E5:0.5 D5:0.5 C5:0.5~`), syncopated ties across barlines, and steady harmonic support.
+    - Bridge (Measures 15–24): Staccato quarter chords in LH ("Call on me brother"), syncopated 16th (`0.25`) and dotted eighth (`0.75`) rhythms in RH, chromatic turnaround and final resolution.
+    - 1-to-1 matching fingerings across all 24 measures in `songs.js` and `starterFallbackDatabase` in `index.html`.
+  - [x] **SVG Tie Arc Rendering Engine**:
+    - Added `~` tie syntax support to token parsing (`parseToken`), returning `{ pitch, beats, tied }`.
+    - Added `.note-tie-arc` SVG styling (`fill: none; stroke: var(--paper-ink); stroke-width: 1.8; stroke-linecap: round; pointer-events: none;`).
+    - Implemented `renderTieArc(svg, n1, n2, scoreWidth, rightMargin, leftMargin)` to render quadratic bezier curves (`M ... Q ...`) curving away from stems, with automatic outgoing/incoming arc splitting across system line breaks.
+  - [x] **16th-Note Double Flags & Dotted Notehead Rendering**:
+    - Extended `renderNoteheadOnly` with dual SVG flag paths for 16th notes (`beats === 0.25`) and rhythm dots for dotted eighth notes (`beats === 0.75`).
+  - [x] **Wait-For-Me Practice Holding Engine**:
+    - Cross-step tie detection in `buildScoreModel` marks `tiedFromPrev = true` on successor notes.
+    - `highlightActiveScoreNote` checks `activeHeldKeyAttacks` and sustain pedal (`pedaledNotes`) for held tied pitches, pre-fulfilling them to avoid requiring unmusical key restrikes, displaying `🔗 Tied note held!` feedback, and auto-advancing after duration.
+  - [x] **Full Repertoire Rhythm Audit**:
+    - Verified all 56 songs in `songDatabase` maintain exact beat totals per measure (0 duration discrepancies).
+  - [x] **Comprehensive Automated Test Suite**:
+    - Updated Test 13 and Test 20 in `tests/test_score_engine.js`.
+    - Added Test 21 asserting 24 measures, tie token parsing, cross-step tie detection, 16th/dotted eighth rhythms, and SVG tie arc quadratic bezier path calculations.
+    - All 21 tests in `tests/test_score_engine.js` and all 13 tests in `tests/test_education.js` passing with 100% success.

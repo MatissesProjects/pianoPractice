@@ -24,11 +24,13 @@ function getDiatonicStep(pitchStr) {
 }
 
 function parseToken(tokenStr) {
-  if (!tokenStr || tokenStr === "|") return { pitch: tokenStr, beats: 0 };
-  const parts = tokenStr.split(":");
+  if (!tokenStr || tokenStr === "|") return { pitch: tokenStr, beats: 0, tied: false };
+  const tied = tokenStr.includes("~");
+  const clean = tokenStr.replace(/~/g, "");
+  const parts = clean.split(":");
   const pitch = parts[0];
   const beats = parts[1] ? parseFloat(parts[1]) : 1.0;
-  return { pitch, beats };
+  return { pitch, beats, tied };
 }
 
 function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") {
@@ -292,6 +294,19 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
     }
 
     measures.push(measureItems);
+  }
+
+  // Cross-step tie detection
+  for (let sIdx = 1; sIdx < steps.length; sIdx++) {
+    const prev = steps[sIdx - 1];
+    const cur = steps[sIdx];
+    const prevTied = (prev.dyad && prev.dyad.tied) || (prev.rh && prev.rh.tied) || (prev.lh && prev.lh.tied);
+    if (prevTied && prev.expectedPitches && cur.expectedPitches) {
+      const hasOverlap = cur.expectedPitches.some(p => prev.expectedPitches.includes(p));
+      if (hasOverlap) {
+        cur.tiedFromPrev = true;
+      }
+    }
   }
 
   return { measures, steps };
@@ -1211,7 +1226,7 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   const triadsModel = buildScoreModel(leanSong, false, true, true, "triads");
   assert.strictEqual(triadsModel.steps[0].dyad.pitch, "C4+E4+G4");
   assert.strictEqual(triadsModel.steps[0].dyadF, "1+3+5");
-  assert.deepStrictEqual(triadsModel.steps[0].expectedPitches, ["C4", "E4", "G4", "C3"]);
+  assert.deepStrictEqual(triadsModel.steps[0].expectedPitches, ["C4", "E4", "G4", "C3", "G3"]);
 
   // 13.4 Key-Signature & Accidental Awareness (Minuet in G & Canon in D)
   const canonSong = songDatabase.find(s => s.id === "canon-in-d");
@@ -1918,30 +1933,35 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   assert.strictEqual(rhRests.length, 1, "Incomplete RH measure must be padded with a rest");
   assert.strictEqual(rhRests[0].rh.beats, 2, "Padded rest must equal 2 beats (4 - 2)");
 
-  // 20.3 Lean on Me Note Durations (User Request Verification)
+  // 20.3 Lean on Me Authentic Sheet Music Transcription Verification
   const lean = songDatabase.find(s => s.id === "lean-on-me");
   assert.ok(lean, "Lean on Me must exist in database");
   
-  // RH: First C must be a 2-beat hollow note, followed by quarter notes C, D, E, F+C, and half note F+C
-  assert.ok(lean.rh.startsWith("C4:2 C4:1 D4:1 | E4:1 C4+F4:1 C4+F4:2"), "RH opening C (half), C (quarter), D (quarter), E (quarter), C4+F4 (quarter), C4+F4 (half)");
-  // LH: Walk up starting with C3:2 C3:1 D3:1
-  assert.ok(lean.lh.startsWith("C3:2 C3:1 D3:1 | E3:1 F3:1 F3:2"), "LH walk up starting with C3:2 C3:1 D3:1");
-  // Dyads: First dyad must be 2 beats
-  assert.ok(lean.dyads.startsWith("C4+E4:2 C4+E4:1 D4+F4:1 | E4+G4:1 C4+F4:1 C4+F4:2"), "Dyads opening C4+E4 and measure 2 C4+F4");
+  // RH: First C is a 2-beat hollow note, followed by eighth notes C, D, E, leading into tied dyad F4+A4:0.5~
+  assert.ok(lean.rh.startsWith("C4:2 C4:0.5 D4:0.5 E4:0.5 F4+A4:0.5~ | F4+A4:2"), "RH opening C (half), C-D-E (eighths), tied F4+A4");
+  // LH: Open fifth/octave chord C3+G3+C4:3, C3+G3+C4:0.5, tied F2+C3+F3:0.5~
+  assert.ok(lean.lh.startsWith("C3+G3+C4:3 C3+G3+C4:0.5 F2+C3+F3:0.5~ | F2+C3+F3:3"), "LH open fifths/octaves with tied F2+C3+F3");
+  // Dyads: First dyad is 2 beats C4+E4:2, followed by eighth notes C4+E4, D4+F4, E4+G4, and tied F4+A4:0.5~
+  assert.ok(lean.dyads.startsWith("C4+E4:2 C4+E4:0.5 D4+F4:0.5 E4+G4:0.5 F4+A4:0.5~ | F4+A4:2"), "Dyads opening C4+E4 and tied F4+A4 across barline");
 
   const leanModel = buildScoreModel(lean, true, true, false);
-  // Measure 1: Step 0 has RH beats=2 and LH beats=2
+  // Measure 1: Step 0 has RH beats=2 and LH beats=3
   assert.strictEqual(leanModel.measures[0][0].rh.beats, 2, "Lean on Me opening RH note is 2 beats");
-  assert.strictEqual(leanModel.measures[0][0].lh.beats, 2, "Lean on Me opening LH note is a 2-beat half note");
-  // Step 1: RH beats=1, LH beats=1
-  assert.strictEqual(leanModel.measures[0][1].rh.beats, 1, "Lean on Me step 1 RH note is 1 beat");
-  assert.strictEqual(leanModel.measures[0][1].lh.beats, 1, "Lean on Me step 1 LH note is 1 beat");
-  // Measure 2: Step 0 has RH beats=1 (E4) and LH beats=1 (E3)
-  assert.strictEqual(leanModel.measures[1][0].rh.beats, 1, "Lean on Me measure 2 RH note is 1 beat");
-  assert.strictEqual(leanModel.measures[1][0].lh.beats, 1, "Lean on Me measure 2 LH note is 1 beat");
-  // Measure 2: Step 2 has RH beats=2 (C4+F4) and LH beats=2 (F3)
-  assert.strictEqual(leanModel.measures[1][2].rh.beats, 2, "Lean on Me measure 2 step 2 RH note is 2 beats");
-  assert.strictEqual(leanModel.measures[1][2].lh.beats, 2, "Lean on Me measure 2 step 2 LH note is 2 beats");
+  assert.strictEqual(leanModel.measures[0][0].lh.beats, 3, "Lean on Me opening LH chord is a 3-beat dotted half");
+  // Step 1 (Beat 2.0): RH beats=0.5 (C4), LH sustains dotted half
+  assert.strictEqual(leanModel.measures[0][1].rh.beats, 0.5, "Lean on Me step 1 RH note is 0.5 beat");
+  assert.strictEqual(leanModel.measures[0][1].lh, null, "Lean on Me step 1 LH sustains previous chord");
+  // Step 3 (Beat 3.0): RH beats=0.5 (E4), LH beats=0.5 (C3+G3+C4)
+  assert.strictEqual(leanModel.measures[0][3].rh.beats, 0.5, "Lean on Me step 3 RH note is 0.5 beat");
+  assert.strictEqual(leanModel.measures[0][3].lh.beats, 0.5, "Lean on Me step 3 LH chord is 0.5 beat");
+  // Step 4 (last note of M1, Beat 3.5): tied note
+  const m1Step4 = leanModel.measures[0][4];
+  assert.strictEqual(m1Step4.rh.tied, true, "Measure 1 Step 4 RH has tie annotation");
+  assert.strictEqual(m1Step4.lh.tied, true, "Measure 1 Step 4 LH has tie annotation");
+  // Measure 2: Step 0 is tied from prev
+  assert.strictEqual(leanModel.measures[1][0].tiedFromPrev, true, "Lean on Me measure 2 step 0 is tied from prev");
+  assert.strictEqual(leanModel.measures[1][0].rh.beats, 2, "Lean on Me measure 2 RH note is 2 beats");
+  assert.strictEqual(leanModel.measures[1][0].lh.beats, 3, "Lean on Me measure 2 LH note is 3 beats");
 
   // 20.4 Full Repertoire Duration Audit (All 56 Songs)
   function getExpBeats(timeSig) {
@@ -1985,6 +2005,78 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   assert.strictEqual(durationDiscrepancies, 0, "All 56 songs in songDatabase must have 0 measure duration discrepancies");
 
   console.log("✔ Test 20: 🎼 SVG Vector Rest Rendering, Lean on Me Durations & Full Repertoire Rhythm Audit passed");
+}
+
+// 21. Full 24-Measure Lean on Me Arrangement, Tie Annotations, 16th Notes & SVG Tie Arcs
+{
+  const lean = songDatabase.find(s => s.id === "lean-on-me");
+  assert.ok(lean, "Lean on Me exists");
+
+  const rhMeasures = lean.rh.split("|").map(m => m.trim());
+  const lhMeasures = lean.lh.split("|").map(m => m.trim());
+  const dyadMeasures = lean.dyads.split("|").map(m => m.trim());
+
+  assert.strictEqual(rhMeasures.length, 24, "Lean on Me RH must have exactly 24 measures");
+  assert.strictEqual(lhMeasures.length, 24, "Lean on Me LH must have exactly 24 measures");
+  assert.strictEqual(dyadMeasures.length, 24, "Lean on Me Dyads must have exactly 24 measures");
+
+  // Verify fingerings are present for all 24 measures
+  assert.strictEqual(lean.rhF.split("|").length, 24, "RH fingers match 24 measures");
+  assert.strictEqual(lean.lhF.split("|").length, 24, "LH fingers match 24 measures");
+  assert.strictEqual(lean.dyadsF.split("|").length, 24, "Dyad fingers match 24 measures");
+
+  // Verify Bridge syncopation: 16th notes (0.25) and dotted eighth notes (0.75) in Measure 17
+  assert.ok(lean.rh.includes("0.75") && lean.rh.includes("0.25"), "RH contains dotted eighth (0.75) and 16th (0.25) note rhythms");
+  const parsed16th = parseToken("A4:0.25");
+  assert.strictEqual(parsed16th.beats, 0.25);
+  const parsedDotted8th = parseToken("G4:0.75");
+  assert.strictEqual(parsedDotted8th.beats, 0.75);
+
+  // Verify Tie Token parsing
+  const tiedToken = parseToken("F4+A4:0.5~");
+  assert.strictEqual(tiedToken.pitch, "F4+A4");
+  assert.strictEqual(tiedToken.beats, 0.5);
+  assert.strictEqual(tiedToken.tied, true);
+
+  // Verify Cross-Step Tie Model Detection
+  const model = buildScoreModel(lean, true, true, false);
+  const tiedSteps = model.steps.filter(s => s.tiedFromPrev);
+  assert.ok(tiedSteps.length >= 5, "At least 5 steps have tiedFromPrev=true across the 24-measure piece");
+
+  // Verify SVG Tie Arc calculation helper
+  function computeTieArcD(n1, n2, scoreWidth = 920, rightMargin = 30, leftMargin = 72) {
+    let curveUp = false;
+    if (typeof n1.isChordTop === "boolean") curveUp = n1.isChordTop;
+    else curveUp = !n1.stemUp;
+    const ySign = curveUp ? -1 : 1;
+    const yOffset = ySign * 7;
+    if (n1.systemIdx === n2.systemIdx) {
+      const x1 = n1.cx + 5;
+      const x2 = n2.cx - 5;
+      const y1 = n1.cy + yOffset;
+      const y2 = n2.cy + yOffset;
+      const midX = (x1 + x2) / 2;
+      const span = Math.max(10, x2 - x1);
+      const curveDepth = ySign * Math.min(18, Math.max(8, span * 0.12));
+      const midY = (y1 + y2) / 2 + curveDepth;
+      return `M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${midX.toFixed(1)} ${midY.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+    } else {
+      const x1 = n1.cx + 5;
+      const x2 = scoreWidth - rightMargin;
+      const y1 = n1.cy + yOffset;
+      const midX1 = (x1 + x2) / 2;
+      const midY1 = y1 + ySign * 10;
+      return `M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${midX1.toFixed(1)} ${midY1.toFixed(1)} ${x2.toFixed(1)} ${y1.toFixed(1)}`;
+    }
+  }
+
+  const arcSameRow = computeTieArcD({ cx: 200, cy: 100, stemUp: true, systemIdx: 0 }, { cx: 260, cy: 100, stemUp: true, systemIdx: 0 });
+  assert.ok(arcSameRow.startsWith("M 205.0 107.0 Q 230.0"), "Same row tie arc draws quadratic bezier below notehead when stemUp is true");
+
+  const arcCrossRow = computeTieArcD({ cx: 800, cy: 100, stemUp: true, systemIdx: 0 }, { cx: 120, cy: 100, stemUp: true, systemIdx: 1 });
+  assert.ok(arcCrossRow.startsWith("M 805.0 107.0 Q"), "Cross-row tie arc terminates at right margin");
+
+  console.log("✔ Test 21: Full 24-Measure Lean on Me Arrangement, Tie Annotations, 16th Notes & SVG Tie Arcs passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
