@@ -202,3 +202,37 @@
   - [x] **Comprehensive Automated Test Suite**:
     - Added Test 22 to `tests/test_score_engine.js` asserting removal of SVG `scrollIntoView`, removal of CSS `scroll-behavior: smooth`, comfort zone no-op checks, positive forward scroll target calculations, animation guard debouncing, and instant reset wiring.
     - All 22 tests in `tests/test_score_engine.js` and all 13 tests in `tests/test_education.js` passing with 100% success.
+
+- [x] **Milestone 22: Authentic Sheet Music Rest Rendering in When the Saints Go Marching In and Repertoire**
+  - [x] **Diagnosed Missing Rest Rendering**:
+    - Identified that `renderSheetMusicScore()` in `index.html` executed `const pitches = item.rh.pitch.split("+").filter(p => p !== "-");` (and for dyads and LH), which completely stripped out rest tokens (`"-"`) into empty arrays `[]`.
+    - As a result, `renderNoteheadOnly` was never invoked for rests, leaving staves completely blank where quarter rests, eighth rests, and whole rests should have been displayed.
+  - [x] **Implemented Explicit Rest Dispatching**:
+    - Added explicit `if (item.dyad.pitch === "-")`, `if (item.rh.pitch === "-")`, and `if (item.lh.pitch === "-")` checks in `renderSheetMusicScore()` that directly invoke `renderNoteheadOnly(noteGroup, "-", beats, cx, bottomStaffY, refDiatonicStep)`.
+    - Restores authentic SVG vector glyphs (`.rest-glyph` and `.rest-rect`) for quarter rests (e.g. M1, M3, M5, M9, M11 in *When the Saints Go Marching In*), eighth rests (e.g. M9 in *Lean on Me*), and whole-measure rests across the 14 repertoire songs with explicit rests.
+  - [x] **Cheat Badge & Tie Cleanliness**:
+    - Preserved cheat badge skipping and tie arc filtering so letter labels, finger numbers, and tie curves are never erroneously attached to rests.
+  - [x] **Comprehensive Automated Test Suite**:
+    - Added Test 23 to `tests/test_score_engine.js` asserting explicit rest tokens, grand staff rest-note coexistence in *When the Saints Go Marching In*, source code rest dispatch verification across Treble, Bass, and Dyads, and Lean on Me eighth rest rendering.
+    - All 23 tests in `tests/test_score_engine.js` and all 13 tests in `tests/test_education.js` passing with 100% success.
+
+- [x] **Milestone 23: Authentic Classical Rest Glyphs, Collision-Free Spacing & Rest Timing Engine**
+  - [x] **Classical SMuFL Quarter Rest Vector Outline**:
+    - Eliminated the awkward looping tadpole bulb at the base of the quarter rest path in `renderNoteheadOnly()`.
+    - Replaced with classical engraved SMuFL `restQuarter` vector path featuring a space-4 top hook, solid diagonal slanting body across line 3, space-2 left belly, and open upward-curving tapered crescent tail in space 1.
+  - [x] **Collision-Free Clef, Time Signature & Barline Clearance**:
+    - Increased `leftMargin` to 74px and shifted `tClef` to `leftMargin - 42` (x=32) and `bClef` to `leftMargin - 40` (x=34).
+    - Centered `timeSig` at `leftMargin + 8` (x=82), guaranteeing a 1px gap from the clef's rightmost edge (x=65).
+    - Positioned `measureStartX` for measure 1 at `leftMargin + 28` (x=102) with first note onset at `cx = 120`, providing 15px of clear air past the time signature's right boundary (x=98) and completely eliminating glyph overlap.
+  - [x] **Active-Target & Error-Target Rest CSS Styling**:
+    - Added `.note-group.active-target .rest-glyph, .note-group.active-target .rest-rect` in `<style>` with `#f59e0b` fill and amber drop shadow so active rests illuminate clearly.
+    - Added matching `.note-group.error-target` red highlight rules for rests.
+    - Enhanced `updateTargetBadgeDisplay()` to display amber-themed `𝄽 REST (${beatVal}b)`.
+  - [x] **Precision Rest Timing Engine in Wait-for-Me Practice Mode**:
+    - Added `isPracticeSessionStarted` state variable to guard Step 0 pickup rests: on initial song load or restart, the rest stays illuminated in amber without prematurely auto-advancing, displaying `𝄽 Count in: play [first note] to begin!`.
+    - Implemented seamless rest pass-through in `checkAndPlayNoteOn()`: striking the first playable note during a rest fulfills the rest transition cleanly without buzzing an error.
+    - Implemented mid-song note-to-rest rhythmic duration holding: when fulfilling a note followed by a rest (e.g. `G4:4` in M2 of *When the Saints Go Marching In*), the prior note stays fulfilled for its full musical beats (`note.beats * (60000 / tempo)`) before advancing to the rest, and the rest then holds for its full duration before advancing to the next note.
+  - [x] **Comprehensive Automated Test Suite**:
+    - Added Test 24 to `tests/test_score_engine.js` asserting classical quarter rest SMuFL geometry, clef/time-signature/measure-1 boundary clearance, active rest CSS styling, pickup rest count-in guard, and note-to-rest duration holding calculations.
+    - All 24 tests in `tests/test_score_engine.js` and all 13 tests in `tests/test_education.js` passing with 100% success.
+

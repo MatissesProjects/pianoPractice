@@ -967,12 +967,26 @@
     }
     .note-group.active-target .notestem { stroke: #f59e0b !important; }
 
+    /* Active Target Rest Styling */
+    .note-group.active-target .rest-glyph,
+    .note-group.active-target .rest-rect {
+      fill: #f59e0b !important;
+      filter: drop-shadow(0 0 7px rgba(245, 158, 11, 0.95));
+      opacity: 1 !important;
+    }
+
     /* Active Error Flash on Note */
     .note-group.error-target .notehead {
       fill: #ef4444 !important;
       filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9));
     }
     .note-group.error-target .notestem { stroke: #ef4444 !important; }
+    .note-group.error-target .rest-glyph,
+    .note-group.error-target .rest-rect {
+      fill: #ef4444 !important;
+      filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9));
+      opacity: 1 !important;
+    }
 
     /* Rests and Harmonic Badges */
     .rest-glyph, .rest-rect {
@@ -2956,6 +2970,7 @@
     // WAIT-FOR-ME INTERACTIVE PRACTICE STATE
     let isWaitPracticeMode = true;
     let currentPracticeStep = 0;
+    let isPracticeSessionStarted = false; // Tracks whether student has begun active playing session (guards step 0 count-in rest)
     let songNoteSteps = []; // Parsed sequence of steps { rh, lh, dyad, expectedPitches: [] }
     let currentSongMeasures = []; // Parsed sequence of measures with beat-aligned onset items
     let stepFulfilledPitches = new Set(); // Tracks satisfied pitches within current active practice step
@@ -3539,8 +3554,8 @@
       // Multi-System Geometry: 2 measures per system row for maximum readability
       const measuresPerSystem = 2;
       const scoreWidth = 920;
-      const leftMargin = 72;
-      const rightMargin = 30;
+      const leftMargin = 74;
+      const rightMargin = 26;
       const availableMeasureWidth = (scoreWidth - leftMargin - rightMargin) / measuresPerSystem;
 
       const staffLineSpacing = 10;
@@ -3566,7 +3581,7 @@
           for (let l = 0; l < 5; l++) {
             const y = topY + l * staffLineSpacing;
             const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            line.setAttribute("x1", leftMargin - 42);
+            line.setAttribute("x1", leftMargin - 46);
             line.setAttribute("y1", y);
             line.setAttribute("x2", scoreWidth - rightMargin);
             line.setAttribute("y2", y);
@@ -3581,7 +3596,7 @@
         // Clefs on Every System Row
         if (showRH || showDyads) {
           const tClef = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          tClef.setAttribute("x", leftMargin - 36);
+          tClef.setAttribute("x", leftMargin - 42);
           tClef.setAttribute("y", trebleBottomY - 4);
           tClef.setAttribute("font-size", "44");
           tClef.setAttribute("class", "clef-text");
@@ -3591,7 +3606,7 @@
 
         if (showLH) {
           const bClef = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          bClef.setAttribute("x", leftMargin - 34);
+          bClef.setAttribute("x", leftMargin - 40);
           bClef.setAttribute("y", bassTopY + 26);
           bClef.setAttribute("font-size", "34");
           bClef.setAttribute("class", "clef-text");
@@ -3603,7 +3618,7 @@
         if (s === 0) {
           if (showRH || showDyads) {
             const timeSig = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            timeSig.setAttribute("x", leftMargin + 2);
+            timeSig.setAttribute("x", leftMargin + 8);
             timeSig.setAttribute("y", trebleTopY + 24);
             timeSig.setAttribute("class", "time-sig-text");
             timeSig.textContent = currentSong.timeSig || "4/4";
@@ -3611,7 +3626,7 @@
           }
           if (showLH) {
             const timeSigB = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            timeSigB.setAttribute("x", leftMargin + 2);
+            timeSigB.setAttribute("x", leftMargin + 8);
             timeSigB.setAttribute("y", bassTopY + 24);
             timeSigB.setAttribute("class", "time-sig-text");
             timeSigB.textContent = currentSong.timeSig || "4/4";
@@ -3623,9 +3638,9 @@
         const startY = (showRH || showDyads) ? trebleTopY : bassTopY;
         const endY = showLH ? bassBottomY : trebleBottomY;
         const initBar = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        initBar.setAttribute("x1", leftMargin - 42);
+        initBar.setAttribute("x1", leftMargin - 46);
         initBar.setAttribute("y1", startY);
-        initBar.setAttribute("x2", leftMargin - 42);
+        initBar.setAttribute("x2", leftMargin - 46);
         initBar.setAttribute("y2", endY);
         initBar.setAttribute("class", "bar-line");
         svg.appendChild(initBar);
@@ -3634,8 +3649,8 @@
         const systemMeasures = measures.slice(s * measuresPerSystem, (s + 1) * measuresPerSystem);
 
         systemMeasures.forEach((mObj, mInRowIdx) => {
-          const measureStartX = leftMargin + 22 + (mInRowIdx * availableMeasureWidth);
-          const measureEndX = measureStartX + availableMeasureWidth - 22;
+          const measureStartX = leftMargin + 28 + (mInRowIdx * availableMeasureWidth);
+          const measureEndX = measureStartX + availableMeasureWidth - 28;
           const globalMeasureNum = s * measuresPerSystem + mInRowIdx + 1;
 
           // Measure Number
@@ -3666,7 +3681,7 @@
           }
           const maxItemBeat = mObj.reduce((maxB, it) => Math.max(maxB, (it.startBeat || 0) + (it.beats || 1)), 0);
           const totalMeasureBeats = Math.max(measureBeats, maxItemBeat || 1);
-          const availableInnerX = availableMeasureWidth - 48;
+          const availableInnerX = availableMeasureWidth - 56;
 
           // Harmonic Roman Numeral Analysis on Beat 0 of Measure
           if ((showRH || showDyads) && mObj.length > 0) {
@@ -3748,149 +3763,161 @@
 
             // 1. Render Treble / Dyad Notes
             if (showDyads && item.dyad) {
-              const pitches = item.dyad.pitch.split("+").filter(p => p !== "-");
-              const sortedPitches = [...pitches].sort((a, b) => (getDiatonicStep(a) || 0) - (getDiatonicStep(b) || 0));
-              pitches.forEach(p => {
-                const info = renderNoteheadOnly(noteGroup, p, item.dyad.beats, cx, trebleBottomY, 2);
-                if (info) {
-                  let isChordTop = undefined;
-                  if (pitches.length > 1) {
-                    isChordTop = (p === sortedPitches[sortedPitches.length - 1]);
+              if (item.dyad.pitch === "-") {
+                renderNoteheadOnly(noteGroup, "-", item.dyad.beats, cx, trebleBottomY, 2);
+              } else {
+                const pitches = item.dyad.pitch.split("+").filter(p => p !== "-");
+                const sortedPitches = [...pitches].sort((a, b) => (getDiatonicStep(a) || 0) - (getDiatonicStep(b) || 0));
+                pitches.forEach(p => {
+                  const info = renderNoteheadOnly(noteGroup, p, item.dyad.beats, cx, trebleBottomY, 2);
+                  if (info) {
+                    let isChordTop = undefined;
+                    if (pitches.length > 1) {
+                      isChordTop = (p === sortedPitches[sortedPitches.length - 1]);
+                    }
+                    renderedNotes.push({
+                      stepIndex: item.stepIndex,
+                      systemIdx: s,
+                      pitch: p,
+                      hand: "treble",
+                      tied: !!item.dyad.tied,
+                      cx: info.cx,
+                      cy: info.cy,
+                      step: info.step,
+                      stemUp: info.stemUp,
+                      isChordTop
+                    });
                   }
-                  renderedNotes.push({
-                    stepIndex: item.stepIndex,
-                    systemIdx: s,
-                    pitch: p,
-                    hand: "treble",
-                    tied: !!item.dyad.tied,
-                    cx: info.cx,
-                    cy: info.cy,
-                    step: info.step,
-                    stemUp: info.stemUp,
-                    isChordTop
-                  });
-                }
-              });
-              const actualPitches = pitches.filter(p => p !== "-");
-              if (showCheat && actualPitches.length > 0) {
-                const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
-                const startYCheat = trebleBottomY + 38;
-                const lineSpacing = 13.5;
-                sorted.forEach((p, pIdx) => {
-                  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                  label.setAttribute("x", cx);
-                  label.setAttribute("y", startYCheat + pIdx * lineSpacing);
-                  label.setAttribute("class", `cheat-text-composite ${actualPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
-                  label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
-                  noteGroup.appendChild(label);
                 });
-                if (showFingers && item.dyadF && item.dyadF !== "-") {
-                  const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                  fLabel.setAttribute("x", cx);
-                  fLabel.setAttribute("y", startYCheat + sorted.length * lineSpacing + 2);
-                  fLabel.setAttribute("class", "cheat-finger-label");
-                  fLabel.textContent = item.dyadF;
-                  noteGroup.appendChild(fLabel);
+                const actualPitches = pitches.filter(p => p !== "-");
+                if (showCheat && actualPitches.length > 0) {
+                  const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
+                  const startYCheat = trebleBottomY + 38;
+                  const lineSpacing = 13.5;
+                  sorted.forEach((p, pIdx) => {
+                    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    label.setAttribute("x", cx);
+                    label.setAttribute("y", startYCheat + pIdx * lineSpacing);
+                    label.setAttribute("class", `cheat-text-composite ${actualPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                    label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
+                    noteGroup.appendChild(label);
+                  });
+                  if (showFingers && item.dyadF && item.dyadF !== "-") {
+                    const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    fLabel.setAttribute("x", cx);
+                    fLabel.setAttribute("y", startYCheat + sorted.length * lineSpacing + 2);
+                    fLabel.setAttribute("class", "cheat-finger-label");
+                    fLabel.textContent = item.dyadF;
+                    noteGroup.appendChild(fLabel);
+                  }
                 }
               }
             } else if (showRH && item.rh) {
-              const pitches = item.rh.pitch.split("+").filter(p => p !== "-");
-              const sortedPitches = [...pitches].sort((a, b) => (getDiatonicStep(a) || 0) - (getDiatonicStep(b) || 0));
-              pitches.forEach(p => {
-                const info = renderNoteheadOnly(noteGroup, p, item.rh.beats, cx, trebleBottomY, 2);
-                if (info) {
-                  let isChordTop = undefined;
-                  if (pitches.length > 1) {
-                    isChordTop = (p === sortedPitches[sortedPitches.length - 1]);
+              if (item.rh.pitch === "-") {
+                renderNoteheadOnly(noteGroup, "-", item.rh.beats, cx, trebleBottomY, 2);
+              } else {
+                const pitches = item.rh.pitch.split("+").filter(p => p !== "-");
+                const sortedPitches = [...pitches].sort((a, b) => (getDiatonicStep(a) || 0) - (getDiatonicStep(b) || 0));
+                pitches.forEach(p => {
+                  const info = renderNoteheadOnly(noteGroup, p, item.rh.beats, cx, trebleBottomY, 2);
+                  if (info) {
+                    let isChordTop = undefined;
+                    if (pitches.length > 1) {
+                      isChordTop = (p === sortedPitches[sortedPitches.length - 1]);
+                    }
+                    renderedNotes.push({
+                      stepIndex: item.stepIndex,
+                      systemIdx: s,
+                      pitch: p,
+                      hand: "treble",
+                      tied: !!item.rh.tied,
+                      cx: info.cx,
+                      cy: info.cy,
+                      step: info.step,
+                      stemUp: info.stemUp,
+                      isChordTop
+                    });
                   }
-                  renderedNotes.push({
-                    stepIndex: item.stepIndex,
-                    systemIdx: s,
-                    pitch: p,
-                    hand: "treble",
-                    tied: !!item.rh.tied,
-                    cx: info.cx,
-                    cy: info.cy,
-                    step: info.step,
-                    stemUp: info.stemUp,
-                    isChordTop
-                  });
-                }
-              });
-              const actualPitches = pitches.filter(p => p !== "-");
-              if (showCheat && actualPitches.length > 0) {
-                const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
-                const startYCheat = trebleBottomY + 38;
-                const lineSpacing = 13.5;
-                sorted.forEach((p, pIdx) => {
-                  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                  label.setAttribute("x", cx);
-                  label.setAttribute("y", startYCheat + pIdx * lineSpacing);
-                  label.setAttribute("class", `cheat-text-composite ${actualPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
-                  label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
-                  noteGroup.appendChild(label);
                 });
-                const fNum = item.rh.f || item.rhF;
-                if (showFingers && fNum && fNum !== "-") {
-                  const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                  fLabel.setAttribute("x", cx);
-                  fLabel.setAttribute("y", startYCheat + sorted.length * lineSpacing + 2);
-                  fLabel.setAttribute("class", "cheat-finger-label");
-                  fLabel.textContent = fNum;
-                  noteGroup.appendChild(fLabel);
+                const actualPitches = pitches.filter(p => p !== "-");
+                if (showCheat && actualPitches.length > 0) {
+                  const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
+                  const startYCheat = trebleBottomY + 38;
+                  const lineSpacing = 13.5;
+                  sorted.forEach((p, pIdx) => {
+                    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    label.setAttribute("x", cx);
+                    label.setAttribute("y", startYCheat + pIdx * lineSpacing);
+                    label.setAttribute("class", `cheat-text-composite ${actualPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                    label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
+                    noteGroup.appendChild(label);
+                  });
+                  const fNum = item.rh.f || item.rhF;
+                  if (showFingers && fNum && fNum !== "-") {
+                    const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    fLabel.setAttribute("x", cx);
+                    fLabel.setAttribute("y", startYCheat + sorted.length * lineSpacing + 2);
+                    fLabel.setAttribute("class", "cheat-finger-label");
+                    fLabel.textContent = fNum;
+                    noteGroup.appendChild(fLabel);
+                  }
                 }
               }
             }
 
             // 2. Render Bass Notes
             if (showLH && item.lh) {
-              const lhPitches = item.lh.pitch.split("+").filter(p => p !== "-");
-              const sortedLHPitches = [...lhPitches].sort((a, b) => (getDiatonicStep(a) || 0) - (getDiatonicStep(b) || 0));
-              lhPitches.forEach(p => {
-                const info = renderNoteheadOnly(noteGroup, p, item.lh.beats, cx, bassBottomY, -10);
-                if (info) {
-                  let isChordTop = undefined;
-                  if (lhPitches.length > 1) {
-                    isChordTop = (p === sortedLHPitches[sortedLHPitches.length - 1]);
+              if (item.lh.pitch === "-") {
+                renderNoteheadOnly(noteGroup, "-", item.lh.beats, cx, bassBottomY, -10);
+              } else {
+                const lhPitches = item.lh.pitch.split("+").filter(p => p !== "-");
+                const sortedLHPitches = [...lhPitches].sort((a, b) => (getDiatonicStep(a) || 0) - (getDiatonicStep(b) || 0));
+                lhPitches.forEach(p => {
+                  const info = renderNoteheadOnly(noteGroup, p, item.lh.beats, cx, bassBottomY, -10);
+                  if (info) {
+                    let isChordTop = undefined;
+                    if (lhPitches.length > 1) {
+                      isChordTop = (p === sortedLHPitches[sortedLHPitches.length - 1]);
+                    }
+                    renderedNotes.push({
+                      stepIndex: item.stepIndex,
+                      systemIdx: s,
+                      pitch: p,
+                      hand: "bass",
+                      tied: !!item.lh.tied,
+                      cx: info.cx,
+                      cy: info.cy,
+                      step: info.step,
+                      stemUp: info.stemUp,
+                      isChordTop
+                    });
                   }
-                  renderedNotes.push({
-                    stepIndex: item.stepIndex,
-                    systemIdx: s,
-                    pitch: p,
-                    hand: "bass",
-                    tied: !!item.lh.tied,
-                    cx: info.cx,
-                    cy: info.cy,
-                    step: info.step,
-                    stemUp: info.stemUp,
-                    isChordTop
-                  });
-                }
-              });
-
-              const actualLHPitches = lhPitches.filter(p => p !== "-");
-              if (showCheat && actualLHPitches.length > 0) {
-                const sortedB = [...actualLHPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
-                const startYBCheat = bassBottomY + 38;
-                const lineSpacing = 13.5;
-
-                sortedB.forEach((p, pIdx) => {
-                  const labelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                  labelB.setAttribute("x", cx);
-                  labelB.setAttribute("y", startYBCheat + pIdx * lineSpacing);
-                  labelB.setAttribute("class", `cheat-text-composite ${actualLHPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
-                  labelB.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
-                  noteGroup.appendChild(labelB);
                 });
 
-                const fNumB = item.lh.f || item.lhF;
-                if (showFingers && fNumB && fNumB !== "-") {
-                  const fLabelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                  fLabelB.setAttribute("x", cx);
-                  fLabelB.setAttribute("y", startYBCheat + sortedB.length * lineSpacing + 2);
-                  fLabelB.setAttribute("class", "cheat-finger-label");
-                  fLabelB.textContent = fNumB;
-                  noteGroup.appendChild(fLabelB);
+                const actualLHPitches = lhPitches.filter(p => p !== "-");
+                if (showCheat && actualLHPitches.length > 0) {
+                  const sortedB = [...actualLHPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
+                  const startYBCheat = bassBottomY + 38;
+                  const lineSpacing = 13.5;
+
+                  sortedB.forEach((p, pIdx) => {
+                    const labelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    labelB.setAttribute("x", cx);
+                    labelB.setAttribute("y", startYBCheat + pIdx * lineSpacing);
+                    labelB.setAttribute("class", `cheat-text-composite ${actualLHPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                    labelB.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
+                    noteGroup.appendChild(labelB);
+                  });
+
+                  const fNumB = item.lh.f || item.lhF;
+                  if (showFingers && fNumB && fNumB !== "-") {
+                    const fLabelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    fLabelB.setAttribute("x", cx);
+                    fLabelB.setAttribute("y", startYBCheat + sortedB.length * lineSpacing + 2);
+                    fLabelB.setAttribute("class", "cheat-finger-label");
+                    fLabelB.textContent = fNumB;
+                    noteGroup.appendChild(fLabelB);
+                  }
                 }
               }
             }
@@ -4006,19 +4033,22 @@
             group.appendChild(dot);
           }
         } else if (beats >= 0.85) {
-          // Quarter Rest: standard vector path
+          // Classical engraved SMuFL restQuarter glyph
           const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          const d = `M ${cx - 2.5} ${cy - 11} ` +
-            `C ${cx - 1} ${cy - 10} ${cx + 3.5} ${cy - 6} ${cx + 3.5} ${cy - 3.5} ` +
-            `C ${cx + 3.5} ${cy - 1.5} ${cx + 1} ${cy + 0.5} ${cx - 3} ${cy + 4} ` +
-            `C ${cx - 4.5} ${cy + 5.5} ${cx - 4} ${cy + 7.5} ${cx - 1.5} ${cy + 8.5} ` +
-            `C ${cx + 1.5} ${cy + 9.5} ${cx + 3.8} ${cy + 10} ${cx + 4} ${cy + 12} ` +
-            `C ${cx + 4.2} ${cy + 14.5} ${cx + 1} ${cy + 16} ${cx - 2} ${cy + 15} ` +
-            `C ${cx - 3.5} ${cy + 14.2} ${cx - 4} ${cy + 12.5} ${cx - 3} ${cy + 11} ` +
-            `C ${cx - 1.8} ${cy + 9.5} ${cx - 0.5} ${cy + 8.5} ${cx - 1.5} ${cy + 7.5} ` +
-            `C ${cx - 3} ${cy + 6.2} ${cx - 4.5} ${cy + 4.5} ${cx - 3} ${cy + 2.5} ` +
-            `C ${cx - 1.5} ${cy + 0.5} ${cx + 1.5} ${cy - 2} ${cx + 1.5} ${cy - 3.8} ` +
-            `C ${cx + 1.5} ${cy - 5.5} ${cx - 1} ${cy - 8.5} ${cx - 2.5} ${cy - 11} Z`;
+          const d = `M ${(cx + 3.2).toFixed(1)} ${(cy - 13.0).toFixed(1)} ` +
+            `C ${(cx + 2.4).toFixed(1)} ${(cy - 13.8).toFixed(1)} ${(cx - 1.2).toFixed(1)} ${(cy - 12.5).toFixed(1)} ${(cx - 3.2).toFixed(1)} ${(cy - 9.0).toFixed(1)} ` +
+            `C ${(cx - 3.8).toFixed(1)} ${(cy - 7.2).toFixed(1)} ${(cx - 3.0).toFixed(1)} ${(cy - 5.5).toFixed(1)} ${(cx - 1.0).toFixed(1)} ${(cy - 2.8).toFixed(1)} ` +
+            `L ${(cx + 3.4).toFixed(1)} ${(cy + 1.6).toFixed(1)} ` +
+            `C ${(cx + 3.6).toFixed(1)} ${(cy + 3.2).toFixed(1)} ${(cx + 1.2).toFixed(1)} ${(cy + 5.6).toFixed(1)} ${(cx - 2.8).toFixed(1)} ${(cy + 7.4).toFixed(1)} ` +
+            `C ${(cx - 4.8).toFixed(1)} ${(cy + 8.5).toFixed(1)} ${(cx - 4.6).toFixed(1)} ${(cy + 11.0).toFixed(1)} ${(cx - 2.0).toFixed(1)} ${(cy + 13.0).toFixed(1)} ` +
+            `C ${(cx + 0.2).toFixed(1)} ${(cy + 14.5).toFixed(1)} ${(cx + 2.5).toFixed(1)} ${(cy + 13.8).toFixed(1)} ${(cx + 3.4).toFixed(1)} ${(cy + 11.2).toFixed(1)} ` +
+            `C ${(cx + 3.6).toFixed(1)} ${(cy + 10.4).toFixed(1)} ${(cx + 2.8).toFixed(1)} ${(cy + 10.0).toFixed(1)} ${(cx + 2.2).toFixed(1)} ${(cy + 10.6).toFixed(1)} ` +
+            `C ${(cx + 1.5).toFixed(1)} ${(cy + 12.2).toFixed(1)} ${(cx - 0.2).toFixed(1)} ${(cy + 12.5).toFixed(1)} ${(cx - 1.5).toFixed(1)} ${(cy + 11.2).toFixed(1)} ` +
+            `C ${(cx - 2.8).toFixed(1)} ${(cy + 10.0).toFixed(1)} ${(cx - 2.6).toFixed(1)} ${(cy + 8.4).toFixed(1)} ${(cx - 0.2).toFixed(1)} ${(cy + 6.6).toFixed(1)} ` +
+            `C ${(cx + 1.4).toFixed(1)} ${(cy + 5.2).toFixed(1)} ${(cx + 1.8).toFixed(1)} ${(cy + 3.6).toFixed(1)} ${(cx + 1.2).toFixed(1)} ${(cy + 2.0).toFixed(1)} ` +
+            `L ${(cx - 2.8).toFixed(1)} ${(cy - 3.6).toFixed(1)} ` +
+            `C ${(cx - 3.8).toFixed(1)} ${(cy - 5.2).toFixed(1)} ${(cx - 3.0).toFixed(1)} ${(cy - 7.4).toFixed(1)} ${(cx - 1.5).toFixed(1)} ${(cy - 9.0).toFixed(1)} ` +
+            `C ${(cx - 0.2).toFixed(1)} ${(cy - 10.5).toFixed(1)} ${(cx + 2.2).toFixed(1)} ${(cy - 11.5).toFixed(1)} ${(cx + 3.2).toFixed(1)} ${(cy - 13.0).toFixed(1)} Z`;
           path.setAttribute("d", d);
           path.setAttribute("class", "rest-glyph");
           group.appendChild(path);
@@ -4252,7 +4282,8 @@
       if (!targetBadge || !step) return;
 
       if (!step.expectedPitches || step.expectedPitches.length === 0) {
-        targetBadge.innerHTML = `<span style="color:#94a3b8; font-size:0.95rem; font-weight:700;">REST</span>`;
+        const beatVal = step.beats || 1;
+        targetBadge.innerHTML = `<span style="color:#f59e0b; font-size:1.02rem; font-weight:800; text-shadow:0 0 8px rgba(245,158,11,0.5);">𝄽 REST (${beatVal}b)</span>`;
         return;
       }
 
@@ -4384,6 +4415,27 @@
         }
 
         if ((!step.expectedPitches || step.expectedPitches.length === 0) && isWaitPracticeMode) {
+          const feedbackText = document.getElementById("hudFeedbackText");
+          const nextStep = songNoteSteps[stepIdx + 1];
+          const nextLabel = (nextStep && nextStep.expectedPitches && nextStep.expectedPitches.length > 0)
+            ? nextStep.expectedPitches.join(" + ")
+            : "first note";
+
+          if (stepIdx === 0 && !isPracticeSessionStarted) {
+            // Opening pickup rest: Do NOT auto-advance with a silent 500ms timer on page load!
+            // Keep the rest highlighted in amber with a clear count-in prompt
+            if (feedbackText) {
+              feedbackText.style.color = "#f59e0b";
+              feedbackText.textContent = `𝄽 Count in: play ${nextLabel} to begin!`;
+            }
+            return;
+          }
+
+          if (feedbackText) {
+            feedbackText.style.color = "#f59e0b";
+            feedbackText.textContent = `𝄽 Rest: pause for ${step.beats || 1} beat${(step.beats || 1) === 1 ? '' : 's'}...`;
+          }
+
           const tempo = currentSong ? (currentSong.tempo || 90) : 90;
           const restDurationMs = Math.max(300, (step.beats || 1) * (60000 / tempo));
           setTimeout(() => {
@@ -4462,8 +4514,27 @@
       }
 
       const currentStep = songNoteSteps[currentPracticeStep];
-      if (!currentStep || !currentStep.expectedPitches || currentStep.expectedPitches.length === 0) return;
+      if (!currentStep) return;
 
+      // Handle Rest Step Transition
+      if (!currentStep.expectedPitches || currentStep.expectedPitches.length === 0) {
+        // Current step is a rest! If user strikes the next playable note, advance through the rest cleanly
+        const nextStep = songNoteSteps[currentPracticeStep + 1];
+        if (nextStep && nextStep.expectedPitches && nextStep.expectedPitches.length > 0) {
+          const matchesNext = nextStep.expectedPitches.some(p =>
+            p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch))
+          );
+          if (matchesNext) {
+            isPracticeSessionStarted = true;
+            advancePracticeStep();
+            checkAndPlayNoteOn(playedPitch, noteAttack);
+            return;
+          }
+        }
+        return;
+      }
+
+      isPracticeSessionStarted = true;
       const expected = currentStep.expectedPitches;
       const targetBadge = document.getElementById("hudTargetBadge");
       const feedbackText = document.getElementById("hudFeedbackText");
@@ -4500,6 +4571,25 @@
         // ALL notes of this step are fulfilled!
         feedbackText.style.color = "#34d399";
         feedbackText.textContent = `✅ Perfect! ${expected.join(" + ")}`;
+
+        // If the next step is a rest, hold the current note visually fulfilled for its remaining musical duration
+        const nextStep = songNoteSteps[currentPracticeStep + 1];
+        const isNextStepRest = nextStep && (!nextStep.expectedPitches || nextStep.expectedPitches.length === 0);
+
+        if (isNextStepRest) {
+          const tempo = currentSong ? (currentSong.tempo || 90) : 90;
+          const noteDurationMs = Math.max(250, (currentStep.beats || 1) * (60000 / tempo));
+          if (currentStep.beats && currentStep.beats > 1) {
+            feedbackText.textContent += ` • hold ${currentStep.beats}b`;
+          }
+          const stepHolding = currentPracticeStep;
+          setTimeout(() => {
+            if (currentPracticeStep === stepHolding && isWaitPracticeMode) {
+              advancePracticeStep();
+            }
+          }, noteDurationMs);
+          return;
+        }
 
         // Advance to next step
         advancePracticeStep();
@@ -5723,12 +5813,19 @@
 
     document.getElementById("hudRestartBtn").addEventListener("click", () => {
       currentPracticeStep = 0;
+      isPracticeSessionStarted = false;
       const scoreContainer = document.getElementById("sheetMusicSection");
       if (scoreContainer) scoreContainer.scrollTop = 0;
       lastScoreScrollTarget = 0;
       lastScoreScrollTime = 0;
       highlightActiveScoreNote(0, false);
-      document.getElementById("hudFeedbackText").textContent = "Piece restarted! Play the first note...";
+      const firstStep = songNoteSteps[0];
+      const nextLabel = (firstStep && firstStep.expectedPitches && firstStep.expectedPitches.length > 0)
+        ? firstStep.expectedPitches.join(" + ")
+        : (songNoteSteps[1] ? songNoteSteps[1].expectedPitches.join(" + ") : "first note");
+      document.getElementById("hudFeedbackText").textContent = (firstStep && (!firstStep.expectedPitches || firstStep.expectedPitches.length === 0))
+        ? `𝄽 Count in: play ${nextLabel} to begin!`
+        : `Piece restarted! Play ${nextLabel}...`;
     });
 
     const hudFeedbackEl = document.getElementById("hudFeedbackText");
@@ -5773,6 +5870,7 @@
       stopPlayback();
       currentSong = song;
       currentPracticeStep = 0;
+      isPracticeSessionStarted = false;
       const scoreContainer = document.getElementById("sheetMusicSection");
       if (scoreContainer) scoreContainer.scrollTop = 0;
       lastScoreScrollTarget = 0;

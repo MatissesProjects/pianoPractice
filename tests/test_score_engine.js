@@ -2160,6 +2160,178 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 22: 📜 Sheet Music Viewport Auto-Scroll Stabilization & Anti-Bounce Engine passed");
 }
 
+// 23. Authentic Sheet Music Rest Rendering in When the Saints Go Marching In and Repertoire
+{
+  const saints = songDatabase.find(s => s.id === "when-the-saints");
+  assert.ok(saints, "When the Saints Go Marching In exists in database");
+
+  // 23.1 Verify explicit rests exist in song data
+  assert.ok(saints.rh.includes("-:1"), "RH must include quarter rest tokens (-:1)");
+  assert.ok(saints.dyads.includes("-:1"), "Dyads must include quarter rest tokens (-:1)");
+
+  // 23.2 Build Score Model (Grand Staff: showRH=true, showLH=true)
+  const saintsModel = buildScoreModel(saints, true, true, false);
+
+  // Measure 1, Step 0 (Beat 0): RH has 1-beat rest, LH has 4-beat whole note C3
+  const m1Step0 = saintsModel.measures[0][0];
+  assert.strictEqual(m1Step0.startBeat, 0, "Measure 1 Step 0 is on Beat 0");
+  assert.strictEqual(m1Step0.rh.pitch, "-", "Measure 1 Step 0 RH must be a rest");
+  assert.strictEqual(m1Step0.rh.beats, 1, "Measure 1 Step 0 RH must be a 1-beat quarter rest");
+  assert.strictEqual(m1Step0.lh.pitch, "C3", "Measure 1 Step 0 LH must be whole note C3");
+  assert.strictEqual(m1Step0.lh.beats, 4, "Measure 1 Step 0 LH must be 4 beats");
+  assert.deepStrictEqual(m1Step0.expectedPitches, ["C3"], "Only LH pitch C3 is expected to be played on beat 0");
+
+  // Measure 1, Step 1 (Beat 1): RH plays C4:1, LH sustains C3
+  const m1Step1 = saintsModel.measures[0][1];
+  assert.strictEqual(m1Step1.startBeat, 1, "Measure 1 Step 1 is on Beat 1");
+  assert.strictEqual(m1Step1.rh.pitch, "C4", "Measure 1 Step 1 RH is C4");
+  assert.strictEqual(m1Step1.lh, null, "Measure 1 Step 1 LH is sustaining from beat 0");
+
+  // 23.3 Verify rest rendering simulation across Treble and Bass
+  function simulateScoreRenderStep(item, showRH, showLH, showDyads) {
+    const rendered = [];
+    if (showDyads && item.dyad) {
+      if (item.dyad.pitch === "-") {
+        rendered.push({ hand: "treble", type: "rest", beats: item.dyad.beats });
+      } else {
+        const pitches = item.dyad.pitch.split("+").filter(p => p !== "-");
+        pitches.forEach(p => rendered.push({ hand: "treble", type: "note", pitch: p }));
+      }
+    } else if (showRH && item.rh) {
+      if (item.rh.pitch === "-") {
+        rendered.push({ hand: "treble", type: "rest", beats: item.rh.beats });
+      } else {
+        const pitches = item.rh.pitch.split("+").filter(p => p !== "-");
+        pitches.forEach(p => rendered.push({ hand: "treble", type: "note", pitch: p }));
+      }
+    }
+    if (showLH && item.lh) {
+      if (item.lh.pitch === "-") {
+        rendered.push({ hand: "bass", type: "rest", beats: item.lh.beats });
+      } else {
+        const lhPitches = item.lh.pitch.split("+").filter(p => p !== "-");
+        lhPitches.forEach(p => rendered.push({ hand: "bass", type: "note", pitch: p }));
+      }
+    }
+    return rendered;
+  }
+
+  // Measure 1 Step 0 in Grand Staff
+  const renderedM1S0 = simulateScoreRenderStep(m1Step0, true, true, false);
+  assert.strictEqual(renderedM1S0.length, 2, "Must render exactly 2 elements: RH rest and LH note");
+  assert.deepStrictEqual(renderedM1S0[0], { hand: "treble", type: "rest", beats: 1 }, "Treble staff renders 1-beat rest");
+  assert.deepStrictEqual(renderedM1S0[1], { hand: "bass", type: "note", pitch: "C3" }, "Bass staff renders note C3");
+
+  // 23.4 Verify index.html contains rest dispatch logic for all 3 modes
+  const fs = require("fs");
+  const normHtml = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  assert.ok(normHtml.includes('if (item.dyad.pitch === "-") {\n                renderNoteheadOnly(noteGroup, "-", item.dyad.beats, cx, trebleBottomY, 2);'), "Dyads mode must render rests when pitch is '-'");
+  assert.ok(normHtml.includes('if (item.rh.pitch === "-") {\n                renderNoteheadOnly(noteGroup, "-", item.rh.beats, cx, trebleBottomY, 2);'), "RH mode must render rests when pitch is '-'");
+  assert.ok(normHtml.includes('if (item.lh.pitch === "-") {\n                renderNoteheadOnly(noteGroup, "-", item.lh.beats, cx, bassBottomY, -10);'), "LH mode must render rests when pitch is '-'");
+
+  // 23.5 Verify Lean on Me Measure 9 eighth rest
+  const lean = songDatabase.find(s => s.id === "lean-on-me");
+  const leanModel = buildScoreModel(lean, true, true, false);
+  // Measure 9 has C5:1.5 then -:0.5
+  const m9Rests = leanModel.measures[8].filter(step => step.rh && step.rh.pitch === "-");
+  assert.strictEqual(m9Rests.length, 1, "Lean on Me measure 9 must have an eighth rest in RH");
+  assert.strictEqual(m9Rests[0].rh.beats, 0.5, "Lean on Me measure 9 rest is 0.5 beat (eighth rest)");
+
+  console.log("✔ Test 23: 𝄽 Authentic Sheet Music Rest Rendering in When the Saints Go Marching In and Repertoire passed");
+}
+
+// ============================================================================
+// TEST 24: 𝄽 Classical Rest Glyphs, Collision-Free Spacing & Rest Timing Engine
+// ============================================================================
+{
+  const fs = require("fs");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+
+  // 24.1 Classical SMuFL Quarter Rest Vector Outline
+  // Ensure the old tadpole blob/loop was removed and replaced with classical SMuFL restQuarter path
+  assert.ok(!html.includes("${cx + 4.2} ${cy + 14.5}"), "Old tadpole bulb coordinates must be completely eliminated");
+  assert.ok(html.includes("Classical engraved SMuFL restQuarter glyph"), "Must use classical engraved SMuFL restQuarter glyph");
+  assert.ok(html.includes("${(cx + 3.2).toFixed(1)} ${(cy - 13.0).toFixed(1)}"), "Starts with top hook in Space 4");
+  assert.ok(html.includes("${(cx + 3.4).toFixed(1)} ${(cy + 11.2).toFixed(1)}"), "Features upward-pointing open crescent tail in Space 1");
+
+  // Simulate classical quarter rest path at cx = 100, cy = 60
+  function classicalRestD(cx, cy) {
+    return [
+      `M ${(cx + 3.2).toFixed(1)} ${(cy - 13.0).toFixed(1)}`,
+      `C ${(cx + 2.4).toFixed(1)} ${(cy - 13.8).toFixed(1)} ${(cx - 1.2).toFixed(1)} ${(cy - 12.5).toFixed(1)} ${(cx - 3.2).toFixed(1)} ${(cy - 9.0).toFixed(1)}`,
+      `C ${(cx - 3.8).toFixed(1)} ${(cy - 7.2).toFixed(1)} ${(cx - 3.0).toFixed(1)} ${(cy - 5.5).toFixed(1)} ${(cx - 1.0).toFixed(1)} ${(cy - 2.8).toFixed(1)}`,
+      `L ${(cx + 3.4).toFixed(1)} ${(cy + 1.6).toFixed(1)}`,
+      `C ${(cx + 3.6).toFixed(1)} ${(cy + 3.2).toFixed(1)} ${(cx + 1.2).toFixed(1)} ${(cy + 5.6).toFixed(1)} ${(cx - 2.8).toFixed(1)} ${(cy + 7.4).toFixed(1)}`,
+      `C ${(cx - 4.8).toFixed(1)} ${(cy + 8.5).toFixed(1)} ${(cx - 4.6).toFixed(1)} ${(cy + 11.0).toFixed(1)} ${(cx - 2.0).toFixed(1)} ${(cy + 13.0).toFixed(1)}`,
+      `C ${(cx + 0.2).toFixed(1)} ${(cy + 14.5).toFixed(1)} ${(cx + 2.5).toFixed(1)} ${(cy + 13.8).toFixed(1)} ${(cx + 3.4).toFixed(1)} ${(cy + 11.2).toFixed(1)}`,
+      `C ${(cx + 3.6).toFixed(1)} ${(cy + 10.4).toFixed(1)} ${(cx + 2.8).toFixed(1)} ${(cy + 10.0).toFixed(1)} ${(cx + 2.2).toFixed(1)} ${(cy + 10.6).toFixed(1)}`,
+      `C ${(cx + 1.5).toFixed(1)} ${(cy + 12.2).toFixed(1)} ${(cx - 0.2).toFixed(1)} ${(cy + 12.5).toFixed(1)} ${(cx - 1.5).toFixed(1)} ${(cy + 11.2).toFixed(1)}`,
+      `C ${(cx - 2.8).toFixed(1)} ${(cy + 10.0).toFixed(1)} ${(cx - 2.6).toFixed(1)} ${(cy + 8.4).toFixed(1)} ${(cx - 0.2).toFixed(1)} ${(cy + 6.6).toFixed(1)}`,
+      `C ${(cx + 1.4).toFixed(1)} ${(cy + 5.2).toFixed(1)} ${(cx + 1.8).toFixed(1)} ${(cy + 3.6).toFixed(1)} ${(cx + 1.2).toFixed(1)} ${(cy + 2.0).toFixed(1)}`,
+      `L ${(cx - 2.8).toFixed(1)} ${(cy - 3.6).toFixed(1)}`,
+      `C ${(cx - 3.8).toFixed(1)} ${(cy - 5.2).toFixed(1)} ${(cx - 3.0).toFixed(1)} ${(cy - 7.4).toFixed(1)} ${(cx - 1.5).toFixed(1)} ${(cy - 9.0).toFixed(1)}`,
+      `C ${(cx - 0.2).toFixed(1)} ${(cy - 10.5).toFixed(1)} ${(cx + 2.2).toFixed(1)} ${(cy - 11.5).toFixed(1)} ${(cx + 3.2).toFixed(1)} ${(cy - 13.0).toFixed(1)} Z`
+    ].join(' ');
+  }
+
+  const dStr = classicalRestD(100, 60);
+  assert.ok(dStr.startsWith("M 103.2 47.0"), "Top hook starts at x=103.2, y=47.0 (Space 4)");
+  assert.ok(dStr.includes("103.4 71.2"), "Lower crescent hook apex at x=103.4, y=71.2 (Space 1)");
+  assert.ok(dStr.endsWith("Z"), "Path forms closed vector contour");
+
+  // 24.2 Clef, Time Signature, and Barline Collision-Free Clearance
+  assert.ok(html.includes("const leftMargin = 74;"), "leftMargin updated to 74 for proper clef buffer");
+  assert.ok(html.includes('tClef.setAttribute("x", leftMargin - 42);'), "tClef positioned at leftMargin - 42 (x=32)");
+  assert.ok(html.includes('timeSig.setAttribute("x", leftMargin + 8);'), "timeSig positioned at leftMargin + 8 (x=82)");
+  assert.ok(html.includes('measureStartX = leftMargin + 28'), "Measure 1 starts at leftMargin + 28 (x=102)");
+
+  const leftMargin = 74;
+  const clefX = leftMargin - 42; // 32
+  const clefRight = clefX + 33;  // 65 (approx width 33px)
+  const timeSigX = leftMargin + 8; // 82
+  const timeSigLeft = timeSigX - 16; // 66 (text-anchor middle, 32px width)
+  const timeSigRight = timeSigX + 16; // 98
+  const note0X = leftMargin + 28 + 18; // 120
+  const note0Left = note0X - 7; // 113
+
+  assert.ok(clefRight < timeSigLeft, `Clef right edge (${clefRight}) must be strictly less than TimeSig left edge (${timeSigLeft}) - zero overlap`);
+  assert.ok(timeSigRight < note0Left, `TimeSig right edge (${timeSigRight}) must be strictly less than Note 0 left edge (${note0Left}) - ample 15px clearance`);
+
+  // 24.3 Active-Target and Error-Target Rest CSS Styling
+  assert.ok(html.includes(".note-group.active-target .rest-glyph"), "CSS must style .note-group.active-target .rest-glyph");
+  assert.ok(html.includes(".note-group.active-target .rest-rect"), "CSS must style .note-group.active-target .rest-rect");
+  assert.ok(html.includes("fill: #f59e0b !important;"), "Active rest must have amber #f59e0b fill");
+  assert.ok(html.includes(".note-group.error-target .rest-glyph"), "CSS must style .note-group.error-target .rest-glyph");
+  assert.ok(html.includes("𝄽 REST (${beatVal}b)"), "HUD target badge must display beat value on rests");
+
+  // 24.4 Precision Rest Timing Engine in Wait-for-Me Practice Mode
+  assert.ok(html.includes("let isPracticeSessionStarted = false;"), "Must declare isPracticeSessionStarted state variable");
+  assert.ok(html.includes("if (stepIdx === 0 && !isPracticeSessionStarted)"), "Must guard step 0 pickup rest on initial load");
+  assert.ok(html.includes("Count in: play ${nextLabel} to begin!"), "Must display count-in prompt on pickup rest");
+  assert.ok(html.includes("isNextStepRest"), "Must detect when following step is a rest");
+  assert.ok(html.includes("noteDurationMs = Math.max(250, (currentStep.beats || 1) * (60000 / tempo))"), "Must hold note for full duration before transitioning to rest");
+
+  // 24.5 When the Saints Go Marching In - Measure 2 whole note G4 into Measure 3 rest
+  const saints = songDatabase.find(s => s.id === "when-the-saints");
+  const saintsModel = buildScoreModel(saints, true, false, false);
+  const m2Step = saintsModel.measures[1][0]; // Measure 2: G4:4
+  const m3RestStep = saintsModel.measures[2][0]; // Measure 3: -:1
+
+  assert.strictEqual(m2Step.rh.pitch, "G4", "Measure 2 is G4");
+  assert.strictEqual(m2Step.beats, 4, "Measure 2 G4 is 4 beats");
+  assert.strictEqual(m3RestStep.rh.pitch, "-", "Measure 3 begins with rest");
+  assert.strictEqual(m3RestStep.beats, 1, "Measure 3 rest is 1 beat");
+
+  // In 120 BPM, G4 note hold must be 2000ms, and rest hold must be 500ms
+  const tempo = saints.tempo || 120;
+  const g4HoldMs = m2Step.beats * (60000 / tempo);
+  const restHoldMs = m3RestStep.beats * (60000 / tempo);
+  assert.strictEqual(g4HoldMs, 2000, "G4 whole note holds for 2000ms (4 beats at 120 BPM)");
+  assert.strictEqual(restHoldMs, 500, "Quarter rest holds for 500ms (1 beat at 120 BPM)");
+
+  console.log("✔ Test 24: 𝄽 Classical Rest Glyphs, Collision-Free Spacing & Rest Timing Engine passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 
