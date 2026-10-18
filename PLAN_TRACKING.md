@@ -236,3 +236,57 @@
     - Added Test 24 to `tests/test_score_engine.js` asserting classical quarter rest SMuFL geometry, clef/time-signature/measure-1 boundary clearance, active rest CSS styling, pickup rest count-in guard, and note-to-rest duration holding calculations.
     - All 24 tests in `tests/test_score_engine.js` and all 13 tests in `tests/test_education.js` passing with 100% success.
 
+- [x] **Milestone 24: Keyboard Size Song Allowance & Range Filtering Engine**
+  - [x] **Core Musical Range Engine in `theory.js` (`getSongPitchRange`, `evaluateSongKeyboardCompatibility`)**:
+    - Algorithmic MIDI pitch extraction across voices (`rh`, `lh`, `dyads`), disregarding rests and ties.
+    - Computes `minMidi`, `maxMidi`, `minPitch`, `maxPitch`, total pitch span, and hand-specific ranges (`rh`, `lh`, `dyads`).
+    - Evaluates exact range fit (`fitsExact`), span fit (`fitsSpan`), semitone shift delta (`shiftNeeded`), out-of-bounds notes below/above, and minimum standard preset recommendations.
+    - Exports `STANDARD_KEYBOARD_PRESETS` (88, 76, 73, 61, 49, 37, 32, 25 keys).
+  - [x] **Catalog Repertoire Allowance / Disallowance & Visual Range Badges**:
+    - Compact range pill on every catalog card: `Range: C4–G4 (8k)`.
+    - Real-time compatibility tags: `✓ Fits 37k` (emerald), `↔ Shift (+5)` (sky), and `🚫 Needs 49k` (rose).
+    - When filtered or out of range, cards receive `.disallowed-song` styling with dashed borders, opacity reduction, and a 1-click `⚡ Auto-Fit (49k) & Load` action.
+    - Added dedicated `🎹 Fits My Keyboard (${count})` quick filter pill in `#filterPillsContainer`.
+    - Added toolbar in `.catalog-header` with `🎹 Filter to Keyboard` toggle, Scope selector (`Active Hands Only` vs `Full Arrangement`), and live playable count badge (`${playableCount} / 56 Playable`).
+  - [x] **Song Dropdown (`#songDropdown`) Synchronization & Gating**:
+    - When "Filter to Keyboard" is active, song dropdown excludes out-of-range pieces or displays only playable repertoire.
+    - When unfiltered, out-of-range options are tagged with `[⚠️ Needs 49k]`.
+  - [x] **Interactive Out-of-Range Warning & 1-Click Auto-Fit Keyboard Assist**:
+    - Non-intrusive banner (`#keyboardRangeWarningBanner`) above `#sheetMusicSection` when an out-of-range song is loaded or when keyboard shrinks.
+    - Features `⚡ Auto-Fit Keyboard` (auto-expands to recommended preset), `↔ Shift to Fit` (adjusts start note), and `✕ Dismiss`.
+  - [x] **Reactive State Updates & LocalStorage Persistence**:
+    - Synchronized toggles across dock (`#kbDockFilterCheckbox`) and catalog (`#catalogKbFilterToggle`).
+    - Re-evaluates filter pills, cards, dropdown, and warning banner whenever keyboard preset, key count, start note, or hand toggles (RH/LH/Dyads) change (`onKeyboardLayoutChanged`).
+    - Persists preferences `piano_filter_by_keyboard` and `piano_keyboard_filter_scope` in `localStorage`.
+  - [x] **Comprehensive Automated Verification Test Suite (`tests/test_score_engine.js` Test 25)**:
+    - Tests 25.1–25.6 verifying module exports, pitch range calculations, preset evaluations across 25/37/49/88 keys, DOM elements, CSS rules, auto-fit logic, and data attributes.
+    - All 25 score engine tests and all 13 education tests passing with 100% success.
+
+- [x] **Milestone 25: Interactive Piano Notes Cheat Sheet, Keyboard Colorization & Live Sustain Integration**
+  - [x] **Music Theory Cheat Sheet Engine (`theory.js`)**:
+    - [x] Diatonic note colors: C (`#ef4444` red), D (`#8b5cf6` purple), E (`#1e40af` navy), F (`#0284c7` blue), G (`#14b8a6` teal), A (`#f97316` orange), B (`#10b981` green)
+    - [x] Data lookup: `getCheatSheetNoteColor`, `getCheatSheetStaffInfo`, `CHEAT_SHEET_NOTE_COLORS`, `CHEAT_SHEET_STAFF_MAP`, `CHEAT_SHEET_NOTES_RANGE`
+    - [x] Staff geometry mapping: Bass clef, Treble clef, Middle C bridging, staff lines and spaces (G2 to G5 range)
+  - [x] **Piano Keyboard Dock Visual Colorization (`index.html`)**:
+    - [x] Note letter cheat badges on white keys in matching colors with octave indicator
+    - [x] Prominent red "MIDDLE C" badge matching cheat sheet diagram
+    - [x] Interactive toggle `#toggleCheatSheetColors` in keyboard controls toolbar with LocalStorage persistence
+    - [x] Staff position & clef tooltips on key hover and touch
+  - [x] **Live Sustain & Chord Recognizer Integration (`index.html`)**:
+    - [x] Sustain lane badges tinted in note's authentic cheat sheet color
+    - [x] Staff position badge added to sustain lanes (`Treble Line 2`, `Bass Space 2`, `⭐ Middle C`)
+    - [x] Sustain ribbon rail fill and glowing spark head styled with note's cheat sheet color gradient
+    - [x] Enable sustain lane generation from on-screen keyboard mouse clicks and touch taps
+    - [x] Chord pill constituent note color indicators
+  - [x] **Interactive Piano Notes Cheat Sheet Visualizer (`index.html`)**:
+    - [x] Dedicated modal `#cheatSheetModal` with interactive SVG `#cheatSheetSvg` faithfully reproducing `pianoNotesCheatSheet.png`
+    - [x] 22-key keyboard on top (G2 to G5), Grand Staff on bottom (Treble & Bass clefs)
+    - [x] Color-coded vertical dotted guidelines connecting each piano key to its staff notehead
+    - [x] Red central guideline bridging Middle C between staves
+    - [x] Interactive click-to-play: clicking key or notehead plays tone, highlights guideline, updates sustain, and displays mnemonic guide
+    - [x] Dock launch button `🎼 Piano Notes Cheat Sheet` and Theory Lessons link
+  - [x] **Comprehensive Automated Verification Test Suite (`tests/test_score_engine.js` Test 26)**:
+    - [x] Tests 26.1–26.5 verifying theory exports, color definitions, staff positions, DOM elements, sustain lane styling, mouse click sustain creation, and guidelines calculations
+    - [x] All 26 score engine tests and all 13 education tests passing with 100% success.
+
+

@@ -1031,6 +1031,274 @@
     return { name: pitchPills, type: "Multi-Note Cluster", root: bassName };
   }
 
+  // STANDARD KEYBOARD HARDWARE PRESETS
+  const STANDARD_KEYBOARD_PRESETS = [
+    { id: "88", name: "88 Keys (Full Grand: A0 – C8)", count: 88, startMidi: 21, endMidi: 108 },
+    { id: "76", name: "76 Keys (Stage: E1 – G7)", count: 76, startMidi: 28, endMidi: 103 },
+    { id: "73", name: "73 Keys (Stage: E1 – E7)", count: 73, startMidi: 28, endMidi: 100 },
+    { id: "61", name: "61 Keys (Standard: C2 – C7)", count: 61, startMidi: 36, endMidi: 96 },
+    { id: "49", name: "49 Keys (Studio: C2 – C6)", count: 49, startMidi: 36, endMidi: 84 },
+    { id: "37", name: "37 Keys (Default: C2 – C5)", count: 37, startMidi: 36, endMidi: 72 },
+    { id: "32", name: "32 Keys (Mini Synth: F2 – C5)", count: 32, startMidi: 41, endMidi: 72 },
+    { id: "25", name: "25 Keys (Mini: C3 – C5)", count: 25, startMidi: 48, endMidi: 72 }
+  ];
+
+  function extractTokensPitches(voiceStr) {
+    if (!voiceStr) return [];
+    const tokens = voiceStr.split("|").join(" ").split(/\s+/).filter(Boolean);
+    const pitches = [];
+    for (const t of tokens) {
+      const clean = t.replace(/~/g, "");
+      const [pitchPart] = clean.split(":");
+      if (!pitchPart || pitchPart === "-") continue;
+      const subNotes = pitchPart.split("+").filter(p => p && p !== "-");
+      pitches.push(...subNotes);
+    }
+    return pitches;
+  }
+
+  function getRangeFromMidis(midiArray) {
+    if (!midiArray || midiArray.length === 0) {
+      return { minMidi: null, maxMidi: null, minPitch: null, maxPitch: null, span: 0, count: 0 };
+    }
+    const minMidi = Math.min(...midiArray);
+    const maxMidi = Math.max(...midiArray);
+    return {
+      minMidi,
+      maxMidi,
+      minPitch: midiToPitch(minMidi),
+      maxPitch: midiToPitch(maxMidi),
+      span: maxMidi - minMidi + 1,
+      count: midiArray.length
+    };
+  }
+
+  function getSongPitchRange(song, options = { rh: true, lh: true, dyads: true }) {
+    if (!song) return { minMidi: 60, maxMidi: 60, minPitch: "C4", maxPitch: "C4", span: 1 };
+    
+    const rhPitches = extractTokensPitches(song.rh);
+    const lhPitches = extractTokensPitches(song.lh);
+    const dyadPitches = extractTokensPitches(song.dyads);
+
+    const rhMidis = rhPitches.map(p => pitchToMidi(p)).filter(m => m !== null);
+    const lhMidis = lhPitches.map(p => pitchToMidi(p)).filter(m => m !== null);
+    const dyadMidis = dyadPitches.map(p => pitchToMidi(p)).filter(m => m !== null);
+
+    const rhRange = getRangeFromMidis(rhMidis);
+    const lhRange = getRangeFromMidis(lhMidis);
+    const dyadRange = getRangeFromMidis(dyadMidis);
+
+    const allMidis = [...rhMidis, ...lhMidis, ...dyadMidis];
+    const totalRange = getRangeFromMidis(allMidis);
+
+    const effectiveMidis = [];
+    if (options.rh !== false) effectiveMidis.push(...rhMidis);
+    if (options.lh !== false) effectiveMidis.push(...lhMidis);
+    if (options.dyads !== false) effectiveMidis.push(...dyadMidis);
+
+    const selectedMidis = effectiveMidis.length > 0 ? effectiveMidis : allMidis;
+    const effectiveRange = getRangeFromMidis(selectedMidis);
+
+    const presetsAscending = [...STANDARD_KEYBOARD_PRESETS].sort((a, b) => a.count - b.count);
+    const minSpanPreset = presetsAscending.find(p => p.count >= effectiveRange.span) || STANDARD_KEYBOARD_PRESETS[0];
+    const minExactPreset = presetsAscending.find(p => p.startMidi <= effectiveRange.minMidi && p.endMidi >= effectiveRange.maxMidi) || STANDARD_KEYBOARD_PRESETS[0];
+
+    return {
+      minMidi: effectiveRange.minMidi,
+      maxMidi: effectiveRange.maxMidi,
+      minPitch: effectiveRange.minPitch,
+      maxPitch: effectiveRange.maxPitch,
+      span: effectiveRange.span,
+      rh: rhRange,
+      lh: lhRange,
+      dyads: dyadRange,
+      total: totalRange,
+      minSpanPreset,
+      minExactPreset
+    };
+  }
+
+  function evaluateSongKeyboardCompatibility(song, keyboardConfig = {}, options = { rh: true, lh: true, dyads: true }) {
+    const startMidi = typeof keyboardConfig.startMidi === "number" ? keyboardConfig.startMidi : 36;
+    const keyCount = typeof keyboardConfig.keyCount === "number" ? keyboardConfig.keyCount : 37;
+    const endMidi = startMidi + keyCount - 1;
+
+    const range = getSongPitchRange(song, options);
+    if (range.minMidi === null) {
+      return {
+        fitsExact: true,
+        fitsSpan: true,
+        status: "fits",
+        statusMessage: "Fits keyboard",
+        notesBelow: 0,
+        notesAbove: 0,
+        shiftNeeded: 0,
+        range,
+        recommendedPreset: "37"
+      };
+    }
+
+    const fitsExact = (range.minMidi >= startMidi && range.maxMidi <= endMidi);
+    const fitsSpan = (range.span <= keyCount);
+    const notesBelow = Math.max(0, startMidi - range.minMidi);
+    const notesAbove = Math.max(0, range.maxMidi - endMidi);
+
+    let shiftNeeded = 0;
+    if (fitsSpan && !fitsExact) {
+      if (range.minMidi < startMidi) {
+        shiftNeeded = range.minMidi - startMidi;
+      } else if (range.maxMidi > endMidi) {
+        shiftNeeded = range.maxMidi - endMidi;
+      }
+    }
+
+    let status = "fits";
+    let statusMessage = `Fits ${keyCount}-Key keyboard (${range.minPitch} – ${range.maxPitch})`;
+
+    if (!fitsExact) {
+      if (fitsSpan) {
+        status = "shift_needed";
+        const octaves = Math.round(shiftNeeded / 12);
+        const octStr = Math.abs(octaves) >= 1 ? ` (${octaves > 0 ? '+' : ''}${octaves} oct)` : "";
+        statusMessage = `Fits with shift: ${shiftNeeded > 0 ? '+' : ''}${shiftNeeded} semitones${octStr}`;
+      } else {
+        status = "exceeds";
+        statusMessage = `Exceeds ${keyCount}-Key keyboard: needs ${range.span} keys (${range.minPitch} – ${range.maxPitch})`;
+      }
+    }
+
+    return {
+      fitsExact,
+      fitsSpan,
+      status,
+      statusMessage,
+      notesBelow,
+      notesAbove,
+      shiftNeeded,
+      range,
+      recommendedPreset: range.minExactPreset ? range.minExactPreset.id : "88",
+      recommendedPresetName: range.minExactPreset ? range.minExactPreset.name : "88 Keys"
+    };
+  }
+
+  // ==========================================
+  // PIANO NOTES CHEAT SHEET ENGINE & DATA MODEL
+  // Based on pianoNotesCheatSheet.png
+  // ==========================================
+  const CHEAT_SHEET_NOTE_COLORS = {
+    'C': '#ef4444', // Vibrant Red (Middle C prominent)
+    'D': '#8b5cf6', // Purple / Violet
+    'E': '#1e40af', // Navy / Deep Indigo
+    'F': '#0284c7', // Bright Sky Blue / Cyan
+    'G': '#14b8a6', // Seafoam / Mint Teal
+    'A': '#f97316', // Warm Orange / Peach
+    'B': '#10b981'  // Emerald Green
+  };
+
+  const CHEAT_SHEET_ACCIDENTAL_COLORS = {
+    'C#': '#dc2626', 'Db': '#dc2626',
+    'D#': '#7c3aed', 'Eb': '#7c3aed',
+    'F#': '#0284c7', 'Gb': '#0284c7',
+    'G#': '#0d9488', 'Ab': '#0d9488',
+    'A#': '#ea580c', 'Bb': '#ea580c'
+  };
+
+  function getCheatSheetNoteColor(pitchStr) {
+    if (!pitchStr || pitchStr === "-") return "#64748b";
+    const clean = pitchStr.trim().replace(/[0-9]/g, "");
+    if (CHEAT_SHEET_ACCIDENTAL_COLORS[clean]) {
+      return CHEAT_SHEET_ACCIDENTAL_COLORS[clean];
+    }
+    const letter = clean.charAt(0).toUpperCase();
+    return CHEAT_SHEET_NOTE_COLORS[letter] || "#64748b";
+  }
+
+  // Grand staff & mnemonic definitions from pianoNotesCheatSheet.png
+  const CHEAT_SHEET_STAFF_MAP = {
+    'G2': { clef: 'bass', role: 'line', index: 1, posText: 'Bass Clef • Line 1', mnemonic: 'Good (Line 1)' },
+    'A2': { clef: 'bass', role: 'space', index: 1, posText: 'Bass Clef • Space 1', mnemonic: 'All (Space 1)' },
+    'B2': { clef: 'bass', role: 'line', index: 2, posText: 'Bass Clef • Line 2', mnemonic: 'Boys (Line 2)' },
+    'C3': { clef: 'bass', role: 'space', index: 2, posText: 'Bass Clef • Space 2', mnemonic: 'Cows (Space 2)' },
+    'D3': { clef: 'bass', role: 'line', index: 3, posText: 'Bass Clef • Line 3', mnemonic: 'Do (Line 3)' },
+    'E3': { clef: 'bass', role: 'space', index: 3, posText: 'Bass Clef • Space 3', mnemonic: 'Eat (Space 3)' },
+    'F3': { clef: 'bass', role: 'line', index: 4, posText: 'Bass Clef • Line 4 (F Clef Line)', mnemonic: 'Fine (Line 4)' },
+    'G3': { clef: 'bass', role: 'space', index: 4, posText: 'Bass Clef • Space 4', mnemonic: 'Grass (Space 4)' },
+    'A3': { clef: 'bass', role: 'line', index: 5, posText: 'Bass Clef • Line 5 (Top line)', mnemonic: 'Always (Line 5)', altClef: 'treble', altRole: 'ledger', altPosText: 'Treble • 2nd Ledger Line Below' },
+    'B3': { clef: 'bass', role: 'space_above', index: 5, posText: 'Bass Clef • Space Above Line 5', mnemonic: 'Above Staff', altClef: 'treble', altRole: 'space_below_ledger', altPosText: 'Treble • Space Below Middle C' },
+    'C4': { clef: 'grand-bridge', role: 'ledger', index: 0, isMiddleC: true, posText: '⭐ MIDDLE C • Center Bridge Ledger Line', mnemonic: 'Middle C (Central Ledger Line)' },
+    'D4': { clef: 'treble', role: 'space_below', index: 1, posText: 'Treble Clef • Space Below Line 1', mnemonic: 'Below Staff', altClef: 'bass', altRole: 'space_above_ledger', altPosText: 'Bass • Space Above Middle C' },
+    'E4': { clef: 'treble', role: 'line', index: 1, posText: 'Treble Clef • Line 1 (Bottom line)', mnemonic: 'Every (Line 1)', altClef: 'bass', altRole: 'ledger', altPosText: 'Bass • 2nd Ledger Line Above' },
+    'F4': { clef: 'treble', role: 'space', index: 1, posText: 'Treble Clef • Space 1', mnemonic: 'F (FACE Space 1)' },
+    'G4': { clef: 'treble', role: 'line', index: 2, posText: 'Treble Clef • Line 2 (G Clef Line)', mnemonic: 'Good (Line 2)' },
+    'A4': { clef: 'treble', role: 'space', index: 2, posText: 'Treble Clef • Space 2', mnemonic: 'A (FACE Space 2)' },
+    'B4': { clef: 'treble', role: 'line', index: 3, posText: 'Treble Clef • Line 3', mnemonic: 'Boy (Line 3)' },
+    'C5': { clef: 'treble', role: 'space', index: 3, posText: 'Treble Clef • Space 3', mnemonic: 'C (FACE Space 3)' },
+    'D5': { clef: 'treble', role: 'line', index: 4, posText: 'Treble Clef • Line 4', mnemonic: 'Does (Line 4)' },
+    'E5': { clef: 'treble', role: 'space', index: 4, posText: 'Treble Clef • Space 4', mnemonic: 'E (FACE Space 4)' },
+    'F5': { clef: 'treble', role: 'line', index: 5, posText: 'Treble Clef • Line 5 (Top line)', mnemonic: 'Fine (Line 5)' },
+    'G5': { clef: 'treble', role: 'space_above', index: 5, posText: 'Treble Clef • Space Above Line 5', mnemonic: 'Above Staff' }
+  };
+
+  function getCheatSheetStaffInfo(pitchStr) {
+    if (!pitchStr || pitchStr === "-") return null;
+    const clean = pitchStr.trim();
+    const letter = clean.charAt(0).toUpperCase();
+    const octMatch = clean.match(/[0-9]/);
+    const oct = octMatch ? parseInt(octMatch[0], 10) : 4;
+    const isMidC = (clean === "C4");
+    const color = getCheatSheetNoteColor(clean);
+    const midi = pitchToMidi(clean);
+    const freq = midiToFreq(midi);
+
+    const baseInfo = CHEAT_SHEET_STAFF_MAP[clean];
+    if (baseInfo) {
+      return {
+        pitch: clean,
+        letter,
+        octave: oct,
+        color,
+        midi,
+        freq,
+        isMiddleC: isMidC,
+        clef: baseInfo.clef,
+        staffRole: baseInfo.role,
+        staffIndex: baseInfo.index,
+        staffPosition: baseInfo.posText,
+        mnemonic: baseInfo.mnemonic,
+        altClef: baseInfo.altClef || null,
+        altRole: baseInfo.altRole || null,
+        altPosText: baseInfo.altPosText || null
+      };
+    }
+
+    // Extrapolate for pitches outside the standard 22-note range
+    const clef = (midi >= 60) ? "treble" : "bass";
+    return {
+      pitch: clean,
+      letter,
+      octave: oct,
+      color,
+      midi,
+      freq,
+      isMiddleC: isMidC,
+      clef: clef,
+      staffRole: 'extended',
+      staffIndex: 0,
+      staffPosition: `${clef === "treble" ? "High Treble" : "Low Bass"} • Octave ${oct}`,
+      mnemonic: `${letter} in Octave ${oct}`,
+      altClef: null,
+      altRole: null,
+      altPosText: null
+    };
+  }
+
+  // Canonical 22 diatonic white keys from pianoNotesCheatSheet.png (G2 to G5)
+  const CHEAT_SHEET_NOTES_RANGE = [
+    "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "A3", "B3",
+    "C4",
+    "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5"
+  ].map(p => getCheatSheetStaffInfo(p));
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -1069,7 +1337,16 @@
     getSRSMasteryLevel,
     getNumeralChordInfo,
     optimizeProgressionVoiceLeading,
-    identifyActiveChord
+    identifyActiveChord,
+    STANDARD_KEYBOARD_PRESETS,
+    getSongPitchRange,
+    evaluateSongKeyboardCompatibility,
+    CHEAT_SHEET_NOTE_COLORS,
+    CHEAT_SHEET_ACCIDENTAL_COLORS,
+    getCheatSheetNoteColor,
+    CHEAT_SHEET_STAFF_MAP,
+    getCheatSheetStaffInfo,
+    CHEAT_SHEET_NOTES_RANGE
   };
 });
 

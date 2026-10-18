@@ -2332,7 +2332,207 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 24: 𝄽 Classical Rest Glyphs, Collision-Free Spacing & Rest Timing Engine passed");
 }
 
+// ============================================================================
+// TEST 25: 🎹 Keyboard Size Song Allowance & Range Filtering Engine
+// ============================================================================
+{
+  const fs = require("fs");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+
+  // 25.1 Verify Theory Module Exports
+  assert.ok(Array.isArray(MusicTheory.STANDARD_KEYBOARD_PRESETS), "Must export STANDARD_KEYBOARD_PRESETS");
+  assert.strictEqual(MusicTheory.STANDARD_KEYBOARD_PRESETS.length, 8, "Must define 8 standard keyboard presets");
+  assert.strictEqual(typeof MusicTheory.getSongPitchRange, "function", "Must export getSongPitchRange function");
+  assert.strictEqual(typeof MusicTheory.evaluateSongKeyboardCompatibility, "function", "Must export evaluateSongKeyboardCompatibility function");
+
+  // 25.2 Pitch Range Calculations Across Repertoire
+  const leanOnMe = songDatabase.find(s => s.id === "lean-on-me");
+  assert.ok(leanOnMe, "Lean on Me must exist in repertoire");
+  const leanRange = MusicTheory.getSongPitchRange(leanOnMe);
+  assert.strictEqual(leanRange.minPitch, "F2", "Lean on Me lowest note is F2");
+  assert.strictEqual(leanRange.maxPitch, "F5", "Lean on Me highest note is F5");
+  assert.strictEqual(leanRange.span, 37, "Lean on Me spans 37 semitones");
+  assert.strictEqual(leanRange.rh.minPitch, "C4", "Lean on Me RH lowest note is C4");
+  assert.strictEqual(leanRange.rh.maxPitch, "F5", "Lean on Me RH highest note is F5");
+  assert.strictEqual(leanRange.rh.span, 18, "Lean on Me RH spans 18 keys");
+
+  const ode = songDatabase.find(s => s.id === "ode-to-joy");
+  assert.ok(ode, "Ode to Joy must exist");
+  const odeRange = MusicTheory.getSongPitchRange(ode);
+  assert.strictEqual(odeRange.minPitch, "G2", "Ode to Joy min pitch G2");
+  assert.strictEqual(odeRange.maxPitch, "G4", "Ode to Joy max pitch G4");
+  assert.strictEqual(odeRange.span, 25, "Ode to Joy spans 25 keys");
+
+  // 25.3 Compatibility Evaluation across Standard Presets
+  // Preset 25 Keys (C3 to C5, MIDI 48 to 72)
+  const kb25 = { startMidi: 48, keyCount: 25 };
+  const leanEval25 = MusicTheory.evaluateSongKeyboardCompatibility(leanOnMe, kb25);
+  assert.strictEqual(leanEval25.status, "exceeds", "Full Lean on Me exceeds 25 keys");
+  assert.strictEqual(leanEval25.fitsExact, false, "Lean on Me does not fit exact on 25 keys");
+  assert.strictEqual(leanEval25.fitsSpan, false, "Lean on Me 37-key span cannot fit on 25 keys");
+  assert.strictEqual(leanEval25.recommendedPreset, "49", "Recommends 49 keys for Lean on Me (F2-F5)");
+
+  // Lean on Me RH only on 25 keys
+  const leanEval25RH = MusicTheory.evaluateSongKeyboardCompatibility(leanOnMe, kb25, { rh: true, lh: false, dyads: false });
+  assert.strictEqual(leanEval25RH.status, "shift_needed", "Lean on Me RH fits 25 keys with octave/semitone shift");
+  assert.strictEqual(leanEval25RH.fitsSpan, true, "18 key span fits within 25 keys");
+  assert.strictEqual(leanEval25RH.shiftNeeded, 5, "Requires +5 semitone shift");
+
+  // Mary Had a Little Lamb RH only on 25 keys
+  const mary = songDatabase.find(s => s.id === "mary-had-a-little-lamb");
+  assert.ok(mary, "Mary Had a Little Lamb must exist");
+  const maryEval25RH = MusicTheory.evaluateSongKeyboardCompatibility(mary, kb25, { rh: true, lh: false, dyads: false });
+  assert.strictEqual(maryEval25RH.status, "fits", "Mary Had a Little Lamb RH (C4-G4) fits exact on 25 keys (C3-C5)");
+  assert.strictEqual(maryEval25RH.fitsExact, true);
+
+  // Ode to Joy on 37 Keys (C2 to C5, MIDI 36 to 72)
+  const kb37 = { startMidi: 36, keyCount: 37 };
+  const odeEval37 = MusicTheory.evaluateSongKeyboardCompatibility(ode, kb37);
+  assert.strictEqual(odeEval37.status, "fits", "Ode to Joy fits exact on 37 keys");
+  assert.strictEqual(odeEval37.fitsExact, true);
+
+  // Lean on Me on 37 Keys (F2 to F5, span 37)
+  const leanEval37 = MusicTheory.evaluateSongKeyboardCompatibility(leanOnMe, kb37);
+  assert.strictEqual(leanEval37.status, "shift_needed", "Lean on Me fits 37 keys if shifted to start at F2");
+  assert.strictEqual(leanEval37.fitsSpan, true, "Span 37 fits count 37");
+  assert.strictEqual(leanEval37.shiftNeeded, 5, "Requires +5 semitone shift from C2 to F2");
+
+  // 49 Keys (C2 to C6, MIDI 36 to 84) encompasses all repertoire pieces
+  const kb49 = { startMidi: 36, keyCount: 49 };
+  songDatabase.forEach(song => {
+    const comp = MusicTheory.evaluateSongKeyboardCompatibility(song, kb49);
+    assert.strictEqual(comp.fitsSpan, true, `${song.title} span must fit within 49 keys`);
+    assert.strictEqual(comp.fitsExact, true, `${song.title} must fit exact on standard 49-key range`);
+  });
+
+  // 88 Keys (Full Grand) fits all 56 songs exact
+  const kb88 = { startMidi: 21, keyCount: 88 };
+  songDatabase.forEach(song => {
+    const comp = MusicTheory.evaluateSongKeyboardCompatibility(song, kb88);
+    assert.strictEqual(comp.fitsExact, true, `${song.title} must fit exact on 88 keys`);
+  });
+
+  // 25.4 UI DOM Markup & Filter Toolbar Verification
+  assert.ok(html.includes('id="keyboardRangeWarningBanner"'), "Must include keyboardRangeWarningBanner in HTML");
+  assert.ok(html.includes('id="kbWarningAutoFitBtn"'), "Must include kbWarningAutoFitBtn");
+  assert.ok(html.includes('id="kbWarningShiftBtn"'), "Must include kbWarningShiftBtn");
+  assert.ok(html.includes('id="kbWarningDismissBtn"'), "Must include kbWarningDismissBtn");
+  assert.ok(html.includes('id="catalogKbFilterToggle"'), "Must include catalogKbFilterToggle");
+  assert.ok(html.includes('id="kbDockFilterCheckbox"'), "Must include kbDockFilterCheckbox in shared keyboard dock");
+  assert.ok(html.includes('id="catalogKbScopeSelect"'), "Must include catalogKbScopeSelect");
+  assert.ok(html.includes('id="keyboardFilterStatsBadge"'), "Must include keyboardFilterStatsBadge");
+
+  // 25.5 CSS Styling Verification
+  assert.ok(html.includes('.card-range-badge'), "Must include .card-range-badge CSS rule");
+  assert.ok(html.includes('.compat-tag.compat-fits'), "Must include .compat-tag.compat-fits CSS rule");
+  assert.ok(html.includes('.compat-tag.compat-shift'), "Must include .compat-tag.compat-shift CSS rule");
+  assert.ok(html.includes('.compat-tag.compat-exceeds'), "Must include .compat-tag.compat-exceeds CSS rule");
+  assert.ok(html.includes('.catalog-card.disallowed-song'), "Must include .catalog-card.disallowed-song CSS rule");
+  assert.ok(html.includes('.keyboard-range-warning'), "Must include .keyboard-range-warning CSS rule");
+
+  // 25.6 Script Logic Verification
+  assert.ok(html.includes('function autoFitKeyboardToSong'), "Must define autoFitKeyboardToSong");
+  assert.ok(html.includes('function shiftKeyboardToFitSong'), "Must define shiftKeyboardToFitSong");
+  assert.ok(html.includes('function updateKeyboardRangeWarning'), "Must define updateKeyboardRangeWarning");
+  assert.ok(html.includes('function handleFilterByKeyboardToggle'), "Must define handleFilterByKeyboardToggle");
+  assert.ok(html.includes('onKeyboardLayoutChanged()'), "Must call onKeyboardLayoutChanged on keyboard shifts and preset changes");
+  assert.ok(html.includes('card.dataset.compat = compat.status'), "Catalog cards must annotate data-compat attribute");
+
+  console.log("✔ Test 25: 🎹 Keyboard Size Song Allowance & Range Filtering Engine passed");
+}
+
+// ==========================================
+// Test 26: 🎼 Interactive Piano Notes Cheat Sheet, Keyboard Colorization & Live Sustain Integration
+// ==========================================
+{
+  const fs = require("fs");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+
+  // 26.1 Music Theory Cheat Sheet Exports & Color Mappings
+  const colors = MusicTheory.CHEAT_SHEET_NOTE_COLORS;
+  assert.ok(colors, "CHEAT_SHEET_NOTE_COLORS must be exported");
+  assert.strictEqual(colors.C, '#ef4444', "C must be Red #ef4444");
+  assert.strictEqual(colors.D, '#8b5cf6', "D must be Purple #8b5cf6");
+  assert.strictEqual(colors.E, '#1e40af', "E must be Navy #1e40af");
+  assert.strictEqual(colors.F, '#0284c7', "F must be Sky Blue #0284c7");
+  assert.strictEqual(colors.G, '#14b8a6', "G must be Mint Teal #14b8a6");
+  assert.strictEqual(colors.A, '#f97316', "A must be Orange #f97316");
+  assert.strictEqual(colors.B, '#10b981', "B must be Emerald #10b981");
+
+  assert.strictEqual(MusicTheory.getCheatSheetNoteColor("C4"), '#ef4444');
+  assert.strictEqual(MusicTheory.getCheatSheetNoteColor("G3"), '#14b8a6');
+  assert.strictEqual(MusicTheory.getCheatSheetNoteColor("A2"), '#f97316');
+  assert.strictEqual(MusicTheory.getCheatSheetNoteColor("F#4"), '#0284c7');
+  assert.strictEqual(MusicTheory.getCheatSheetNoteColor("Bb3"), '#ea580c');
+
+  // 26.2 Staff Position & Mnemonic Metadata
+  const midC = MusicTheory.getCheatSheetStaffInfo("C4");
+  assert.ok(midC, "C4 staff info must exist");
+  assert.strictEqual(midC.isMiddleC, true, "C4 isMiddleC must be true");
+  assert.strictEqual(midC.clef, "grand-bridge", "C4 clef must be grand-bridge");
+  assert.ok(midC.staffPosition.includes("MIDDLE C"), "C4 staffPosition must mention MIDDLE C");
+
+  const e4 = MusicTheory.getCheatSheetStaffInfo("E4");
+  assert.ok(e4, "E4 staff info must exist");
+  assert.strictEqual(e4.clef, "treble");
+  assert.strictEqual(e4.staffRole, "line");
+  assert.strictEqual(e4.staffIndex, 1);
+  assert.ok(e4.mnemonic.includes("Every"), "E4 mnemonic must include Every");
+
+  const g2 = MusicTheory.getCheatSheetStaffInfo("G2");
+  assert.ok(g2, "G2 staff info must exist");
+  assert.strictEqual(g2.clef, "bass");
+  assert.strictEqual(g2.staffRole, "line");
+  assert.strictEqual(g2.staffIndex, 1);
+  assert.ok(g2.mnemonic.includes("Good"), "G2 mnemonic must include Good");
+
+  const c3 = MusicTheory.getCheatSheetStaffInfo("C3");
+  assert.ok(c3, "C3 staff info must exist");
+  assert.strictEqual(c3.clef, "bass");
+  assert.strictEqual(c3.staffRole, "space");
+  assert.strictEqual(c3.staffIndex, 2);
+  assert.ok(c3.mnemonic.includes("Cows"), "C3 mnemonic must include Cows");
+
+  // 22 Notes Range in Cheat Sheet (G2 to G5)
+  const range = MusicTheory.CHEAT_SHEET_NOTES_RANGE;
+  assert.ok(Array.isArray(range), "CHEAT_SHEET_NOTES_RANGE must be an array");
+  assert.strictEqual(range.length, 22, "Must contain exactly 22 diatonic white keys from G2 to G5");
+  assert.strictEqual(range[0].pitch, "G2", "First note must be G2");
+  assert.strictEqual(range[10].pitch, "C4", "Index 10 must be Middle C (C4)");
+  assert.strictEqual(range[21].pitch, "G5", "Last note must be G5");
+
+  // 26.3 UI DOM Markup Verification
+  assert.ok(html.includes('id="toggleCheatSheetColors"'), "Must include toggleCheatSheetColors toggle");
+  assert.ok(html.includes('id="openCheatSheetBtn"'), "Must include openCheatSheetBtn in keyboard dock");
+  assert.ok(html.includes('id="theoryOpenCheatSheetBtn"'), "Must include theoryOpenCheatSheetBtn in Theory panel");
+  assert.ok(html.includes('id="cheatSheetModal"'), "Must include cheatSheetModal dialog");
+  assert.ok(html.includes('id="cheatSheetSvg"'), "Must include cheatSheetSvg container");
+  assert.ok(html.includes('id="csInspectorCard"'), "Must include csInspectorCard note inspector");
+  assert.ok(html.includes('id="csPlayScaleBtn"'), "Must include csPlayScaleBtn sequence player");
+  assert.ok(html.includes('id="csCloseModalBtn"'), "Must include csCloseModalBtn close button");
+
+  // 26.4 CSS Styling Verification
+  assert.ok(html.includes('.piano-key-cheat-label'), "Must include .piano-key-cheat-label CSS rule");
+  assert.ok(html.includes('content: "MIDDLE C"'), "Middle C marker must display authentic MIDDLE C label");
+  assert.ok(html.includes('.lane-staff-badge'), "Must include .lane-staff-badge CSS rule");
+  assert.ok(html.includes('.lane-staff-badge.is-mid-c'), "Must include .lane-staff-badge.is-mid-c CSS rule");
+  assert.ok(html.includes('.cheat-sheet-modal-backdrop'), "Must include .cheat-sheet-modal-backdrop CSS rule");
+  assert.ok(html.includes('.cheat-sheet-modal-dialog'), "Must include .cheat-sheet-modal-dialog CSS rule");
+
+  // 26.5 Script Logic Verification
+  assert.ok(html.includes('function isCheatSheetColorsEnabled'), "Must define isCheatSheetColorsEnabled");
+  assert.ok(html.includes('function createSustainLane'), "Must define createSustainLane");
+  assert.ok(html.includes('function removeSustainLane'), "Must define removeSustainLane");
+  assert.ok(html.includes('function renderCheatSheetSvg'), "Must define renderCheatSheetSvg");
+  assert.ok(html.includes('function openCheatSheetModal'), "Must define openCheatSheetModal");
+  assert.ok(html.includes('function closeCheatSheetModal'), "Must define closeCheatSheetModal");
+  assert.ok(html.includes('function selectCheatSheetNote'), "Must define selectCheatSheetNote");
+
+  console.log("✔ Test 26: 🎼 Interactive Piano Notes Cheat Sheet, Keyboard Colorization & Live Sustain Integration passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
+
 
 
 
