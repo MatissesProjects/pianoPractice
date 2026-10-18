@@ -1099,17 +1099,47 @@
       transition: background 0.05s, transform 0.05s;
     }
 
-    /* Distinct Beginner Guide Marker for Middle C */
+    /* Distinct Beginner Guide Marker for Middle C from pianoNotesCheatSheet.png */
     .piano-key.white.is-middle-c::before {
-      content: "MID C";
+      content: "MIDDLE C";
       position: absolute;
-      bottom: 25px;
+      bottom: 27px;
+      font-size: 0.58rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: #ef4444;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+      pointer-events: none;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+    .piano-key.white .piano-key-cheat-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 1px;
+      user-select: none;
+      pointer-events: none;
+      transition: transform 0.1s;
+    }
+    .piano-key.white .key-letter {
+      font-size: 0.92rem;
+      font-weight: 800;
+      font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+    .piano-key.white .key-oct {
+      font-size: 0.62rem;
+      font-weight: 600;
+      opacity: 0.75;
+    }
+    .piano-key.black .black-key-label {
       font-size: 0.62rem;
       font-weight: 800;
-      color: #0284c7;
-      background: rgba(2, 132, 199, 0.15);
-      padding: 0.1rem 0.25rem;
-      border-radius: 4px;
+      user-select: none;
       pointer-events: none;
     }
 
@@ -1395,6 +1425,118 @@
       font-size: 0.8rem;
       color: var(--rh-color);
       font-weight: 600;
+    }
+    .card-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.35rem;
+    }
+    .card-range-badge {
+      font-size: 0.72rem;
+      font-family: ui-monospace, monospace;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: #0f172a;
+      color: #94a3b8;
+      border: 1px solid #334155;
+    }
+    .compat-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .compat-tag.compat-fits {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .compat-tag.compat-shift {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .compat-tag.compat-exceeds {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.35);
+    }
+    .catalog-card.disallowed-song {
+      opacity: 0.62;
+      border-style: dashed;
+      border-color: #64748b;
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .catalog-card.disallowed-song:hover {
+      opacity: 0.92;
+      border-color: #f43f5e;
+    }
+    .card-action-auto-fit {
+      color: #38bdf8;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(2, 132, 199, 0.18);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      transition: all 0.15s;
+    }
+    .card-action-auto-fit:hover {
+      background: rgba(2, 132, 199, 0.35);
+      color: #7dd3fc;
+    }
+    .keyboard-range-warning {
+      background: linear-gradient(90deg, #1e1b4b 0%, #311042 100%);
+      border: 1px solid #f43f5e;
+      border-radius: 10px;
+      padding: 0.65rem 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.15);
+    }
+    .keyboard-range-warning .warning-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .keyboard-range-warning .warning-icon {
+      font-size: 1.35rem;
+    }
+    .keyboard-range-warning .warning-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+    .keyboard-range-warning .warning-title {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: #fecdd3;
+    }
+    .keyboard-range-warning .warning-desc {
+      font-size: 0.8rem;
+      color: #fda4af;
+    }
+    .keyboard-range-warning .warning-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .auto-fit-btn {
+      background: #0284c7 !important;
+      color: #f0f9ff !important;
+      border-color: #38bdf8 !important;
+      font-weight: 700 !important;
+    }
+    .auto-fit-btn:hover {
+      background: #0369a1 !important;
     }
     /* TOP EDUCATIONAL MODE NAVIGATION */
     .edu-mode-nav {
@@ -2020,7 +2162,91 @@
       background: #111a2d;
       border: 1px solid #233554;
       border-radius: 10px;
-      padding: 1.25rem;
+    /* Live Sustain Staff Position Badge from pianoNotesCheatSheet.png */
+    .lane-staff-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .lane-staff-badge.is-mid-c {
+      background: #ef4444 !important;
+      color: #ffffff !important;
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Interactive Piano Notes Cheat Sheet Modal */
+    .cheat-sheet-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: fadeInModal 0.2s ease-out;
+    }
+    .cheat-sheet-modal-backdrop.is-open {
+      display: flex;
+    }
+    .cheat-sheet-modal-dialog {
+      background: #090e1a;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.15);
+      max-width: 1140px;
+      width: 100%;
+      max-height: 94vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: scaleInModal 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeInModal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scaleInModal {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .cs-svg-key {
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .cs-svg-key:hover {
+      filter: brightness(1.15);
+    }
+    .cs-svg-key.is-active {
+      filter: drop-shadow(0 0 10px #fbbf24) brightness(1.2);
+    }
+    .cs-notehead {
+      cursor: pointer;
+      transition: transform 0.15s, filter 0.15s;
+    }
+    .cs-notehead:hover {
+      filter: brightness(1.25);
+      transform: scale(1.1);
+      transform-origin: center;
+    }
+    .cs-notehead.is-active {
+      filter: drop-shadow(0 0 12px #fbbf24) brightness(1.3);
+      stroke: #ffffff;
+      stroke-width: 2.5;
+    }
+    .cs-guideline.is-active {
+      stroke-width: 3.5 !important;
+      opacity: 1 !important;
+      filter: drop-shadow(0 0 6px currentColor);
     }
   </style>
 </head>
@@ -2278,6 +2504,22 @@
         <div class="hud-stats">
           <span id="hudProgressText">Note: 1 / 32</span>
           <button class="hud-restart-btn" id="hudRestartBtn">↺ Restart Piece</button>
+        </div>
+      </div>
+
+      <!-- KEYBOARD RANGE WARNING BANNER (When loaded song exceeds active keyboard) -->
+      <div id="keyboardRangeWarningBanner" class="keyboard-range-warning" style="display: none;">
+        <div class="warning-left">
+          <span class="warning-icon" id="kbWarningIcon">⚠️</span>
+          <div class="warning-text">
+            <span class="warning-title" id="kbWarningTitle">Song Exceeds Current Keyboard Size</span>
+            <span class="warning-desc" id="kbWarningDesc">This piece requires notes outside your active keyboard range.</span>
+          </div>
+        </div>
+        <div class="warning-actions">
+          <button class="range-shift-btn auto-fit-btn" id="kbWarningAutoFitBtn" title="Automatically set keyboard size and range to fit this song">⚡ Auto-Fit Keyboard</button>
+          <button class="range-shift-btn" id="kbWarningShiftBtn" style="display: none;" title="Shift start key to bring this piece into range">↔ Shift to Fit</button>
+          <button class="range-shift-btn" id="kbWarningDismissBtn" title="Dismiss warning" style="color:var(--text-muted);">✕ Dismiss</button>
         </div>
       </div>
 
@@ -2625,6 +2867,29 @@
         </div>
 
         <div class="theory-grid">
+          <!-- Featured Cheat Sheet Module from pianoNotesCheatSheet.png -->
+          <div class="lesson-card cheat-sheet-feature-card" style="border: 2px solid #ec4899; background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(56, 189, 248, 0.08) 100%); grid-column: 1 / -1;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem;">
+              <div>
+                <h3 style="color:#ec4899; font-size:1.25rem; font-weight:800; margin-bottom:0.25rem;">🎼 Piano Notes Cheat Sheet & Grand Staff Map</h3>
+                <p style="color:#cbd5e1; font-size:0.88rem; margin:0;">The complete interactive visual bridge between piano keyboard keys and the Grand Staff, featuring authentic 7-color note coding and Middle C bridging.</p>
+              </div>
+              <span style="font-size:0.75rem; background:#ec4899; color:#0f172a; font-weight:800; padding:0.25rem 0.65rem; border-radius:9999px;">INTERACTIVE</span>
+            </div>
+            <div style="display:flex; gap:0.45rem; flex-wrap:wrap; margin:0.9rem 0;">
+              <span style="background:#ef444422; color:#ef4444; border:1px solid #ef4444; padding:0.2rem 0.55rem; border-radius:6px; font-size:0.75rem; font-weight:700;">C (Red)</span>
+              <span style="background:#8b5cf622; color:#8b5cf6; border:1px solid #8b5cf6; padding:0.2rem 0.55rem; border-radius:6px; font-size:0.75rem; font-weight:700;">D (Purple)</span>
+              <span style="background:#1e40af22; color:#38bdf8; border:1px solid #38bdf8; padding:0.2rem 0.55rem; border-radius:6px; font-size:0.75rem; font-weight:700;">E (Navy)</span>
+              <span style="background:#0284c722; color:#0284c7; border:1px solid #0284c7; padding:0.2rem 0.55rem; border-radius:6px; font-size:0.75rem; font-weight:700;">F (Sky Blue)</span>
+              <span style="background:#14b8a622; color:#14b8a6; border:1px solid #14b8a6; padding:0.2rem 0.55rem; border-radius:6px; font-size:0.75rem; font-weight:700;">G (Mint Teal)</span>
+              <span style="background:#f9731622; color:#f97316; border:1px solid #f97316; padding:0.2rem 0.55rem; border-radius:6px; font-size:0.75rem; font-weight:700;">A (Peach)</span>
+              <span style="background:#10b98122; color:#10b981; border:1px solid #10b981; padding:0.2rem 0.55rem; border-radius:6px; font-size:0.75rem; font-weight:700;">B (Emerald)</span>
+            </div>
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+              <button id="theoryOpenCheatSheetBtn" class="play-btn" style="background:linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);">Launch Interactive Cheat Sheet 🎼</button>
+            </div>
+          </div>
+
           <div class="lesson-card">
             <h3>🎼 The Musical Staff & Clefs</h3>
             <p>Music is written on 5 lines and 4 spaces.</p>
@@ -2712,6 +2977,15 @@
             </div>
 
             <button class="range-shift-btn" id="centerMidCBtn" title="Scroll View to Middle C" style="color:#38bdf8; border-color:#0284c7;">🎯 Center Mid C</button>
+            <label class="layer-toggle kb-filter-dock-toggle" title="Filter song repertoire to only pieces that fit this keyboard size" style="margin:0 0 0 0.4rem; font-size:0.75rem; white-space:nowrap; cursor:pointer;">
+              <input type="checkbox" id="kbDockFilterCheckbox">
+              <span id="kbDockFilterLabel">🎹 Fit Keyboard</span>
+            </label>
+            <label class="layer-toggle" id="toggleCheatSheetColorsLabel" title="Toggle color-coded note letters based on the piano notes cheat sheet" style="margin:0 0 0 0.3rem; font-size:0.75rem; white-space:nowrap; cursor:pointer;">
+              <input type="checkbox" id="toggleCheatSheetColors" checked>
+              <span>🎨 Note Colors</span>
+            </label>
+            <button class="range-shift-btn" id="openCheatSheetBtn" title="Open Interactive Piano Notes Cheat Sheet" style="color:#ec4899; border-color:#ec4899; font-weight:700; margin-left:0.2rem;">🎼 Cheat Sheet</button>
           </div>
 
           <div class="piano-legend">
@@ -2719,6 +2993,7 @@
             <div class="legend-item"><div class="dot rh"></div> Right Hand</div>
             <div class="legend-item"><div class="dot lh"></div> Left Hand</div>
             <div class="legend-item"><div class="dot dyad"></div> Dyads</div>
+            <div class="legend-item" title="C:Red, D:Purple, E:Navy, F:Blue, G:Teal, A:Orange, B:Green"><div class="dot" style="background:#ef4444;"></div> Cheat Colors</div>
           </div>
         </div>
         <div class="piano-scroll">
@@ -2749,7 +3024,24 @@
     <!-- REPERTOIRE SONG CATALOG (Displayed in Repertoire Mode) -->
     <div id="repertoireCatalogSection" class="repertoire-catalog-section">
       <div class="catalog-header">
-        <input type="text" id="catalogSearch" class="search-box" placeholder="Search by song name or style...">
+        <div style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center; width:100%; margin-bottom:0.75rem;">
+          <input type="text" id="catalogSearch" class="search-box" style="flex:1; min-width:240px; margin-bottom:0;" placeholder="Search by song name or style...">
+          <div class="keyboard-filter-controls" style="display:inline-flex; align-items:center; gap:0.6rem; background:var(--bg-card); padding:0.35rem 0.75rem; border:1px solid var(--border); border-radius:8px;">
+            <label class="layer-toggle" style="margin:0; font-size:0.8rem; cursor:pointer;" title="Filter song database to pieces that fit the current keyboard size">
+              <input type="checkbox" id="catalogKbFilterToggle">
+              <span id="catalogKbFilterToggleLabel">🎹 Filter to Keyboard</span>
+            </label>
+            <span style="color:var(--border);">|</span>
+            <label style="font-size:0.75rem; color:var(--text-muted); display:inline-flex; align-items:center; gap:0.3rem;">
+              Scope:
+              <select id="catalogKbScopeSelect" class="midi-select" style="background:var(--bg-surface); padding:0.2rem 0.4rem; font-size:0.75rem;">
+                <option value="active_hands">Active Hands Only</option>
+                <option value="full_song">Full Arrangement</option>
+              </select>
+            </label>
+            <span id="keyboardFilterStatsBadge" class="filter-stats-badge" style="font-size:0.75rem; font-weight:700; color:#38bdf8; background:rgba(2,132,199,0.15); padding:0.2rem 0.5rem; border-radius:4px; border:1px solid rgba(56,189,248,0.25);">--</span>
+          </div>
+        </div>
         <div class="filter-pills" id="filterPillsContainer"></div>
       </div>
       <div class="song-grid" id="catalogGrid"></div>
@@ -2760,7 +3052,59 @@
       <div class="perf-stars" id="perfStars">⭐⭐⭐</div>
       <h4 style="font-size:1.1rem; color:#f8fafc; font-weight:800; margin-bottom:0.35rem;" id="perfTitle">Song Mastered!</h4>
       <p style="font-size:0.85rem; color:#cbd5e1; margin-bottom:0.75rem;" id="perfBody">Accuracy: 98% (32/33 notes)</p>
-      <button class="range-shift-btn" id="perfCloseBtn" style="width:100%;">Great!</button>
+    <!-- INTERACTIVE PIANO NOTES CHEAT SHEET MODAL (Based on pianoNotesCheatSheet.png) -->
+    <div class="cheat-sheet-modal-backdrop" id="cheatSheetModal" role="dialog" aria-modal="true" aria-labelledby="csModalTitle">
+      <div class="cheat-sheet-modal-dialog">
+        <div class="cheat-sheet-modal-header" style="display:flex; justify-content:space-between; align-items:center; padding:1rem 1.5rem; border-bottom:1px solid #1e293b; background:#0f172a;">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <span style="font-size:1.4rem;">🎼</span>
+            <div>
+              <h3 id="csModalTitle" style="font-size:1.15rem; font-weight:800; color:#f8fafc; margin:0; letter-spacing:0.02em;">PIANO NOTES CHEAT SHEET</h3>
+              <p style="font-size:0.78rem; color:#94a3b8; margin:0;">Interactive visual map bridging piano keys and the Grand Staff</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <button id="csPlayScaleBtn" class="range-shift-btn" style="color:#38bdf8; border-color:#0284c7; padding:0.35rem 0.75rem; font-weight:700;">▶ Play Range (G2–G5)</button>
+            <button id="csCloseModalBtn" class="range-shift-btn" style="color:#94a3b8; padding:0.35rem 0.65rem; font-size:1.1rem; line-height:1;" aria-label="Close modal">✕</button>
+          </div>
+        </div>
+
+        <!-- Note Inspector Card -->
+        <div id="csInspectorCard" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; padding:0.75rem 1.5rem; background:#0c1322; border-bottom:1px solid #1e293b;">
+          <div style="display:flex; align-items:center; gap:0.85rem;">
+            <div id="csActiveBadge" style="width:42px; height:42px; border-radius:50%; background:#ef4444; color:#ffffff; font-weight:900; font-size:1.3rem; display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px rgba(239,68,68,0.5);">C</div>
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span id="csActivePitch" style="font-size:1.2rem; font-weight:800; color:#f8fafc; font-family:ui-monospace,monospace;">C4 (Middle C)</span>
+                <span id="csActiveFreq" style="font-size:0.75rem; color:#94a3b8; font-family:ui-monospace,monospace;">261.63 Hz</span>
+              </div>
+              <div id="csActivePos" style="font-size:0.82rem; color:#38bdf8; font-weight:600;">⭐ MIDDLE C • Center Bridge Ledger Line</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div id="csActiveMnemonic" style="font-size:0.82rem; color:#fcd34d; background:rgba(245,158,11,0.12); padding:0.35rem 0.75rem; border-radius:6px; border:1px solid rgba(245,158,11,0.3);">
+              Mnemonic: <strong>Middle C (Central Ledger Line)</strong>
+            </div>
+            <button id="csPlayActiveNoteBtn" class="play-btn" style="padding:0.4rem 0.85rem; font-size:0.82rem;">🔊 Audition Note</button>
+          </div>
+        </div>
+
+        <!-- Interactive SVG Container -->
+        <div class="cheat-sheet-svg-wrapper" style="overflow-x:auto; overflow-y:auto; padding:1rem; display:flex; justify-content:center; background:#090e1a; flex:1;">
+          <svg id="cheatSheetSvg" width="1080" height="580" viewBox="0 0 1080 580" style="user-select:none; max-width:100%; height:auto; display:block;"></svg>
+        </div>
+
+        <!-- Footer / Mnemonic Legend -->
+        <div style="padding:0.75rem 1.5rem; background:#0f172a; border-top:1px solid #1e293b; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:0.75rem; font-size:0.78rem;">
+          <div style="display:flex; flex-wrap:wrap; gap:1.2rem;">
+            <div><span style="color:#38bdf8; font-weight:700;">𝄞 Treble Clef:</span> Lines: <em>E-G-B-D-F</em> (Every Good Boy Does Fine) | Spaces: <em>F-A-C-E</em></div>
+            <div><span style="color:#34d399; font-weight:700;">𝄢 Bass Clef:</span> Lines: <em>G-B-D-F-A</em> (Good Boys Do Fine Always) | Spaces: <em>A-C-E-G</em> (All Cows Eat Grass)</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.4rem; color:#94a3b8;">
+            <span style="color:#ef4444; font-weight:800;">●</span> Click any key or notehead on the diagram to play & inspect
+          </div>
+        </div>
+      </div>
     </div>
   </div> <!-- end container -->
 
@@ -2870,7 +3214,10 @@
       pitchToFreq: getNoteFreq,
       midiToPitch: midiNumberToPitch,
       pitchToMidi: getPitchMidiNumber,
-      identifyActiveChord
+      identifyActiveChord,
+      STANDARD_KEYBOARD_PRESETS,
+      getSongPitchRange,
+      evaluateSongKeyboardCompatibility
     } = (typeof MusicTheory !== "undefined" ? MusicTheory : window.MusicTheory);
 
     function findPianoKeyElement(pitchStr, defaultOct = 4) {
@@ -2896,6 +3243,11 @@
       return { pitch, beats, tied };
     }
 
+    function isCheatSheetColorsEnabled() {
+      const toggle = document.getElementById("toggleCheatSheetColors");
+      return toggle ? toggle.checked : true;
+    }
+
     function setChordPillDisplay(notesArray) {
       const chordPill = document.getElementById("activeChordPill");
       if (!chordPill) return;
@@ -2907,8 +3259,21 @@
         ? identifyActiveChord(notesArray) 
         : (window.MusicTheory && window.MusicTheory.identifyActiveChord ? window.MusicTheory.identifyActiveChord(notesArray) : null);
       if (chordInfo) {
-        chordPill.style.display = "inline-block";
-        chordPill.textContent = `${chordInfo.name} (${chordInfo.type})`;
+        chordPill.style.display = "inline-flex";
+        chordPill.style.alignItems = "center";
+        chordPill.style.gap = "0.45rem";
+
+        let dotsHtml = "";
+        if (notesArray.length > 1 && isCheatSheetColorsEnabled()) {
+          dotsHtml = notesArray.map(n => {
+            const col = (window.MusicTheory && window.MusicTheory.getCheatSheetNoteColor) 
+              ? window.MusicTheory.getCheatSheetNoteColor(n.pitch) 
+              : "#fbbf24";
+            return `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${col}; box-shadow:0 0 6px ${col};" title="${n.pitch}"></span>`;
+          }).join("");
+        }
+
+        chordPill.innerHTML = `<span>${chordInfo.name}</span> <span style="font-size:0.75rem; opacity:0.85;">(${chordInfo.type})</span> ${dotsHtml}`;
       } else {
         chordPill.style.display = "none";
       }
@@ -3799,6 +4164,10 @@
                     label.setAttribute("x", cx);
                     label.setAttribute("y", startYCheat + pIdx * lineSpacing);
                     label.setAttribute("class", `cheat-text-composite ${actualPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                    const pColor = (window.MusicTheory && window.MusicTheory.getCheatSheetNoteColor) ? window.MusicTheory.getCheatSheetNoteColor(p) : null;
+                    if (pColor && isCheatSheetColorsEnabled()) {
+                      label.setAttribute("fill", pColor);
+                    }
                     label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                     noteGroup.appendChild(label);
                   });
@@ -3849,6 +4218,10 @@
                     label.setAttribute("x", cx);
                     label.setAttribute("y", startYCheat + pIdx * lineSpacing);
                     label.setAttribute("class", `cheat-text-composite ${actualPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                    const pColor = (window.MusicTheory && window.MusicTheory.getCheatSheetNoteColor) ? window.MusicTheory.getCheatSheetNoteColor(p) : null;
+                    if (pColor && isCheatSheetColorsEnabled()) {
+                      label.setAttribute("fill", pColor);
+                    }
                     label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                     noteGroup.appendChild(label);
                   });
@@ -3905,6 +4278,10 @@
                     labelB.setAttribute("x", cx);
                     labelB.setAttribute("y", startYBCheat + pIdx * lineSpacing);
                     labelB.setAttribute("class", `cheat-text-composite ${actualLHPitches.length > 1 ? 'cheat-dyad' : 'cheat-single'}`);
+                    const pColor = (window.MusicTheory && window.MusicTheory.getCheatSheetNoteColor) ? window.MusicTheory.getCheatSheetNoteColor(p) : null;
+                    if (pColor && isCheatSheetColorsEnabled()) {
+                      labelB.setAttribute("fill", pColor);
+                    }
                     labelB.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                     noteGroup.appendChild(labelB);
                   });
@@ -4472,6 +4849,12 @@
       activeHeldKeyAttacks.set(pitchName, noteAttack);
       updateActiveChordRecognizer();
 
+      // Connect interactive playing to Live Sustain stage
+      const midiNum = meta.noteNumber ?? ((window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(pitchName) : getPitchMidiNumber(pitchName));
+      if (midiNum && source !== "direct") {
+        createSustainLane(midiNum, pitchName);
+      }
+
       if (activeEducationalMode === "repertoire") {
         if (typeof isTempoFlowActive !== "undefined" && isTempoFlowActive) {
           verifyTempoFlowInput(pitchName, noteAttack);
@@ -4486,6 +4869,12 @@
     function handleNoteUp(pitchName, meta = {}) {
       const now = performance.now();
       const noteAttack = activeHeldKeyAttacks.get(pitchName);
+
+      const midiNum = meta.noteNumber ?? ((window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(pitchName) : getPitchMidiNumber(pitchName));
+      if (midiNum) {
+        removeSustainLane(midiNum);
+      }
+
       if (noteAttack) {
         noteAttack.isDown = false;
         const durationMs = now - noteAttack.downTime;
@@ -4750,12 +5139,14 @@
           if (e.cancelable && e.type === "touchstart") e.preventDefault();
           e.stopPropagation();
           keyEl.classList.add("active-live");
-          handleNoteDown(noteId, "mouse");
+          const midiNum = (window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(noteId) : getPitchMidiNumber(noteId);
+          handleNoteDown(noteId, "mouse", { noteNumber: midiNum });
         };
         const onUp = (e) => {
           e.stopPropagation();
           keyEl.classList.remove("active-live");
-          handleNoteUp(noteId);
+          const midiNum = (window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(noteId) : getPitchMidiNumber(noteId);
+          handleNoteUp(noteId, { noteNumber: midiNum });
         };
 
         keyEl.addEventListener("mousedown", onDown);
@@ -4765,6 +5156,8 @@
         keyEl.addEventListener("touchend", onUp);
         keyEl.addEventListener("touchcancel", onUp);
       }
+
+      const showCheatColors = isCheatSheetColorsEnabled();
 
       // If the first key is black, provide an invisible leading white anchor
       const isStartBlack = [1, 3, 6, 8, 10].includes(minMidi % 12);
@@ -4777,7 +5170,10 @@
         const blackKey = document.createElement("div");
         blackKey.className = "piano-key black";
         blackKey.dataset.note = blackKeyId;
-        blackKey.textContent = blackKeyId.replace(/[0-9]/g, "");
+        const bLetter = blackKeyId.replace(/[0-9]/g, "");
+        const bColor = (window.MusicTheory && window.MusicTheory.getCheatSheetNoteColor) ? window.MusicTheory.getCheatSheetNoteColor(blackKeyId) : "#94a3b8";
+        blackKey.innerHTML = `<span class="black-key-label" style="color: ${showCheatColors ? bColor : '#94a3b8'};">${bLetter}</span>`;
+        blackKey.title = blackKeyId;
         bindKeyListeners(blackKey, blackKeyId);
         dummyKey.appendChild(blackKey);
         keyboard.appendChild(dummyKey);
@@ -4792,7 +5188,20 @@
         const whiteKey = document.createElement("div");
         whiteKey.className = "piano-key white" + (whiteKeyId === "C4" ? " is-middle-c" : "");
         whiteKey.dataset.note = whiteKeyId;
-        whiteKey.textContent = whiteKeyId;
+
+        const wLetter = whiteKeyId.replace(/[0-9]/g, "");
+        const wOct = whiteKeyId.replace(/[^0-9]/g, "");
+        const wColor = (window.MusicTheory && window.MusicTheory.getCheatSheetNoteColor) ? window.MusicTheory.getCheatSheetNoteColor(whiteKeyId) : "#64748b";
+        const wStaff = (window.MusicTheory && window.MusicTheory.getCheatSheetStaffInfo) ? window.MusicTheory.getCheatSheetStaffInfo(whiteKeyId) : null;
+
+        whiteKey.innerHTML = `
+          <div class="piano-key-cheat-label" style="color: ${showCheatColors ? wColor : '#64748b'};">
+            <span class="key-letter">${wLetter}</span><span class="key-oct">${wOct}</span>
+          </div>
+        `;
+        if (wStaff) {
+          whiteKey.title = `${whiteKeyId}: ${wStaff.staffPosition} (${wStaff.mnemonic})`;
+        }
         bindKeyListeners(whiteKey, whiteKeyId);
 
         const nextMidi = m + 1;
@@ -4803,13 +5212,23 @@
           const blackKey = document.createElement("div");
           blackKey.className = "piano-key black";
           blackKey.dataset.note = blackKeyId;
-          blackKey.textContent = blackKeyId.replace(/[0-9]/g, "");
+          const bLetter = blackKeyId.replace(/[0-9]/g, "");
+          const bColor = (window.MusicTheory && window.MusicTheory.getCheatSheetNoteColor) ? window.MusicTheory.getCheatSheetNoteColor(blackKeyId) : "#94a3b8";
+          blackKey.innerHTML = `<span class="black-key-label" style="color: ${showCheatColors ? bColor : '#94a3b8'};">${bLetter}</span>`;
+          blackKey.title = blackKeyId;
           bindKeyListeners(blackKey, blackKeyId);
           whiteKey.appendChild(blackKey);
         }
 
         keyboard.appendChild(whiteKey);
       }
+    }
+
+    function onKeyboardLayoutChanged() {
+      if (typeof updateKeyboardRangeWarning === "function") updateKeyboardRangeWarning();
+      if (typeof renderFilterPills === "function") renderFilterPills();
+      if (typeof applyCatalogFilters === "function") applyCatalogFilters();
+      if (typeof updateFilterHeaderBadges === "function") updateFilterHeaderBadges();
     }
 
     function shiftKeyboardStart(delta) {
@@ -4819,6 +5238,7 @@
         currentStartMidi = newStart;
         updateKeyboardControlsUI();
         buildPianoKeyboard();
+        onKeyboardLayoutChanged();
       }
     }
 
@@ -4858,6 +5278,7 @@
             currentStartMidi = found.startMidi;
             updateKeyboardControlsUI();
             buildPianoKeyboard();
+            onKeyboardLayoutChanged();
             if (currentKeyCount > 37) {
               setTimeout(() => centerMiddleCView(false), 50);
             }
@@ -4877,6 +5298,7 @@
           }
           updateKeyboardControlsUI();
           buildPianoKeyboard();
+          onKeyboardLayoutChanged();
         });
       }
 
@@ -4891,6 +5313,7 @@
           }
           updateKeyboardControlsUI();
           buildPianoKeyboard();
+          onKeyboardLayoutChanged();
         });
       }
 
@@ -4906,13 +5329,516 @@
       const shiftOctU = document.getElementById("shiftKeyUpOctBtn");
       if (shiftOctU) shiftOctU.addEventListener("click", () => shiftKeyboardStart(12));
 
-      const centerMidCBtn = document.getElementById("centerMidCBtn");
-      if (centerMidCBtn) centerMidCBtn.addEventListener("click", () => centerMiddleCView(true));
+      // Restore cheat sheet colors preference
+      try {
+        const savedColors = localStorage.getItem("piano_cheat_sheet_colors");
+        const toggleColors = document.getElementById("toggleCheatSheetColors");
+        if (toggleColors && savedColors !== null) {
+          toggleColors.checked = (savedColors === "true");
+        }
+      } catch (err) {}
+
+      const toggleColors = document.getElementById("toggleCheatSheetColors");
+      if (toggleColors) {
+        toggleColors.addEventListener("change", () => {
+          try {
+            localStorage.setItem("piano_cheat_sheet_colors", toggleColors.checked ? "true" : "false");
+          } catch(e) {}
+          buildPianoKeyboard();
+          if (currentSong && typeof renderSheetMusicScore === "function") {
+            renderSheetMusicScore();
+          }
+        });
+      }
+
+      const openCheatBtn = document.getElementById("openCheatSheetBtn");
+      if (openCheatBtn) {
+        openCheatBtn.addEventListener("click", () => openCheatSheetModal("C4"));
+      }
+      const theoryCheatBtn = document.getElementById("theoryOpenCheatSheetBtn");
+      if (theoryCheatBtn) {
+        theoryCheatBtn.addEventListener("click", () => openCheatSheetModal("C4"));
+      }
+
+      const closeCheatModalBtn = document.getElementById("csCloseModalBtn");
+      if (closeCheatModalBtn) {
+        closeCheatModalBtn.addEventListener("click", closeCheatSheetModal);
+      }
+      const cheatModalBackdrop = document.getElementById("cheatSheetModal");
+      if (cheatModalBackdrop) {
+        cheatModalBackdrop.addEventListener("click", (e) => {
+          if (e.target === cheatModalBackdrop) closeCheatSheetModal();
+        });
+      }
+      const playScaleBtn = document.getElementById("csPlayScaleBtn");
+      if (playScaleBtn) {
+        playScaleBtn.addEventListener("click", playCheatSheetScaleSequence);
+      }
+      const playActiveNoteBtn = document.getElementById("csPlayActiveNoteBtn");
+      if (playActiveNoteBtn) {
+        playActiveNoteBtn.addEventListener("click", () => {
+          selectCheatSheetNote(currentCheatSheetSelectedPitch, true);
+        });
+      }
 
       // Auto-center Middle C on initial load if keyboard is wide
       if (currentKeyCount > 37) {
         setTimeout(() => centerMiddleCView(false), 100);
       }
+    }
+
+    // ==========================================
+    // INTERACTIVE PIANO NOTES CHEAT SHEET VISUALIZER
+    // Based faithfully on pianoNotesCheatSheet.png
+    // ==========================================
+    let isCheatSheetSvgRendered = false;
+    let currentCheatSheetSelectedPitch = "C4";
+    let isCheatSheetScalePlaying = false;
+
+    function renderCheatSheetSvg() {
+      const svg = document.getElementById("cheatSheetSvg");
+      if (!svg || !window.MusicTheory) return;
+      svg.innerHTML = "";
+
+      const notes = window.MusicTheory.CHEAT_SHEET_NOTES_RANGE;
+      if (!notes || notes.length === 0) return;
+
+      const numWhiteKeys = 22;
+      const keyW = 44;
+      const keyH = 120;
+      const kbY = 32;
+      const startX = 56;
+
+      const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+      defs.innerHTML = `
+        <filter id="csKeyGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#f59e0b" flood-opacity="0.8"/>
+        </filter>
+        <filter id="csNoteGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#ffffff" flood-opacity="0.9"/>
+        </filter>
+      `;
+      svg.appendChild(defs);
+
+      // Title at Top Center
+      const title = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      title.setAttribute("x", "540");
+      title.setAttribute("y", "24");
+      title.setAttribute("text-anchor", "middle");
+      title.setAttribute("font-size", "18");
+      title.setAttribute("font-weight", "900");
+      title.setAttribute("fill", "#f8fafc");
+      title.setAttribute("letter-spacing", "4");
+      title.textContent = "PIANO NOTES";
+      svg.appendChild(title);
+
+      // Keyboard Container Group
+      const kbGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      kbGroup.setAttribute("class", "cs-keyboard-group");
+
+      // White keys
+      notes.forEach((noteInfo, idx) => {
+        const kx = startX + idx * keyW;
+        const kwGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        kwGroup.setAttribute("class", `cs-svg-key cs-key-white cs-key-${noteInfo.pitch}`);
+        kwGroup.setAttribute("data-pitch", noteInfo.pitch);
+
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", kx);
+        rect.setAttribute("y", kbY);
+        rect.setAttribute("width", keyW);
+        rect.setAttribute("height", keyH);
+        rect.setAttribute("rx", "3");
+        rect.setAttribute("fill", "#ffffff");
+        rect.setAttribute("stroke", "#0f172a");
+        rect.setAttribute("stroke-width", "1.5");
+        kwGroup.appendChild(rect);
+
+        // Letter label at bottom of white key
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", kx + keyW / 2);
+        label.setAttribute("y", kbY + keyH - 12);
+        label.setAttribute("text-anchor", "middle");
+        label.setAttribute("font-size", "15");
+        label.setAttribute("font-weight", "900");
+        label.setAttribute("fill", noteInfo.color);
+        label.setAttribute("pointer-events", "none");
+        label.textContent = noteInfo.letter;
+        kwGroup.appendChild(label);
+
+        // Middle C label
+        if (noteInfo.isMiddleC) {
+          const midLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          midLabel.setAttribute("x", kx + keyW / 2);
+          midLabel.setAttribute("y", kbY + 36);
+          midLabel.setAttribute("text-anchor", "middle");
+          midLabel.setAttribute("font-size", "7.5");
+          midLabel.setAttribute("font-weight", "900");
+          midLabel.setAttribute("fill", "#ef4444");
+          midLabel.setAttribute("transform", `rotate(-90 ${kx + keyW / 2} ${kbY + 36})`);
+          midLabel.setAttribute("pointer-events", "none");
+          midLabel.textContent = "MIDDLE C";
+          kwGroup.appendChild(midLabel);
+        }
+
+        kwGroup.addEventListener("click", () => selectCheatSheetNote(noteInfo.pitch));
+        kbGroup.appendChild(kwGroup);
+      });
+
+      // Black keys
+      const blackKeyWidth = 24;
+      const blackKeyHeight = 74;
+      const blackOffsets = [
+        { idx: 0, pitch: "G#2" },
+        { idx: 1, pitch: "A#2" },
+        { idx: 3, pitch: "C#3" },
+        { idx: 4, pitch: "D#3" },
+        { idx: 6, pitch: "F#3" },
+        { idx: 7, pitch: "G#3" },
+        { idx: 8, pitch: "A#3" },
+        { idx: 10, pitch: "C#4" },
+        { idx: 11, pitch: "D#4" },
+        { idx: 13, pitch: "F#4" },
+        { idx: 14, pitch: "G#4" },
+        { idx: 15, pitch: "A#4" },
+        { idx: 17, pitch: "C#5" },
+        { idx: 18, pitch: "D#5" },
+        { idx: 20, pitch: "F#5" }
+      ];
+
+      blackOffsets.forEach(bo => {
+        const bx = startX + (bo.idx + 1) * keyW - blackKeyWidth / 2;
+        const bGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        bGroup.setAttribute("class", `cs-svg-key cs-key-black cs-key-${bo.pitch.replace('#', 's')}`);
+        bGroup.setAttribute("data-pitch", bo.pitch);
+
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", bx);
+        rect.setAttribute("y", kbY);
+        rect.setAttribute("width", blackKeyWidth);
+        rect.setAttribute("height", blackKeyHeight);
+        rect.setAttribute("rx", "2");
+        rect.setAttribute("fill", "#1e293b");
+        rect.setAttribute("stroke", "#020617");
+        rect.setAttribute("stroke-width", "1.5");
+        bGroup.appendChild(rect);
+
+        bGroup.addEventListener("click", () => selectCheatSheetNote(bo.pitch));
+        kbGroup.appendChild(bGroup);
+      });
+
+      svg.appendChild(kbGroup);
+
+      // Middle C Header Label in Center between Staves
+      const midCKeyIdx = 10; // C4
+      const midCX = startX + midCKeyIdx * keyW + keyW / 2;
+
+      const midText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      midText.setAttribute("x", midCX);
+      midText.setAttribute("y", "182");
+      midText.setAttribute("text-anchor", "middle");
+      midText.setAttribute("font-size", "11");
+      midText.setAttribute("font-weight", "900");
+      midText.setAttribute("fill", "#f8fafc");
+      midText.setAttribute("letter-spacing", "2");
+      midText.textContent = "MIDDLE";
+      svg.appendChild(midText);
+
+      const midCText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      midCText.setAttribute("x", midCX);
+      midCText.setAttribute("y", "198");
+      midCText.setAttribute("text-anchor", "middle");
+      midCText.setAttribute("font-size", "14");
+      midCText.setAttribute("font-weight", "900");
+      midCText.setAttribute("fill", "#ef4444");
+      midCText.textContent = "C";
+      svg.appendChild(midCText);
+
+      // Staves Group
+      const stavesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      stavesGroup.setAttribute("class", "cs-staves-group");
+
+      const staffLeftX = 40;
+      const staffRightX = 1040;
+
+      // Treble Clef 5 Lines (y: 228 to 292, spacing 16px)
+      const trebleLineYs = [228, 244, 260, 276, 292];
+      trebleLineYs.forEach(ly => {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", staffLeftX);
+        line.setAttribute("x2", staffRightX);
+        line.setAttribute("y1", ly);
+        line.setAttribute("y2", ly);
+        line.setAttribute("stroke", "#475569");
+        line.setAttribute("stroke-width", "1.2");
+        stavesGroup.appendChild(line);
+      });
+
+      // Treble Clef Glyph
+      const tClef = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tClef.setAttribute("x", "52");
+      tClef.setAttribute("y", "288");
+      tClef.setAttribute("font-size", "52");
+      tClef.setAttribute("fill", "#f8fafc");
+      tClef.setAttribute("class", "clef-text");
+      tClef.setAttribute("pointer-events", "none");
+      tClef.textContent = "𝄞";
+      stavesGroup.appendChild(tClef);
+
+      // Bass Clef 5 Lines (y: 450 to 514, spacing 16px)
+      const bassLineYs = [450, 466, 482, 498, 514];
+      bassLineYs.forEach(ly => {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", staffLeftX);
+        line.setAttribute("x2", staffRightX);
+        line.setAttribute("y1", ly);
+        line.setAttribute("y2", ly);
+        line.setAttribute("stroke", "#475569");
+        line.setAttribute("stroke-width", "1.2");
+        stavesGroup.appendChild(line);
+      });
+
+      // Bass Clef Glyph
+      const bClef = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      bClef.setAttribute("x", "52");
+      bClef.setAttribute("y", "484");
+      bClef.setAttribute("font-size", "42");
+      bClef.setAttribute("fill", "#f8fafc");
+      bClef.setAttribute("class", "clef-text");
+      bClef.setAttribute("pointer-events", "none");
+      bClef.textContent = "𝄢";
+      stavesGroup.appendChild(bClef);
+
+      svg.appendChild(stavesGroup);
+
+      // Ledger Lines between Staves
+      const ledgerGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      ledgerGroup.setAttribute("class", "cs-ledger-group");
+
+      function drawLedger(cx, cy) {
+        const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        l.setAttribute("x1", cx - 16);
+        l.setAttribute("x2", cx + 16);
+        l.setAttribute("y1", cy);
+        l.setAttribute("y2", cy);
+        l.setAttribute("stroke", "#64748b");
+        l.setAttribute("stroke-width", "1.5");
+        ledgerGroup.appendChild(l);
+      }
+
+      // Treble ledger line 1 (Middle C below treble: y = 308)
+      drawLedger(midCX, 308);
+      // Treble ledger line 2 (A3 below treble: y = 324)
+      const a3X = startX + 8 * keyW + keyW / 2;
+      drawLedger(a3X, 324);
+      // Treble ledger line 1 across B3 space
+      const b3X = startX + 9 * keyW + keyW / 2;
+      drawLedger(b3X, 308);
+
+      // Bass ledger line 1 (Middle C above bass: y = 434)
+      drawLedger(midCX, 434);
+      // Bass ledger line 2 (E4 above bass: y = 418)
+      const e4X = startX + 12 * keyW + keyW / 2;
+      drawLedger(e4X, 418);
+      // Bass ledger line 1 across D4 space
+      const d4X = startX + 11 * keyW + keyW / 2;
+      drawLedger(d4X, 434);
+      // Bass ledger line 2 across F4 space
+      const f4X = startX + 13 * keyW + keyW / 2;
+      drawLedger(f4X, 418);
+
+      svg.appendChild(ledgerGroup);
+
+      // Dotted Vertical Guidelines Group
+      const guideGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      guideGroup.setAttribute("class", "cs-guidelines-group");
+
+      const notePositions = {
+        'G2': [{ y: 514, clef: 'bass' }],
+        'A2': [{ y: 506, clef: 'bass' }],
+        'B2': [{ y: 498, clef: 'bass' }],
+        'C3': [{ y: 490, clef: 'bass' }],
+        'D3': [{ y: 482, clef: 'bass' }],
+        'E3': [{ y: 474, clef: 'bass' }],
+        'F3': [{ y: 466, clef: 'bass' }],
+        'G3': [{ y: 458, clef: 'bass' }],
+        'A3': [{ y: 450, clef: 'bass' }, { y: 324, clef: 'treble' }],
+        'B3': [{ y: 442, clef: 'bass' }, { y: 316, clef: 'treble' }],
+        'C4': [{ y: 434, clef: 'bass' }, { y: 308, clef: 'treble' }],
+        'D4': [{ y: 426, clef: 'bass' }, { y: 300, clef: 'treble' }],
+        'E4': [{ y: 418, clef: 'bass' }, { y: 292, clef: 'treble' }],
+        'F4': [{ y: 410, clef: 'bass' }, { y: 284, clef: 'treble' }],
+        'G4': [{ y: 276, clef: 'treble' }],
+        'A4': [{ y: 268, clef: 'treble' }],
+        'B4': [{ y: 260, clef: 'treble' }],
+        'C5': [{ y: 252, clef: 'treble' }],
+        'D5': [{ y: 244, clef: 'treble' }],
+        'E5': [{ y: 236, clef: 'treble' }],
+        'F5': [{ y: 228, clef: 'treble' }],
+        'G5': [{ y: 220, clef: 'treble' }]
+      };
+
+      // Draw Guidelines
+      notes.forEach((noteInfo, idx) => {
+        const kx = startX + idx * keyW + keyW / 2;
+        const targets = notePositions[noteInfo.pitch] || [];
+        const maxY = Math.max(...targets.map(t => t.y), kbY + keyH + 40);
+
+        const guide = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        guide.setAttribute("class", `cs-guideline cs-guide-${noteInfo.pitch}`);
+        guide.setAttribute("x1", kx);
+        guide.setAttribute("x2", kx);
+        guide.setAttribute("y1", kbY + keyH);
+        guide.setAttribute("y2", maxY + 14);
+        guide.setAttribute("stroke", noteInfo.color);
+        guide.setAttribute("stroke-dasharray", noteInfo.isMiddleC ? "4,3" : "3,3");
+        guide.setAttribute("stroke-width", noteInfo.isMiddleC ? "2.5" : "1.5");
+        guide.setAttribute("opacity", noteInfo.isMiddleC ? "1.0" : "0.75");
+        guideGroup.appendChild(guide);
+      });
+
+      svg.appendChild(guideGroup);
+
+      // Noteheads Group
+      const noteheadGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      noteheadGroup.setAttribute("class", "cs-noteheads-group");
+
+      notes.forEach((noteInfo, idx) => {
+        const kx = startX + idx * keyW + keyW / 2;
+        const targets = notePositions[noteInfo.pitch] || [];
+
+        targets.forEach(tgt => {
+          const nhGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+          nhGroup.setAttribute("class", `cs-notehead cs-nh-${noteInfo.pitch}`);
+          nhGroup.setAttribute("data-pitch", noteInfo.pitch);
+
+          const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          circle.setAttribute("cx", kx);
+          circle.setAttribute("cy", tgt.y);
+          circle.setAttribute("r", "10");
+          circle.setAttribute("fill", noteInfo.color);
+          circle.setAttribute("stroke", "#ffffff");
+          circle.setAttribute("stroke-width", "1.6");
+          nhGroup.appendChild(circle);
+
+          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          text.setAttribute("x", kx);
+          text.setAttribute("y", tgt.y);
+          text.setAttribute("text-anchor", "middle");
+          text.setAttribute("dominant-baseline", "central");
+          text.setAttribute("font-size", "10.5");
+          text.setAttribute("font-weight", "900");
+          text.setAttribute("fill", "#ffffff");
+          text.setAttribute("pointer-events", "none");
+          text.textContent = noteInfo.letter;
+          nhGroup.appendChild(text);
+
+          nhGroup.addEventListener("click", () => selectCheatSheetNote(noteInfo.pitch));
+          noteheadGroup.appendChild(nhGroup);
+        });
+      });
+
+      svg.appendChild(noteheadGroup);
+      isCheatSheetSvgRendered = true;
+    }
+
+    function selectCheatSheetNote(pitch, playSound = true) {
+      if (!pitch || !window.MusicTheory) return;
+      currentCheatSheetSelectedPitch = pitch;
+
+      const staffInfo = window.MusicTheory.getCheatSheetStaffInfo(pitch);
+      if (!staffInfo) return;
+
+      // Update Inspector Badges
+      const badge = document.getElementById("csActiveBadge");
+      if (badge) {
+        badge.textContent = staffInfo.letter;
+        badge.style.background = staffInfo.color;
+        badge.style.boxShadow = `0 0 16px ${staffInfo.color}88`;
+      }
+
+      const pitchEl = document.getElementById("csActivePitch");
+      if (pitchEl) {
+        pitchEl.textContent = `${staffInfo.pitch} ${staffInfo.isMiddleC ? '(Middle C)' : ''}`;
+      }
+
+      const freqEl = document.getElementById("csActiveFreq");
+      if (freqEl) {
+        freqEl.textContent = `${staffInfo.freq.toFixed(2)} Hz`;
+      }
+
+      const posEl = document.getElementById("csActivePos");
+      if (posEl) {
+        posEl.textContent = staffInfo.staffPosition;
+        posEl.style.color = staffInfo.color;
+      }
+
+      const mnemEl = document.getElementById("csActiveMnemonic");
+      if (mnemEl) {
+        mnemEl.innerHTML = `Mnemonic: <strong>${staffInfo.mnemonic}</strong>`;
+      }
+
+      // Visual Highlighting on SVG
+      document.querySelectorAll(".cs-svg-key").forEach(k => k.classList.remove("is-active"));
+      document.querySelectorAll(`.cs-key-${pitch.replace('#', 's')}`).forEach(k => k.classList.add("is-active"));
+
+      document.querySelectorAll(".cs-notehead").forEach(n => n.classList.remove("is-active"));
+      document.querySelectorAll(`.cs-nh-${pitch.replace('#', 's')}`).forEach(n => n.classList.add("is-active"));
+
+      document.querySelectorAll(".cs-guideline").forEach(g => g.classList.remove("is-active"));
+      document.querySelectorAll(`.cs-guide-${pitch.replace('#', 's')}`).forEach(g => g.classList.add("is-active"));
+
+      // Play Sound & trigger Live Sustain stage
+      if (playSound && isSynthAudioEnabled()) {
+        initAudio();
+        const freq = window.MusicTheory.pitchToFreq(pitch);
+        if (freq) playTone(freq, 0.7);
+      }
+
+      const midiNum = window.MusicTheory.pitchToMidi(pitch);
+      if (midiNum) {
+        createSustainLane(midiNum, pitch);
+        setTimeout(() => removeSustainLane(midiNum), 750);
+      }
+    }
+
+    function openCheatSheetModal(initialPitch = "C4") {
+      const modal = document.getElementById("cheatSheetModal");
+      if (!modal) return;
+      modal.classList.add("is-open");
+
+      if (!isCheatSheetSvgRendered) {
+        renderCheatSheetSvg();
+      }
+      selectCheatSheetNote(initialPitch, false);
+    }
+
+    function closeCheatSheetModal() {
+      const modal = document.getElementById("cheatSheetModal");
+      if (!modal) return;
+      modal.classList.remove("is-open");
+    }
+
+    function playCheatSheetScaleSequence() {
+      if (isCheatSheetScalePlaying) return;
+      isCheatSheetScalePlaying = true;
+
+      const btn = document.getElementById("csPlayScaleBtn");
+      if (btn) btn.textContent = "⏹ Playing...";
+
+      const notes = window.MusicTheory.CHEAT_SHEET_NOTES_RANGE.map(n => n.pitch);
+      let idx = 0;
+
+      const stepTimer = setInterval(() => {
+        if (idx >= notes.length) {
+          clearInterval(stepTimer);
+          isCheatSheetScalePlaying = false;
+          if (btn) btn.textContent = "▶ Play Range (G2–G5)";
+          return;
+        }
+        selectCheatSheetNote(notes[idx], true);
+        idx++;
+      }, 350);
     }
 
     function playSingleNoteAudit(noteStr, hand = "rh", playSound = true) {
@@ -4938,6 +5864,91 @@
           }, durationMs);
         }
       });
+    // Live Sustain Lane Factory (Tinted with pianoNotesCheatSheet.png Note Colors & Staff Positions)
+    function createSustainLane(noteNumber, pitchName) {
+      if (!noteNumber || !pitchName) return;
+      if (activeHeldMidiNotes.has(noteNumber)) return;
+
+      const showCheatColors = isCheatSheetColorsEnabled();
+      const color = (showCheatColors && window.MusicTheory && window.MusicTheory.getCheatSheetNoteColor) 
+        ? window.MusicTheory.getCheatSheetNoteColor(pitchName) 
+        : "#fbbf24";
+      const staffInfo = (window.MusicTheory && window.MusicTheory.getCheatSheetStaffInfo) 
+        ? window.MusicTheory.getCheatSheetStaffInfo(pitchName) 
+        : null;
+
+      const lane = document.createElement("div");
+      lane.className = "sustain-lane";
+      lane.id = `lane_${noteNumber}`;
+      lane.style.borderLeft = `3px solid ${color}`;
+
+      const staffText = staffInfo ? staffInfo.staffPosition : `#${noteNumber}`;
+      const isMidC = (pitchName === "C4");
+
+      lane.innerHTML = `
+        <div class="lane-badge">
+          <span class="lane-pitch" style="color: ${color}; text-shadow: 0 0 10px ${color}88;">${pitchName}</span>
+          <span class="lane-staff-badge ${isMidC ? 'is-mid-c' : ''}" style="border: 1px solid ${color}66; color: ${color}; background: ${color}15;">${staffText}</span>
+          <span class="lane-midi-num">#${noteNumber}</span>
+        </div>
+        <div class="lane-rail-track">
+          <div class="rail-ticks">
+            <div class="rail-tick" style="left: 25%;"><span class="rail-tick-label">1b</span></div>
+            <div class="rail-tick" style="left: 50%;"><span class="rail-tick-label">2b</span></div>
+            <div class="rail-tick" style="left: 75%;"><span class="rail-tick-label">3b</span></div>
+          </div>
+          <div class="lane-rail-fill" style="background: linear-gradient(90deg, ${color}33 0%, ${color}aa 60%, ${color} 100%); box-shadow: 0 0 14px ${color}88;">
+            <div class="rail-spark-head" style="box-shadow: 0 0 10px #ffffff, 0 0 16px ${color};"></div>
+          </div>
+        </div>
+        <div class="lane-stats">0.00s • 0.00 beats</div>
+      `;
+
+      const container = document.getElementById("sustainLanesContainer");
+      const placeholder = document.getElementById("emptyPlaceholder");
+      if (placeholder) placeholder.style.display = "none";
+      if (container) container.appendChild(lane);
+
+      activeHeldMidiNotes.set(noteNumber, {
+        num: noteNumber,
+        pitch: pitchName,
+        startTime: performance.now(),
+        element: lane,
+        fillEl: lane.querySelector(".lane-rail-fill"),
+        statsEl: lane.querySelector(".lane-stats")
+      });
+
+      const countEl = document.getElementById("activeCount");
+      if (countEl) countEl.textContent = activeHeldMidiNotes.size;
+
+      if (activeHeldMidiNotes.size === 1) requestAnimationFrame(updateSustainRailsLoop);
+      updateActiveChordRecognizer();
+    }
+
+    function removeSustainLane(noteNumber) {
+      if (!noteNumber) return;
+      if (activeHeldMidiNotes.has(noteNumber)) {
+        const noteData = activeHeldMidiNotes.get(noteNumber);
+        if (noteData.element) {
+          noteData.element.style.transition = "opacity 0.18s ease-out, transform 0.18s ease-out";
+          noteData.element.style.opacity = "0";
+          noteData.element.style.transform = "translateY(-4px)";
+          setTimeout(() => {
+            if (noteData.element && noteData.element.parentNode) {
+              noteData.element.remove();
+            }
+          }, 180);
+        }
+        activeHeldMidiNotes.delete(noteNumber);
+      }
+
+      if (activeHeldMidiNotes.size === 0) {
+        const placeholder = document.getElementById("emptyPlaceholder");
+        if (placeholder) placeholder.style.display = "flex";
+      }
+      const countEl = document.getElementById("activeCount");
+      if (countEl) countEl.textContent = activeHeldMidiNotes.size;
+      updateActiveChordRecognizer();
     }
 
     // 60FPS Sustain Ribbon Loop
@@ -5349,44 +6360,7 @@
 
         if (document.getElementById("midiSoundToggle").checked) startLiveTone(noteNumber, velocity);
 
-        if (!activeHeldMidiNotes.has(noteNumber)) {
-          const lane = document.createElement("div");
-          lane.className = "sustain-lane";
-          lane.id = `lane_${noteNumber}`;
-
-          lane.innerHTML = `
-            <div class="lane-badge">
-              <span class="lane-pitch">${pitchName}</span>
-              <span class="lane-midi-num">#${noteNumber}</span>
-            </div>
-            <div class="lane-rail-track">
-              <div class="rail-ticks">
-                <div class="rail-tick" style="left: 25%;"><span class="rail-tick-label">1b</span></div>
-                <div class="rail-tick" style="left: 50%;"><span class="rail-tick-label">2b</span></div>
-                <div class="rail-tick" style="left: 75%;"><span class="rail-tick-label">3b</span></div>
-              </div>
-              <div class="lane-rail-fill"><div class="rail-spark-head"></div></div>
-            </div>
-            <div class="lane-stats">0.00s • 0.00 beats</div>
-          `;
-
-          const container = document.getElementById("sustainLanesContainer");
-          document.getElementById("emptyPlaceholder").style.display = "none";
-          container.appendChild(lane);
-
-          activeHeldMidiNotes.set(noteNumber, {
-            num: noteNumber,
-            pitch: pitchName,
-            startTime: performance.now(),
-            element: lane,
-            fillEl: lane.querySelector(".lane-rail-fill"),
-            statsEl: lane.querySelector(".lane-stats")
-          });
-
-          if (activeHeldMidiNotes.size === 1) requestAnimationFrame(updateSustainRailsLoop);
-        }
-        document.getElementById("activeCount").textContent = activeHeldMidiNotes.size;
-        updateActiveChordRecognizer();
+        createSustainLane(noteNumber, pitchName);
 
         // PRACTICE & EDUCATIONAL NOTE INPUT
         handleNoteDown(pitchName, "midi", { noteNumber, velocity });
@@ -5398,17 +6372,7 @@
 
         stopLiveTone(noteNumber);
 
-        if (activeHeldMidiNotes.has(noteNumber)) {
-          const noteData = activeHeldMidiNotes.get(noteNumber);
-          if (noteData.element) noteData.element.remove();
-          activeHeldMidiNotes.delete(noteNumber);
-        }
-
-        if (activeHeldMidiNotes.size === 0) {
-          document.getElementById("emptyPlaceholder").style.display = "flex";
-        }
-        document.getElementById("activeCount").textContent = activeHeldMidiNotes.size;
-        updateActiveChordRecognizer();
+        removeSustainLane(noteNumber);
 
         handleNoteUp(pitchName, { noteNumber });
       }
@@ -5838,31 +6802,189 @@
       feedbackObserver.observe(hudFeedbackEl, { childList: true, characterData: true, subtree: true });
     }
 
+    // KEYBOARD SIZE SONG ALLOWANCE & RANGE FILTERING ENGINE
+    let filterByKeyboard = false;
+    let keyboardFilterScope = "active_hands";
+    let isKbWarningDismissedForSong = false;
+
+    try {
+      const savedKbFilter = localStorage.getItem("piano_filter_by_keyboard");
+      if (savedKbFilter !== null) filterByKeyboard = (savedKbFilter === "true");
+      const savedKbScope = localStorage.getItem("piano_keyboard_filter_scope");
+      if (savedKbScope) keyboardFilterScope = savedKbScope;
+    } catch (err) {}
+
+    function getActiveHandOptions() {
+      const scopeSelect = document.getElementById("catalogKbScopeSelect");
+      const scope = scopeSelect ? scopeSelect.value : keyboardFilterScope;
+      if (scope === "full_song") {
+        return { rh: true, lh: true, dyads: true };
+      }
+      const rhOn = document.getElementById("toggleRH") ? document.getElementById("toggleRH").checked : true;
+      const lhOn = document.getElementById("toggleLH") ? document.getElementById("toggleLH").checked : false;
+      const dyadOn = document.getElementById("toggleDyads") ? document.getElementById("toggleDyads").checked : false;
+      return { rh: rhOn, lh: lhOn, dyads: dyadOn };
+    }
+
+    function getSongKeyboardCompatibility(song) {
+      const config = { startMidi: currentStartMidi, keyCount: currentKeyCount };
+      const handOpts = getActiveHandOptions();
+      if (typeof evaluateSongKeyboardCompatibility === "function") {
+        return evaluateSongKeyboardCompatibility(song, config, handOpts);
+      }
+      if (window.MusicTheory && window.MusicTheory.evaluateSongKeyboardCompatibility) {
+        return window.MusicTheory.evaluateSongKeyboardCompatibility(song, config, handOpts);
+      }
+      return { fitsExact: true, fitsSpan: true, status: "fits", statusMessage: "Fits", range: { minPitch: "C4", maxPitch: "C4", span: 1 }, recommendedPreset: "37", recommendedPresetName: "37 Keys" };
+    }
+
+    function autoFitKeyboardToSong(song) {
+      if (!song) return;
+      const handOpts = getActiveHandOptions();
+      const range = (typeof getSongPitchRange === "function")
+        ? getSongPitchRange(song, handOpts)
+        : (window.MusicTheory && window.MusicTheory.getSongPitchRange ? window.MusicTheory.getSongPitchRange(song, handOpts) : null);
+      if (!range) return;
+
+      const targetPreset = range.minExactPreset || { count: 88, startMidi: 21, id: "88", name: "88 Keys" };
+      currentKeyCount = targetPreset.count;
+      currentStartMidi = targetPreset.startMidi;
+      updateKeyboardControlsUI();
+      buildPianoKeyboard();
+      updateKeyboardRangeWarning();
+      renderFilterPills();
+      applyCatalogFilters();
+      if (currentKeyCount > 37) {
+        setTimeout(() => centerMiddleCView(false), 50);
+      }
+    }
+
+    function shiftKeyboardToFitSong(song) {
+      if (!song) return;
+      const compat = getSongKeyboardCompatibility(song);
+      if (compat && compat.shiftNeeded) {
+        shiftKeyboardStart(compat.shiftNeeded);
+        updateKeyboardRangeWarning();
+        renderFilterPills();
+        applyCatalogFilters();
+      }
+    }
+
+    function updateKeyboardRangeWarning() {
+      const banner = document.getElementById("keyboardRangeWarningBanner");
+      if (!banner || !currentSong) return;
+
+      if (isKbWarningDismissedForSong) {
+        banner.style.display = "none";
+        return;
+      }
+
+      const compat = getSongKeyboardCompatibility(currentSong);
+      const titleEl = document.getElementById("kbWarningTitle");
+      const descEl = document.getElementById("kbWarningDesc");
+      const autoFitBtn = document.getElementById("kbWarningAutoFitBtn");
+      const shiftBtn = document.getElementById("kbWarningShiftBtn");
+
+      if (compat.status === "exceeds") {
+        banner.style.display = "flex";
+        if (titleEl) titleEl.textContent = `⚠️ Song Exceeds Keyboard Size: "${currentSong.title}"`;
+        if (descEl) descEl.textContent = `Requires ${compat.range.span} keys (${compat.range.minPitch} to ${compat.range.maxPitch}). Current keyboard has ${currentKeyCount} keys (${midiNumberToPitch(currentStartMidi)} to ${midiNumberToPitch(currentStartMidi + currentKeyCount - 1)}).`;
+        if (autoFitBtn) {
+          autoFitBtn.style.display = "inline-flex";
+          autoFitBtn.textContent = `⚡ Auto-Fit to ${compat.recommendedPresetName || (compat.recommendedPreset + ' Keys')}`;
+        }
+        if (shiftBtn) shiftBtn.style.display = "none";
+      } else if (compat.status === "shift_needed") {
+        banner.style.display = "flex";
+        if (titleEl) titleEl.textContent = `↔ Keyboard Shift Recommended: "${currentSong.title}"`;
+        if (descEl) descEl.textContent = `Notes span ${compat.range.span} keys (${compat.range.minPitch} to ${compat.range.maxPitch}), which fits your ${currentKeyCount}-key keyboard if shifted.`;
+        if (shiftBtn) {
+          shiftBtn.style.display = "inline-flex";
+          shiftBtn.textContent = `↔ Shift ${compat.shiftNeeded > 0 ? '+' : ''}${compat.shiftNeeded} Semitones`;
+        }
+        if (autoFitBtn) autoFitBtn.style.display = "none";
+      } else {
+        banner.style.display = "none";
+      }
+    }
+
+    function updateFilterHeaderBadges() {
+      const currentConfig = { startMidi: currentStartMidi, keyCount: currentKeyCount };
+      const handOpts = getActiveHandOptions();
+      const playableCount = songDatabase.filter(s => {
+        const c = evaluateSongKeyboardCompatibility(s, currentConfig, handOpts);
+        return c.fitsExact;
+      }).length;
+
+      const badge = document.getElementById("keyboardFilterStatsBadge");
+      if (badge) {
+        badge.textContent = `${playableCount} / ${songDatabase.length} Playable (${currentKeyCount} Keys)`;
+      }
+
+      const dockLabel = document.getElementById("kbDockFilterLabel");
+      if (dockLabel) {
+        dockLabel.textContent = `🎹 Fit Keyboard (${playableCount}/${songDatabase.length})`;
+      }
+
+      const toggleCheckbox = document.getElementById("catalogKbFilterToggle");
+      if (toggleCheckbox) toggleCheckbox.checked = filterByKeyboard;
+
+      const dockCheckbox = document.getElementById("kbDockFilterCheckbox");
+      if (dockCheckbox) dockCheckbox.checked = filterByKeyboard;
+
+      const scopeSelect = document.getElementById("catalogKbScopeSelect");
+      if (scopeSelect) scopeSelect.value = keyboardFilterScope;
+    }
+
+    function handleFilterByKeyboardToggle(checked) {
+      filterByKeyboard = checked;
+      try {
+        localStorage.setItem("piano_filter_by_keyboard", filterByKeyboard.toString());
+      } catch (err) {}
+      const c1 = document.getElementById("catalogKbFilterToggle");
+      const c2 = document.getElementById("kbDockFilterCheckbox");
+      if (c1) c1.checked = filterByKeyboard;
+      if (c2) c2.checked = filterByKeyboard;
+      renderFilterPills();
+      applyCatalogFilters();
+    }
+
     // Dropdown Population & Filter Pills
     function populateDropdown(songsToUse = songDatabase) {
       const select = document.getElementById("songDropdown");
+      if (!select) return;
       select.innerHTML = "";
+
+      const currentConfig = { startMidi: currentStartMidi, keyCount: currentKeyCount };
+      const handOpts = getActiveHandOptions();
+
+      // If filterByKeyboard is active, only show compatible songs
+      const songsAllowed = filterByKeyboard
+        ? songsToUse.filter(s => evaluateSongKeyboardCompatibility(s, currentConfig, handOpts).fitsExact)
+        : songsToUse;
 
       const categories = [...new Set(songDatabase.map(s => s.category))];
       categories.forEach(cat => {
-        const matching = songsToUse.filter(s => s.category === cat);
+        const matching = songsAllowed.filter(s => s.category === cat);
         if (matching.length > 0) {
           const group = document.createElement("optgroup");
           group.label = `${cat} (${matching.length})`;
           matching.forEach(song => {
             const opt = document.createElement("option");
             opt.value = song.id;
-            opt.textContent = song.title;
+            const compat = evaluateSongKeyboardCompatibility(song, currentConfig, handOpts);
+            const tag = (!filterByKeyboard && compat.status === "exceeds") ? ` [⚠️ Needs ${compat.recommendedPreset}k]` : "";
+            opt.textContent = `${song.title}${tag}`;
             group.appendChild(opt);
           });
           select.appendChild(group);
         }
       });
 
-      if (currentSong && songsToUse.some(s => s.id === currentSong.id)) {
+      if (currentSong && songsAllowed.some(s => s.id === currentSong.id)) {
         select.value = currentSong.id;
-      } else if (songsToUse.length > 0) {
-        select.value = songsToUse[0].id;
+      } else if (songsAllowed.length > 0) {
+        select.value = songsAllowed[0].id;
       }
     }
 
@@ -5871,6 +6993,7 @@
       currentSong = song;
       currentPracticeStep = 0;
       isPracticeSessionStarted = false;
+      isKbWarningDismissedForSong = false;
       const scoreContainer = document.getElementById("sheetMusicSection");
       if (scoreContainer) scoreContainer.scrollTop = 0;
       lastScoreScrollTarget = 0;
@@ -5882,6 +7005,7 @@
       parseSongSteps();
       renderSheetMusicScore();
       highlightActiveCard();
+      updateKeyboardRangeWarning();
     }
 
     function highlightActiveCard() {
@@ -5893,17 +7017,39 @@
 
     function renderCatalog(songsToRender) {
       const grid = document.getElementById("catalogGrid");
+      if (!grid) return;
       grid.innerHTML = "";
 
       if (songsToRender.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem;">No songs match your filter.</div>`;
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem;">No songs match your filter or keyboard size.</div>`;
         return;
       }
 
+      const currentConfig = { startMidi: currentStartMidi, keyCount: currentKeyCount };
+      const handOpts = getActiveHandOptions();
+
       songsToRender.forEach(song => {
+        const compat = evaluateSongKeyboardCompatibility(song, currentConfig, handOpts);
         const card = document.createElement("div");
-        card.className = "catalog-card" + (currentSong && song.id === currentSong.id ? " active-card" : "");
+        const isDisallowed = compat.status === "exceeds";
+        card.className = "catalog-card" 
+          + (currentSong && song.id === currentSong.id ? " active-card" : "")
+          + (isDisallowed ? " disallowed-song" : "");
         card.dataset.id = song.id;
+        card.dataset.compat = compat.status;
+
+        let compatTagHtml = "";
+        if (compat.status === "fits") {
+          compatTagHtml = `<span class="compat-tag compat-fits" title="Fits current ${currentKeyCount}-key keyboard">✓ Fits ${currentKeyCount}k</span>`;
+        } else if (compat.status === "shift_needed") {
+          compatTagHtml = `<span class="compat-tag compat-shift" title="${compat.statusMessage}">↔ Shift (${compat.shiftNeeded > 0 ? '+' : ''}${compat.shiftNeeded})</span>`;
+        } else {
+          compatTagHtml = `<span class="compat-tag compat-exceeds" title="${compat.statusMessage}">🚫 Needs ${compat.recommendedPreset}k</span>`;
+        }
+
+        const actionRight = isDisallowed
+          ? `<span class="card-action-auto-fit" data-action="autofit" title="Auto-expand keyboard to ${compat.recommendedPreset} keys and load">⚡ Auto-Fit (${compat.recommendedPreset}k) & Load</span>`
+          : `<span>Load Piece →</span>`;
 
         card.innerHTML = `
           <div>
@@ -5911,15 +7057,25 @@
               <span class="card-title">${song.title}</span>
               <span class="card-badge">${song.category}</span>
             </div>
+            <div class="card-meta-row">
+              <span class="card-range-badge" title="Pitch Range">${compat.range.minPitch || 'C4'} – ${compat.range.maxPitch || 'C4'} (${compat.range.span}k)</span>
+              ${compatTagHtml}
+            </div>
             <div class="card-preview">Score: ${song.rh.slice(0, 36)}...</div>
           </div>
           <div class="card-action">
             <span>Staff Notation ✓</span>
-            <span>Load Piece →</span>
+            ${actionRight}
           </div>
         `;
 
-        card.addEventListener("click", () => {
+        card.addEventListener("click", (e) => {
+          if (e.target.dataset.action === "autofit" || e.target.closest("[data-action='autofit']")) {
+            autoFitKeyboardToSong(song);
+            loadSong(song);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
           loadSong(song);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         });
@@ -5933,15 +7089,30 @@
 
     function renderFilterPills() {
       const container = document.getElementById("filterPillsContainer");
+      if (!container) return;
       container.innerHTML = "";
+
+      const currentConfig = { startMidi: currentStartMidi, keyCount: currentKeyCount };
+      const handOpts = getActiveHandOptions();
+      const compatibleCount = songDatabase.filter(s => {
+        const c = evaluateSongKeyboardCompatibility(s, currentConfig, handOpts);
+        return c.fitsExact;
+      }).length;
 
       const uniqueCats = [...new Set(songDatabase.map(s => s.category).filter(Boolean))];
       const categories = [
         { key: "all", label: `All (${songDatabase.length})` },
-        ...uniqueCats.map(cat => ({
-          key: cat,
-          label: `${cat} (${songDatabase.filter(s => s.category === cat).length})`
-        }))
+        { key: "fits_keyboard", label: `🎹 Fits My Keyboard (${compatibleCount})` },
+        ...uniqueCats.map(cat => {
+          let count = songDatabase.filter(s => s.category === cat).length;
+          if (filterByKeyboard) {
+            count = songDatabase.filter(s => s.category === cat && evaluateSongKeyboardCompatibility(s, currentConfig, handOpts).fitsExact).length;
+          }
+          return {
+            key: cat,
+            label: `${cat} (${count})`
+          };
+        })
       ];
 
       categories.forEach(cat => {
@@ -5959,21 +7130,82 @@
 
         container.appendChild(btn);
       });
+
+      updateFilterHeaderBadges();
     }
 
     function applyCatalogFilters() {
-      const query = searchInput.value.toLowerCase().trim();
+      const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+      const currentConfig = { startMidi: currentStartMidi, keyCount: currentKeyCount };
+      const handOpts = getActiveHandOptions();
+
       const filtered = songDatabase.filter(s => {
-        const matchesCat = activeCategory === "all" || s.category === activeCategory;
+        const compat = evaluateSongKeyboardCompatibility(s, currentConfig, handOpts);
+        const matchesKb = !filterByKeyboard || compat.fitsExact;
+
+        let matchesCat = false;
+        if (activeCategory === "all") {
+          matchesCat = true;
+        } else if (activeCategory === "fits_keyboard") {
+          matchesCat = compat.fitsExact;
+        } else {
+          matchesCat = (s.category === activeCategory);
+        }
+
         const matchesSearch = s.title.toLowerCase().includes(query) || s.rh.toLowerCase().includes(query);
-        return matchesCat && matchesSearch;
+        return matchesCat && matchesSearch && matchesKb;
       });
 
       renderCatalog(filtered);
       populateDropdown(filtered);
+      updateFilterHeaderBadges();
     }
 
-    searchInput.addEventListener("input", applyCatalogFilters);
+    if (searchInput) {
+      searchInput.addEventListener("input", applyCatalogFilters);
+    }
+
+    const catalogKbFilterToggle = document.getElementById("catalogKbFilterToggle");
+    if (catalogKbFilterToggle) {
+      catalogKbFilterToggle.addEventListener("change", (e) => handleFilterByKeyboardToggle(e.target.checked));
+    }
+
+    const kbDockFilterCheckbox = document.getElementById("kbDockFilterCheckbox");
+    if (kbDockFilterCheckbox) {
+      kbDockFilterCheckbox.addEventListener("change", (e) => handleFilterByKeyboardToggle(e.target.checked));
+    }
+
+    const catalogKbScopeSelect = document.getElementById("catalogKbScopeSelect");
+    if (catalogKbScopeSelect) {
+      catalogKbScopeSelect.addEventListener("change", (e) => {
+        keyboardFilterScope = e.target.value;
+        try {
+          localStorage.setItem("piano_keyboard_filter_scope", keyboardFilterScope);
+        } catch (err) {}
+        renderFilterPills();
+        applyCatalogFilters();
+        updateKeyboardRangeWarning();
+      });
+    }
+
+    const kbWarningAutoFitBtn = document.getElementById("kbWarningAutoFitBtn");
+    if (kbWarningAutoFitBtn) {
+      kbWarningAutoFitBtn.addEventListener("click", () => autoFitKeyboardToSong(currentSong));
+    }
+
+    const kbWarningShiftBtn = document.getElementById("kbWarningShiftBtn");
+    if (kbWarningShiftBtn) {
+      kbWarningShiftBtn.addEventListener("click", () => shiftKeyboardToFitSong(currentSong));
+    }
+
+    const kbWarningDismissBtn = document.getElementById("kbWarningDismissBtn");
+    if (kbWarningDismissBtn) {
+      kbWarningDismissBtn.addEventListener("click", () => {
+        isKbWarningDismissedForSong = true;
+        const banner = document.getElementById("keyboardRangeWarningBanner");
+        if (banner) banner.style.display = "none";
+      });
+    }
 
     // Curriculum Tier Listener
     document.querySelectorAll(".level-btn").forEach(btn => {
@@ -6043,6 +7275,9 @@
 
       parseSongSteps();
       renderSheetMusicScore();
+      if (typeof onKeyboardLayoutChanged === "function") {
+        onKeyboardLayoutChanged();
+      }
     }
 
     [toggleRH, toggleLH, toggleDyads, toggleCheat, toggleFingers].forEach(t => {
