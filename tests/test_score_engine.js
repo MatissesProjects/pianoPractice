@@ -2528,6 +2528,15 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   assert.ok(html.includes('function closeCheatSheetModal'), "Must define closeCheatSheetModal");
   assert.ok(html.includes('function selectCheatSheetNote'), "Must define selectCheatSheetNote");
 
+  // 26.6 Complete Inline Script Syntax & Balance Validation
+  const vm = require("vm");
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid and free of unclosed braces or tokens");
+
   console.log("✔ Test 26: 🎼 Interactive Piano Notes Cheat Sheet, Keyboard Colorization & Live Sustain Integration passed");
 }
 
