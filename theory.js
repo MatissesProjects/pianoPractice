@@ -1299,6 +1299,189 @@
     "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5"
   ].map(p => getCheatSheetStaffInfo(p));
 
+  // ==========================================
+  // METRONOME & TIME SIGNATURE EQUAL DIVISIONS ENGINE
+  // ==========================================
+
+  const TIME_SIGNATURE_NAMES = {
+    "4/4": "4/4 (Common Time)",
+    "3/4": "3/4 (Waltz Time)",
+    "2/4": "2/4 (March Time)",
+    "6/8": "6/8 (Compound Duple)",
+    "3/8": "3/8 (Compound Single)",
+    "5/4": "5/4 (Odd Meter)",
+    "7/8": "7/8 (Complex Meter)",
+    "9/8": "9/8 (Compound Triple)",
+    "12/8": "12/8 (Compound Quadruple)"
+  };
+
+  /**
+   * Parse a time signature string (e.g. "4/4", "3/4", "6/8", or integer 4).
+   * Computes numerator, denominator, beat unit in quarter notes, and compound status.
+   */
+  function parseTimeSignature(timeSigStr) {
+    if (!timeSigStr) timeSigStr = "4/4";
+    let num = 4;
+    let den = 4;
+
+    if (typeof timeSigStr === "number") {
+      num = timeSigStr;
+      den = 4;
+    } else {
+      const parts = String(timeSigStr).trim().split("/");
+      num = parseInt(parts[0], 10) || 4;
+      den = parts[1] ? (parseInt(parts[1], 10) || 4) : 4;
+    }
+
+    const timeSig = `${num}/${den}`;
+    const beatUnitBeats = 4 / den; // quarter note duration equivalency
+    const measureQuarterBeats = num * beatUnitBeats;
+    const isCompound = (den === 8 || den === 16) && (num % 3 === 0 && num > 3);
+    const compoundBeats = isCompound ? num / 3 : num;
+    const name = TIME_SIGNATURE_NAMES[timeSig] || `${timeSig} Time`;
+
+    return {
+      numerator: num,
+      denominator: den,
+      timeSig,
+      name,
+      beatUnitBeats,
+      measureQuarterBeats,
+      isCompound,
+      compoundBeats
+    };
+  }
+
+  /**
+   * Calculate sample-accurate equal divisions for metronome ticks across any time signature.
+   * @param {number} bpm - Beats per minute (quarter notes per minute)
+   * @param {string|number} timeSigStr - Time signature (e.g. "4/4", "3/4", "6/8")
+   * @param {number} subdivision - Equal divisions per beat (1 = quarter/beat unit, 2 = eighths, 3 = triplets, 4 = sixteenths)
+   */
+  function calculateMetronomeIntervals(bpm, timeSigStr = "4/4", subdivision = 1) {
+    const validBpm = Math.max(20, Math.min(300, parseInt(bpm, 10) || 96));
+    const validSubdiv = Math.max(1, Math.min(8, parseInt(subdivision, 10) || 1));
+    const ts = parseTimeSignature(timeSigStr);
+
+    // Duration of 1 beat unit in seconds (e.g. at 120 BPM: quarter=0.5s, eighth=0.25s)
+    const beatIntervalSec = (60.0 / validBpm) * ts.beatUnitBeats;
+    // Exactly equal division interval
+    const tickIntervalSec = beatIntervalSec / validSubdiv;
+    const tickIntervalMs = tickIntervalSec * 1000;
+    const ticksPerMeasure = ts.numerator * validSubdiv;
+    const measureDurationSec = beatIntervalSec * ts.numerator;
+
+    return {
+      bpm: validBpm,
+      timeSig: ts.timeSig,
+      numerator: ts.numerator,
+      denominator: ts.denominator,
+      beatUnitBeats: ts.beatUnitBeats,
+      subdivision: validSubdiv,
+      ticksPerMeasure,
+      beatIntervalSec,
+      tickIntervalSec,
+      tickIntervalMs,
+      measureDurationSec,
+      isCompound: ts.isCompound
+    };
+  }
+
+  /**
+   * Returns musical accent hierarchy, frequency and volume for a specific tick in a measure.
+   * Ensures distinct auditory cues for downbeat, secondary strong beats, regular beats, and equal subdivisions.
+   */
+  function getMetronomeTickProfile(tickIndex, ticksPerMeasure, timeSigStr = "4/4", subdivision = 1) {
+    const validSubdiv = Math.max(1, parseInt(subdivision, 10) || 1);
+    const ts = parseTimeSignature(timeSigStr);
+    const modTick = ((tickIndex % ticksPerMeasure) + ticksPerMeasure) % ticksPerMeasure;
+    const isDownbeat = modTick === 0;
+    const isBeatOnset = modTick % validSubdiv === 0;
+    const beatIndex = Math.floor(modTick / validSubdiv); // 0-indexed beat (0..num-1)
+    const beatNumber = beatIndex + 1; // 1-indexed
+
+    let accentType = "beat";
+    let freq = 640;
+    let volume = 0.6;
+
+    if (isDownbeat) {
+      accentType = "downbeat";
+      freq = 1200;
+      volume = 1.0;
+    } else if (isBeatOnset) {
+      // Check secondary accents in common meters
+      let isSecondary = false;
+      if (ts.numerator === 4 && beatIndex === 2) {
+        // Beat 3 in 4/4
+        isSecondary = true;
+      } else if (ts.numerator === 6 && beatIndex === 3) {
+        // Beat 4 in 6/8
+        isSecondary = true;
+      } else if (ts.numerator === 12 && (beatIndex === 3 || beatIndex === 6 || beatIndex === 9)) {
+        // Beats 4, 7, 10 in 12/8
+        isSecondary = true;
+      } else if (ts.numerator === 9 && (beatIndex === 3 || beatIndex === 6)) {
+        // Beats 4, 7 in 9/8
+        isSecondary = true;
+      }
+
+      if (isSecondary) {
+        accentType = "secondary";
+        freq = 900;
+        volume = 0.75;
+      } else {
+        accentType = "beat";
+        freq = 640;
+        volume = 0.6;
+      }
+    } else {
+      accentType = "subdivision";
+      freq = 420;
+      volume = 0.35;
+    }
+
+    return {
+      tickIndex: modTick,
+      beatNumber,
+      beatIndex,
+      isDownbeat,
+      isBeatOnset,
+      isSubdivision: !isBeatOnset,
+      accentType,
+      freq,
+      volume
+    };
+  }
+
+  /**
+   * Generates dynamic count-in array matching the authentic meter of the time signature.
+   */
+  function getTimeSignatureCountIn(timeSigStr = "4/4", bpm = 96) {
+    const ts = parseTimeSignature(timeSigStr);
+    const countBeats = [];
+    // Count from ts.numerator down to 1, then GO! (num 0)
+    for (let b = ts.numerator; b >= 1; b--) {
+      const isDownbeat = (b === ts.numerator);
+      countBeats.push({
+        num: b,
+        freq: isDownbeat ? 880 : 440,
+        label: String(b)
+      });
+    }
+    countBeats.push({
+      num: 0,
+      freq: 1046.5,
+      label: "GO! 🔥"
+    });
+
+    const beatMs = (60 / bpm) * ts.beatUnitBeats * 1000;
+    return {
+      countBeats,
+      beatMs,
+      totalCountInMs: (countBeats.length - 1) * beatMs
+    };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -1346,7 +1529,12 @@
     getCheatSheetNoteColor,
     CHEAT_SHEET_STAFF_MAP,
     getCheatSheetStaffInfo,
-    CHEAT_SHEET_NOTES_RANGE
+    CHEAT_SHEET_NOTES_RANGE,
+    TIME_SIGNATURE_NAMES,
+    parseTimeSignature,
+    calculateMetronomeIntervals,
+    getMetronomeTickProfile,
+    getTimeSignatureCountIn
   };
 });
 
