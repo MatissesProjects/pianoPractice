@@ -2540,6 +2540,204 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 26: 🎼 Interactive Piano Notes Cheat Sheet, Keyboard Colorization & Live Sustain Integration passed");
 }
 
+// ==========================================
+// TEST 27: ⏱️ Metronome Engine Architecture — Equal Divisions, Proper Time Signatures, Beat Subdivisions & Repertoire Synchronization
+// ==========================================
+{
+  const fs = require("fs");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const theory = window.MusicTheory;
+  assert.ok(theory, "window.MusicTheory must be available");
+  assert.ok(typeof theory.parseTimeSignature === "function", "theory.parseTimeSignature must be exported");
+  assert.ok(typeof theory.calculateMetronomeIntervals === "function", "theory.calculateMetronomeIntervals must be exported");
+  assert.ok(typeof theory.getMetronomeTickProfile === "function", "theory.getMetronomeTickProfile must be exported");
+  assert.ok(typeof theory.getTimeSignatureCountIn === "function", "theory.getTimeSignatureCountIn must be exported");
+
+  // 27.1 Time Signature Parsing & Quarter-Note Beat Equivalencies
+  const sig4_4 = theory.parseTimeSignature("4/4");
+  assert.strictEqual(sig4_4.numerator, 4);
+  assert.strictEqual(sig4_4.denominator, 4);
+  assert.strictEqual(sig4_4.beatUnitBeats, 1.0, "Quarter note is 1.0 beat in 4/4");
+  assert.strictEqual(sig4_4.measureQuarterBeats, 4.0, "4/4 measure has 4.0 quarter beats");
+  assert.strictEqual(sig4_4.isCompound, false, "4/4 is not compound");
+
+  const sig3_4 = theory.parseTimeSignature("3/4");
+  assert.strictEqual(sig3_4.numerator, 3);
+  assert.strictEqual(sig3_4.denominator, 4);
+  assert.strictEqual(sig3_4.beatUnitBeats, 1.0);
+  assert.strictEqual(sig3_4.measureQuarterBeats, 3.0);
+
+  const sig2_4 = theory.parseTimeSignature("2/4");
+  assert.strictEqual(sig2_4.numerator, 2);
+  assert.strictEqual(sig2_4.denominator, 4);
+  assert.strictEqual(sig2_4.beatUnitBeats, 1.0);
+  assert.strictEqual(sig2_4.measureQuarterBeats, 2.0);
+
+  const sig6_8 = theory.parseTimeSignature("6/8");
+  assert.strictEqual(sig6_8.numerator, 6);
+  assert.strictEqual(sig6_8.denominator, 8);
+  assert.strictEqual(sig6_8.beatUnitBeats, 0.5, "Eighth note is 0.5 beat in 6/8");
+  assert.strictEqual(sig6_8.measureQuarterBeats, 3.0, "6/8 measure has 3.0 quarter beats");
+  assert.strictEqual(sig6_8.isCompound, true, "6/8 is compound duple");
+  assert.strictEqual(sig6_8.compoundBeats, 2, "6/8 has 2 compound beats");
+
+  const sig3_8 = theory.parseTimeSignature("3/8");
+  assert.strictEqual(sig3_8.numerator, 3);
+  assert.strictEqual(sig3_8.denominator, 8);
+  assert.strictEqual(sig3_8.beatUnitBeats, 0.5);
+  assert.strictEqual(sig3_8.measureQuarterBeats, 1.5);
+
+  const sig5_4 = theory.parseTimeSignature("5/4");
+  assert.strictEqual(sig5_4.numerator, 5);
+  assert.strictEqual(sig5_4.denominator, 4);
+  assert.strictEqual(sig5_4.measureQuarterBeats, 5.0);
+
+  const sig7_8 = theory.parseTimeSignature("7/8");
+  assert.strictEqual(sig7_8.numerator, 7);
+  assert.strictEqual(sig7_8.denominator, 8);
+  assert.strictEqual(sig7_8.measureQuarterBeats, 3.5);
+
+  const sig12_8 = theory.parseTimeSignature("12/8");
+  assert.strictEqual(sig12_8.numerator, 12);
+  assert.strictEqual(sig12_8.denominator, 8);
+  assert.strictEqual(sig12_8.isCompound, true);
+  assert.strictEqual(sig12_8.compoundBeats, 4);
+
+  // Fallback defaults for missing / numeric
+  assert.strictEqual(theory.parseTimeSignature(null).timeSig, "4/4");
+  assert.strictEqual(theory.parseTimeSignature(3).timeSig, "3/4");
+
+  // 27.2 Strictly Equal Divisions Across Tempos & Subdivisions
+  // At 120 BPM:
+  // 4/4 with 1 division per beat:
+  const metro120_44_1 = theory.calculateMetronomeIntervals(120, "4/4", 1);
+  assert.strictEqual(metro120_44_1.ticksPerMeasure, 4);
+  assert.strictEqual(metro120_44_1.beatIntervalSec, 0.5);
+  assert.strictEqual(metro120_44_1.tickIntervalSec, 0.5, "Each tick interval must be mathematically equal (0.5s)");
+  assert.strictEqual(metro120_44_1.tickIntervalMs, 500);
+  assert.strictEqual(metro120_44_1.measureDurationSec, 2.0);
+
+  // 4/4 with 2 equal divisions (eighth notes):
+  const metro120_44_2 = theory.calculateMetronomeIntervals(120, "4/4", 2);
+  assert.strictEqual(metro120_44_2.ticksPerMeasure, 8);
+  assert.strictEqual(metro120_44_2.tickIntervalSec, 0.25, "Eighth note subdivision must be equal (0.25s)");
+  assert.strictEqual(metro120_44_2.tickIntervalMs, 250);
+
+  // 4/4 with 3 equal divisions (triplets):
+  const metro120_44_3 = theory.calculateMetronomeIntervals(120, "4/4", 3);
+  assert.strictEqual(metro120_44_3.ticksPerMeasure, 12);
+  assert.ok(Math.abs(metro120_44_3.tickIntervalMs - (500 / 3)) < 0.001);
+
+  // 4/4 with 4 equal divisions (sixteenth notes):
+  const metro120_44_4 = theory.calculateMetronomeIntervals(120, "4/4", 4);
+  assert.strictEqual(metro120_44_4.ticksPerMeasure, 16);
+  assert.strictEqual(metro120_44_4.tickIntervalSec, 0.125, "Sixteenth note subdivision must be equal (0.125s)");
+  assert.strictEqual(metro120_44_4.tickIntervalMs, 125);
+
+  // 6/8 with 1 equal division (6 eighth notes):
+  const metro120_68_1 = theory.calculateMetronomeIntervals(120, "6/8", 1);
+  assert.strictEqual(metro120_68_1.ticksPerMeasure, 6);
+  assert.strictEqual(metro120_68_1.tickIntervalSec, 0.25, "6/8 eighth pulse is 0.25s at 120 BPM quarter speed");
+  assert.strictEqual(metro120_68_1.measureDurationSec, 1.5, "6/8 measure is 1.5s total");
+
+  // 3/4 with 1 division per beat at 60 BPM:
+  const metro60_34_1 = theory.calculateMetronomeIntervals(60, "3/4", 1);
+  assert.strictEqual(metro60_34_1.ticksPerMeasure, 3);
+  assert.strictEqual(metro60_34_1.tickIntervalSec, 1.0);
+  assert.strictEqual(metro60_34_1.measureDurationSec, 3.0);
+
+  // 27.3 Accent Hierarchy (Downbeat, Secondary Accent, Main Beats, Subdivisions)
+  // In 4/4 (1 division):
+  const p0 = theory.getMetronomeTickProfile(0, 4, "4/4", 1);
+  assert.strictEqual(p0.isDownbeat, true);
+  assert.strictEqual(p0.accentType, "downbeat");
+  assert.strictEqual(p0.freq, 1200);
+
+  const p1 = theory.getMetronomeTickProfile(1, 4, "4/4", 1);
+  assert.strictEqual(p1.isDownbeat, false);
+  assert.strictEqual(p1.accentType, "beat");
+  assert.strictEqual(p1.freq, 640);
+
+  const p2 = theory.getMetronomeTickProfile(2, 4, "4/4", 1);
+  assert.strictEqual(p2.accentType, "secondary", "Beat 3 in 4/4 must have secondary accent");
+  assert.strictEqual(p2.freq, 900);
+
+  const p3 = theory.getMetronomeTickProfile(3, 4, "4/4", 1);
+  assert.strictEqual(p3.accentType, "beat");
+  assert.strictEqual(p3.freq, 640);
+
+  // In 4/4 with 2 subdivisions (8 ticks total):
+  const sub_p0 = theory.getMetronomeTickProfile(0, 8, "4/4", 2);
+  assert.strictEqual(sub_p0.accentType, "downbeat");
+  const sub_p1 = theory.getMetronomeTickProfile(1, 8, "4/4", 2);
+  assert.strictEqual(sub_p1.accentType, "subdivision", "Off-beat '&' must be subdivision");
+  assert.strictEqual(sub_p1.freq, 420);
+  const sub_p2 = theory.getMetronomeTickProfile(2, 8, "4/4", 2);
+  assert.strictEqual(sub_p2.accentType, "beat", "Beat 2 must be main beat");
+  const sub_p4 = theory.getMetronomeTickProfile(4, 8, "4/4", 2);
+  assert.strictEqual(sub_p4.accentType, "secondary", "Beat 3 must be secondary accent");
+
+  // In 6/8 (6 ticks): Beat 4 (index 3) is secondary accent
+  const p68_down = theory.getMetronomeTickProfile(0, 6, "6/8", 1);
+  assert.strictEqual(p68_down.accentType, "downbeat");
+  const p68_sec = theory.getMetronomeTickProfile(3, 6, "6/8", 1);
+  assert.strictEqual(p68_sec.accentType, "secondary", "Beat 4 in 6/8 must have secondary accent");
+  assert.strictEqual(p68_sec.freq, 900);
+
+  // 27.4 Authentic Time Signature Count-in Generator
+  const countIn4 = theory.getTimeSignatureCountIn("4/4", 120);
+  assert.strictEqual(countIn4.countBeats.length, 5, "4/4 count-in has 4 beats + GO!");
+  assert.strictEqual(countIn4.countBeats[0].label, "4");
+  assert.strictEqual(countIn4.countBeats[4].label, "GO! 🔥");
+  assert.strictEqual(countIn4.beatMs, 500);
+
+  const countIn3 = theory.getTimeSignatureCountIn("3/4", 120);
+  assert.strictEqual(countIn3.countBeats.length, 4, "3/4 count-in has 3 beats + GO!");
+  assert.strictEqual(countIn3.countBeats[0].label, "3");
+  assert.strictEqual(countIn3.countBeats[1].label, "2");
+  assert.strictEqual(countIn3.countBeats[2].label, "1");
+  assert.strictEqual(countIn3.countBeats[3].label, "GO! 🔥");
+
+  const countIn2 = theory.getTimeSignatureCountIn("2/4", 120);
+  assert.strictEqual(countIn2.countBeats.length, 3, "2/4 count-in has 2 beats + GO!");
+  assert.strictEqual(countIn2.countBeats[0].label, "2");
+
+  const countIn68 = theory.getTimeSignatureCountIn("6/8", 120);
+  assert.strictEqual(countIn68.countBeats.length, 7, "6/8 count-in has 6 pulses + GO!");
+  assert.strictEqual(countIn68.countBeats[0].label, "6");
+  assert.strictEqual(countIn68.beatMs, 250);
+
+  // 27.5 DOM & CSS Markup Validation in index.html
+  assert.ok(html.includes('id="repertoireMetroToggle"'), "index.html must include #repertoireMetroToggle button");
+  assert.ok(html.includes('id="metroSubdivisionSelect"'), "index.html must include #metroSubdivisionSelect");
+  assert.ok(html.includes('value="6/8"'), "index.html time signature select must support 6/8");
+  assert.ok(html.includes('value="3/8"'), "index.html time signature select must support 3/8");
+  assert.ok(html.includes('value="5/4"'), "index.html time signature select must support 5/4");
+  assert.ok(html.includes('value="7/8"'), "index.html time signature select must support 7/8");
+  assert.ok(html.includes('.beat-light.active-secondary'), "CSS must include .beat-light.active-secondary styling");
+  assert.ok(html.includes('.subdivision-lights-bar'), "CSS must include .subdivision-lights-bar styling");
+  assert.ok(html.includes('.sub-light.active-sub'), "CSS must include .sub-light.active-sub styling");
+
+  // 27.6 Script Logic Verification
+  assert.ok(html.includes('function initRepertoireMetronome'), "index.html must define initRepertoireMetronome");
+  assert.ok(html.includes('function startRepertoireMetronomeClock'), "index.html must define startRepertoireMetronomeClock");
+  assert.ok(html.includes('function stopRepertoireMetronomeClock'), "index.html must define stopRepertoireMetronomeClock");
+  assert.ok(html.includes('function scheduleRepertoireMetroClick'), "index.html must define scheduleRepertoireMetroClick");
+  assert.ok(html.includes('getTimeSignatureCountIn(timeSigStr, bpm)'), "Tempo Flow mode must use dynamic time signature count-in");
+  assert.ok(html.includes('calculateMetronomeIntervals(bpm, timeSigStr, 1)'), "Tempo Flow mode must schedule isochronous equal-division clicks");
+
+  // 27.7 Complete Script Syntax Validation
+  const vm = require("vm");
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid and free of unclosed tokens or syntax errors");
+
+  console.log("✔ Test 27: ⏱️ Metronome Engine Architecture — Equal Divisions, Proper Time Signatures, Beat Subdivisions & Repertoire Synchronization passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 

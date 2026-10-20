@@ -290,4 +290,28 @@
     - [x] Test 26.6 verifying complete inline script syntax validation via `vm.Script` (resolved missing closing brace on `highlightPlaybackKey` that caused browser `Uncaught SyntaxError: Unexpected end of input`)
     - [x] All 26 score engine tests and all 13 education tests passing with 100% success.
 
+- [x] **Milestone 26: Metronome Engine Architecture — Equal Divisions, Proper Time Signatures, Beat Subdivisions & Repertoire Synchronization**
+  - [x] **Music Theory Metronome Engine (`theory.js`)**:
+    - [x] `parseTimeSignature(timeSigStr)`: Computes numerator, denominator, beat unit in quarter notes (`4 / den`), measure quarter beats, compound meter detection (`6/8`, `9/8`, `12/8`, `3/8`), and compound beats.
+    - [x] `calculateMetronomeIntervals(bpm, timeSigStr, subdivision)`: Computes sample-accurate, strictly equal intervals across all tempos, time signatures, and beat subdivisions (`tickIntervalSec = beatIntervalSec / subdivision`), guaranteeing isochronous equal divisions.
+    - [x] `getMetronomeTickProfile(tickIndex, ticksPerMeasure, timeSigStr, subdivision)`: Implements hierarchical accents with distinct auditory cues: Downbeat (1200 Hz, volume 1.0), Secondary strong beat (Beat 3 in 4/4, Beat 4 in 6/8 at 900 Hz, volume 0.75), Regular beats (640 Hz, volume 0.6), and Subdivisions (420 Hz, volume 0.35).
+    - [x] `getTimeSignatureCountIn(timeSigStr, bpm)`: Dynamic count-in matching authentic time signature meter (e.g. 3 beats for 3/4, 2 beats for 2/4, 6 beats for 6/8, 4 beats for 4/4) with countdown labels and audio frequencies.
+  - [x] **Precision Audio-Visual Metronome Workshop Upgrade (`index.html`)**:
+    - [x] Extended Time Signature selector (`#metroTimeSigSelect`): Full support for `4/4` (Common), `3/4` (Waltz), `2/4` (March), `6/8` (Compound Duple), `3/8` (Compound Single), `5/4` (Odd Meter), `7/8` (Complex Meter), `9/8` (Compound Triple), `12/8` (Compound Quadruple).
+    - [x] Equal Divisions / Subdivisions Selector (`#metroSubdivisionSelect`): 1 Division (Main Beats), 2 Equal Divisions (Eighths 𝅘𝅥𝅮 𝅘𝅥𝅮), 3 Equal Divisions (Triplets 𝅘𝅥𝅮 𝅘𝅥𝅮 𝅘𝅥𝅮), 4 Equal Divisions (16ths 𝅘𝅥𝅯 𝅘𝅥𝅯 𝅘𝅥𝅯 𝅘𝅥𝅯).
+    - [x] Dynamic Beat & Subdivision Lights Bar: Displays primary downbeat (golden amber glow), secondary accents (emerald glow), upbeat pulses (sky blue glow), and miniature subdivision dots (`.sub-light.active-sub`).
+    - [x] Sample-accurate Web Audio click synthesis routed through master gain node with volume scaling and mute support.
+    - [x] Precision rhythm tap trainer synced with current equal-division interval.
+  - [x] **Decoupled Isochronous Tempo Flow Mode Metronome**:
+    - [x] Eliminated irregular note-step clicks (`playTone(stepIdx % 4 === 0 ...)`): Replaced note-onset firing with an independent isochronous beat clock scheduled across the full song duration.
+    - [x] Dynamic Time Signature count-in replacing hardcoded 4-beat count-in.
+  - [x] **Repertoire Transport Steady Metronome Synchronizer**:
+    - [x] Added `⏱️ Metronome` toggle button (`#repertoireMetroToggle`) to transport controls bar.
+    - [x] Synchronizes steady equal-division metronome clicks during Auto Play Preview and Wait-for-Me Practice mode according to the loaded song's time signature and tempo.
+    - [x] LocalStorage persistence (`piano_repertoire_metronome`) and reactive tempo slider re-syncing.
+  - [x] **Comprehensive Automated Verification Test Suite (`tests/test_score_engine.js` Test 27)**:
+    - [x] Tests 27.1–27.7 verifying theory exports, time signature parsing, equal divisions calculations across 60/96/120/144 BPM, accent hierarchies, compound meters, dynamic count-in generation, DOM elements, CSS styles, and full inline script syntax validation via `vm.Script`.
+    - [x] All 27 score engine tests and all 13 education tests passing with 100% success.
+
+
 
