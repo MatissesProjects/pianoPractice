@@ -2078,11 +2078,37 @@
       box-shadow: 0 0 20px rgba(245, 158, 11, 0.9);
       transform: scale(1.2);
     }
+    .beat-light.active-secondary {
+      background: #10b981;
+      border-color: #34d399;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.85);
+      transform: scale(1.18);
+    }
     .beat-light.active-upbeat {
       background: #38bdf8;
       border-color: #7dd3fc;
       box-shadow: 0 0 16px rgba(56, 189, 248, 0.8);
       transform: scale(1.15);
+    }
+    .subdivision-lights-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0.3rem;
+      margin-top: 0.35rem;
+    }
+    .sub-light {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      transition: all 0.05s;
+    }
+    .sub-light.active-sub {
+      background: #a855f7;
+      border-color: #c084fc;
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.9);
+      transform: scale(1.3);
     }
     .tap-trainer-card {
       background: #111a2d;
@@ -2455,6 +2481,7 @@
         <div class="left-controls">
           <button class="mode-switch-btn active-practice" id="practiceModeToggle">🎯 Wait-for-Me Practice Mode</button>
           <button class="mode-switch-btn" id="tempoFlowToggle" title="Metronome-synced auto-advancing playhead with timing window accuracy grading">🥁 Tempo Flow Mode</button>
+          <button class="mode-switch-btn" id="repertoireMetroToggle" title="Toggle audio metronome click on/off during practice or auto play">⏱️ Metronome: Off</button>
           <button id="mainPlayBtn" class="play-btn">▶ Auto Play Preview</button>
           
           <div class="tempo-control">
@@ -2800,15 +2827,32 @@
             <button class="tempo-preset-btn" data-bpm="160">Presto 160</button>
           </div>
 
-          <!-- Time Signature -->
-          <div style="display:flex; justify-content:center; align-items:center; gap:0.5rem; margin-bottom:1rem;">
-            <span class="section-label">Time Signature:</span>
-            <select id="metroTimeSigSelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.6rem; border:1px solid var(--border); border-radius:6px;">
-              <option value="4">4/4 (Common Time)</option>
-              <option value="3">3/4 (Waltz Time)</option>
-              <option value="2">2/4 (March Time)</option>
-              <option value="6">6/8 (Compound)</option>
-            </select>
+          <!-- Time Signature & Equal Divisions / Subdivisions -->
+          <div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:1.25rem; margin-bottom:1rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span class="section-label">Time Signature:</span>
+              <select id="metroTimeSigSelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.6rem; border:1px solid var(--border); border-radius:6px;">
+                <option value="4/4" selected>4/4 (Common Time)</option>
+                <option value="3/4">3/4 (Waltz Time)</option>
+                <option value="2/4">2/4 (March Time)</option>
+                <option value="6/8">6/8 (Compound Duple)</option>
+                <option value="3/8">3/8 (Compound Single)</option>
+                <option value="5/4">5/4 (Odd Meter)</option>
+                <option value="7/8">7/8 (Complex Meter)</option>
+                <option value="9/8">9/8 (Compound Triple)</option>
+                <option value="12/8">12/8 (Compound Quadruple)</option>
+              </select>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span class="section-label">Equal Divisions:</span>
+              <select id="metroSubdivisionSelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.6rem; border:1px solid var(--border); border-radius:6px;">
+                <option value="1" selected>1 Division (Main Beats)</option>
+                <option value="2">2 Equal Divisions (Eighths 𝅘𝅥𝅮 𝅘𝅥𝅮)</option>
+                <option value="3">3 Equal Divisions (Triplets 𝅘𝅥𝅮 𝅘𝅥𝅮 𝅘𝅥𝅮)</option>
+                <option value="4">4 Equal Divisions (16ths 𝅘𝅥𝅯 𝅘𝅥𝅯 𝅘𝅥𝅯 𝅘𝅥𝅯)</option>
+              </select>
+            </div>
           </div>
 
           <!-- Beat Lights -->
@@ -6405,6 +6449,9 @@
       document.querySelectorAll(".note-group").forEach(g => g.classList.remove("active-target"));
       document.querySelectorAll(".piano-key").forEach(k => k.classList.remove("active-rh", "active-lh", "active-dyad"));
       setChordPillDisplay([]);
+      if (typeof stopRepertoireMetronomeClock === "function") {
+        stopRepertoireMetronomeClock();
+      }
     }
 
     function startPlayback() {
@@ -6415,6 +6462,10 @@
       const btn = document.getElementById("mainPlayBtn");
       btn.classList.add("playing");
       btn.textContent = "■ Stop Preview";
+
+      if (typeof isRepertoireMetroActive !== "undefined" && isRepertoireMetroActive) {
+        startRepertoireMetronomeClock();
+      }
 
       const bpm = parseInt(document.getElementById("tempoSlider").value, 10);
       const beatMs = (60 / bpm) * 1000;
@@ -6591,6 +6642,13 @@
       stopPlayback();
       currentPracticeStep = 0;
       highlightActiveScoreNote(0);
+      if (typeof isRepertoireMetroActive !== "undefined" && isRepertoireMetroActive) {
+        if (isWaitPracticeMode) {
+          startRepertoireMetronomeClock();
+        } else {
+          stopRepertoireMetronomeClock();
+        }
+      }
     });
 
     // ==========================================
@@ -6649,16 +6707,24 @@
       const feedbackText = document.getElementById("hudFeedbackText");
 
       const bpm = parseInt(document.getElementById("tempoSlider")?.value, 10) || 100;
-      const beatMs = (60 / bpm) * 1000;
+      const timeSigStr = (currentSong && currentSong.timeSig) ? currentSong.timeSig : "4/4";
 
-      // 4-beat Audio-Visual Count-In
-      const countBeats = [
-        { num: 4, freq: 880, label: "4" },
-        { num: 3, freq: 440, label: "3" },
-        { num: 2, freq: 440, label: "2" },
-        { num: 1, freq: 440, label: "1" },
-        { num: 0, freq: 1046.5, label: "GO! 🔥" }
-      ];
+      // Dynamic Audio-Visual Count-In Matching Time Signature
+      const countInInfo = (window.MusicTheory && window.MusicTheory.getTimeSignatureCountIn)
+        ? window.MusicTheory.getTimeSignatureCountIn(timeSigStr, bpm)
+        : {
+            countBeats: [
+              { num: 4, freq: 880, label: "4" },
+              { num: 3, freq: 440, label: "3" },
+              { num: 2, freq: 440, label: "2" },
+              { num: 1, freq: 440, label: "1" },
+              { num: 0, freq: 1046.5, label: "GO! 🔥" }
+            ],
+            beatMs: (60 / bpm) * 1000
+          };
+
+      const countBeats = countInInfo.countBeats;
+      const countBeatMs = countInInfo.beatMs;
 
       currentPracticeStep = 0;
       highlightActiveScoreNote(0);
@@ -6674,7 +6740,7 @@
           if (idx === countBeats.length - 1) {
             runTempoFlowSequence();
           }
-        }, idx * beatMs);
+        }, idx * countBeatMs);
         tempoFlowTimeouts.push(t);
       });
     }
@@ -6713,13 +6779,35 @@
             updateTargetBadgeDisplay(step, null);
           }
           document.getElementById("hudProgressText").textContent = `Step: ${stepIdx + 1} / ${steps}`;
-
-          // Subtle metronome click on each step onset
-          playTone(stepIdx % 4 === 0 ? 880 : 440, 0.04);
         }, accumulatedMs);
 
         tempoFlowTimeouts.push(t);
         accumulatedMs += stepDurationMs;
+      }
+
+      // Isochronous Metronome Clicks (Always Equal Divisions for the Time Signature)
+      const timeSigStr = (currentSong && currentSong.timeSig) ? currentSong.timeSig : "4/4";
+      const metroCalc = (window.MusicTheory && window.MusicTheory.calculateMetronomeIntervals)
+        ? window.MusicTheory.calculateMetronomeIntervals(bpm, timeSigStr, 1)
+        : { tickIntervalMs: (60 / bpm) * 1000, ticksPerMeasure: 4 };
+
+      const metroIntervalMs = metroCalc.tickIntervalMs;
+      const ticksPerMeasure = metroCalc.ticksPerMeasure;
+      const totalPieceMs = accumulatedMs;
+
+      let tickCounter = 0;
+      for (let tMs = 0; tMs < totalPieceMs; tMs += metroIntervalMs) {
+        const curTick = tickCounter;
+        const tickTimer = setTimeout(() => {
+          if (!isTempoFlowActive) return;
+          const profile = (window.MusicTheory && window.MusicTheory.getMetronomeTickProfile)
+            ? window.MusicTheory.getMetronomeTickProfile(curTick, ticksPerMeasure, timeSigStr, 1)
+            : { isDownbeat: curTick % ticksPerMeasure === 0, freq: curTick % ticksPerMeasure === 0 ? 880 : 440 };
+
+          playTone(profile.freq, 0.04);
+        }, tMs);
+        tempoFlowTimeouts.push(tickTimer);
+        tickCounter++;
       }
 
       const endTimer = setTimeout(() => {
@@ -7308,6 +7396,12 @@
     const tempoSlider = document.getElementById("tempoSlider");
     tempoSlider.addEventListener("input", (e) => {
       document.getElementById("tempoText").textContent = `Tempo: ${e.target.value} BPM`;
+      if (typeof isRepertoireMetroActive !== "undefined" && isRepertoireMetroActive) {
+        const isPlaying = document.getElementById("mainPlayBtn")?.classList.contains("playing");
+        if (isPlaying || isWaitPracticeMode) {
+          startRepertoireMetronomeClock();
+        }
+      }
     });
 
     document.querySelectorAll(".tempo-preset-btn").forEach(btn => {
@@ -7315,6 +7409,12 @@
         const speed = btn.dataset.speed;
         tempoSlider.value = speed;
         document.getElementById("tempoText").textContent = `Tempo: ${speed} BPM`;
+        if (typeof isRepertoireMetroActive !== "undefined" && isRepertoireMetroActive) {
+          const isPlaying = document.getElementById("mainPlayBtn")?.classList.contains("playing");
+          if (isPlaying || isWaitPracticeMode) {
+            startRepertoireMetronomeClock();
+          }
+        }
       });
     });
 
@@ -8425,12 +8525,15 @@
       }
     }
 
+    // ==========================================
     // 5. RHYTHM & PRECISION AUDIO-VISUAL METRONOME
+    // ==========================================
     let metroBpm = 96;
-    let metroTimeSig = 4;
+    let metroTimeSig = "4/4";
+    let metroSubdivision = 1;
     let metroIsPlaying = false;
     let metroTimerId = null;
-    let metroCurrentBeat = 0;
+    let metroTickIndex = 0;
     let metroNextTickTime = 0;
     let metroTapTimes = [];
     let lastBeatPerfTime = 0;
@@ -8454,10 +8557,23 @@
         });
       });
 
-      document.getElementById("metroTimeSigSelect")?.addEventListener("change", (e) => {
-        metroTimeSig = parseInt(e.target.value, 10);
-        buildMetroBeatLights();
-      });
+      const timeSigSel = document.getElementById("metroTimeSigSelect");
+      if (timeSigSel) {
+        timeSigSel.value = metroTimeSig;
+        timeSigSel.addEventListener("change", (e) => {
+          metroTimeSig = e.target.value;
+          buildMetroBeatLights();
+        });
+      }
+
+      const subSel = document.getElementById("metroSubdivisionSelect");
+      if (subSel) {
+        subSel.value = String(metroSubdivision);
+        subSel.addEventListener("change", (e) => {
+          metroSubdivision = parseInt(e.target.value, 10) || 1;
+          buildMetroBeatLights();
+        });
+      }
 
       document.getElementById("metroStartBtn")?.addEventListener("click", toggleMetronome);
       document.getElementById("metroTapTempoBtn")?.addEventListener("click", handleTapTempo);
@@ -8490,10 +8606,39 @@
       const container = document.getElementById("metroBeatLights");
       if (!container) return;
       container.innerHTML = "";
-      for (let i = 0; i < metroTimeSig; i++) {
+
+      const ts = (window.MusicTheory && window.MusicTheory.parseTimeSignature)
+        ? window.MusicTheory.parseTimeSignature(metroTimeSig)
+        : { numerator: 4, denominator: 4 };
+
+      const numBeats = ts.numerator;
+      for (let i = 0; i < numBeats; i++) {
+        const beatWrap = document.createElement("div");
+        beatWrap.style.display = "flex";
+        beatWrap.style.flexDirection = "column";
+        beatWrap.style.alignItems = "center";
+        beatWrap.style.gap = "0.25rem";
+
         const d = document.createElement("div");
         d.className = "beat-light" + (i === 0 ? " active-downbeat" : "");
-        container.appendChild(d);
+        d.dataset.beatIndex = i;
+        beatWrap.appendChild(d);
+
+        // If subdivisions > 1, add mini subdivision lights
+        if (metroSubdivision > 1) {
+          const subRow = document.createElement("div");
+          subRow.className = "subdivision-lights-bar";
+          for (let s = 0; s < metroSubdivision; s++) {
+            const subDot = document.createElement("div");
+            subDot.className = "sub-light";
+            subDot.dataset.beatIndex = i;
+            subDot.dataset.subIndex = s;
+            subRow.appendChild(subDot);
+          }
+          beatWrap.appendChild(subRow);
+        }
+
+        container.appendChild(beatWrap);
       }
     }
 
@@ -8505,7 +8650,7 @@
     function startMetronome() {
       initAudio();
       metroIsPlaying = true;
-      metroCurrentBeat = 0;
+      metroTickIndex = 0;
       const startBtn = document.getElementById("metroStartBtn");
       if (startBtn) startBtn.textContent = "■ Stop Metronome";
 
@@ -8518,50 +8663,76 @@
       clearTimeout(metroTimerId);
       const startBtn = document.getElementById("metroStartBtn");
       if (startBtn) startBtn.textContent = "▶ Start Metronome";
-      document.querySelectorAll(".beat-light").forEach(l => l.classList.remove("active-downbeat", "active-upbeat"));
+      document.querySelectorAll("#metroBeatLights .beat-light").forEach(l => l.classList.remove("active-downbeat", "active-secondary", "active-upbeat"));
+      document.querySelectorAll("#metroBeatLights .sub-light").forEach(sl => sl.classList.remove("active-sub"));
     }
 
     function schedulerMetro() {
       if (!metroIsPlaying) return;
-      const intervalSec = 60.0 / metroBpm;
+      const calc = (window.MusicTheory && window.MusicTheory.calculateMetronomeIntervals)
+        ? window.MusicTheory.calculateMetronomeIntervals(metroBpm, metroTimeSig, metroSubdivision)
+        : { tickIntervalSec: (60.0 / metroBpm) / metroSubdivision, ticksPerMeasure: 4 * metroSubdivision };
+
+      const intervalSec = calc.tickIntervalSec;
+      const ticksPerMeasure = calc.ticksPerMeasure;
 
       while (metroNextTickTime < audioCtx.currentTime + 0.1) {
-        scheduleMetroClick(metroNextTickTime, metroCurrentBeat);
-        metroCurrentBeat = (metroCurrentBeat + 1) % metroTimeSig;
+        scheduleMetroClick(metroNextTickTime, metroTickIndex, ticksPerMeasure, metroTimeSig, metroSubdivision);
+        metroTickIndex = (metroTickIndex + 1) % ticksPerMeasure;
         metroNextTickTime += intervalSec;
       }
       metroTimerId = setTimeout(schedulerMetro, 25);
     }
 
-    function scheduleMetroClick(time, beat) {
+    function scheduleMetroClick(time, tick, totalTicks, timeSigStr, subdivision) {
       const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
-      const isDownbeat = (beat === 0);
+      const profile = (window.MusicTheory && window.MusicTheory.getMetronomeTickProfile)
+        ? window.MusicTheory.getMetronomeTickProfile(tick, totalTicks, timeSigStr, subdivision)
+        : {
+            isDownbeat: tick === 0,
+            isBeatOnset: tick % subdivision === 0,
+            beatIndex: Math.floor(tick / subdivision),
+            accentType: tick === 0 ? "downbeat" : (tick % subdivision === 0 ? "beat" : "subdivision"),
+            freq: tick === 0 ? 1200 : (tick % subdivision === 0 ? 640 : 420),
+            volume: tick === 0 ? 1.0 : (tick % subdivision === 0 ? 0.6 : 0.35)
+          };
 
       if (effectiveVol > 0.0001) {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
 
-        osc.frequency.setValueAtTime(isDownbeat ? 1200 : 800, time);
+        osc.frequency.setValueAtTime(profile.freq, time);
         const volScale = Math.pow(effectiveVol, 2);
-        const targetPeak = 0.3 * volScale;
+        const targetPeak = 0.35 * volScale * profile.volume;
 
         gain.gain.setValueAtTime(targetPeak, time);
-        gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.045);
 
         osc.connect(gain);
         gain.connect(masterGainNode || audioCtx.destination);
         osc.start(time);
-        osc.stop(time + 0.05);
+        osc.stop(time + 0.045);
       }
 
-      // Trigger visual light
+      // Trigger visual lights
       const timeMs = (time - audioCtx.currentTime) * 1000;
       setTimeout(() => {
         lastBeatPerfTime = performance.now();
-        const lights = document.querySelectorAll(".beat-light");
+        const beatIndex = Math.floor(tick / subdivision);
+        const subIndex = tick % subdivision;
+
+        const lights = document.querySelectorAll("#metroBeatLights .beat-light");
         lights.forEach((l, idx) => {
-          l.classList.toggle("active-downbeat", idx === beat && isDownbeat);
-          l.classList.toggle("active-upbeat", idx === beat && !isDownbeat);
+          l.classList.toggle("active-downbeat", idx === beatIndex && profile.isDownbeat);
+          l.classList.toggle("active-secondary", idx === beatIndex && profile.accentType === "secondary");
+          l.classList.toggle("active-upbeat", idx === beatIndex && profile.accentType === "beat");
+        });
+
+        const subLights = document.querySelectorAll("#metroBeatLights .sub-light");
+        subLights.forEach(sl => {
+          const bIdx = parseInt(sl.dataset.beatIndex, 10);
+          const sIdx = parseInt(sl.dataset.subIndex, 10);
+          sl.classList.toggle("active-sub", bIdx === beatIndex && sIdx === subIndex);
         });
       }, Math.max(0, timeMs));
     }
@@ -8587,7 +8758,10 @@
 
     function registerRhythmTap() {
       const now = performance.now();
-      const beatMs = (60 / metroBpm) * 1000;
+      const calc = (window.MusicTheory && window.MusicTheory.calculateMetronomeIntervals)
+        ? window.MusicTheory.calculateMetronomeIntervals(metroBpm, metroTimeSig, metroSubdivision)
+        : { tickIntervalSec: (60 / metroBpm) / metroSubdivision };
+      const beatMs = calc.tickIntervalSec * 1000;
       const delta = now - lastBeatPerfTime;
       const offset = delta > beatMs / 2 ? delta - beatMs : delta;
       const absOffset = Math.abs(offset);
@@ -8605,6 +8779,105 @@
       }
 
       statEl.textContent = `Target beat interval: ${Math.round(beatMs)} ms | Delta: ${Math.round(offset)} ms`;
+    }
+
+    // ==========================================
+    // REPERTOIRE STEADY METRONOME SYNCHRONIZER
+    // ==========================================
+    let isRepertoireMetroActive = false;
+    let repMetroTimerId = null;
+    let repMetroNextTickTime = 0;
+    let repMetroTickIndex = 0;
+
+    function initRepertoireMetronome() {
+      const btn = document.getElementById("repertoireMetroToggle");
+      if (!btn) return;
+      const saved = localStorage.getItem("piano_repertoire_metronome");
+      if (saved === "true") {
+        isRepertoireMetroActive = true;
+        btn.classList.add("active-practice");
+        btn.textContent = "⏱️ Metronome: On";
+      }
+
+      btn.addEventListener("click", () => {
+        isRepertoireMetroActive = !isRepertoireMetroActive;
+        localStorage.setItem("piano_repertoire_metronome", String(isRepertoireMetroActive));
+        btn.classList.toggle("active-practice", isRepertoireMetroActive);
+        btn.textContent = isRepertoireMetroActive ? "⏱️ Metronome: On" : "⏱️ Metronome: Off";
+
+        const isPlaying = document.getElementById("mainPlayBtn")?.classList.contains("playing");
+        if (isRepertoireMetroActive) {
+          if (isPlaying || isWaitPracticeMode) {
+            startRepertoireMetronomeClock();
+          }
+        } else {
+          stopRepertoireMetronomeClock();
+        }
+      });
+    }
+
+    function startRepertoireMetronomeClock() {
+      stopRepertoireMetronomeClock();
+      if (!isRepertoireMetroActive || !currentSong) return;
+      initAudio();
+      const bpm = parseInt(document.getElementById("tempoSlider")?.value, 10) || currentSong.tempo || 96;
+      const timeSig = currentSong.timeSig || "4/4";
+      const calc = (window.MusicTheory && window.MusicTheory.calculateMetronomeIntervals)
+        ? window.MusicTheory.calculateMetronomeIntervals(bpm, timeSig, 1)
+        : { tickIntervalSec: 60.0 / bpm, ticksPerMeasure: 4 };
+
+      repMetroTickIndex = 0;
+      repMetroNextTickTime = audioCtx.currentTime;
+
+      function repScheduler() {
+        const isPlaying = document.getElementById("mainPlayBtn")?.classList.contains("playing");
+        if (!isRepertoireMetroActive || (!isPlaying && !isWaitPracticeMode)) {
+          stopRepertoireMetronomeClock();
+          return;
+        }
+        const intervalSec = calc.tickIntervalSec;
+        const ticksPerMeasure = calc.ticksPerMeasure;
+
+        while (repMetroNextTickTime < audioCtx.currentTime + 0.1) {
+          scheduleRepertoireMetroClick(repMetroNextTickTime, repMetroTickIndex, ticksPerMeasure, timeSig);
+          repMetroTickIndex = (repMetroTickIndex + 1) % ticksPerMeasure;
+          repMetroNextTickTime += intervalSec;
+        }
+        repMetroTimerId = setTimeout(repScheduler, 25);
+      }
+
+      repScheduler();
+    }
+
+    function stopRepertoireMetronomeClock() {
+      if (repMetroTimerId) {
+        clearTimeout(repMetroTimerId);
+        repMetroTimerId = null;
+      }
+    }
+
+    function scheduleRepertoireMetroClick(time, tick, ticksPerMeasure, timeSig) {
+      const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
+      if (effectiveVol <= 0.0001) return;
+
+      const profile = (window.MusicTheory && window.MusicTheory.getMetronomeTickProfile)
+        ? window.MusicTheory.getMetronomeTickProfile(tick, ticksPerMeasure, timeSig, 1)
+        : { isDownbeat: tick === 0, freq: tick === 0 ? 1000 : 500, volume: tick === 0 ? 0.7 : 0.4 };
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.frequency.setValueAtTime(profile.freq, time);
+      const volScale = Math.pow(effectiveVol, 2);
+      const targetPeak = 0.25 * volScale * (profile.isDownbeat ? 1.0 : 0.6);
+
+      gain.gain.setValueAtTime(targetPeak, time);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.04);
+
+      osc.connect(gain);
+      gain.connect(masterGainNode || audioCtx.destination);
+      osc.start(time);
+      osc.stop(time + 0.04);
     }
 
     // 6. THEORY LESSONS & CIRCLE OF FIFTHS ENGINE
@@ -8729,6 +9002,7 @@
     initMidiChannelPicker();
     initWebMIDI();
     initMasterVolume();
+    initRepertoireMetronome();
 
     // Boot up educational modes
     initModeNavigation();
