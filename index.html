@@ -80,8 +80,69 @@
 
     .header-audio-deck {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 0.75rem;
+    }
+
+    .audio-output-control {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.45rem 0.85rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .audio-output-icon {
+      font-size: 1.25rem;
+      user-select: none;
+    }
+
+    .audio-output-select-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .audio-output-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .audio-output-select {
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.2rem 0.45rem;
+      font-size: 0.8rem;
+      font-family: inherit;
+      max-width: 220px;
+      min-width: 170px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .audio-output-select:focus, .audio-output-select:hover {
+      border-color: #38bdf8;
+    }
+
+    .audio-output-select option, .audio-output-select optgroup {
+      background: var(--bg-card);
+      color: var(--text);
+    }
+
+    .audio-output-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
     }
 
     .master-volume-control {
@@ -2284,6 +2345,21 @@
         <p class="subtitle">Multi-mode piano academy: interactive score reading, sight-reading drills, ear training, scale studio & metronome</p>
       </div>
       <div class="header-audio-deck">
+        <div class="audio-output-control" id="audioOutputControl" title="Audio Output Destination (Headphones, Speakers, Audio Interface)">
+          <span class="audio-output-icon" id="audioOutputStatusIcon">🎧</span>
+          <div class="audio-output-select-wrap">
+            <span class="audio-output-label" id="audioOutputLabel">Audio Output:</span>
+            <select id="audioOutputSelect" class="audio-output-select" aria-label="Select Audio Output Device">
+              <option value="default">Default Audio Device</option>
+            </select>
+          </div>
+          <div class="audio-output-actions">
+            <button type="button" id="openAudioPickerBtn" class="refresh-devices-btn" title="Open native system audio output picker (Chrome/Edge)">✨</button>
+            <button type="button" id="refreshAudioDevicesBtn" class="refresh-devices-btn" title="Discover & rescan all computer audio output devices">🔄</button>
+            <button type="button" id="testAudioOutputBtn" class="refresh-devices-btn" title="Play test audio chime through selected output">🔔</button>
+          </div>
+        </div>
+
         <div class="master-volume-control" title="Master Audio Output Volume (Controls all modes, notes, MIDI synth, preview & metronome)">
           <button class="volume-mute-btn master-volume-icon" title="Mute / Unmute Audio Output" aria-label="Toggle Mute Audio">🔊</button>
           <div class="volume-slider-wrap">
@@ -2358,11 +2434,18 @@
 
       <div class="midi-controls">
         <div class="midi-select-group">
-          <span class="midi-label">Device:</span>
-          <select id="midiDeviceSelect" class="midi-select">
-            <option value="">No MIDI Device Found</option>
+          <span class="midi-label">MIDI In:</span>
+          <select id="midiDeviceSelect" class="midi-select" title="Select MIDI input device (Keyboard / Controller)">
+            <option value="">No MIDI Input Found</option>
           </select>
-          <button type="button" id="refreshMidiDevicesBtn" class="refresh-devices-btn" title="Rescan MIDI devices and reset activity">🔄</button>
+          <button type="button" id="refreshMidiDevicesBtn" class="refresh-devices-btn" title="Rescan MIDI input & output devices">🔄</button>
+        </div>
+
+        <div class="midi-select-group">
+          <span class="midi-label">MIDI Out:</span>
+          <select id="midiOutputSelect" class="midi-select" title="Send MIDI note output to digital piano or external synth">
+            <option value="">None (Audio Synth Only)</option>
+          </select>
         </div>
 
         <div class="midi-select-group midi-channel-picker-group" id="midiChannelPickerGroup">
@@ -2482,6 +2565,13 @@
           <button class="mode-switch-btn active-practice" id="practiceModeToggle">🎯 Wait-for-Me Practice Mode</button>
           <button class="mode-switch-btn" id="tempoFlowToggle" title="Metronome-synced auto-advancing playhead with timing window accuracy grading">🥁 Tempo Flow Mode</button>
           <button class="mode-switch-btn" id="repertoireMetroToggle" title="Toggle audio metronome click on/off during practice or auto play">⏱️ Metronome: Off</button>
+          <select id="repertoireMetroSoundSelect" class="midi-select" title="Metronome Sound Timbre" style="background:var(--bg-card); padding:0.35rem 0.6rem; border:1px solid var(--border); border-radius:8px; font-size:0.8rem; font-weight:600; color:var(--text); cursor:pointer;">
+            <option value="woodblock" selected>🪵 Wood Block</option>
+            <option value="mechanical">⏱️ Mechanical Tick</option>
+            <option value="digital">⚡ Digital Beep</option>
+            <option value="cowbell">🔔 Cowbell</option>
+            <option value="stick">🥁 Rimshot / Sticks</option>
+          </select>
           <button id="mainPlayBtn" class="play-btn">▶ Auto Play Preview</button>
           
           <div class="tempo-control">
@@ -2827,8 +2917,19 @@
             <button class="tempo-preset-btn" data-bpm="160">Presto 160</button>
           </div>
 
-          <!-- Time Signature & Equal Divisions / Subdivisions -->
+          <!-- Time Signature, Equal Divisions & Sound Timbre -->
           <div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:1.25rem; margin-bottom:1rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span class="section-label">Sound:</span>
+              <select id="metroSoundSelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.6rem; border:1px solid var(--border); border-radius:6px;">
+                <option value="woodblock" selected>🪵 Wood Block</option>
+                <option value="mechanical">⏱️ Mechanical Tick</option>
+                <option value="digital">⚡ Digital Beep</option>
+                <option value="cowbell">🔔 Cowbell / Agogô</option>
+                <option value="stick">🥁 Rimshot / Sticks</option>
+              </select>
+            </div>
+
             <div style="display:flex; align-items:center; gap:0.5rem;">
               <span class="section-label">Time Signature:</span>
               <select id="metroTimeSigSelect" class="midi-select" style="background:var(--bg-card); padding:0.3rem 0.6rem; border:1px solid var(--border); border-radius:6px;">
@@ -3400,6 +3501,11 @@
         masterGainNode.gain.setValueAtTime(volScale, audioCtx.currentTime);
         masterGainNode.gain.value = volScale;
         masterGainNode.connect(audioCtx.destination);
+
+        // Apply audio output sink if supported and configured
+        if (typeof audioCtx.setSinkId === "function" && typeof selectedAudioOutputId !== "undefined" && selectedAudioOutputId && selectedAudioOutputId !== "default") {
+          audioCtx.setSinkId(selectedAudioOutputId).catch(() => {});
+        }
       }
       if (audioCtx.state === "suspended") audioCtx.resume();
     }
@@ -3521,8 +3627,460 @@
       }
     }
 
+    // ==========================================
+    // HARDWARE OUTPUT ROUTING (AUDIO SINK & WEB MIDI)
+    // ==========================================
+    let selectedAudioOutputId = "default";
+    let cachedAudioOutputs = [];
+    let midiAccess = null;
+    let selectedMidiInput = null;
+    let selectedMidiOutput = null;
+    let selectedMidiOutputId = "none";
+
+    async function initAudioOutputRouting() {
+      const select = document.getElementById("audioOutputSelect");
+      const refreshBtn = document.getElementById("refreshAudioDevicesBtn");
+      const pickerBtn = document.getElementById("openAudioPickerBtn");
+      const testBtn = document.getElementById("testAudioOutputBtn");
+
+      try {
+        const saved = localStorage.getItem("piano_audio_output_device");
+        if (saved) selectedAudioOutputId = saved;
+      } catch (e) {}
+
+      if (select) {
+        select.addEventListener("change", async (e) => {
+          await setAudioOutputDevice(e.target.value);
+        });
+      }
+
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", async () => {
+          if (cachedAudioOutputs.length <= 1) {
+            await requestAudioOutputAccess();
+          } else {
+            await updateAudioOutputDeviceList(true);
+          }
+        });
+      }
+
+      if (pickerBtn) {
+        pickerBtn.addEventListener("click", async () => {
+          await openNativeAudioOutputPicker();
+        });
+      }
+
+      if (testBtn) {
+        testBtn.addEventListener("click", () => {
+          playTestAudioChime();
+        });
+      }
+
+      if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+        navigator.mediaDevices.addEventListener("devicechange", () => {
+          updateAudioOutputDeviceList(false);
+        });
+      }
+
+      await updateAudioOutputDeviceList(false);
+    }
+
+    async function requestAudioOutputAccess() {
+      try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach(track => track.stop());
+        }
+      } catch (err) {
+        console.info("Audio device access request:", err.message || err);
+      }
+      await updateAudioOutputDeviceList(true);
+    }
+
+    async function openNativeAudioOutputPicker() {
+      if (navigator.mediaDevices && typeof navigator.mediaDevices.selectAudioOutput === "function") {
+        try {
+          const device = await navigator.mediaDevices.selectAudioOutput();
+          if (device && device.deviceId) {
+            await updateAudioOutputDeviceList(true);
+            await setAudioOutputDevice(device.deviceId);
+            return;
+          }
+        } catch (err) {
+          if (err.name !== "AbortError") {
+            console.warn("selectAudioOutput encountered error:", err);
+          }
+        }
+      } else {
+        await requestAudioOutputAccess();
+      }
+    }
+
+    function playTestAudioChime() {
+      try {
+        if (typeof initAudio === "function") initAudio();
+        if (!audioCtx) return;
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const notes = [
+          { freq: 523.25, time: 0, dur: 0.28 },
+          { freq: 659.25, time: 0.12, dur: 0.32 },
+          { freq: 783.99, time: 0.24, dur: 0.45 }
+        ];
+        const effectiveVol = (typeof isMasterMuted !== "undefined" && isMasterMuted) ? 0 : (typeof currentMasterVolume !== "undefined" ? currentMasterVolume : 0.8);
+        const vol = 0.22 * Math.pow(effectiveVol, 2);
+        notes.forEach(n => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(n.freq, now + n.time);
+          gain.gain.setValueAtTime(0, now + n.time);
+          gain.gain.linearRampToValueAtTime(vol, now + n.time + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + n.time + n.dur);
+          osc.connect(gain);
+          gain.connect((typeof masterGainNode !== "undefined" && masterGainNode) ? masterGainNode : audioCtx.destination);
+          osc.start(now + n.time);
+          osc.stop(now + n.time + n.dur);
+        });
+      } catch (err) {
+        console.warn("Unable to play test audio chime:", err);
+      }
+    }
+
+    async function updateAudioOutputDeviceList(isManual = false) {
+      const select = document.getElementById("audioOutputSelect");
+      const labelEl = document.getElementById("audioOutputLabel");
+      const controlEl = document.getElementById("audioOutputControl");
+      if (!select) return;
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        select.innerHTML = '<option value="default">Default Audio Device</option>';
+        return;
+      }
+
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const outputs = (window.MusicTheory && window.MusicTheory.filterAudioOutputDevices)
+          ? window.MusicTheory.filterAudioOutputDevices(devices)
+          : devices.filter(d => d.kind === "audiooutput").map((d, i) => {
+              const label = d.label || (d.deviceId === "default" ? "System Default Output" : `Audio Output ${i + 1}`);
+              const info = (window.MusicTheory && window.MusicTheory.classifyAudioDevice)
+                ? window.MusicTheory.classifyAudioDevice(label, d.deviceId)
+                : { type: "speakers", icon: "🔊", category: "Audio Output Device" };
+              return {
+                deviceId: d.deviceId || "",
+                groupId: d.groupId || "",
+                label,
+                type: info.type,
+                icon: info.icon,
+                category: info.category
+              };
+            });
+
+        cachedAudioOutputs = outputs;
+        select.innerHTML = "";
+
+        // Deduplicate devices by deviceId
+        const seenIds = new Set();
+        const uniqueOutputs = [];
+
+        // Ensure default option is present
+        const hasDefault = outputs.some(d => d.deviceId === "default" || d.deviceId === "");
+        if (!hasDefault) {
+          uniqueOutputs.push({
+            deviceId: "default",
+            label: "System Default Output",
+            type: "default",
+            icon: "💻",
+            category: "Default System Output"
+          });
+          seenIds.add("default");
+          seenIds.add("");
+        }
+
+        outputs.forEach(device => {
+          const devId = device.deviceId || "default";
+          if (!seenIds.has(devId)) {
+            seenIds.add(devId);
+            uniqueOutputs.push(device);
+          }
+        });
+
+        uniqueOutputs.forEach((device, index) => {
+          const opt = document.createElement("option");
+          opt.value = device.deviceId || "default";
+          const icon = device.icon || "🔊";
+          let label = device.label || (device.deviceId === "default" ? "System Default Output" : `Audio Output ${index + 1}`);
+
+          if (device.deviceId === "default") {
+            const cleanName = label.replace(/^default\s*-\s*/i, "");
+            opt.textContent = `💻 Default: ${cleanName || "System Output"}`;
+          } else if (device.deviceId === "communications") {
+            const cleanName = label.replace(/^communications\s*-\s*/i, "");
+            opt.textContent = `📞 Comm: ${cleanName || "Communications Device"}`;
+          } else {
+            if (label.length > 65) {
+              label = label.substring(0, 62) + "…";
+            }
+            opt.textContent = `${icon} ${label}`;
+          }
+          select.appendChild(opt);
+        });
+
+        // Add discovery / picker actions in an optgroup
+        const optGroupActions = document.createElement("optgroup");
+        optGroupActions.label = "─── Output Discovery ───";
+
+        const discoverOpt = document.createElement("option");
+        discoverOpt.value = "__discover__";
+        discoverOpt.textContent = "🔍 Discover / Scan All Outputs (11+ on PC)...";
+        optGroupActions.appendChild(discoverOpt);
+
+        if (navigator.mediaDevices && typeof navigator.mediaDevices.selectAudioOutput === "function") {
+          const pickerOpt = document.createElement("option");
+          pickerOpt.value = "__system_picker__";
+          pickerOpt.textContent = "✨ Open System Output Picker...";
+          optGroupActions.appendChild(pickerOpt);
+        }
+        select.appendChild(optGroupActions);
+
+        // Update count badge on header label & tooltip
+        const outputCount = uniqueOutputs.length;
+        if (labelEl) {
+          labelEl.textContent = outputCount > 1 ? `Audio Output (${outputCount}):` : "Audio Output:";
+        }
+        if (controlEl) {
+          controlEl.title = `Audio Output: ${outputCount} device${outputCount === 1 ? '' : 's'} discovered on this PC (Headphones, Speakers, Audio Interface)`;
+        }
+
+        // Restore selected value
+        const matchesSelection = Array.from(select.options).some(o => o.value === selectedAudioOutputId && o.value !== "__discover__" && o.value !== "__system_picker__");
+        if (matchesSelection) {
+          select.value = selectedAudioOutputId;
+        } else {
+          select.value = "default";
+          selectedAudioOutputId = "default";
+        }
+
+        await setAudioOutputDevice(selectedAudioOutputId);
+      } catch (err) {
+        console.warn("Unable to enumerate audio output devices:", err);
+      }
+    }
+
+    async function setAudioOutputDevice(deviceId) {
+      if (deviceId === "__discover__") {
+        await requestAudioOutputAccess();
+        return;
+      }
+      if (deviceId === "__system_picker__") {
+        await openNativeAudioOutputPicker();
+        return;
+      }
+
+      selectedAudioOutputId = deviceId || "default";
+      try {
+        localStorage.setItem("piano_audio_output_device", selectedAudioOutputId);
+      } catch (e) {}
+
+      const select = document.getElementById("audioOutputSelect");
+      if (select && select.value !== selectedAudioOutputId) {
+        select.value = selectedAudioOutputId;
+      }
+
+      if (!audioCtx && typeof initAudio === "function") {
+        initAudio();
+      }
+
+      if (audioCtx && typeof audioCtx.setSinkId === "function") {
+        try {
+          const sinkVal = (selectedAudioOutputId === "default" || !selectedAudioOutputId) ? "" : selectedAudioOutputId;
+          await audioCtx.setSinkId(sinkVal);
+        } catch (err) {
+          console.warn("audioCtx.setSinkId failed for sink:", selectedAudioOutputId, err);
+        }
+      }
+
+      const icon = document.getElementById("audioOutputStatusIcon");
+      const selectedOpt = select ? select.selectedOptions[0] : null;
+      const labelText = selectedOpt ? selectedOpt.textContent : "";
+      if (icon) {
+        if (window.MusicTheory && window.MusicTheory.classifyAudioDevice) {
+          const info = window.MusicTheory.classifyAudioDevice(labelText, selectedAudioOutputId);
+          icon.textContent = info.icon || "🔊";
+        } else {
+          const l = labelText.toLowerCase();
+          icon.textContent = l.includes("headphone") ? "🎧" : "🔊";
+        }
+      }
+    }
+
+    // ==========================================
+    // MIDI OUTPUT ROUTING (WEB MIDI API)
+    // ==========================================
+    function initMidiOutputRouting() {
+      const select = document.getElementById("midiOutputSelect");
+      try {
+        const saved = localStorage.getItem("piano_midi_output_device");
+        if (saved) selectedMidiOutputId = saved;
+      } catch (e) {}
+
+      if (select) {
+        select.addEventListener("change", (e) => {
+          setMidiOutputDevice(e.target.value);
+        });
+      }
+    }
+
+    function updateMidiOutputDeviceList() {
+      const select = document.getElementById("midiOutputSelect");
+      if (!select) return;
+
+      select.innerHTML = "";
+
+      const noneOpt = document.createElement("option");
+      noneOpt.value = "none";
+      noneOpt.textContent = "None (Mute MIDI Output)";
+      select.appendChild(noneOpt);
+
+      if (!midiAccess || !midiAccess.outputs) {
+        select.value = "none";
+        selectedMidiOutput = null;
+        return;
+      }
+
+      const outputs = Array.from(midiAccess.outputs.values());
+      outputs.forEach((output, index) => {
+        const opt = document.createElement("option");
+        opt.value = output.id;
+        let label = `${output.name || "MIDI Port " + (index + 1)} (${output.manufacturer || "Generic"})`;
+        if (label.length > 32) {
+          label = label.substring(0, 30) + "…";
+        }
+        opt.textContent = label;
+        select.appendChild(opt);
+      });
+
+      const matchesSelection = outputs.some(o => o.id === selectedMidiOutputId);
+      if (matchesSelection) {
+        select.value = selectedMidiOutputId;
+      } else {
+        select.value = "none";
+        selectedMidiOutputId = "none";
+      }
+
+      setMidiOutputDevice(select.value);
+    }
+
+    function setMidiOutputDevice(deviceId) {
+      if (selectedMidiOutput && deviceId !== selectedMidiOutputId) {
+        sendMidiAllNotesOff();
+      }
+
+      selectedMidiOutputId = deviceId || "none";
+      try {
+        localStorage.setItem("piano_midi_output_device", selectedMidiOutputId);
+      } catch (e) {}
+
+      const select = document.getElementById("midiOutputSelect");
+      if (select && select.value !== selectedMidiOutputId) {
+        select.value = selectedMidiOutputId;
+      }
+
+      if (!midiAccess || !midiAccess.outputs || selectedMidiOutputId === "none" || !selectedMidiOutputId) {
+        selectedMidiOutput = null;
+        return;
+      }
+
+      selectedMidiOutput = midiAccess.outputs.get(selectedMidiOutputId) || null;
+    }
+
+    function getActiveMidiOutputChannel() {
+      const chSelect = document.getElementById("midiChannelSelect");
+      if (chSelect && chSelect.value && chSelect.value !== "all") {
+        const parsed = parseInt(chSelect.value, 10);
+        if (parsed >= 1 && parsed <= 16) return parsed;
+      }
+      return 1;
+    }
+
+    function sendMidiOutputNoteOn(pitchOrMidi, velocity = 85) {
+      if (!selectedMidiOutput) return;
+      try {
+        const ch = getActiveMidiOutputChannel();
+        const msg = (window.MusicTheory && window.MusicTheory.createMidiNoteOn)
+          ? window.MusicTheory.createMidiNoteOn(pitchOrMidi, velocity, ch)
+          : null;
+        if (msg) {
+          selectedMidiOutput.send(msg);
+        } else {
+          const num = typeof pitchOrMidi === "number" ? pitchOrMidi : 60;
+          const vel = Math.max(1, Math.min(127, Math.round(velocity)));
+          selectedMidiOutput.send([0x90 | ((ch - 1) & 0x0F), num, vel]);
+        }
+      } catch (err) {
+        console.warn("sendMidiOutputNoteOn failed:", err);
+      }
+    }
+
+    function sendMidiOutputNoteOff(pitchOrMidi) {
+      if (!selectedMidiOutput) return;
+      try {
+        const ch = getActiveMidiOutputChannel();
+        const msg = (window.MusicTheory && window.MusicTheory.createMidiNoteOff)
+          ? window.MusicTheory.createMidiNoteOff(pitchOrMidi, ch)
+          : null;
+        if (msg) {
+          selectedMidiOutput.send(msg);
+        } else {
+          const num = typeof pitchOrMidi === "number" ? pitchOrMidi : 60;
+          selectedMidiOutput.send([0x80 | ((ch - 1) & 0x0F), num, 0]);
+        }
+      } catch (err) {
+        console.warn("sendMidiOutputNoteOff failed:", err);
+      }
+    }
+
+    function sendMidiOutputSustain(isDown) {
+      if (!selectedMidiOutput) return;
+      try {
+        const ch = getActiveMidiOutputChannel();
+        const val = isDown ? 127 : 0;
+        const msg = (window.MusicTheory && window.MusicTheory.createMidiCC)
+          ? window.MusicTheory.createMidiCC(64, val, ch)
+          : [0xB0 | ((ch - 1) & 0x0F), 64, val];
+        selectedMidiOutput.send(msg);
+      } catch (err) {
+        console.warn("sendMidiOutputSustain failed:", err);
+      }
+    }
+
+    function sendMidiAllNotesOff() {
+      if (!selectedMidiOutput) return;
+      try {
+        for (let ch = 1; ch <= 16; ch++) {
+          const statusByte = 0xB0 | ((ch - 1) & 0x0F);
+          selectedMidiOutput.send([statusByte, 120, 0]); // All Sound Off
+          selectedMidiOutput.send([statusByte, 123, 0]); // All Notes Off
+          selectedMidiOutput.send([statusByte, 64, 0]);  // Sustain Off
+        }
+      } catch (err) {
+        console.warn("sendMidiAllNotesOff failed:", err);
+      }
+    }
+
     function playTone(freq, duration = 0.35) {
       if (!freq) return;
+      if (typeof sendMidiOutputNoteOn === "function" && typeof selectedMidiOutput !== "undefined" && selectedMidiOutput) {
+        const midiNum = Math.round(69 + 12 * Math.log2(freq / 440));
+        if (midiNum >= 0 && midiNum <= 127) {
+          sendMidiOutputNoteOn(midiNum, 80);
+          setTimeout(() => {
+            if (typeof sendMidiOutputNoteOff === "function") sendMidiOutputNoteOff(midiNum);
+          }, duration * 1000);
+        }
+      }
+
       const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
       if (effectiveVol <= 0.0001) return; // Muted / zero volume
 
@@ -3552,6 +4110,9 @@
     const pedaledNotes = new Set(); // MIDI note numbers kept ringing by pedal
 
     function startLiveTone(noteNumber, velocity = 100) {
+      if (typeof sendMidiOutputNoteOn === "function") {
+        sendMidiOutputNoteOn(noteNumber, velocity);
+      }
       if (!isSynthAudioEnabled()) return;
       if (liveOscillators.has(noteNumber)) {
         stopLiveTone(noteNumber, true); // Re-strike cleanly if pedaled
@@ -3604,6 +4165,9 @@
     }
 
     function stopLiveTone(noteNumber, forceImmediate = false) {
+      if (typeof sendMidiOutputNoteOff === "function") {
+        sendMidiOutputNoteOff(noteNumber);
+      }
       if (isSustainPedalDown && !forceImmediate) {
         pedaledNotes.add(noteNumber);
         return;
@@ -5184,12 +5748,16 @@
           e.stopPropagation();
           keyEl.classList.add("active-live");
           const midiNum = (window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(noteId) : getPitchMidiNumber(noteId);
+          if (isSynthAudioEnabled() || (typeof selectedMidiOutput !== "undefined" && selectedMidiOutput)) {
+            startLiveTone(midiNum, 90);
+          }
           handleNoteDown(noteId, "mouse", { noteNumber: midiNum });
         };
         const onUp = (e) => {
           e.stopPropagation();
           keyEl.classList.remove("active-live");
           const midiNum = (window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(noteId) : getPitchMidiNumber(noteId);
+          stopLiveTone(midiNum);
           handleNoteUp(noteId, { noteNumber: midiNum });
         };
 
@@ -6296,9 +6864,6 @@
     }
 
     // Web MIDI Input
-    let midiAccess = null;
-    let selectedMidiInput = null;
-
     function initWebMIDI() {
       const statusDot = document.getElementById("midiStatusDot");
       const statusText = document.getElementById("midiStatusText");
@@ -6314,7 +6879,11 @@
           statusDot.classList.add("connected");
           statusText.textContent = "Web MIDI: Active & Listening";
           updateMidiDeviceList();
-          midiAccess.onstatechange = () => updateMidiDeviceList();
+          updateMidiOutputDeviceList();
+          midiAccess.onstatechange = () => {
+            updateMidiDeviceList();
+            updateMidiOutputDeviceList();
+          };
         })
         .catch(() => { statusText.textContent = "MIDI Permission Denied"; });
     }
@@ -6387,6 +6956,9 @@
       // Sustain Pedal Handling (CC 64)
       if (cmd === 11 && data1 === 64) {
         isSustainPedalDown = (velocity >= 64);
+        if (typeof sendMidiOutputSustain === "function") {
+          sendMidiOutputSustain(isSustainPedalDown);
+        }
         if (!isSustainPedalDown) {
           pedaledNotes.forEach(num => {
             if (!activeHeldMidiNotes.has(num)) stopLiveTone(num, true);
@@ -6436,6 +7008,7 @@
     if (refreshMidiDevicesBtn) {
       refreshMidiDevicesBtn.addEventListener("click", () => {
         updateMidiDeviceList();
+        updateMidiOutputDeviceList();
       });
     }
 
@@ -6443,6 +7016,9 @@
     function stopPlayback() {
       playbackTimeouts.forEach(t => clearTimeout(t));
       playbackTimeouts = [];
+      if (typeof sendMidiAllNotesOff === "function") {
+        sendMidiAllNotesOff();
+      }
       const btn = document.getElementById("mainPlayBtn");
       btn.classList.remove("playing");
       btn.textContent = "▶ Auto Play Preview";
@@ -6524,6 +7100,14 @@
           }
           if (isSynthAudioEnabled()) {
             playTone(getNoteFreq(clean), voiceSoundDuration);
+          } else if (typeof sendMidiOutputNoteOn === "function" && selectedMidiOutput) {
+            const num = getPitchMidiNumber(clean, defaultOct);
+            if (num !== null) {
+              sendMidiOutputNoteOn(num, 85);
+              setTimeout(() => {
+                if (typeof sendMidiOutputNoteOff === "function") sendMidiOutputNoteOff(num);
+              }, voiceSoundDuration * 1000);
+            }
           }
           const num = getPitchMidiNumber(clean, defaultOct);
           if (num !== null) {
@@ -8538,6 +9122,44 @@
     let metroTapTimes = [];
     let lastBeatPerfTime = 0;
 
+    let currentMetroSound = "woodblock";
+    try {
+      const savedMetroSound = localStorage.getItem("piano_metro_sound");
+      if (savedMetroSound) currentMetroSound = savedMetroSound;
+    } catch (e) {}
+
+    function setMetroSound(soundId, playPreview = false) {
+      currentMetroSound = soundId || "woodblock";
+      try {
+        localStorage.setItem("piano_metro_sound", currentMetroSound);
+      } catch (e) {}
+
+      const s1 = document.getElementById("metroSoundSelect");
+      if (s1 && s1.value !== currentMetroSound) s1.value = currentMetroSound;
+
+      const s2 = document.getElementById("repertoireMetroSoundSelect");
+      if (s2 && s2.value !== currentMetroSound) s2.value = currentMetroSound;
+
+      if (playPreview) {
+        playMetronomeSoundPreview(currentMetroSound);
+      }
+    }
+
+    function playMetronomeSoundPreview(soundId) {
+      try {
+        if (typeof initAudio === "function") initAudio();
+        if (!audioCtx) return;
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
+        if (effectiveVol <= 0.0001) return;
+        if (window.MusicTheory && window.MusicTheory.synthesizeMetronomeClick) {
+          window.MusicTheory.synthesizeMetronomeClick(audioCtx, masterGainNode || audioCtx.destination, audioCtx.currentTime, "downbeat", soundId, effectiveVol);
+        }
+      } catch (e) {
+        console.warn("Unable to play metronome sound preview:", e);
+      }
+    }
+
     function initRhythmModule() {
       const slider = document.getElementById("metroBpmSlider");
       slider?.addEventListener("input", (e) => {
@@ -8556,6 +9178,14 @@
           updateMetroBpmDisplay();
         });
       });
+
+      const soundSel = document.getElementById("metroSoundSelect");
+      if (soundSel) {
+        soundSel.value = currentMetroSound;
+        soundSel.addEventListener("change", (e) => {
+          setMetroSound(e.target.value, true);
+        });
+      }
 
       const timeSigSel = document.getElementById("metroTimeSigSelect");
       if (timeSigSel) {
@@ -8698,20 +9328,24 @@
           };
 
       if (effectiveVol > 0.0001) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        if (window.MusicTheory && window.MusicTheory.synthesizeMetronomeClick) {
+          window.MusicTheory.synthesizeMetronomeClick(audioCtx, masterGainNode || audioCtx.destination, time, profile.accentType, currentMetroSound, effectiveVol);
+        } else {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
 
-        osc.frequency.setValueAtTime(profile.freq, time);
-        const volScale = Math.pow(effectiveVol, 2);
-        const targetPeak = 0.35 * volScale * profile.volume;
+          osc.frequency.setValueAtTime(profile.freq, time);
+          const volScale = Math.pow(effectiveVol, 2);
+          const targetPeak = 0.35 * volScale * profile.volume;
 
-        gain.gain.setValueAtTime(targetPeak, time);
-        gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.045);
+          gain.gain.setValueAtTime(targetPeak, time);
+          gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.045);
 
-        osc.connect(gain);
-        gain.connect(masterGainNode || audioCtx.destination);
-        osc.start(time);
-        osc.stop(time + 0.045);
+          osc.connect(gain);
+          gain.connect(masterGainNode || audioCtx.destination);
+          osc.start(time);
+          osc.stop(time + 0.045);
+        }
       }
 
       // Trigger visual lights
@@ -8814,6 +9448,14 @@
           stopRepertoireMetronomeClock();
         }
       });
+
+      const repSoundSel = document.getElementById("repertoireMetroSoundSelect");
+      if (repSoundSel) {
+        repSoundSel.value = currentMetroSound;
+        repSoundSel.addEventListener("change", (e) => {
+          setMetroSound(e.target.value, true);
+        });
+      }
     }
 
     function startRepertoireMetronomeClock() {
@@ -8862,22 +9504,26 @@
 
       const profile = (window.MusicTheory && window.MusicTheory.getMetronomeTickProfile)
         ? window.MusicTheory.getMetronomeTickProfile(tick, ticksPerMeasure, timeSig, 1)
-        : { isDownbeat: tick === 0, freq: tick === 0 ? 1000 : 500, volume: tick === 0 ? 0.7 : 0.4 };
+        : { isDownbeat: tick === 0, accentType: tick === 0 ? "downbeat" : "beat", freq: tick === 0 ? 1000 : 500, volume: tick === 0 ? 0.7 : 0.4 };
 
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
+      if (window.MusicTheory && window.MusicTheory.synthesizeMetronomeClick) {
+        window.MusicTheory.synthesizeMetronomeClick(audioCtx, masterGainNode || audioCtx.destination, time, profile.accentType, currentMetroSound, effectiveVol);
+      } else {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
 
-      osc.frequency.setValueAtTime(profile.freq, time);
-      const volScale = Math.pow(effectiveVol, 2);
-      const targetPeak = 0.25 * volScale * (profile.isDownbeat ? 1.0 : 0.6);
+        osc.frequency.setValueAtTime(profile.freq, time);
+        const volScale = Math.pow(effectiveVol, 2);
+        const targetPeak = 0.25 * volScale * (profile.isDownbeat ? 1.0 : 0.6);
 
-      gain.gain.setValueAtTime(targetPeak, time);
-      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.04);
+        gain.gain.setValueAtTime(targetPeak, time);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.04);
 
-      osc.connect(gain);
-      gain.connect(masterGainNode || audioCtx.destination);
-      osc.start(time);
-      osc.stop(time + 0.04);
+        osc.connect(gain);
+        gain.connect(masterGainNode || audioCtx.destination);
+        osc.start(time);
+        osc.stop(time + 0.04);
+      }
     }
 
     // 6. THEORY LESSONS & CIRCLE OF FIFTHS ENGINE
@@ -9001,6 +9647,8 @@
     updateLayerToggleClasses();
     initMidiChannelPicker();
     initWebMIDI();
+    initAudioOutputRouting();
+    initMidiOutputRouting();
     initMasterVolume();
     initRepertoireMetronome();
 

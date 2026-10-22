@@ -313,5 +313,58 @@
     - [x] Tests 27.1–27.7 verifying theory exports, time signature parsing, equal divisions calculations across 60/96/120/144 BPM, accent hierarchies, compound meters, dynamic count-in generation, DOM elements, CSS styles, and full inline script syntax validation via `vm.Script`.
     - [x] All 27 score engine tests and all 13 education tests passing with 100% success.
 
+- [x] **Milestone 28: Hardware Output Device Selection (Web Audio setSinkId & Web MIDI Outputs)**
+  - [x] **Core Music Theory & MIDI Message Utilities (`theory.js`)**:
+    - [x] `formatMidiMessage(cmd, data1, data2, channel)`: Formats standard 3-byte MIDI voice and channel messages across channels 1..16 with 0-indexed status bytes and byte clamping (0..127).
+    - [x] `createMidiNoteOn(pitchOrMidi, velocity, channel)`: Creates Note-On messages (`0x90–0x9F`) accepting both pitch strings (e.g., "C4", "A4") and numeric MIDI values (0..127).
+    - [x] `createMidiNoteOff(pitchOrMidi, channel)`: Creates Note-Off messages (`0x80–0x8F`) with velocity 0.
+    - [x] `createMidiCC(controllerNumber, value, channel)`: Creates standard Control Change messages (`0xB0–0xBF`), including CC 64 Damper Sustain, CC 120 All Sound Off, and CC 123 All Notes Off.
+    - [x] `filterAudioOutputDevices(devices)`: Extracts and deduplicates `audiooutput` hardware devices from `navigator.mediaDevices.enumerateDevices()` with friendly label fallbacks and system default handling.
+  - [x] **Audio Output Hardware Routing UI & Web Audio Engine (`index.html`)**:
+    - [x] Added persistent `#audioOutputSelect` dropdown and `#refreshAudioDevicesBtn` rescan button to the global header audio deck.
+    - [x] Implemented dynamic audio output status icon (`🎧` for headphones, `🔊` for external speakers / audio interface DAC).
+    - [x] Added `initAudioOutputRouting()`, `updateAudioOutputDeviceList()`, and `setAudioOutputDevice(deviceId)` with `navigator.mediaDevices.addEventListener('devicechange')` hardware hot-plug listener.
+    - [x] Integrated Web Audio `audioCtx.setSinkId()` routing all sound (synthesizer, drills, auto play, ear training, metronome) directly to the selected hardware output device.
+    - [x] LocalStorage persistence (`piano_audio_output_device`) across sessions.
+  - [x] **Web MIDI Output Device Routing (`index.html`)**:
+    - [x] Added `#midiOutputSelect` destination dropdown in MIDI controls alongside input device selector (`#midiDeviceSelect`).
+    - [x] Implemented `initMidiOutputRouting()`, `updateMidiOutputDeviceList()`, `setMidiOutputDevice(deviceId)`, `getActiveMidiOutputChannel()`, `sendMidiOutputNoteOn()`, `sendMidiOutputNoteOff()`, `sendMidiOutputSustain()`, and `sendMidiAllNotesOff()`.
+    - [x] Synchronized MIDI port enumeration on `navigator.requestMIDIAccess()` and `midiAccess.onstatechange`.
+    - [x] Routed live keyboard performance, on-screen mouse/touch keys, Auto Play Preview playback (`triggerVoicePlayback`), and CC 64 sustain pedal directly to connected external MIDI hardware (digital pianos, synth modules, DAWs).
+    - [x] Implemented safety flush: sends CC 120 (All Sound Off), CC 123 (All Notes Off), and CC 64 (Damper Off) across all 16 MIDI channels on device switch and playback stop.
+    - [x] LocalStorage persistence (`piano_midi_output_device`) across sessions.
+  - [x] **Comprehensive Automated Verification Test Suite (`tests/test_score_engine.js` Test 28)**:
+    - [x] Tests 28.1–28.6 verifying theory exports, bitwise MIDI message generation, channel 1..16 formatting, CC message encoding, audio device filtering, DOM elements, CSS styles, lifecycle functions, and full inline script syntax validation via `vm.Script`.
+    - [x] All 28 score engine tests and all 13 education tests passing with 100% success.
+
+- [x] **Milestone 29: Universal Multi-Device Audio Output Enumeration, Discovery & Native Picker Engine**
+  - [x] **Core Music Theory & Device Categorization Engine (`theory.js`)**:
+    - [x] `classifyAudioDevice(label, deviceId)`: Categorize devices into headphones (`🎧`), speakers (`🔊`), HDMI/displays (`🖥️`), USB audio interfaces/DACs (`🎛️`), virtual cables (`🔀`), optical/digital (`⚡`), and system default (`💻`).
+    - [x] Enhanced `filterAudioOutputDevices(devices)`: Full label preservation without harsh 30-character truncation, device classification tagging (`type`, `icon`, `category`), and clean deduplication.
+  - [x] **Full Device Discovery & Native Picker Engine (`index.html`)**:
+    - [x] Proactive device permission unlocker `requestAudioOutputAccess()`: Prompts `getUserMedia` and immediately stops tracks, unlocking all 11+ Windows audio outputs with actual hardware names.
+    - [x] Native system output picker `openNativeAudioOutputPicker()`: Supports `navigator.mediaDevices.selectAudioOutput()` in Chromium (Chrome/Edge 110+) allowing OS-level audio device dialog selection.
+    - [x] Dynamic device count badge & interactive action items in `#audioOutputSelect` (`🔍 Discover All Devices (11+ on PC)...`, `✨ Open System Device Picker...`).
+    - [x] Header audio deck UI controls: Added `#openAudioPickerBtn` (system picker) and `#testAudioOutputBtn` (plays 3-note harmonic chime through chosen device).
+    - [x] AudioContext instant binding on user gesture in `setAudioOutputDevice(deviceId)` with dynamic icon updates and LocalStorage persistence.
+  - [x] **Comprehensive Automated Verification Test Suite (`tests/test_score_engine.js` Test 29)**:
+    - [x] Tests 29.1–29.5 verifying 11-device enumeration, classification across all hardware types, label preservation, test chime generation, DOM elements, and syntax validation.
+    - [x] All 29 score engine tests and all 13 education tests passing with 100% success.
+
+- [x] **Milestone 30: Multi-Timbre Metronome Engine & Acoustic Wood Block Synthesis**
+  - [x] **Core Metronome Sound Presets & Acoustic Synthesis Engine (`theory.js`)**:
+    - [x] `METRONOME_SOUND_PRESETS`: Definition of 5 sound presets (`woodblock` as default, `mechanical`, `digital`, `cowbell`, `stick`).
+    - [x] `synthesizeMetronomeClick(audioCtx, destinationNode, time, accentType, soundId, volScale)`: Physical acoustic Web Audio synthesizer for all 5 sound types with hierarchical accent support (`downbeat`, `secondary`, `beat`, `subdivision`).
+    - [x] Authentic Wood Block acoustic model: Dual-oscillator cavity with downward pitch transient ($1.22f \to f$), secondary harmonic resonance, and bandpass wooden filter.
+  - [x] **Rhythm Studio & Repertoire Metronome Sound UI Controls (`index.html`)**:
+    - [x] Added `#metroSoundSelect` dropdown in Rhythm & Metronome Workshop panel.
+    - [x] Added synchronized `#repertoireMetroSoundSelect` dropdown in Repertoire Transport Controls bar.
+    - [x] Two-way reactive synchronization and LocalStorage persistence (`piano_metro_sound`).
+    - [x] Updated `scheduleMetroClick` and `scheduleRepertoireMetroClick` to route through `synthesizeMetronomeClick`.
+  - [x] **Comprehensive Automated Verification Test Suite (`tests/test_score_engine.js` Test 30)**:
+    - [x] Tests 30.1–30.6 verifying presets, acoustic synthesis across all sound types and accents, DOM elements, synchronization, and syntax validation.
+    - [x] All 30 score engine tests and all 13 education tests passing with 100% success.
+
+
 
 
