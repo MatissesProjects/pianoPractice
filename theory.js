@@ -785,7 +785,6 @@
 
     for (let cIdx = 0; cIdx < chords.length; cIdx++) {
       const chord = chords[cIdx];
-      const pcs = chord.pitchClasses;
 
       if (cIdx === 0) {
         // Initial chord: close root position centered in octave 4 (MIDI 60-68)

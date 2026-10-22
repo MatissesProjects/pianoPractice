@@ -365,6 +365,20 @@
     - [x] Tests 30.1–30.6 verifying presets, acoustic synthesis across all sound types and accents, DOM elements, synchronization, and syntax validation.
     - [x] All 30 score engine tests and all 13 education tests passing with 100% success.
 
+- [x] **Milestone 31: Codebase Cleanup, Dead Code Elimination & Lifecycle Safety**
+  - [x] **Dead Code & Unreferenced Variable Removal**:
+    - [x] Removed unused `const pcs = chord.pitchClasses;` in `theory.js`.
+    - [x] Removed dead legacy keyboard generator constants `WHITE_NOTES` and `HAS_BLACK` in `index.html`.
+    - [x] Removed unused `const numWhiteKeys = 22;` in `renderCheatSheetSvg`.
+    - [x] Streamlined redundant 45-line fallback song database in `index.html` into a lightweight fallback leveraging `songs.js`.
+  - [x] **Mode Navigation & Metronome Lifecycle Safety**:
+    - [x] Added active metronome clock cancellation (`stopRepertoireMetronomeClock()`) when navigating away from Repertoire Lab to prevent ghost background clicks.
+    - [x] Added active scale practice cancellation (`toggleScalePractice()`) when leaving Scales & Theory Studio.
+    - [x] Reset timer IDs (`metroTimerId = null; repMetroTimerId = null;`) and tick indexes (`metroTickIndex = 0; repMetroTickIndex = 0;`) upon stopping to ensure downbeat alignment on restart.
+  - [x] **Verification & Test Suite**:
+    - [x] Verified full syntax validation across all files (`node --check theory.js; node --check songs.js`).
+    - [x] All 13 education suite tests and all 30 score engine tests passing with 100% success.
+
 
 
 
