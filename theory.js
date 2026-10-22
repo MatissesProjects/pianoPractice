@@ -1453,6 +1453,206 @@
     };
   }
 
+  const METRONOME_SOUND_PRESETS = [
+    { id: "woodblock", label: "🪵 Wood Block", description: "Hollow resonant woodblock percussion (Default)" },
+    { id: "mechanical", label: "⏱️ Mechanical Tick", description: "Classic pendulum wooden cabinet metronome" },
+    { id: "digital", label: "⚡ Digital Beep", description: "Modern electronic precision sine beep" },
+    { id: "cowbell", label: "🔔 Cowbell / Agogô", description: "Metallic dual-mode percussion bell" },
+    { id: "stick", label: "🥁 Rimshot / Sticks", description: "Acoustic drumstick cross-stick click" }
+  ];
+
+  /**
+   * Returns synthesis parameters for a given metronome sound and accent hierarchy.
+   */
+  function getMetronomeSoundParameters(soundId = "woodblock", accentType = "beat") {
+    const sId = (soundId || "woodblock").toLowerCase();
+    const isDownbeat = (accentType === "downbeat");
+    const isSecondary = (accentType === "secondary");
+    const isSub = (accentType === "subdivision");
+
+    switch (sId) {
+      case "mechanical":
+        if (isDownbeat) {
+          return { clickFreq: 3800, clickDur: 0.005, clickGain: 0.32, thumpFreq: 320, thumpDur: 0.024, thumpGain: 0.40 };
+        } else if (isSecondary) {
+          return { clickFreq: 3400, clickDur: 0.004, clickGain: 0.22, thumpFreq: 280, thumpDur: 0.020, thumpGain: 0.28 };
+        } else if (isSub) {
+          return { clickFreq: 2800, clickDur: 0.003, clickGain: 0.12, thumpFreq: 200, thumpDur: 0.014, thumpGain: 0.16 };
+        }
+        return { clickFreq: 3200, clickDur: 0.004, clickGain: 0.18, thumpFreq: 240, thumpDur: 0.018, thumpGain: 0.24 };
+
+      case "digital":
+        if (isDownbeat) {
+          return { freq: 1600, gain: 0.38, dur: 0.042 };
+        } else if (isSecondary) {
+          return { freq: 1050, gain: 0.28, dur: 0.035 };
+        } else if (isSub) {
+          return { freq: 520, gain: 0.16, dur: 0.025 };
+        }
+        return { freq: 800, gain: 0.24, dur: 0.032 };
+
+      case "cowbell":
+        if (isDownbeat) {
+          return { freq1: 800, freq2: 1240, filterFreq: 1000, filterQ: 6.0, gain: 0.40, dur: 0.080 };
+        } else if (isSecondary) {
+          return { freq1: 650, freq2: 1000, filterFreq: 850, filterQ: 6.0, gain: 0.30, dur: 0.070 };
+        } else if (isSub) {
+          return { freq1: 420, freq2: 650, filterFreq: 600, filterQ: 5.0, gain: 0.16, dur: 0.050 };
+        }
+        return { freq1: 540, freq2: 840, filterFreq: 750, filterQ: 5.5, gain: 0.26, dur: 0.065 };
+
+      case "stick":
+        if (isDownbeat) {
+          return { freq1: 2400, freq2: 1800, filterFreq: 2200, filterQ: 4.0, gain: 0.42, dur: 0.022 };
+        } else if (isSecondary) {
+          return { freq1: 2100, freq2: 1600, filterFreq: 1900, filterQ: 4.0, gain: 0.30, dur: 0.018 };
+        } else if (isSub) {
+          return { freq1: 1500, freq2: 1200, filterFreq: 1400, filterQ: 3.5, gain: 0.16, dur: 0.014 };
+        }
+        return { freq1: 1900, freq2: 1450, filterFreq: 1750, filterQ: 4.0, gain: 0.26, dur: 0.016 };
+
+      case "woodblock":
+      default:
+        if (isDownbeat) {
+          return { freq1: 1220, freq2: 1928, filterFreq: 1320, filterQ: 5.5, gain: 0.46, dur: 0.052 };
+        } else if (isSecondary) {
+          return { freq1: 980, freq2: 1550, filterFreq: 1060, filterQ: 5.5, gain: 0.36, dur: 0.046 };
+        } else if (isSub) {
+          return { freq1: 640, freq2: 1010, filterFreq: 700, filterQ: 5.0, gain: 0.20, dur: 0.035 };
+        }
+        return { freq1: 860, freq2: 1360, filterFreq: 930, filterQ: 5.5, gain: 0.30, dur: 0.042 };
+    }
+  }
+
+  /**
+   * Synthesizes authentic metronome clicks across sound presets (Wood Block, Mechanical, Digital, Cowbell, Stick).
+   * Fully scheduled in Web Audio API.
+   */
+  function synthesizeMetronomeClick(audioCtx, destinationNode, time, accentType = "beat", soundId = "woodblock", volScale = 1.0) {
+    if (!audioCtx) return null;
+    const dest = destinationNode || audioCtx.destination;
+    const t = (typeof time === "number" && !isNaN(time)) ? time : audioCtx.currentTime;
+    const sId = (soundId || "woodblock").toLowerCase();
+    const effectiveVol = Math.max(0, Math.min(1, parseFloat(volScale) || 0));
+    if (effectiveVol <= 0.0001) return null;
+
+    const params = getMetronomeSoundParameters(sId, accentType);
+
+    if (sId === "mechanical") {
+      const oscClick = audioCtx.createOscillator();
+      const clickGain = audioCtx.createGain();
+      const clickFilter = audioCtx.createBiquadFilter();
+
+      clickFilter.type = "bandpass";
+      clickFilter.frequency.setValueAtTime(params.clickFreq, t);
+      clickFilter.Q.setValueAtTime(4.0, t);
+
+      oscClick.type = "triangle";
+      oscClick.frequency.setValueAtTime(params.clickFreq, t);
+
+      const targetClickPeak = params.clickGain * effectiveVol;
+      clickGain.gain.setValueAtTime(targetClickPeak, t);
+      clickGain.gain.exponentialRampToValueAtTime(0.0001, t + params.clickDur);
+
+      oscClick.connect(clickGain);
+      clickGain.connect(clickFilter);
+      clickFilter.connect(dest);
+      oscClick.start(t);
+      oscClick.stop(t + params.clickDur + 0.005);
+
+      const oscThump = audioCtx.createOscillator();
+      const thumpGain = audioCtx.createGain();
+
+      oscThump.type = "sine";
+      oscThump.frequency.setValueAtTime(params.thumpFreq * 1.15, t);
+      oscThump.frequency.exponentialRampToValueAtTime(params.thumpFreq, t + 0.008);
+
+      const targetThumpPeak = params.thumpGain * effectiveVol;
+      thumpGain.gain.setValueAtTime(targetThumpPeak, t);
+      thumpGain.gain.exponentialRampToValueAtTime(0.0001, t + params.thumpDur);
+
+      oscThump.connect(thumpGain);
+      thumpGain.connect(dest);
+      oscThump.start(t);
+      oscThump.stop(t + params.thumpDur + 0.005);
+
+      return { soundId: sId, accentType, time: t, nodes: [oscClick, oscThump] };
+    }
+
+    if (sId === "digital") {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(params.freq, t);
+
+      const targetPeak = params.gain * effectiveVol;
+      gain.gain.setValueAtTime(targetPeak, t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + params.dur);
+
+      osc.connect(gain);
+      gain.connect(dest);
+      osc.start(t);
+      osc.stop(t + params.dur + 0.005);
+
+      return { soundId: sId, accentType, time: t, nodes: [osc] };
+    }
+
+    // Default: Wood Block, Cowbell, or Stick (dual-mode resonant percussion)
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain1 = audioCtx.createGain();
+    const gain2 = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(params.filterFreq, t);
+    filter.Q.setValueAtTime(params.filterQ, t);
+
+    if (sId === "woodblock") {
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(params.freq1 * 1.25, t);
+      osc1.frequency.exponentialRampToValueAtTime(params.freq1, t + 0.007);
+
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(params.freq2 * 1.05, t);
+      osc2.frequency.exponentialRampToValueAtTime(params.freq2, t + 0.010);
+    } else if (sId === "cowbell") {
+      osc1.type = "square";
+      osc1.frequency.setValueAtTime(params.freq1, t);
+
+      osc2.type = "square";
+      osc2.frequency.setValueAtTime(params.freq2, t);
+    } else {
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(params.freq1, t);
+
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(params.freq2, t);
+    }
+
+    const peak1 = params.gain * effectiveVol;
+    gain1.gain.setValueAtTime(peak1, t);
+    gain1.gain.exponentialRampToValueAtTime(0.0001, t + params.dur);
+
+    const peak2 = params.gain * 0.45 * effectiveVol;
+    gain2.gain.setValueAtTime(peak2, t);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, t + params.dur * 0.65);
+
+    osc1.connect(gain1);
+    osc2.connect(gain2);
+    gain1.connect(filter);
+    gain2.connect(filter);
+    filter.connect(dest);
+
+    osc1.start(t);
+    osc2.start(t);
+    osc1.stop(t + params.dur + 0.01);
+    osc2.stop(t + params.dur + 0.01);
+
+    return { soundId: sId, accentType, time: t, nodes: [osc1, osc2] };
+  }
+
   /**
    * Generates dynamic count-in array matching the authentic meter of the time signature.
    */
@@ -1480,6 +1680,118 @@
       beatMs,
       totalCountInMs: (countBeats.length - 1) * beatMs
     };
+  }
+
+  // ==========================================
+  // OUTPUT DEVICE & MIDI MESSAGE UTILITIES
+  // ==========================================
+
+  /**
+   * Format standard 3-byte MIDI channel voice message.
+   * @param {number} cmd - Command nibble (8 = Note Off, 9 = Note On, 11 = CC)
+   * @param {number} data1 - Note number or controller index (0-127)
+   * @param {number} data2 - Velocity or controller value (0-127)
+   * @param {number} channel - 1-indexed MIDI channel (1-16)
+   */
+  function formatMidiMessage(cmd, data1, data2, channel = 1) {
+    const validCh = Math.max(1, Math.min(16, parseInt(channel, 10) || 1));
+    const status = ((cmd & 0x0F) << 4) | ((validCh - 1) & 0x0F);
+    const d1 = Math.max(0, Math.min(127, Math.round(data1 || 0)));
+    const d2 = Math.max(0, Math.min(127, Math.round(data2 || 0)));
+    return [status, d1, d2];
+  }
+
+  /**
+   * Generates a MIDI Note On message for an output device.
+   */
+  function createMidiNoteOn(pitchOrMidi, velocity = 80, channel = 1) {
+    let noteNum = 60;
+    if (typeof pitchOrMidi === "number") {
+      noteNum = pitchOrMidi;
+    } else if (typeof pitchOrMidi === "string") {
+      const parsed = pitchToMidi(pitchOrMidi);
+      if (parsed !== null) noteNum = parsed;
+    }
+    return formatMidiMessage(9, noteNum, velocity, channel);
+  }
+
+  /**
+   * Generates a MIDI Note Off message for an output device.
+   */
+  function createMidiNoteOff(pitchOrMidi, channel = 1) {
+    let noteNum = 60;
+    if (typeof pitchOrMidi === "number") {
+      noteNum = pitchOrMidi;
+    } else if (typeof pitchOrMidi === "string") {
+      const parsed = pitchToMidi(pitchOrMidi);
+      if (parsed !== null) noteNum = parsed;
+    }
+    return formatMidiMessage(8, noteNum, 0, channel);
+  }
+
+  /**
+   * Generates a MIDI Control Change (e.g. CC 64 Sustain Pedal).
+   */
+  function createMidiCC(controllerNumber, value, channel = 1) {
+    return formatMidiMessage(11, controllerNumber, value, channel);
+  }
+
+  /**
+   * Classifies an audio device label and deviceId into categories and icons.
+   */
+  function classifyAudioDevice(label = "", deviceId = "") {
+    const l = (label || "").toLowerCase();
+    const id = (deviceId || "").toLowerCase();
+
+    if (id === "default" && (!l || l.includes("default"))) {
+      return { type: "default", icon: "💻", category: "Default System Output" };
+    }
+    if (id === "communications" || l.includes("communications")) {
+      return { type: "communications", icon: "📞", category: "Communications Device" };
+    }
+    if (/headphone|headset|earphone|airpod|buds|wh-1000|bose|iem|front.*headphone/i.test(l)) {
+      return { type: "headphones", icon: "🎧", category: "Headphones / Headset" };
+    }
+    if (/hdmi|displayport|nvidia|amd|tv|monitor|screen|ultrawide|lg tv|samsung/i.test(l)) {
+      return { type: "display", icon: "🖥️", category: "Monitor / TV / HDMI" };
+    }
+    if (/focusrite|scarlett|motu|steinberg|behringer|rode|yamaha|komplete|apollo|audio interface|dac|usb audio|sound card/i.test(l)) {
+      return { type: "interface", icon: "🎛️", category: "Audio Interface / USB DAC" };
+    }
+    if (/cable|virtual|voicemeeter|vb-audio|obs|blackhole|virtual-audio|stereo mix/i.test(l)) {
+      return { type: "virtual", icon: "🔀", category: "Virtual Cable / Routing" };
+    }
+    if (/spdif|optical|digital/i.test(l)) {
+      return { type: "digital", icon: "⚡", category: "Digital / Optical S/PDIF" };
+    }
+    if (/speaker|lautsprecher|haut-parleur|realtek/i.test(l)) {
+      return { type: "speakers", icon: "🔊", category: "Speakers / Line Out" };
+    }
+    return { type: "audio", icon: "🔊", category: "Audio Output Device" };
+  }
+
+  /**
+   * Filters and formats an array of MediaDeviceInfo for audio output destinations.
+   */
+  function filterAudioOutputDevices(devices) {
+    if (!Array.isArray(devices)) return [];
+    return devices
+      .filter(d => d.kind === "audiooutput")
+      .map((d, idx) => {
+        const deviceId = d.deviceId || "";
+        const rawLabel = d.label || "";
+        const fallback = (deviceId === "default" ? "System Default Output" : `Audio Output ${idx + 1}`);
+        const label = rawLabel || fallback;
+        const info = classifyAudioDevice(label, deviceId);
+        return {
+          deviceId,
+          groupId: d.groupId || "",
+          label,
+          type: info.type,
+          icon: info.icon,
+          category: info.category
+        };
+      });
   }
 
   return {
@@ -1534,7 +1846,16 @@
     parseTimeSignature,
     calculateMetronomeIntervals,
     getMetronomeTickProfile,
-    getTimeSignatureCountIn
+    getTimeSignatureCountIn,
+    formatMidiMessage,
+    createMidiNoteOn,
+    createMidiNoteOff,
+    createMidiCC,
+    filterAudioOutputDevices,
+    classifyAudioDevice,
+    METRONOME_SOUND_PRESETS,
+    getMetronomeSoundParameters,
+    synthesizeMetronomeClick
   };
 });
 

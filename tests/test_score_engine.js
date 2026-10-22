@@ -2738,6 +2738,380 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 27: ⏱️ Metronome Engine Architecture — Equal Divisions, Proper Time Signatures, Beat Subdivisions & Repertoire Synchronization passed");
 }
 
+// ==========================================
+// TEST 28: 🔊 Hardware Output Device Selection (Web Audio setSinkId & Web MIDI Outputs)
+// ==========================================
+{
+  const fs = require("fs");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const theory = window.MusicTheory;
+  assert.ok(theory, "window.MusicTheory must be available");
+
+  // 28.1 Theory MIDI Message Formatting & Encoding
+  assert.ok(typeof theory.formatMidiMessage === "function", "theory.formatMidiMessage must be exported");
+  assert.ok(typeof theory.createMidiNoteOn === "function", "theory.createMidiNoteOn must be exported");
+  assert.ok(typeof theory.createMidiNoteOff === "function", "theory.createMidiNoteOff must be exported");
+  assert.ok(typeof theory.createMidiCC === "function", "theory.createMidiCC must be exported");
+  assert.ok(typeof theory.filterAudioOutputDevices === "function", "theory.filterAudioOutputDevices must be exported");
+
+  // Test Note-On bitwise generation across channels 1..16
+  const msgNoteOnCh1 = theory.formatMidiMessage(9, 60, 100, 1);
+  assert.deepStrictEqual(msgNoteOnCh1, [0x90, 60, 100], "Channel 1 Note-On status byte must be 0x90");
+
+  const msgNoteOnCh10 = theory.formatMidiMessage(9, 36, 127, 10);
+  assert.deepStrictEqual(msgNoteOnCh10, [0x99, 36, 127], "Channel 10 Note-On status byte must be 0x99 (percussion)");
+
+  const msgNoteOnCh16 = theory.formatMidiMessage(9, 72, 80, 16);
+  assert.deepStrictEqual(msgNoteOnCh16, [0x9F, 72, 80], "Channel 16 Note-On status byte must be 0x9F");
+
+  // Test Note-Off bitwise generation
+  const msgNoteOffCh1 = theory.formatMidiMessage(8, 60, 0, 1);
+  assert.deepStrictEqual(msgNoteOffCh1, [0x80, 60, 0], "Channel 1 Note-Off status byte must be 0x80");
+
+  // Test Control Change (CC) generation (CC 64 Damper Sustain, CC 120 All Sound Off, CC 123 All Notes Off)
+  const msgSustainOn = theory.createMidiCC(64, 127, 1);
+  assert.deepStrictEqual(msgSustainOn, [0xB0, 64, 127], "Damper pedal down on Ch 1 must produce [0xB0, 64, 127]");
+
+  const msgSustainOff = theory.createMidiCC(64, 0, 1);
+  assert.deepStrictEqual(msgSustainOff, [0xB0, 64, 0], "Damper pedal release on Ch 1 must produce [0xB0, 64, 0]");
+
+  const msgAllSoundOff = theory.createMidiCC(120, 0, 2);
+  assert.deepStrictEqual(msgAllSoundOff, [0xB1, 120, 0], "All Sound Off on Ch 2 must produce [0xB1, 120, 0]");
+
+  const msgAllNotesOff = theory.createMidiCC(123, 0, 1);
+  assert.deepStrictEqual(msgAllNotesOff, [0xB0, 123, 0], "All Notes Off on Ch 1 must produce [0xB0, 123, 0]");
+
+  // Test createMidiNoteOn with pitch strings and MIDI numbers
+  const noteOnFromPitch = theory.createMidiNoteOn("C4", 90, 1);
+  assert.deepStrictEqual(noteOnFromPitch, [0x90, 60, 90], "createMidiNoteOn with 'C4' must map to MIDI 60");
+
+  const noteOnFromNumber = theory.createMidiNoteOn(69, 110, 3);
+  assert.deepStrictEqual(noteOnFromNumber, [0x92, 69, 110], "createMidiNoteOn with 69 on Ch 3 must map to [0x92, 69, 110]");
+
+  // Test createMidiNoteOff with pitch strings and MIDI numbers
+  const noteOffFromPitch = theory.createMidiNoteOff("A4", 1);
+  assert.deepStrictEqual(noteOffFromPitch, [0x80, 69, 0], "createMidiNoteOff with 'A4' must map to [0x80, 69, 0]");
+
+  // Boundary clamping: velocity and data bytes capped to 0..127
+  const clampedNoteOn = theory.createMidiNoteOn("C4", 150, 1);
+  assert.strictEqual(clampedNoteOn[2], 127, "Velocity above 127 must be clamped to 127");
+
+  // 28.2 Audio Output Device Filtering
+  const mockDevices = [
+    { kind: "audioinput", deviceId: "mic1", label: "Built-in Microphone" },
+    { kind: "videoinput", deviceId: "cam1", label: "Webcam" },
+    { kind: "audiooutput", deviceId: "default", label: "System Default Output" },
+    { kind: "audiooutput", deviceId: "hp_out", label: "Headphones (Realtek Audio)" },
+    { kind: "audiooutput", deviceId: "dac_out", label: "Focusrite Scarlett 2i2 USB" },
+    { kind: "audiooutput", deviceId: "spk_out", label: "" } // Unlabeled output fallback
+  ];
+
+  const filteredOutputs = theory.filterAudioOutputDevices(mockDevices);
+  assert.strictEqual(filteredOutputs.length, 4, "Should only extract the 4 audiooutput devices");
+  assert.strictEqual(filteredOutputs[0].deviceId, "default");
+  assert.strictEqual(filteredOutputs[0].label, "System Default Output");
+  assert.strictEqual(filteredOutputs[1].deviceId, "hp_out");
+  assert.strictEqual(filteredOutputs[2].deviceId, "dac_out");
+  assert.strictEqual(filteredOutputs[3].deviceId, "spk_out");
+  assert.strictEqual(filteredOutputs[3].label, "Audio Output 4", "Unlabeled output must receive friendly fallback label");
+
+  // 28.3 DOM & UI Verification in index.html
+  assert.ok(html.includes('id="audioOutputSelect"'), "index.html must include #audioOutputSelect in header audio deck");
+  assert.ok(html.includes('id="refreshAudioDevicesBtn"'), "index.html must include #refreshAudioDevicesBtn");
+  assert.ok(html.includes('id="audioOutputStatusIcon"'), "index.html must include #audioOutputStatusIcon");
+  assert.ok(html.includes('id="midiOutputSelect"'), "index.html must include #midiOutputSelect");
+  assert.ok(html.includes('id="midiDeviceSelect"'), "index.html must include #midiDeviceSelect");
+  assert.ok(html.includes('title="Select MIDI input device'), "midiDeviceSelect must be labeled for MIDI input");
+  assert.ok(html.includes('title="Send MIDI note output to digital piano or external synth"'), "midiOutputSelect must be labeled for MIDI output");
+
+  // CSS Styling Verification
+  assert.ok(html.includes('.audio-output-control'), "CSS must include .audio-output-control");
+  assert.ok(html.includes('.audio-output-select'), "CSS must include .audio-output-select");
+  assert.ok(html.includes('.midi-select'), "CSS must include .midi-select");
+
+  // 28.4 Script Functions & Routing Logic
+  assert.ok(html.includes('function initAudioOutputRouting'), "index.html must define initAudioOutputRouting");
+  assert.ok(html.includes('function updateAudioOutputDeviceList'), "index.html must define updateAudioOutputDeviceList");
+  assert.ok(html.includes('function setAudioOutputDevice'), "index.html must define setAudioOutputDevice");
+  assert.ok(html.includes('function initMidiOutputRouting'), "index.html must define initMidiOutputRouting");
+  assert.ok(html.includes('function updateMidiOutputDeviceList'), "index.html must define updateMidiOutputDeviceList");
+  assert.ok(html.includes('function setMidiOutputDevice'), "index.html must define setMidiOutputDevice");
+  assert.ok(html.includes('function sendMidiOutputNoteOn'), "index.html must define sendMidiOutputNoteOn");
+  assert.ok(html.includes('function sendMidiOutputNoteOff'), "index.html must define sendMidiOutputNoteOff");
+  assert.ok(html.includes('function sendMidiOutputSustain'), "index.html must define sendMidiOutputSustain");
+  assert.ok(html.includes('function sendMidiAllNotesOff'), "index.html must define sendMidiAllNotesOff");
+  assert.ok(html.includes('audioCtx.setSinkId'), "index.html must route Web Audio via audioCtx.setSinkId");
+
+  // 28.5 Boot Up & Lifecycle Invocation
+  assert.ok(html.includes('initAudioOutputRouting();'), "index.html boot up must invoke initAudioOutputRouting");
+  assert.ok(html.includes('initMidiOutputRouting();'), "index.html boot up must invoke initMidiOutputRouting");
+
+  // 28.6 Complete Script Syntax Validation
+  const vm = require("vm");
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid and free of unclosed tokens or syntax errors");
+
+  console.log("✔ Test 28: 🔊 Hardware Output Device Selection (Web Audio setSinkId & Web MIDI Outputs) passed");
+}
+
+// ==========================================
+// TEST 29: 🔊 Universal Multi-Device Audio Output Enumeration, Discovery & Native Picker Engine
+// ==========================================
+{
+  const fs = require("fs");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const theory = window.MusicTheory;
+  assert.ok(theory, "window.MusicTheory must be available");
+
+  // 29.1 Device Categorization & Classification (theory.classifyAudioDevice)
+  assert.ok(typeof theory.classifyAudioDevice === "function", "theory.classifyAudioDevice must be exported");
+
+  const headPhoneTest = theory.classifyAudioDevice("Headphones (Realtek(R) Audio)", "hp1");
+  assert.strictEqual(headPhoneTest.type, "headphones", "Headphones must be classified as type 'headphones'");
+  assert.strictEqual(headPhoneTest.icon, "🎧", "Headphones must receive 🎧 icon");
+
+  const displayTest = theory.classifyAudioDevice("2 - LG UltraWide (NVIDIA High Definition Audio)", "disp1");
+  assert.strictEqual(displayTest.type, "display", "Monitor/TV audio must be classified as 'display'");
+  assert.strictEqual(displayTest.icon, "🖥️", "Display audio must receive 🖥️ icon");
+
+  const dacTest = theory.classifyAudioDevice("Focusrite USB Audio (Scarlett 2i2 USB)", "dac1");
+  assert.strictEqual(dacTest.type, "interface", "USB DAC / Audio interface must be classified as 'interface'");
+  assert.strictEqual(dacTest.icon, "🎛️", "Audio interface must receive 🎛️ icon");
+
+  const virtualTest = theory.classifyAudioDevice("CABLE Input (VB-Audio Virtual Cable)", "virt1");
+  assert.strictEqual(virtualTest.type, "virtual", "Virtual audio cable must be classified as 'virtual'");
+  assert.strictEqual(virtualTest.icon, "🔀", "Virtual audio cable must receive 🔀 icon");
+
+  const spdifTest = theory.classifyAudioDevice("Digital Audio (S/PDIF) (High Definition Audio Device)", "spdif1");
+  assert.strictEqual(spdifTest.type, "digital", "S/PDIF optical audio must be classified as 'digital'");
+  assert.strictEqual(spdifTest.icon, "⚡", "S/PDIF audio must receive ⚡ icon");
+
+  const speakerTest = theory.classifyAudioDevice("Speakers (Realtek(R) Audio)", "spk1");
+  assert.strictEqual(speakerTest.type, "speakers", "Speakers must be classified as 'speakers'");
+  assert.strictEqual(speakerTest.icon, "🔊", "Speakers must receive 🔊 icon");
+
+  const defaultTest = theory.classifyAudioDevice("Default - System Default Output", "default");
+  assert.strictEqual(defaultTest.type, "default", "Default system device must be classified as 'default'");
+  assert.strictEqual(defaultTest.icon, "💻", "Default system device must receive 💻 icon");
+
+  // 29.2 Full 11-Device Computer Audio Output Enumeration
+  const mock11Devices = [
+    { kind: "audioinput", deviceId: "mic_built_in", label: "Microphone Array (Realtek(R) Audio)" },
+    { kind: "videoinput", deviceId: "webcam1", label: "Integrated Webcam HD" },
+    { kind: "audiooutput", deviceId: "default", label: "Default - Speakers (Realtek(R) Audio)" },
+    { kind: "audiooutput", deviceId: "dev_speakers", label: "Speakers (Realtek(R) Audio)" },
+    { kind: "audiooutput", deviceId: "dev_headphones", label: "Headphones (Realtek(R) Audio)" },
+    { kind: "audiooutput", deviceId: "dev_spdif", label: "Digital Audio (S/PDIF) (High Definition Audio Device)" },
+    { kind: "audiooutput", deviceId: "dev_hdmi_lg", label: "2 - LG UltraWide (NVIDIA High Definition Audio)" },
+    { kind: "audiooutput", deviceId: "dev_bt_stereo", label: "Headphones (WH-1000XM4 Stereo)" },
+    { kind: "audiooutput", deviceId: "dev_bt_ag", label: "Headset (WH-1000XM4 Hands-Free AG Audio)" },
+    { kind: "audiooutput", deviceId: "dev_vb_cable", label: "CABLE Input (VB-Audio Virtual Cable)" },
+    { kind: "audiooutput", deviceId: "dev_focusrite", label: "Focusrite USB Audio (Scarlett 2i2 USB)" },
+    { kind: "audiooutput", deviceId: "dev_voicemeeter", label: "VoiceMeeter Input (VB-Audio VoiceMeeter VAIO)" },
+    { kind: "audiooutput", deviceId: "communications", label: "Communications - Headset (WH-1000XM4 Hands-Free AG Audio)" }
+  ];
+
+  const filtered11 = theory.filterAudioOutputDevices(mock11Devices);
+  assert.strictEqual(filtered11.length, 11, "Must accurately extract all 11 audiooutput devices on the computer");
+
+  // Verify full label preservation (no 30-character aggressive truncation)
+  assert.ok(filtered11.some(d => d.label === "Digital Audio (S/PDIF) (High Definition Audio Device)"), "Long device labels must not be aggressively truncated");
+  assert.ok(filtered11.some(d => d.label === "2 - LG UltraWide (NVIDIA High Definition Audio)"), "Display device labels must be preserved in full");
+  assert.ok(filtered11.some(d => d.label === "Focusrite USB Audio (Scarlett 2i2 USB)"), "USB interface labels must be preserved in full");
+
+  // Verify icons & categories attached to filtered results
+  const focusriteItem = filtered11.find(d => d.deviceId === "dev_focusrite");
+  assert.strictEqual(focusriteItem.icon, "🎛️", "Focusrite device must be tagged with 🎛️ icon");
+  const hdmiItem = filtered11.find(d => d.deviceId === "dev_hdmi_lg");
+  assert.strictEqual(hdmiItem.icon, "🖥️", "HDMI display device must be tagged with 🖥️ icon");
+
+  // 29.3 DOM UI Elements in index.html
+  assert.ok(html.includes('id="openAudioPickerBtn"'), "index.html must include #openAudioPickerBtn for system output picker");
+  assert.ok(html.includes('id="refreshAudioDevicesBtn"'), "index.html must include #refreshAudioDevicesBtn for rescan & discovery");
+  assert.ok(html.includes('id="testAudioOutputBtn"'), "index.html must include #testAudioOutputBtn for audible test chimes");
+  assert.ok(html.includes('id="audioOutputLabel"'), "index.html must include #audioOutputLabel for dynamic device count badge");
+  assert.ok(html.includes('.audio-output-actions'), "index.html CSS must include .audio-output-actions");
+
+  // 29.4 Discovery & Routing Function Validation
+  assert.ok(html.includes('function requestAudioOutputAccess'), "index.html must define requestAudioOutputAccess");
+  assert.ok(html.includes('function openNativeAudioOutputPicker'), "index.html must define openNativeAudioOutputPicker");
+  assert.ok(html.includes('function playTestAudioChime'), "index.html must define playTestAudioChime");
+  assert.ok(html.includes('__discover__'), "index.html must include __discover__ action in dropdown");
+  assert.ok(html.includes('__system_picker__'), "index.html must include __system_picker__ action in dropdown");
+  assert.ok(html.includes('audioCtx.setSinkId'), "index.html must route Web Audio via audioCtx.setSinkId");
+
+  // 29.5 Script Syntax Validation via Node vm
+  const vm = require("vm");
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html script must remain fully syntactically valid with multi-device discovery");
+
+  console.log("✔ Test 29: 🔊 Universal Multi-Device Audio Output Enumeration, Discovery & Native Picker Engine passed");
+}
+
+// ==========================================
+// TEST 30: 🪵 Multi-Timbre Metronome Engine & Acoustic Wood Block Synthesis
+// ==========================================
+{
+  const fs = require("fs");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const theory = window.MusicTheory;
+  assert.ok(theory, "window.MusicTheory must be available");
+
+  // 30.1 Presets Validation (METRONOME_SOUND_PRESETS)
+  assert.ok(Array.isArray(theory.METRONOME_SOUND_PRESETS), "theory.METRONOME_SOUND_PRESETS must be exported as an array");
+  assert.strictEqual(theory.METRONOME_SOUND_PRESETS.length, 5, "Must support 5 distinct metronome sound presets");
+
+  const woodblockPreset = theory.METRONOME_SOUND_PRESETS.find(p => p.id === "woodblock");
+  assert.ok(woodblockPreset, "Wood Block preset must exist");
+  assert.strictEqual(woodblockPreset.id, "woodblock");
+  assert.ok(woodblockPreset.label.includes("Wood Block"), "Wood Block label must include 'Wood Block'");
+
+  const mechanicalPreset = theory.METRONOME_SOUND_PRESETS.find(p => p.id === "mechanical");
+  assert.ok(mechanicalPreset, "Mechanical Tick preset must exist");
+
+  const digitalPreset = theory.METRONOME_SOUND_PRESETS.find(p => p.id === "digital");
+  assert.ok(digitalPreset, "Digital Beep preset must exist");
+
+  const cowbellPreset = theory.METRONOME_SOUND_PRESETS.find(p => p.id === "cowbell");
+  assert.ok(cowbellPreset, "Cowbell preset must exist");
+
+  const stickPreset = theory.METRONOME_SOUND_PRESETS.find(p => p.id === "stick");
+  assert.ok(stickPreset, "Stick preset must exist");
+
+  // 30.2 Sound Parameter Engine (getMetronomeSoundParameters)
+  assert.ok(typeof theory.getMetronomeSoundParameters === "function", "theory.getMetronomeSoundParameters must be exported");
+
+  const wbDownbeat = theory.getMetronomeSoundParameters("woodblock", "downbeat");
+  assert.strictEqual(wbDownbeat.freq1, 1220, "Wood Block downbeat primary frequency must be 1220 Hz");
+  assert.strictEqual(wbDownbeat.freq2, 1928, "Wood Block downbeat secondary frequency must be 1928 Hz");
+  assert.strictEqual(wbDownbeat.filterFreq, 1320, "Wood Block downbeat bandpass filter must be 1320 Hz");
+  assert.strictEqual(wbDownbeat.filterQ, 5.5, "Wood Block filter Q factor must be 5.5");
+
+  const wbBeat = theory.getMetronomeSoundParameters("woodblock", "beat");
+  assert.strictEqual(wbBeat.freq1, 860, "Wood Block beat primary frequency must be 860 Hz");
+  assert.strictEqual(wbBeat.freq2, 1360, "Wood Block beat secondary frequency must be 1360 Hz");
+  assert.ok(wbDownbeat.gain > wbBeat.gain, "Wood Block downbeat must have higher gain than regular beat");
+
+  const mechBeat = theory.getMetronomeSoundParameters("mechanical", "beat");
+  assert.strictEqual(mechBeat.clickFreq, 3200, "Mechanical click frequency must be 3200 Hz");
+  assert.strictEqual(mechBeat.thumpFreq, 240, "Mechanical cabinet thump frequency must be 240 Hz");
+
+  const digiBeat = theory.getMetronomeSoundParameters("digital", "downbeat");
+  assert.strictEqual(digiBeat.freq, 1600, "Digital downbeat frequency must be 1600 Hz");
+
+  // 30.3 Web Audio Synthesis Engine (synthesizeMetronomeClick)
+  assert.ok(typeof theory.synthesizeMetronomeClick === "function", "theory.synthesizeMetronomeClick must be exported");
+
+  // Mock AudioContext and Web Audio Nodes
+  function createMockAudioContext() {
+    return {
+      currentTime: 1.0,
+      destination: { id: "dest" },
+      createOscillator() {
+        return {
+          type: "sine",
+          frequency: {
+            setValueAtTime: (v, t) => {},
+            exponentialRampToValueAtTime: (v, t) => {}
+          },
+          connect: (n) => {},
+          start: (t) => {},
+          stop: (t) => {}
+        };
+      },
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: (v, t) => {},
+            exponentialRampToValueAtTime: (v, t) => {}
+          },
+          connect: (n) => {}
+        };
+      },
+      createBiquadFilter() {
+        return {
+          type: "bandpass",
+          frequency: { setValueAtTime: (v, t) => {} },
+          Q: { setValueAtTime: (v, t) => {} },
+          connect: (n) => {}
+        };
+      }
+    };
+  }
+
+  const mockCtx = createMockAudioContext();
+
+  // Test Wood Block synthesis
+  const wbResult = theory.synthesizeMetronomeClick(mockCtx, null, 1.5, "downbeat", "woodblock", 0.8);
+  assert.ok(wbResult, "synthesizeMetronomeClick for woodblock must return synthesis object");
+  assert.strictEqual(wbResult.soundId, "woodblock");
+  assert.strictEqual(wbResult.accentType, "downbeat");
+  assert.strictEqual(wbResult.time, 1.5);
+  assert.strictEqual(wbResult.nodes.length, 2, "Wood Block must create dual resonant body oscillators");
+
+  // Test Mechanical synthesis
+  const mechResult = theory.synthesizeMetronomeClick(mockCtx, null, 2.0, "beat", "mechanical", 0.8);
+  assert.ok(mechResult, "synthesizeMetronomeClick for mechanical must return synthesis object");
+  assert.strictEqual(mechResult.soundId, "mechanical");
+  assert.strictEqual(mechResult.nodes.length, 2, "Mechanical tick must create click and thump oscillators");
+
+  // Test Digital synthesis
+  const digiResult = theory.synthesizeMetronomeClick(mockCtx, null, 2.5, "subdivision", "digital", 0.8);
+  assert.ok(digiResult, "synthesizeMetronomeClick for digital must return synthesis object");
+  assert.strictEqual(digiResult.soundId, "digital");
+  assert.strictEqual(digiResult.nodes.length, 1, "Digital beep creates single sine oscillator");
+
+  // Test Cowbell and Stick synthesis
+  const cowResult = theory.synthesizeMetronomeClick(mockCtx, null, 3.0, "beat", "cowbell", 0.8);
+  assert.strictEqual(cowResult.soundId, "cowbell");
+  const stickResult = theory.synthesizeMetronomeClick(mockCtx, null, 3.5, "beat", "stick", 0.8);
+  assert.strictEqual(stickResult.soundId, "stick");
+
+  // Silence gate on 0 volume
+  const silentResult = theory.synthesizeMetronomeClick(mockCtx, null, 4.0, "beat", "woodblock", 0);
+  assert.strictEqual(silentResult, null, "Zero volume scale must bypass synthesis and return null");
+
+  // Null audio context safety
+  const nullCtxResult = theory.synthesizeMetronomeClick(null, null, 1.0, "beat", "woodblock", 0.8);
+  assert.strictEqual(nullCtxResult, null, "Null audio context must safely return null without throwing");
+
+  // 30.4 DOM Elements & UI Selectors in index.html
+  assert.ok(html.includes('id="metroSoundSelect"'), "index.html must include #metroSoundSelect in Rhythm Workshop");
+  assert.ok(html.includes('id="repertoireMetroSoundSelect"'), "index.html must include #repertoireMetroSoundSelect in transport controls");
+  assert.ok(html.includes('value="woodblock"'), "Both metronome sound selects must support 'woodblock'");
+  assert.ok(html.includes('value="mechanical"'), "Both metronome sound selects must support 'mechanical'");
+  assert.ok(html.includes('value="digital"'), "Both metronome sound selects must support 'digital'");
+  assert.ok(html.includes('value="cowbell"'), "Both metronome sound selects must support 'cowbell'");
+  assert.ok(html.includes('value="stick"'), "Both metronome sound selects must support 'stick'");
+
+  // 30.5 Script Logic & Synchronization in index.html
+  assert.ok(html.includes('let currentMetroSound = "woodblock"'), "index.html must default currentMetroSound to 'woodblock'");
+  assert.ok(html.includes('function setMetroSound'), "index.html must define setMetroSound function");
+  assert.ok(html.includes('function playMetronomeSoundPreview'), "index.html must define playMetronomeSoundPreview function");
+  assert.ok(html.includes('piano_metro_sound'), "index.html must persist metronome sound in LocalStorage (piano_metro_sound)");
+  assert.ok(html.includes('synthesizeMetronomeClick(audioCtx, masterGainNode || audioCtx.destination, time, profile.accentType, currentMetroSound'), "scheduleMetroClick must route clicks through synthesizeMetronomeClick");
+  assert.ok(html.includes('synthesizeMetronomeClick(audioCtx, masterGainNode || audioCtx.destination, time, profile.accentType, currentMetroSound, effectiveVol)'), "scheduleRepertoireMetroClick must route clicks through synthesizeMetronomeClick");
+
+  // 30.6 Complete Script Syntax Validation via Node vm
+  const vm = require("vm");
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid with multi-sound metronome engine");
+
+  console.log("✔ Test 30: 🪵 Multi-Timbre Metronome Engine & Acoustic Wood Block Synthesis passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 
