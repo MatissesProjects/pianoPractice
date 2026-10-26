@@ -2799,11 +2799,12 @@
    * Automatically inspects any repertoire song and extracts its Music Theory DNA
    * (Key Signature, Scale Warmup, Hand Range Landmarks, Meter, and Primary Chords).
    */
-  function analyzeSongTheoryDNA(song) {
+  function analyzeSongTheoryDNA(song, handOptions = null) {
     if (!song) return null;
 
     let tonic = "C";
     let isMinor = false;
+    const keyAccs = detectKeyAccidentals(song);
 
     if (song.category && song.category.includes("C 5-Finger")) {
       tonic = "C";
@@ -2820,10 +2821,9 @@
     } else if (song.id && song.id.includes("amazing-grace-f")) {
       tonic = "F";
     } else {
-      const accs = detectKeyAccidentals(song);
-      if (accs["B"] === "b" && !accs["E"]) tonic = "F";
-      else if (accs["F"] === "#" && !accs["C"]) tonic = "G";
-      else if (accs["F"] === "#" && accs["C"] === "#") tonic = "D";
+      if (keyAccs["B"] === "b" && !keyAccs["E"]) tonic = "F";
+      else if (keyAccs["F"] === "#" && !keyAccs["C"]) tonic = "G";
+      else if (keyAccs["F"] === "#" && keyAccs["C"] === "#") tonic = "D";
     }
 
     const scaleType = isMinor ? "natural_minor" : "major";
@@ -2833,41 +2833,38 @@
     const warmupPitches = scaleObj ? scaleObj.notes.slice(0, 5).map(n => n.pitch) : ["C4", "D4", "E4", "F4", "G4"];
     const fullScalePitches = scaleObj ? scaleObj.notes.map(n => n.pitch) : ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5"];
 
-    // Extract unique harmonic chords across measures
-    const model = buildScoreModel(song, true, true, true, "song", "song");
+    // Extract clean diatonic harmonic chords across measures from Left-Hand bass roots
+    const rootModel = buildScoreModel(song, true, true, false, "song", "roots");
     const seenChords = new Map();
 
-    if (model && model.measures) {
-      model.measures.forEach(m => {
+    if (rootModel && rootModel.measures) {
+      rootModel.measures.forEach(m => {
         if (!m || m.length === 0) return;
         const beat0 = m[0];
         if (!beat0) return;
-        const pitches = new Set();
+        let triadPitches = [];
         if (beat0.lh && beat0.lh.pitch && beat0.lh.pitch !== "-") {
-          beat0.lh.pitch.split("+").forEach(p => pitches.add(p));
+          const lhRoot = beat0.lh.pitch.split("+")[0];
+          const triadStr = transformLeftHandPitch(lhRoot, "triads", keyAccs);
+          triadPitches = triadStr.split("+").filter(Boolean);
         }
-        if (beat0.dyad && beat0.dyad.pitch && beat0.dyad.pitch !== "-") {
-          beat0.dyad.pitch.split("+").forEach(p => pitches.add(p));
-        } else if (beat0.rh && beat0.rh.pitch && beat0.rh.pitch !== "-") {
-          beat0.rh.pitch.split("+").forEach(p => pitches.add(p));
-        }
-        const pitchArr = Array.from(pitches);
-        if (pitchArr.length >= 2) {
-          const info = identifyActiveChord(pitchArr);
-          if (info && info.name && !info.type.includes("Single")) {
+        if (triadPitches.length >= 3) {
+          const info = identifyActiveChord(triadPitches);
+          if (info && info.name && (info.type.includes("Triad") || info.type.includes("7th"))) {
             const numeral = getRomanNumeralAnalysis(info, song) || "";
-            const keyId = info.rootName || info.name.split(" ")[0];
+            const keyId = info.root || info.name.split(" ")[0];
             if (keyId && !seenChords.has(keyId) && seenChords.size < 5) {
               const isMin = info.name.includes("Minor") || info.type.includes("Minor");
-              const gen = generateChord(keyId, isMin ? "minor" : "major", 4, 0);
-              const sym = `${keyId}${isMin ? "m" : ""}`;
+              const isDim = info.name.includes("Diminished") || info.type.includes("Dim");
+              const gen = generateChord(keyId, isDim ? "diminished" : (isMin ? "minor" : "major"), 4, 0);
+              const sym = `${keyId}${isDim ? "dim" : (isMin ? "m" : "")}`;
               const num = numeral || "I";
               seenChords.set(keyId, {
                 symbol: sym,
                 name: info.name,
                 numeral: num,
                 label: `${num} (${sym})`,
-                pitches: gen ? gen.pitches : pitchArr
+                pitches: gen ? gen.pitches : triadPitches
               });
             }
           }
@@ -2892,7 +2889,31 @@
       }
     }
 
-    const range = getSongPitchRange(song);
+    const rangeOpts = handOptions
+      ? { rh: handOptions.rh !== false, lh: Boolean(handOptions.lh), dyads: Boolean(handOptions.dyads) }
+      : { rh: true, lh: true, dyads: false };
+    const activeModel = buildScoreModel(
+      song,
+      rangeOpts.rh,
+      rangeOpts.lh,
+      rangeOpts.dyads,
+      (handOptions && handOptions.harmonyType) || "song",
+      (handOptions && handOptions.lhStyle) || "roots"
+    );
+    const activeMidis = [];
+    let playableStepCount = 0;
+    if (activeModel && Array.isArray(activeModel.steps)) {
+      activeModel.steps.forEach(s => {
+        if (s.expectedPitches && s.expectedPitches.length > 0) {
+          playableStepCount++;
+          s.expectedPitches.forEach(p => {
+            const m = pitchToMidi(p);
+            if (m !== null) activeMidis.push(m);
+          });
+        }
+      });
+    }
+    const range = activeMidis.length > 0 ? getRangeFromMidis(activeMidis) : getSongPitchRange(song, rangeOpts);
     const timeSig = parseTimeSignature(song.timeSig || "4/4");
     const accSummary = keySigInfo.count === 0
       ? "All Natural"
@@ -2913,7 +2934,7 @@
       beatsPerMeasure: timeSig.numerator,
       range,
       handSpanSummary: `${range.minPitch || "C4"} – ${range.maxPitch || "G4"} (${range.span || 8} keys)`,
-      totalNotes: range.noteCount || fullScalePitches.length,
+      totalNotes: playableStepCount || range.count || fullScalePitches.length,
       warmupScale: scaleObj,
       warmupPitches,
       fullScalePitches,
