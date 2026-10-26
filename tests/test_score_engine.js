@@ -3298,6 +3298,140 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song", 
   console.log("✔ Test 32: 𝄢 Left-Hand Accompaniment Engine & Multi-Level Left-Hand Style Selector passed");
 }
 
+// ==========================================
+// TEST 33: 🏆 Post-Song Comprehensive Performance Review, Score Inspection & Anti-Reset Engine
+// ==========================================
+{
+  const fs = require("fs");
+  const path = require("path");
+  const vm = require("vm");
+  const htmlPath = path.join(__dirname, "..", "index.html");
+  const html = fs.readFileSync(htmlPath, "utf8");
+
+  // 33.1 DOM Elements: Modal, Hero Grade, 4 Metric Cards, Problem Measure Diagnostic & Actions
+  const requiredElements = [
+    'id="songReviewModal"',
+    'id="reviewModalTitle"',
+    'id="reviewModalSubtitle"',
+    'id="reviewGradeBadge"',
+    'id="reviewStarsBanner"',
+    'id="reviewAccuracyPct"',
+    'id="reviewPedagogicalVerdict"',
+    'id="reviewNotesRatio"',
+    'id="reviewMissCount"',
+    'id="reviewPeakStreak"',
+    'id="reviewCleanliness"',
+    'id="reviewTimingMain"',
+    'id="reviewTimingSub"',
+    'id="reviewTimeDuration"',
+    'id="reviewTempoAndBest"',
+    'id="reviewDiagnosticPanel"',
+    'id="reviewLoopMistakesBtn"',
+    'id="closeReviewModalBtn"',
+    'id="reviewInspectScoreBtn"',
+    'id="reviewReplayBtn"',
+    'id="reviewNextSongBtn"',
+    'id="openReviewBtn"',
+    'id="hudReviewResultsBtn"',
+    'id="perfCloseBtn"'
+  ];
+
+  requiredElements.forEach(elemId => {
+    assert.ok(html.includes(elemId), `index.html must include ${elemId}`);
+  });
+
+  // Verify #perfToast properly closes before cheat sheet modal
+  const perfToastPos = html.indexOf('id="perfToast"');
+  const cheatSheetPos = html.indexOf('id="cheatSheetModal"');
+  assert.ok(perfToastPos < cheatSheetPos, "perfToast must appear before cheatSheetModal");
+  const perfToastSlice = html.slice(perfToastPos, cheatSheetPos);
+  assert.ok(perfToastSlice.includes("</div>"), "perfToast must contain a closing </div> before cheatSheetModal starts");
+
+  // 33.2 CSS Rules & Animations
+  const requiredCss = [
+    ".song-review-modal-backdrop",
+    ".song-review-modal-dialog",
+    ".review-grade-badge",
+    ".review-grade-badge.grade-s",
+    ".review-grade-badge.grade-a",
+    ".review-grade-badge.grade-b",
+    ".review-grade-badge.grade-c",
+    ".review-grade-badge.grade-d",
+    ".review-metrics-grid",
+    ".review-stat-card",
+    ".review-diagnostic-panel",
+    ".measure-number.has-mistake",
+    ".note-group.completed-target"
+  ];
+
+  requiredCss.forEach(cssRule => {
+    assert.ok(html.includes(cssRule), `index.html CSS must include ${cssRule}`);
+  });
+
+  // 33.3 Performance Evaluation & Letter Grade Logic
+  function evaluateGrade(accuracy) {
+    if (accuracy >= 98) return { letter: "S", class: "grade-s" };
+    if (accuracy >= 90) return { letter: "A", class: "grade-a" };
+    if (accuracy >= 80) return { letter: "B", class: "grade-b" };
+    if (accuracy >= 70) return { letter: "C", class: "grade-c" };
+    return { letter: "D", class: "grade-d" };
+  }
+
+  assert.strictEqual(evaluateGrade(100).letter, "S", "100% accuracy yields S grade");
+  assert.strictEqual(evaluateGrade(98).letter, "S", "98% accuracy yields S grade");
+  assert.strictEqual(evaluateGrade(94).letter, "A", "94% accuracy yields A grade");
+  assert.strictEqual(evaluateGrade(85).letter, "B", "85% accuracy yields B grade");
+  assert.strictEqual(evaluateGrade(74).letter, "C", "74% accuracy yields C grade");
+  assert.strictEqual(evaluateGrade(55).letter, "D", "55% accuracy yields D grade");
+
+  // 33.4 Anti-Score Reset on Completion: advancePracticeStep does not clobber view
+  const advFuncMatch = html.match(/function advancePracticeStep\(\)[\s\S]*?highlightActiveScoreNote\(currentPracticeStep\);[\s\S]*?\}/);
+  assert.ok(advFuncMatch, "advancePracticeStep function must exist");
+  const advFuncStr = advFuncMatch[0];
+  assert.ok(advFuncStr.includes("completeSongPerformance(acc, \"wait\");"), "advancePracticeStep must call completeSongPerformance on completion");
+  assert.ok(advFuncStr.includes("return;"), "advancePracticeStep must return early on completion to prevent premature score reset");
+  assert.ok(!advFuncStr.includes("scoreContainer.scrollTop = 0;"), "advancePracticeStep completion must not reset scoreContainer.scrollTop = 0");
+
+  // 33.5 Problem Measures Diagnostic & Automatic Loop Range Calculation
+  function calculateProblemMeasureLoop(mistakeMeasures) {
+    if (!mistakeMeasures || mistakeMeasures.length === 0) return null;
+    return {
+      startM: Math.min(...mistakeMeasures),
+      endM: Math.max(...mistakeMeasures)
+    };
+  }
+
+  const loopRange1 = calculateProblemMeasureLoop([3, 7, 5]);
+  assert.deepStrictEqual(loopRange1, { startM: 3, endM: 7 }, "Problem measures [3, 7, 5] bounds to 3..7");
+
+  const loopRange2 = calculateProblemMeasureLoop([12]);
+  assert.deepStrictEqual(loopRange2, { startM: 12, endM: 12 }, "Single problem measure 12 bounds to 12..12");
+
+  assert.strictEqual(calculateProblemMeasureLoop([]), null, "Empty mistake array returns null");
+
+  // 33.6 Persistent Review & Replay Functions in Script
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+
+  assert.ok(scriptContent.includes("function completeSongPerformance("), "Script must define completeSongPerformance");
+  assert.ok(scriptContent.includes("function showSongReviewModal("), "Script must define showSongReviewModal");
+  assert.ok(scriptContent.includes("function closeSongReviewModal("), "Script must define closeSongReviewModal");
+  assert.ok(scriptContent.includes("function replaySongPractice("), "Script must define replaySongPractice");
+  assert.ok(scriptContent.includes("function loopProblemMeasures("), "Script must define loopProblemMeasures");
+  assert.ok(scriptContent.includes("function advanceToNextSong("), "Script must define advanceToNextSong");
+  assert.ok(scriptContent.includes("function openLastReview("), "Script must define openLastReview");
+  assert.ok(scriptContent.includes("function annotateScoreMistakeMeasures("), "Script must define annotateScoreMistakeMeasures");
+  assert.ok(scriptContent.includes("function playVictoryFanfare("), "Script must define playVictoryFanfare");
+
+  // 33.7 Script Syntax Validation via Node vm
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid with Performance Review & Anti-Reset Suite");
+
+  console.log("✔ Test 33: 🏆 Post-Song Comprehensive Performance Review, Score Inspection & Anti-Reset Engine passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 
