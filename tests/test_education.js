@@ -347,6 +347,100 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 14: Ear Training SRS Weighting, Score Engine Exports & UMD Song Database passed");
 }
 
-console.log("=== ALL 14 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// 15. Test Milestone 36 Beginner Pedagogy & Deep Music Theory Engine
+{
+  // 15.1 Interval Pedagogy & Song Mnemonics
+  assert.ok(MusicTheory.INTERVAL_PEDAGOGY, "INTERVAL_PEDAGOGY must be exported");
+  assert.strictEqual(MusicTheory.INTERVAL_PEDAGOGY[4].name, "Major 3rd");
+  assert.ok(MusicTheory.INTERVAL_PEDAGOGY[7].mnemonicAsc.includes("Star Wars"), "Perfect 5th ascending mnemonic must include Star Wars");
+
+  const intChal = MusicTheory.generateEarTrainingChallenge("interval_recognition", true);
+  assert.strictEqual(typeof intChal.semitones, "number");
+  assert.strictEqual(typeof intChal.mnemonicAsc, "string");
+  assert.ok(intChal.mnemonicAsc.length > 3, "Interval ear training challenge must include famous song mnemonic");
+
+  // 15.2 Scale Pedagogy: Step Formula, Solfege, Degrees & Thumb-Tuck Transitions
+  const cMajScale = MusicTheory.generateScale("C", "major", 4);
+  assert.strictEqual(cMajScale.stepFormula, "W - W - H - W - W - W - H");
+  assert.strictEqual(cMajScale.notes[0].solfege, "Do");
+  assert.strictEqual(cMajScale.notes[0].degree, "1");
+  // In C Major RH (1,2,3,1,2,3,4,5), index 3 (F4) is where thumb tucks under finger 3
+  assert.strictEqual(cMajScale.notes[3].pitch, "F4");
+  assert.ok(cMajScale.notes[3].rhTransition && cMajScale.notes[3].rhTransition.includes("Thumb Tuck"), "F4 in C Major RH must have Thumb Tuck transition");
+  // In C Major LH (5,4,3,2,1,3,2,1), index 5 (A4) is where finger 3 crosses over thumb 1
+  assert.strictEqual(cMajScale.notes[5].pitch, "A4");
+  assert.ok(cMajScale.notes[5].lhTransition && cMajScale.notes[5].lhTransition.includes("Finger Cross"), "A4 in C Major LH must have Finger Cross transition");
+
+  const aMinScale = MusicTheory.generateScale("A", "natural_minor", 4);
+  assert.strictEqual(aMinScale.stepFormula, "W - H - W - W - H - W - W");
+  assert.strictEqual(aMinScale.notes[2].degree, "♭3");
+  assert.strictEqual(aMinScale.notes[2].solfege, "Me");
+
+  const pedInfo = MusicTheory.getScalePedagogyInfo("G", "major", 4);
+  assert.strictEqual(pedInfo.stepFormula, "W - W - H - W - W - W - H");
+  assert.strictEqual(pedInfo.thumbTucksRH.length, 1);
+  assert.strictEqual(pedInfo.fingerCrossesLH.length, 1);
+
+  // 15.3 Chord Construction Recipe & Inversions
+  const cMajRecipe = MusicTheory.getChordConstructionRecipe("C", "major", 4, 0);
+  assert.ok(cMajRecipe.recipe.includes("Major 3rd") && cMajRecipe.recipe.includes("Perfect 5th"));
+  assert.strictEqual(cMajRecipe.stepMath, "4 half-steps + 3 half-steps");
+  assert.strictEqual(cMajRecipe.tones.length, 3);
+  assert.strictEqual(cMajRecipe.tones[0].roleLabel, "Root (1)");
+  assert.strictEqual(cMajRecipe.tones[1].roleLabel, "Major 3rd (3)");
+  assert.strictEqual(cMajRecipe.tones[2].roleLabel, "Perfect 5th (5)");
+
+  // 15.4 Diatonic 7-Chord Family Generator (Major & Minor Keys)
+  const cFamily = MusicTheory.generateDiatonicChordFamily("C");
+  assert.strictEqual(cFamily.chords.length, 7);
+  assert.strictEqual(cFamily.chords[0].roman, "I");
+  assert.strictEqual(cFamily.chords[0].symbol, "C");
+  assert.strictEqual(cFamily.chords[1].roman, "ii");
+  assert.strictEqual(cFamily.chords[1].symbol, "Dm");
+  assert.strictEqual(cFamily.chords[4].roman, "V");
+  assert.strictEqual(cFamily.chords[4].symbol, "G");
+  assert.strictEqual(cFamily.chords[6].roman, "vii°");
+  assert.strictEqual(cFamily.chords[6].symbol, "Bdim");
+
+  const amFamily = MusicTheory.generateDiatonicChordFamily("Am");
+  assert.strictEqual(amFamily.isMinor, true);
+  assert.strictEqual(amFamily.chords[0].roman, "i");
+  assert.strictEqual(amFamily.chords[0].symbol, "Am");
+
+  // 15.5 Engraved Key Signature Staff Info
+  const gSig = MusicTheory.getKeySignatureStaffInfo("G");
+  assert.strictEqual(gSig.accidentalType, "sharps");
+  assert.strictEqual(gSig.count, 1);
+  assert.strictEqual(gSig.symbols[0].note, "F#");
+  assert.ok(gSig.ruleText.includes("G Major"), "Key rule text for G Major must explain how to find G");
+
+  const fSig = MusicTheory.getKeySignatureStaffInfo("F");
+  assert.strictEqual(fSig.accidentalType, "flats");
+  assert.strictEqual(fSig.count, 1);
+  assert.strictEqual(fSig.symbols[0].note, "Bb");
+
+  // 15.6 Beginner Bootcamp Curriculum (7 Interactive Modules)
+  assert.ok(Array.isArray(MusicTheory.BEGINNER_BOOTCAMP_MODULES), "BEGINNER_BOOTCAMP_MODULES must be an array");
+  assert.strictEqual(MusicTheory.BEGINNER_BOOTCAMP_MODULES.length, 7, "Bootcamp must contain 7 interactive modules");
+  MusicTheory.BEGINNER_BOOTCAMP_MODULES.forEach(mod => {
+    assert.ok(mod.id && mod.title && Array.isArray(mod.steps), "Each bootcamp module must have id, title, and steps");
+    assert.ok(mod.interactiveTask && Array.isArray(mod.interactiveTask.targetNotes) && mod.interactiveTask.targetNotes.length > 0, "Each module must have interactive targetNotes");
+  });
+
+  // 15.7 Song Theory DNA & Warmup Analyzer
+  const allSongs = require("../songs.js");
+  const odeSong = allSongs.find(s => s.id === "ode") || allSongs[0];
+  const dna = MusicTheory.analyzeSongTheoryDNA(odeSong);
+  assert.ok(dna, "analyzeSongTheoryDNA must return DNA object");
+  assert.strictEqual(typeof dna.keySignature, "string");
+  assert.strictEqual(typeof dna.timeSignature, "string");
+  assert.ok(dna.warmupScale && Array.isArray(dna.warmupScale.notes), "DNA must include warmupScale notes");
+  assert.ok(Array.isArray(dna.primaryChords), "DNA must include primaryChords array");
+
+  console.log("✔ Test 15: 🎓 Milestone 36 Beginner Pedagogy, Bootcamp, Diatonic Family & Song Theory DNA passed");
+}
+
+console.log("=== ALL 15 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+
 
 

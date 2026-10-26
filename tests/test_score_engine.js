@@ -3174,7 +3174,61 @@ const {
   console.log("✔ Test 34: 🛠️ FIXES.MD Complete Audit & Codebase Deduplication Verification passed");
 }
 
+// ============================================================================
+// TEST 35: 🎓 Milestone 36 Beginner Pedagogy, Bootcamp, Chord Lab & Theory DNA UI
+// ============================================================================
+{
+  const fs = require("fs");
+  const vm = require("vm");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+
+  // 35.1 Repertoire Song Theory DNA & Warmup Bar
+  assert.ok(html.includes('id="songTheoryDnaBar"'), "index.html must include #songTheoryDnaBar in Repertoire panel");
+  assert.ok(html.includes('id="dnaKeyText"'), "index.html must include #dnaKeyText");
+  assert.ok(html.includes('id="dnaChordsContainer"'), "index.html must include #dnaChordsContainer");
+  assert.ok(html.includes('id="dnaPlayScaleWarmupBtn"'), "index.html must include #dnaPlayScaleWarmupBtn");
+  assert.ok(html.includes('id="repLaunchBootcampBtn"'), "index.html must include #repLaunchBootcampBtn in Curriculum card");
+  assert.ok(html.includes("function renderSongTheoryDnaBar("), "index.html must define renderSongTheoryDnaBar");
+
+  // 35.2 Ear Training Famous Song Mnemonic Coach
+  assert.ok(html.includes('id="earMnemonicCoachRow"'), "Ear Training panel must include #earMnemonicCoachRow");
+  assert.ok(html.includes('id="earMnemonicHintBtn"'), "Ear Training panel must include #earMnemonicHintBtn");
+  assert.ok(html.includes('id="earMnemonicBanner"'), "Ear Training panel must include #earMnemonicBanner");
+
+  // 35.3 Scales & Theory Studio: Hand/Direction Selectors, Thumb-Tuck Banner & Chord Builder Lab
+  assert.ok(html.includes('id="scaleHandSelect"'), "Scales panel must include #scaleHandSelect (RH Treble / LH Bass)");
+  assert.ok(html.includes('id="scaleDirectionSelect"'), "Scales panel must include #scaleDirectionSelect (Ascending / Asc & Desc)");
+  assert.ok(html.includes('id="scaleThumbTuckBanner"'), "Scales panel must include #scaleThumbTuckBanner");
+  assert.ok(html.includes('id="btnSubmodeChordLab"'), "Scales panel must include 3rd submode tab #btnSubmodeChordLab");
+  assert.ok(html.includes('id="subviewChordLab"'), "Scales panel must include #subviewChordLab container");
+  assert.ok(html.includes('id="chordLabRecipeGrid"'), "Chord Lab must include #chordLabRecipeGrid");
+  assert.ok(html.includes('id="chordLabScoreSvg"'), "Chord Lab must include #chordLabScoreSvg");
+  assert.ok(html.includes("function initChordLabModule("), "index.html must define initChordLabModule");
+  assert.ok(html.includes("function updateChordLabDisplay("), "index.html must define updateChordLabDisplay");
+
+  // 35.4 Theory Panel: 7-Module Interactive Beginner Bootcamp, Engraved Key Sig SVG & Diatonic Chords Strip
+  assert.ok(html.includes('id="beginnerBootcampSection"'), "Theory panel must include #beginnerBootcampSection");
+  assert.ok(html.includes('id="bootcampModuleTabs"'), "Bootcamp must include #bootcampModuleTabs");
+  assert.ok(html.includes('id="bootcampStartTaskBtn"'), "Bootcamp must include #bootcampStartTaskBtn");
+  assert.ok(html.includes('id="circleKeySigSvg"'), "Circle of Fifths must include engraved key signature SVG #circleKeySigSvg");
+  assert.ok(html.includes('id="circleDiatonicChordsGrid"'), "Circle of Fifths must include 7 diatonic chords strip #circleDiatonicChordsGrid");
+  assert.ok(html.includes("function initBeginnerBootcamp("), "index.html must define initBeginnerBootcamp");
+  assert.ok(html.includes("function verifyBootcampNoteInput("), "index.html must define verifyBootcampNoteInput");
+  assert.ok(html.includes("function initInteractiveTheoryCards("), "index.html must define initInteractiveTheoryCards");
+
+  // 35.5 Full Inline Script Syntax Check
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid after Milestone 36 upgrades");
+
+  console.log("✔ Test 35: 🎓 Milestone 36 Beginner Pedagogy, Bootcamp, Chord Lab & Theory DNA UI passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
+
 
 
 

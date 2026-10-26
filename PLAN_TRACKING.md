@@ -472,6 +472,30 @@
     - [x] Added Test 14 in `tests/test_education.js` and Test 34 in `tests/test_score_engine.js`.
     - [x] All 14 education suite tests and all 34 score engine tests passing with 100% success (48 total automated tests).
 
+- [x] **Milestone 36: Deep Music Theory & Beginner Conservatory Learning Studio**
+  - [x] **Phase 1 — Music Theory & Pedagogy Engine (`theory.js`)**:
+    - [x] Added `INTERVAL_PEDAGOGY` (semitones 0–12 with consonance, emotional feel, and ascending/descending famous song mnemonics).
+    - [x] Enriched `SCALE_FORMULAS` with `stepFormula`, `degrees`, `solfege` (`Do–Re–Mi`), and `harmonicRoles`, plus `rhTransition` (`Thumb Tuck`) and `lhTransition` (`Finger Cross`) detection in `generateScale()` and `getScalePedagogyInfo()`.
+    - [x] Enriched `CHORD_TYPES` with `recipe`, `stepMath`, `mood`, `rhFingers`, and `lhFingers`, and added `getChordConstructionRecipe()`.
+    - [x] Added `generateDiatonicChordFamily(keyStr)` (all 7 diatonic chords `I–vii°` for any Major or Minor key).
+    - [x] Added `getKeySignatureStaffInfo(keyStr)` (engraved staff coordinates for up to 7 sharps/flats + key signature reading rules).
+    - [x] Added `BEGINNER_BOOTCAMP_MODULES` (7 interactive step-by-step lessons with live keyboard tasks) and `analyzeSongTheoryDNA(song)`.
+  - [x] **Phase 2 — Interactive Beginner Bootcamp & Circle of Fifths (`#panelTheory` in `index.html`)**:
+    - [x] Built the 7-Module **Interactive Beginner Piano & Theory Bootcamp (`#beginnerBootcampSection`)** with live MIDI/keyboard note verification (`verifyBootcampNoteInput`) and `localStorage` progress tracking.
+    - [x] Upgraded Circle of Fifths (`selectCircleKey`) with **Engraved Key Signature SVG (`#circleKeySigSvg`)**, Key-Reading Rule callout (`#circleKeyRuleText`), and clickable **7 Diatonic Chords strip (`#circleDiatonicChordsGrid`)**, plus fixed the `F#`/`Gb` tonic selector.
+    - [x] Made all 4 Theory Lesson Cards interactive (`initInteractiveTheoryCards` with `[data-demo-notes]`, `[data-demo-chord]`, and `[data-demo-rhythm]` click-to-audition buttons).
+  - [x] **Phase 3 — Scales, Solfège, Thumb-Tuck Coach & Chord Builder Lab (`#panelScales` in `index.html`)**:
+    - [x] Fixed `#scaleFormulaFormula` to dynamically update when switching scale modes (`Major`, `Minor`, `Blues`, `Dorian`, etc.).
+    - [x] Added Hand selector (`#scaleHandSelect`: RH Treble Clef / LH Bass Clef), Direction selector (`#scaleDirectionSelect`: Ascending / Asc & Desc), and **Thumb-Tuck & Finger-Crossing Coach Banner (`#scaleThumbTuckBanner`)**.
+    - [x] Added 3rd submode tab: **🔍 Chord & Interval Builder Lab (`#subviewChordLab`)** with Root, 9 Chord Qualities, Inversions, tone-by-tone recipe cards, SVG notation, and live keyboard practice.
+  - [x] **Phase 4 — Ear Training Song Mnemonics & Repertoire Theory DNA Bar (`index.html`)**:
+    - [x] Added **Famous Song Mnemonic Coach (`#earMnemonicHintBtn`, `#earMnemonicBanner`)** and keyboard pitch reveal in Ear Training.
+    - [x] Added **Song Theory DNA & Pre-Song Warmup Bar (`#songTheoryDnaBar`)** in Repertoire Lab displaying each piece's Key Signature, Meter, Hand Range, clickable Primary Chords, and 1-click **"▶ Play Scale Warmup"** button.
+  - [x] **Phase 5 — Automated Verification & Documentation (`tests/test_education.js` Test 15 & `tests/test_score_engine.js` Test 35)**:
+    - [x] Added Test 15 in `tests/test_education.js` and Test 35 in `tests/test_score_engine.js`.
+    - [x] All 15 education suite tests and all 35 score engine tests passing with 100% success (50 total automated tests).
+
+
 
 
 

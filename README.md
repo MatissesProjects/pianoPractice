@@ -284,11 +284,11 @@ pianoPractice/
 ├── songs.js                   # Universal UMD 56-piece pedagogical repertoire database
 ├── pianoNotesCheatSheet.png   # Authentic pedagogical reference sheet for cheat visualizer
 ├── FIXES.MD                   # Engineering audit & upgrade verification checklist (100% complete)
-├── PLAN_TRACKING.md           # Master milestone tracking document (Milestones 1–35)
+├── PLAN_TRACKING.md           # Master milestone tracking document (Milestones 1–36)
 ├── README.md                  # Comprehensive documentation and architecture reference
 └── tests/
-    ├── test_education.js      # 14 automated unit tests for theory, scales, chords, UMD, and SRS
-    └── test_score_engine.js   # 34 automated integration tests for SVG rendering, audio & MIDI
+    ├── test_education.js      # 15 automated unit tests for theory, scales, chords, bootcamp, and SRS
+    └── test_score_engine.js   # 35 automated integration tests for SVG rendering, audio & MIDI
 ```
 
 - **`index.html`**: Zero-framework application layer containing responsive dark/light theme CSS, accessible DOM components, SVG score generation (`renderSheetMusicScore`), practice evaluation loops, Web Audio routing, and Web MIDI message dispatchers.
@@ -333,10 +333,10 @@ Piano Practice Lab features an automated Node.js test harness covering the music
 To run the automated test suites:
 
 ```bash
-# Run the core music theory & educational engine tests (14 tests)
+# Run the core music theory & educational engine tests (15 tests)
 node tests/test_education.js
 
-# Run the score engine, SVG rendering & MIDI integration tests (34 tests)
+# Run the score engine, SVG rendering & MIDI integration tests (35 tests)
 node tests/test_score_engine.js
 
 # Run both suites sequentially (Windows PowerShell syntax)
@@ -363,7 +363,7 @@ All architectural phases, algorithmic fixes, and feature milestones are recorded
 - **Milestones 13–18**: Conservatory fingerings, velocity-sensitive electric piano synth, CC 64 sustain, beat-proportional score spacing, voice-leading gym, and polyphonic chord recognizer.
 - **Milestones 19–24**: SMuFL vector rests, full 24-measure *Lean on Me* transcription, SVG tie arcs, non-bouncing viewport auto-scroll, and keyboard size song allowance engine.
 - **Milestones 25–30**: Interactive Piano Notes Cheat Sheet, equal beat subdivision metronome, hardware audio output routing (`setSinkId`), and acoustic wood block synthesis.
-- **Milestones 31–35**: Codebase cleanup, 3D visual expansion, mechanical metronome pendulum, multi-level left-hand accompaniment engine, post-song performance review modal, and full `FIXES.MD` audit & deduplication.
+- **Milestones 31–36**: Codebase cleanup, 3D visual expansion, mechanical metronome pendulum, multi-level left-hand accompaniment engine, post-song performance review modal, full `FIXES.MD` audit & deduplication, and **Deep Music Theory & Beginner Conservatory Learning Studio** (7-Module Interactive Bootcamp, Song Theory DNA Bar, Chord & Interval Builder Lab, Solfège & Thumb-Tuck Coach, Engraved Key Signature SVGs, and Famous Song Interval Mnemonics).
 
 ---
 
