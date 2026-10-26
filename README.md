@@ -95,6 +95,14 @@ The primary performance stage featuring dynamic SVG Grand Staff rendering:
 - **A-B Measure Looping & Tempo Ramp**: Isolate difficult measures and configure progressive tempo ramps ($+5\text{ BPM}$ per repetition).
 - **Harmonic Roman Numeral Analysis**: Functional harmonic analysis overlay on Beat 0 of each measure (e.g., $\text{I}$, $\text{IV}$, $\text{V}^7$, $\text{vi}$).
 - **Non-Bouncing Viewport Auto-Scroll**: Container-isolated auto-scroll algorithm with an ergonomic reading comfort zone, eliminating Chromium SVG viewport bounce bugs.
+- **🏆 Post-Song Performance Review, Score Inspection & Anti-Reset Engine**:
+  - **Score Preservation & Anti-Reset**: When a song finishes, the score sheet no longer violently jumps or resets to Measure 1. The viewport stays resting right at the final chord with an emerald celebration glow (`.completed-target`), allowing calm score review and study.
+  - **Comprehensive Performance Review Modal (`#songReviewModal`)**:
+    - **Letter Grading & Stars**: Automated grading ($S \ge 98\%$, $A \ge 90\%$, $B \ge 80\%$, $C \ge 70\%$, $D < 70\%$) with pedagogical verdicts.
+    - **4 Analytics Cards**: Note precision ratio, peak note streak, rhythm hold ratings / timing windows, and elapsed duration vs historical personal best in LocalStorage.
+    - **Targeted Problem Measure Diagnostics**: Pinpoints exact measures where errors occurred and provides a one-click **"🔁 Loop Problem Measures"** button to automatically bracket trouble spots.
+    - **Score Mistake Annotations**: Visually highlights measure numbers containing errors in coral-red (`.measure-number.has-mistake`) for clear review.
+    - **Action Controls**: Replay Song, Review Score Sheet, Loop Mistakes, and Next Song, with persistent review access buttons in the score header and HUD.
 - **Dual-Hand Multi-Level Accompaniment Engine**:
   - **Left Hand Style Selector (`#lhStyleSelect`)**:
     - **Single Roots (1-Note Primer)**: Automatically simplifies complex multi-finger chords (such as Lean on Me's $C3+G3+C4$ and $F2+C3+F3$) down to clean, single root bass anchors ($C3$, $F2$, $G2$ with finger 5), making repertoire approachable for Level 1/2 beginners.
