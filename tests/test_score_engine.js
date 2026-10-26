@@ -934,7 +934,7 @@ const {
   const triadsModel = buildScoreModel(leanSong, false, true, true, "triads");
   assert.strictEqual(triadsModel.steps[0].dyad.pitch, "C4+E4+G4");
   assert.strictEqual(triadsModel.steps[0].dyadF, "1+3+5");
-  assert.deepStrictEqual(triadsModel.steps[0].expectedPitches, ["C4", "E4", "G4", "C3", "G3"]);
+  assert.deepStrictEqual(triadsModel.steps[0].expectedPitches, ["C4", "E4", "G4", "C3"]);
 
   // 13.4 Key-Signature & Accidental Awareness (Minuet in G & Canon in D)
   const canonSong = songDatabase.find(s => s.id === "canon-in-d");
@@ -1645,31 +1645,32 @@ const {
   const lean = songDatabase.find(s => s.id === "lean-on-me");
   assert.ok(lean, "Lean on Me must exist in database");
   
-  // RH: First C is a 2-beat hollow note, followed by eighth notes C, D, E, leading into tied dyad F4+A4:0.5~
-  assert.ok(lean.rh.startsWith("C4:2 C4:0.5 D4:0.5 E4:0.5 F4+A4:0.5~ | F4+A4:2"), "RH opening C (half), C-D-E (eighths), tied F4+A4");
-  // LH: Open fifth/octave chord C3+G3+C4:3, C3+G3+C4:0.5, tied F2+C3+F3:0.5~
-  assert.ok(lean.lh.startsWith("C3+G3+C4:3 C3+G3+C4:0.5 F2+C3+F3:0.5~ | F2+C3+F3:3"), "LH open fifths/octaves with tied F2+C3+F3");
+  // RH: Pure single-note melody for beginner Level 1/2 (C half, C-D-E eighths, tied F4:0.5~ | F4:2)
+  assert.ok(lean.rh.startsWith("C4:2 C4:0.5 D4:0.5 E4:0.5 F4:0.5~ | F4:2"), "RH opening C (half), C-D-E (eighths), tied single-note F4");
+  assert.ok(!lean.rh.includes("+"), "Beginner C 5-Finger single-note RH must not contain multi-note + chords");
+  // LH: Clean 1-note bass roots (C3:4 | F2:4 | C3:4 | G2:4) for foundational bass reading
+  assert.ok(lean.lh.startsWith("C3:4 | F2:4 | C3:4 | G2:4"), "LH clean foundational whole-note bass roots C3, F2, C3, G2");
+  assert.ok(!lean.lh.includes("+"), "Beginner C 5-Finger default LH must not contain complex 3-note chords");
   // Dyads: First dyad is 2 beats C4+E4:2, followed by eighth notes C4+E4, D4+F4, E4+G4, and tied F4+A4:0.5~
   assert.ok(lean.dyads.startsWith("C4+E4:2 C4+E4:0.5 D4+F4:0.5 E4+G4:0.5 F4+A4:0.5~ | F4+A4:2"), "Dyads opening C4+E4 and tied F4+A4 across barline");
 
   const leanModel = buildScoreModel(lean, true, true, false);
-  // Measure 1: Step 0 has RH beats=2 and LH beats=3
+  // Measure 1: Step 0 has RH beats=2 and LH beats=4 (whole note bass root C3)
   assert.strictEqual(leanModel.measures[0][0].rh.beats, 2, "Lean on Me opening RH note is 2 beats");
-  assert.strictEqual(leanModel.measures[0][0].lh.beats, 3, "Lean on Me opening LH chord is a 3-beat dotted half");
-  // Step 1 (Beat 2.0): RH beats=0.5 (C4), LH sustains dotted half
+  assert.strictEqual(leanModel.measures[0][0].lh.beats, 4, "Lean on Me opening LH root C3 is a 4-beat whole note");
+  // Step 1 (Beat 2.0): RH beats=0.5 (C4), LH sustains whole note
   assert.strictEqual(leanModel.measures[0][1].rh.beats, 0.5, "Lean on Me step 1 RH note is 0.5 beat");
-  assert.strictEqual(leanModel.measures[0][1].lh, null, "Lean on Me step 1 LH sustains previous chord");
-  // Step 3 (Beat 3.0): RH beats=0.5 (E4), LH beats=0.5 (C3+G3+C4)
+  assert.strictEqual(leanModel.measures[0][1].lh, null, "Lean on Me step 1 LH sustains whole note");
+  // Step 3 (Beat 3.0): RH beats=0.5 (E4), LH sustains whole note
   assert.strictEqual(leanModel.measures[0][3].rh.beats, 0.5, "Lean on Me step 3 RH note is 0.5 beat");
-  assert.strictEqual(leanModel.measures[0][3].lh.beats, 0.5, "Lean on Me step 3 LH chord is 0.5 beat");
-  // Step 4 (last note of M1, Beat 3.5): tied note
+  assert.strictEqual(leanModel.measures[0][3].lh, null, "Lean on Me step 3 LH sustains whole note");
+  // Step 4 (last note of M1, Beat 3.5): tied note on RH
   const m1Step4 = leanModel.measures[0][4];
   assert.strictEqual(m1Step4.rh.tied, true, "Measure 1 Step 4 RH has tie annotation");
-  assert.strictEqual(m1Step4.lh.tied, true, "Measure 1 Step 4 LH has tie annotation");
-  // Measure 2: Step 0 is tied from prev
-  assert.strictEqual(leanModel.measures[1][0].tiedFromPrev, true, "Lean on Me measure 2 step 0 is tied from prev");
+  // Measure 2: Step 0 is tied from prev on RH, while LH plays new F2:4 root
   assert.strictEqual(leanModel.measures[1][0].rh.beats, 2, "Lean on Me measure 2 RH note is 2 beats");
-  assert.strictEqual(leanModel.measures[1][0].lh.beats, 3, "Lean on Me measure 2 LH note is 3 beats");
+  assert.strictEqual(leanModel.measures[1][0].lh.beats, 4, "Lean on Me measure 2 LH note F2 is 4 beats");
+  assert.strictEqual(leanModel.measures[1][0].lh.pitch, "F2", "Lean on Me measure 2 LH note is F2");
 
   // 20.4 Full Repertoire Duration Audit (All 56 Songs)
   function getExpBeats(timeSig) {
@@ -2930,16 +2931,24 @@ const {
   assert.strictEqual(theory.transformLeftHandPitch("G2", "triads"), "G2+B2+D3", "Triads style builds G Major triad G2+B2+D3");
   assert.strictEqual(theory.transformLeftHandPitch("C3", "thirds"), "C3+E3", "Thirds style adds diatonic 3rd above C3");
 
-  // 32.3 Lean on Me Simplification with Single Roots
+  // 32.3 Lean on Me & Chordal Bass Accompaniment Styles (Roots, Fifths, Triads)
   const leanSong = songDatabase.find(s => s.id === "lean-on-me");
   assert.ok(leanSong, "Lean on Me must exist");
   const leanRoots = theory.generateLeftHandAccompaniment(leanSong, "roots");
-
-  // Measure 1 of Lean on Me with roots: C3:3 C3:0.5 F2:0.5~
   const leanRootsM1 = leanRoots.lh.split("|")[0].trim();
-  assert.ok(leanRootsM1.includes("C3:3") && leanRootsM1.includes("F2:0.5~"), "Lean on Me M1 simplified to C3 and F2 roots with tie preserved");
+  assert.strictEqual(leanRootsM1, "C3:4", "Lean on Me M1 with roots style is clean whole-note C3:4");
   assert.ok(!leanRootsM1.includes("+"), "Lean on Me M1 with roots style must have zero chord plus signs");
-  assert.strictEqual(leanRoots.lhF.split("|")[0].trim(), "5 5 5", "Fingers simplified to single finger 5");
+
+  const leanFifths = theory.generateLeftHandAccompaniment(leanSong, "fifths");
+  assert.strictEqual(leanFifths.lh.split("|")[0].trim(), "C3+G3:4", "Lean on Me M1 with fifths style builds clean C3+G3:4");
+  const leanTriads = theory.generateLeftHandAccompaniment(leanSong, "triads");
+  assert.strictEqual(leanTriads.lh.split("|")[0].trim(), "C3+E3+G3:4", "Lean on Me M1 with triads style builds clean C3+E3+G3:4");
+
+  // Verify roots style strips multi-note LH chords on Classical/Modal repertoire (e.g. Gymnopédie No. 1)
+  const gymSong = songDatabase.find(s => s.id === "gymnopedie-1");
+  assert.ok(gymSong, "Gymnopedie No. 1 must exist");
+  const gymRoots = theory.generateLeftHandAccompaniment(gymSong, "roots");
+  assert.strictEqual(gymRoots.lh.split("|")[0].trim(), "G2:1 B3:2", "Gymnopedie M1 chord B3+D4:2 simplified to single root B3:2");
 
   // 32.4 Ode to Joy Accompaniment Generation (Fifths, Octaves, Triads)
   const odeSong = songDatabase.find(s => s.id === "ode-to-joy");

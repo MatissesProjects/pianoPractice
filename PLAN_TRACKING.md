@@ -495,6 +495,18 @@
     - [x] Added Test 15 in `tests/test_education.js` and Test 35 in `tests/test_score_engine.js`.
     - [x] All 15 education suite tests and all 35 score engine tests passing with 100% success (50 total automated tests).
 
+- [x] **Milestone 37: Beginner Basic Setup & Bass Clef Simplification (`lean-on-me` & Default LH Roots)**
+  - [x] **Simplified `Lean on Me` Basic Setup & Bass Clef (`songs.js`)**:
+    - [x] Replaced `Lean on Me`'s cluttered 3-note syncopated eighth-note bass chords (`C3+G3+C4:3 C3+G3+C4:0.5 F2+C3+F3:0.5~`) across all 24 measures with clean, foundational single-note bass roots (`C3:4 | F2:4 | C3:4 | G2:4 | C3:4 | F2:4 | C3:2 G2:2 | C3:4 ...`), matching every other `"C 5-Finger"` beginner song and eliminating triple tie arcs, ledger-line stem collisions, and stacked 3-letter cheat-sheet overlays.
+    - [x] Replaced the 2-note dyad `F4+A4` in `Lean on Me`'s single-note `rh` track (Measures 1, 2, 5, 6) with single-note `F4` so single-note Right Hand mode (`Harmonies (Dyads)` OFF) is 100% single notes (`F4+A4` remains in `dyads` when `Harmonies` is enabled).
+  - [x] **Defaulted Left-Hand Style Selector to `"roots"` (`index.html`)**:
+    - [x] Set `<option value="roots" selected>Single Roots (1-Note Primer)</option>` as the default first option in `#lhStyleSelect` and enforced `lhStyle: "roots"` across Curriculum Levels 1–5 so basic setups always start with clean 1-note bass roots while still allowing progressive upgrades to `Open 5ths`, `Thirds`, `Full Triads`, or `Bass Octaves`.
+  - [x] **Accurate Song Theory DNA Bar (`theory.js`, `index.html`)**:
+    - [x] Upgraded `analyzeSongTheoryDNA(song, handOptions)` to derive primary harmonic chords directly from left-hand bass roots (yielding clean `I (C)`, `IV (F)`, `V (G)` for `Lean on Me` instead of false-positive `vi7 (Am7)` / `ii7 (Dm7)` from melodic passing tones) and compute exact playable note count and active hand key range dynamically when hand toggles change.
+  - [x] **Updated Automated Test Suite (`tests/test_education.js` & `tests/test_score_engine.js`)**:
+    - [x] Updated Tests 13, 20.3, and 32.3/32.5 in `tests/test_score_engine.js` and Test 15.7 in `tests/test_education.js` — all 50/50 tests passing.
+
+
 
 
 

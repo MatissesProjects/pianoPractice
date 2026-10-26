@@ -429,13 +429,18 @@ console.log("=== Running Piano Education Suite Tests ===");
 
   // 15.7 Song Theory DNA & Warmup Analyzer
   const allSongs = require("../songs.js");
-  const odeSong = allSongs.find(s => s.id === "ode") || allSongs[0];
+  const odeSong = allSongs.find(s => s.id === "ode-to-joy") || allSongs[0];
   const dna = MusicTheory.analyzeSongTheoryDNA(odeSong);
   assert.ok(dna, "analyzeSongTheoryDNA must return DNA object");
   assert.strictEqual(typeof dna.keySignature, "string");
   assert.strictEqual(typeof dna.timeSignature, "string");
   assert.ok(dna.warmupScale && Array.isArray(dna.warmupScale.notes), "DNA must include warmupScale notes");
   assert.ok(Array.isArray(dna.primaryChords), "DNA must include primaryChords array");
+
+  const leanSong = allSongs.find(s => s.id === "lean-on-me");
+  const leanDna = MusicTheory.analyzeSongTheoryDNA(leanSong, { rh: true, lh: true, dyads: false, lhStyle: "roots" });
+  assert.deepStrictEqual(leanDna.primaryChords.map(c => c.label), ["I (C)", "IV (F)", "V (G)"], "Lean on Me DNA chords must be clean I (C), IV (F), V (G)");
+  assert.ok(leanDna.totalNotes > 50, "Lean on Me totalNotes must reflect actual playable steps rather than scale length 8");
 
   console.log("✔ Test 15: 🎓 Milestone 36 Beginner Pedagogy, Bootcamp, Diatonic Family & Song Theory DNA passed");
 }
