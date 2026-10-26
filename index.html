@@ -2801,6 +2801,286 @@
       fill: #10b981 !important;
       filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.8));
     }
+
+    /* ==========================================
+       MILESTONE 36: DEEP MUSIC THEORY, BEGINNER BOOTCAMP,
+       CHORD LAB & SONG THEORY DNA STYLES
+       ========================================== */
+    .song-theory-dna-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      padding: 0.65rem 1rem;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.85) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 10px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    .dna-left-group, .dna-right-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .dna-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      color: #e2e8f0;
+    }
+    .dna-pill strong {
+      color: #38bdf8;
+    }
+    .dna-chord-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.22rem 0.55rem;
+      border-radius: 6px;
+      background: rgba(168, 85, 247, 0.14);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #e9d5ff;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .dna-chord-chip:hover {
+      background: rgba(168, 85, 247, 0.3);
+      transform: translateY(-1px);
+    }
+    .dna-warmup-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 0.3rem 0.75rem;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      color: #ffffff;
+      border: 1px solid #38bdf8;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .dna-warmup-btn:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+
+    /* Beginner Bootcamp Academy */
+    .bootcamp-studio-card {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 14px;
+      padding: 1.35rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+    .bootcamp-module-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin: 1rem 0;
+    }
+    .bootcamp-mod-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .bootcamp-mod-btn:hover {
+      border-color: #38bdf8;
+      color: #f8fafc;
+    }
+    .bootcamp-mod-btn.active {
+      background: linear-gradient(135deg, #0284c7 0%, #1d4ed8 100%);
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+    }
+    .bootcamp-mod-btn.completed {
+      border-color: #10b981;
+    }
+    .bootcamp-content-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 1.25rem;
+      margin-top: 0.75rem;
+    }
+    @media (max-width: 900px) {
+      .bootcamp-content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .bootcamp-theory-pane {
+      background: rgba(9, 14, 26, 0.65);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      border-radius: 10px;
+      padding: 1.1rem;
+    }
+    .bootcamp-task-box {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 10px;
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.85rem;
+    }
+    .bootcamp-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .bootcamp-step-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .bootcamp-step-chip.active {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fef3c7;
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+    }
+    .bootcamp-step-chip.done {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+      color: #a7f3d0;
+    }
+
+    /* Circle of Fifths Diatonic Chords & Key Signature Card */
+    .diatonic-chord-strip {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(95px, 1fr));
+      gap: 0.55rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 860px) {
+      .diatonic-chord-strip {
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      }
+    }
+    .diatonic-chord-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 0.55rem 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .diatonic-chord-card:hover, .diatonic-chord-card.active {
+      border-color: #38bdf8;
+      background: rgba(2, 132, 199, 0.18);
+      transform: translateY(-2px);
+    }
+    .diatonic-numeral {
+      font-family: Georgia, serif;
+      font-size: 1rem;
+      font-weight: 900;
+      color: #fbbf24;
+    }
+    .diatonic-name {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #f8fafc;
+      margin: 0.15rem 0;
+    }
+    .diatonic-fn {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      line-height: 1.2;
+    }
+
+    /* Chord & Interval Builder Lab */
+    .chord-lab-recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .chord-lab-stat-box {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 0.75rem 0.9rem;
+    }
+    .chord-lab-stat-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .chord-lab-stat-val {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .thumb-tuck-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.55rem 0.9rem;
+      margin: 0.65rem 0;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fde68a;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .interactive-theory-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.18rem 0.5rem;
+      margin-left: 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 5px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .interactive-theory-btn:hover {
+      background: rgba(56, 189, 248, 0.3);
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -2959,8 +3239,9 @@
       <!-- PROGRESSIVE CURRICULUM LEVEL SELECTOR -->
       <div class="curriculum-deck">
         <div class="curriculum-top">
-          <div class="curriculum-title">
+          <div class="curriculum-title" style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
             <span>🎓 Pedagogical Lesson Pathway</span>
+            <button type="button" id="repLaunchBootcampBtn" class="dna-warmup-btn" title="Open the 7-Module Interactive Beginner Piano & Music Theory Bootcamp">🚀 Beginner Theory Bootcamp</button>
           </div>
           <div class="level-pills">
             <button class="level-btn active" data-level="1">Level 1: Root Primer</button>
@@ -3118,6 +3399,20 @@
         </div>
       </div>
 
+      <!-- SONG THEORY DNA & PRE-SONG WARMUP BAR -->
+      <div class="song-theory-dna-bar" id="songTheoryDnaBar">
+        <div class="dna-left-group" id="songTheoryDnaLeft">
+          <span class="dna-pill">🎹 Key: <strong id="dnaKeyText">C Major</strong></span>
+          <span class="dna-pill">⏱️ Meter: <strong id="dnaMeterText">4/4 Common Time</strong></span>
+          <span class="dna-pill">🖐️ Range: <strong id="dnaRangeText">C3 – G4</strong></span>
+          <span style="font-size:0.75rem; color:#94a3b8; font-weight:700;">Chords:</span>
+          <div id="dnaChordsContainer" style="display:inline-flex; gap:0.35rem; flex-wrap:wrap;"></div>
+        </div>
+        <div class="dna-right-group">
+          <button type="button" class="dna-warmup-btn" id="dnaPlayScaleWarmupBtn" title="Audition and highlight the 5-finger / key scale for this song before playing">🎵 Play Key Scale Warmup</button>
+        </div>
+      </div>
+
       <!-- 1. MULTI-SYSTEM VERTICAL SHEET MUSIC SCORE VIEW -->
       <div class="sheet-music-container" id="sheetMusicSection">
         <div class="sheet-music-header">
@@ -3232,6 +3527,10 @@
           <div id="earFeedbackBanner" style="min-height:30px; font-weight:700; font-size:1rem; margin-top:1.25rem; color:#94a3b8;">
             Press the button above to begin listening.
           </div>
+          <div id="earMnemonicCoachRow" style="margin-top:0.5rem; min-height:24px;">
+            <button type="button" id="earMnemonicHintBtn" class="interactive-theory-btn" style="display:none; font-size:0.78rem; padding:0.25rem 0.65rem;">💡 Show Famous Song Hook Hint</button>
+            <div id="earMnemonicBanner" style="display:none; font-size:0.84rem; color:#fde68a; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); padding:0.35rem 0.75rem; border-radius:8px; margin-top:0.35rem;"></div>
+          </div>
           <div class="ear-options-grid" id="earOptionsGrid"></div>
         </div>
       </div>
@@ -3244,6 +3543,7 @@
         <div class="scale-submode-tabs">
           <button id="btnSubmodeScales" class="tab-btn active">🎼 Scale & Fingering Explorer</button>
           <button id="btnSubmodeVoiceLeading" class="tab-btn">🎹 Chord Progressions & Voice-Leading Gym</button>
+          <button id="btnSubmodeChordLab" class="tab-btn">🔍 Chord & Interval Builder Lab</button>
         </div>
 
         <!-- 4A. SCALES & FINGERINGS EXPLORER SUBVIEW -->
@@ -3251,9 +3551,17 @@
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem;">
             <div>
               <h2 style="font-size:1.35rem; font-weight:800; color:#38bdf8;">Interactive Scale & Fingering Explorer</h2>
-              <p style="font-size:0.85rem; color:var(--text-muted);">Visualize key formulas, correct fingerings for both hands, and test your scale fluency.</p>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Visualize step formulas (W/H), Solfège degrees, thumb-tuck points, and drill both hands.</p>
             </div>
-            <div style="display:flex; gap:0.65rem; align-items:center;">
+            <div style="display:flex; gap:0.65rem; align-items:center; flex-wrap:wrap;">
+              <select id="scaleHandSelect" class="midi-select" style="background:var(--bg-card); padding:0.4rem 0.7rem; border:1px solid var(--border); border-radius:8px; font-size:0.82rem; font-weight:700;">
+                <option value="rh" selected>🖐️ Right Hand (𝄞 Treble)</option>
+                <option value="lh">🖐️ Left Hand (𝄢 Bass)</option>
+              </select>
+              <select id="scaleDirectionSelect" class="midi-select" style="background:var(--bg-card); padding:0.4rem 0.7rem; border:1px solid var(--border); border-radius:8px; font-size:0.82rem; font-weight:700;">
+                <option value="asc" selected>↗ Ascending (8 Notes)</option>
+                <option value="asc_desc">↔ Asc & Desc (15 Notes)</option>
+              </select>
               <button id="scaleListenBtn" class="play-btn">▶ Listen to Scale</button>
               <button id="scalePracticeBtn" class="mode-switch-btn active-practice">🎯 Practice Scale</button>
             </div>
@@ -3295,12 +3603,16 @@
 
           <!-- Scale Sheet Music Card -->
           <div class="scale-diagram-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; flex-wrap:wrap; gap:0.5rem;">
               <span style="font-family:Georgia,serif; font-size:1.25rem; font-weight:700; color:var(--paper-ink);" id="scaleDisplayTitle">C Major (Ionian)</span>
-              <span style="font-size:0.85rem; color:#64748b;" id="scaleFormulaFormula">Formula: W - W - H - W - W - W - H</span>
+              <span style="font-size:0.85rem; color:#64748b; font-weight:700;" id="scaleFormulaFormula">Formula: W - W - H - W - W - W - H</span>
             </div>
-            <svg id="scaleScoreSvg" width="900" height="150" style="display:block; margin:0 auto;"></svg>
+            <svg id="scaleScoreSvg" width="900" height="165" style="display:block; margin:0 auto;"></svg>
             <div class="fingering-row" id="scaleFingeringRow"></div>
+          </div>
+
+          <div class="thumb-tuck-banner" id="scaleThumbTuckBanner">
+            <span id="scaleThumbTuckText">🔄 <strong>Thumb-Tuck Guide:</strong> RH tucks Thumb (1) under Finger 3 on F4 • LH crosses Finger 3 over Thumb (1) on A3.</span>
           </div>
 
           <div class="curriculum-insight" id="scaleDescriptionText">
@@ -3371,6 +3683,98 @@
 
           <div class="curriculum-insight" id="vlDescriptionText">
             Voice leading minimizes physical distance on the keyboard so chord changes sound smooth and connected.
+          </div>
+        </div>
+
+        <!-- 4C. INTERACTIVE CHORD & INTERVAL BUILDER LABORATORY SUBVIEW -->
+        <div id="subviewChordLab" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem;">
+            <div>
+              <h2 style="font-size:1.35rem; font-weight:800; color:#34d399;">Interactive Chord & Interval Construction Lab</h2>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Build any triad, suspended, or 7th chord from first principles: inspect semitone recipes, inversions, and hand fingerings.</p>
+            </div>
+            <div style="display:flex; gap:0.65rem; align-items:center; flex-wrap:wrap;">
+              <button id="chordLabListenBtn" class="play-btn">▶ Arpeggiate & Block Play</button>
+              <button id="chordLabPracticeBtn" class="mode-switch-btn active-practice">🎯 Practice Chord on Piano</button>
+            </div>
+          </div>
+
+          <!-- Chord Root Selector -->
+          <div>
+            <span class="section-label" style="display:block; margin-bottom:0.4rem;">1. Select Chord Root:</span>
+            <div class="tonic-selector-row" id="chordLabRootRow">
+              <button class="tonic-btn active" data-root="C">C</button>
+              <button class="tonic-btn" data-root="Db">C♯ / D♭</button>
+              <button class="tonic-btn" data-root="D">D</button>
+              <button class="tonic-btn" data-root="Eb">D♯ / E♭</button>
+              <button class="tonic-btn" data-root="E">E</button>
+              <button class="tonic-btn" data-root="F">F</button>
+              <button class="tonic-btn" data-root="F#">F♯ / G♭</button>
+              <button class="tonic-btn" data-root="G">G</button>
+              <button class="tonic-btn" data-root="Ab">G♯ / A♭</button>
+              <button class="tonic-btn" data-root="A">A</button>
+              <button class="tonic-btn" data-root="Bb">A♯ / B♭</button>
+              <button class="tonic-btn" data-root="B">B</button>
+            </div>
+          </div>
+
+          <!-- Chord Type Selector -->
+          <div>
+            <span class="section-label" style="display:block; margin-bottom:0.4rem;">2. Select Chord Quality:</span>
+            <div class="scale-formula-pills" id="chordLabTypePills">
+              <button class="scale-pill-btn active" data-chordtype="major">Major Triad (4+3)</button>
+              <button class="scale-pill-btn" data-chordtype="minor">Minor Triad (3+4)</button>
+              <button class="scale-pill-btn" data-chordtype="diminished">Diminished (3+3)</button>
+              <button class="scale-pill-btn" data-chordtype="augmented">Augmented (4+4)</button>
+              <button class="scale-pill-btn" data-chordtype="sus2">Suspended 2nd (sus2)</button>
+              <button class="scale-pill-btn" data-chordtype="sus4">Suspended 4th (sus4)</button>
+              <button class="scale-pill-btn" data-chordtype="dom7">Dominant 7th (7)</button>
+              <button class="scale-pill-btn" data-chordtype="maj7">Major 7th (maj7)</button>
+              <button class="scale-pill-btn" data-chordtype="min7">Minor 7th (m7)</button>
+            </div>
+          </div>
+
+          <!-- Inversion Selector -->
+          <div>
+            <span class="section-label" style="display:block; margin-bottom:0.4rem;">3. Select Voicing Inversion:</span>
+            <div class="scale-formula-pills" id="chordLabInversionRow">
+              <button class="scale-pill-btn active" data-inv="0">Root Position (1 – 3 – 5)</button>
+              <button class="scale-pill-btn" data-inv="1">1st Inversion (3 – 5 – 1)</button>
+              <button class="scale-pill-btn" data-inv="2">2nd Inversion (5 – 1 – 3)</button>
+            </div>
+          </div>
+
+          <!-- Recipe Breakdown Cards -->
+          <div class="chord-lab-recipe-grid" id="chordLabRecipeGrid">
+            <div class="chord-lab-stat-box">
+              <div class="chord-lab-stat-label">Interval Recipe</div>
+              <div class="chord-lab-stat-val" id="chordLabRecipeText">Root (0) + Major 3rd (+4 st) + Perfect 5th (+7 st)</div>
+            </div>
+            <div class="chord-lab-stat-box">
+              <div class="chord-lab-stat-label">Half-Step Math</div>
+              <div class="chord-lab-stat-val" id="chordLabMathText">4 half-steps + 3 half-steps</div>
+            </div>
+            <div class="chord-lab-stat-box">
+              <div class="chord-lab-stat-label">Recommended Fingerings</div>
+              <div class="chord-lab-stat-val" id="chordLabFingersText">RH: 1 – 3 – 5 | LH: 5 – 3 – 1</div>
+            </div>
+            <div class="chord-lab-stat-box">
+              <div class="chord-lab-stat-label">Emotional Character</div>
+              <div class="chord-lab-stat-val" id="chordLabMoodText">Bright, happy, confident, and resolved</div>
+            </div>
+          </div>
+
+          <!-- Grand Staff Chord Diagram -->
+          <div class="scale-diagram-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
+              <span style="font-family:Georgia,serif; font-size:1.25rem; font-weight:700; color:var(--paper-ink);" id="chordLabDisplayTitle">C Major Triad (Root Position)</span>
+              <span style="font-size:0.85rem; color:#64748b; font-weight:700;" id="chordLabNotesList">Notes: C4 + E4 + G4 (Bass: C3)</span>
+            </div>
+            <svg id="chordLabScoreSvg" width="900" height="175" style="display:block; margin:0 auto;"></svg>
+          </div>
+
+          <div class="curriculum-insight" id="chordLabFeedbackText">
+            Click "Arpeggiate & Block Play" to hear how each interval stacks, or press the highlighted keys on your piano!
           </div>
         </div>
       </div>
@@ -3496,17 +3900,99 @@
     <!-- 6. THEORY LESSONS & CIRCLE OF FIFTHS PANEL -->
     <div id="panelTheory" class="edu-view-panel">
       <div class="theory-studio-box">
-        <h2 style="font-size:1.4rem; font-weight:800; color:#38bdf8; margin-bottom:0.5rem;">Interactive Circle of Fifths & Music Fundamentals</h2>
-        <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1.5rem;">Click any key on the wheel to explore its key signature, accidentals, and relative minor.</p>
+
+        <!-- 6A. 7-MODULE INTERACTIVE BEGINNER PIANO & MUSIC THEORY BOOTCAMP -->
+        <div class="bootcamp-studio-card" id="beginnerBootcampSection">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem;">
+            <div>
+              <div style="display:inline-flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                <span style="background:#0284c7; color:#ffffff; font-size:0.72rem; font-weight:900; padding:0.2rem 0.6rem; border-radius:9999px; letter-spacing:0.05em;">STEP-BY-STEP ACADEMY</span>
+                <span id="bootcampProgressBadge" style="font-size:0.78rem; color:#34d399; font-weight:800;">0 / 7 Modules Mastered</span>
+              </div>
+              <h2 style="font-size:1.4rem; font-weight:800; color:#f8fafc; margin:0;">🎓 Interactive Beginner Piano & Music Theory Bootcamp</h2>
+              <p style="font-size:0.86rem; color:var(--text-muted); margin-top:0.2rem;">Learn from zero: read the concept, audition it on the keyboard, and complete the live hands-on piano task below!</p>
+            </div>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <button type="button" id="bootcampDemoBtn" class="play-btn" style="padding:0.45rem 0.95rem; font-size:0.84rem;">🔊 Demonstrate on Piano</button>
+              <button type="button" id="bootcampStartTaskBtn" class="mode-switch-btn active-practice" style="padding:0.45rem 0.95rem; font-size:0.84rem;">🎯 Start Interactive Task</button>
+            </div>
+          </div>
+
+          <!-- 7 Module Selector Tabs -->
+          <div class="bootcamp-module-tabs" id="bootcampModuleTabs"></div>
+
+          <!-- Active Module Content Grid -->
+          <div class="bootcamp-content-grid">
+            <div class="bootcamp-theory-pane">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem; margin-bottom:0.5rem;">
+                <span id="bootcampModBadge" style="font-size:0.75rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.12); padding:0.2rem 0.55rem; border-radius:6px; border:1px solid rgba(56,189,248,0.3);">🗺️ Orientation</span>
+                <span id="bootcampModStatus" style="font-size:0.75rem; font-weight:800; color:#94a3b8;">In Progress</span>
+              </div>
+              <h3 id="bootcampModTitle" style="font-size:1.18rem; font-weight:800; color:#f8fafc; margin-bottom:0.25rem;">Module 1: Keyboard Geography</h3>
+              <p id="bootcampModSubtitle" style="font-size:0.84rem; color:#38bdf8; font-weight:600; margin-bottom:0.75rem;">Never get lost on the piano again</p>
+              <p id="bootcampModSummary" style="font-size:0.88rem; color:#cbd5e1; line-height:1.55; margin-bottom:0.85rem;"></p>
+              <div style="font-size:0.78rem; font-weight:800; color:#fbbf24; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.35rem;">Key Takeaways:</div>
+              <ul id="bootcampModTakeaways" style="margin:0; padding-left:1.2rem; font-size:0.84rem; color:#e2e8f0; line-height:1.5;"></ul>
+              <div style="margin-top:0.9rem; padding-top:0.75rem; border-top:1px solid rgba(51,65,85,0.6); display:flex; align-items:center; flex-wrap:wrap; gap:0.45rem;">
+                <span style="font-size:0.75rem; color:#94a3b8; font-weight:700;">Practice Pieces for this Lesson:</span>
+                <div id="bootcampRecSongs" style="display:inline-flex; gap:0.4rem; flex-wrap:wrap;"></div>
+              </div>
+            </div>
+
+            <div class="bootcamp-task-box">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                  <span style="font-size:0.76rem; font-weight:900; color:#f59e0b; text-transform:uppercase; letter-spacing:0.06em;">🎹 Hands-On Piano Challenge</span>
+                  <span id="bootcampStepProgress" style="font-size:0.78rem; font-weight:800; color:#38bdf8;">Step 1 / 4</span>
+                </div>
+                <div id="bootcampTaskPrompt" style="font-size:0.9rem; font-weight:700; color:#f8fafc; margin-bottom:0.75rem;"></div>
+                <div class="bootcamp-steps-list" id="bootcampStepList"></div>
+              </div>
+              <div id="bootcampLiveFeedback" style="font-size:0.84rem; font-weight:700; color:#fde68a; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); border-radius:8px; padding:0.55rem 0.8rem;">
+                Press the highlighted amber key(s) on the piano dock below (or your MIDI keyboard) to complete each step!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6B. INTERACTIVE CIRCLE OF FIFTHS, ENGRAVED KEY SIGNATURE & 7 DIATONIC CHORDS -->
+        <h2 style="font-size:1.4rem; font-weight:800; color:#38bdf8; margin-bottom:0.5rem;">Interactive Circle of Fifths & Key Harmony Explorer</h2>
+        <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1.5rem;">Click any key on the wheel to inspect its engraved staff key signature, how to read it on sheet music, and audition all 7 diatonic chords in that key.</p>
 
         <div class="circle-interactive-wrapper">
           <svg id="circleFifthsSvg" width="340" height="340" viewBox="-170 -170 340 340"></svg>
-          <div class="circle-info-panel" id="circleInfoPanel">
-            <h3 style="font-size:1.35rem; color:#fbbf24; font-weight:800;" id="circleKeyTitle">Key of C Major</h3>
-            <p style="color:#94a3b8; font-size:0.9rem;" id="circleRelativeMinor">Relative Minor: <strong>A Minor (Am)</strong></p>
-            <p style="color:#94a3b8; font-size:0.9rem;" id="circleAccidentals">Key Signature: <strong>Natural (No sharps or flats)</strong></p>
-            <div style="margin-top:1rem;">
-              <button id="circleExploreScaleBtn" class="play-btn" style="width:100%; justify-content:center;">Explore Scale in Studio →</button>
+          <div class="circle-info-panel" id="circleInfoPanel" style="flex:1; min-width:300px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem;">
+              <div>
+                <h3 style="font-size:1.35rem; color:#fbbf24; font-weight:800; margin:0;" id="circleKeyTitle">Key of C Major</h3>
+                <p style="color:#94a3b8; font-size:0.9rem; margin:0.2rem 0;" id="circleRelativeMinor">Relative Minor: <strong>A Minor (Am)</strong></p>
+                <p style="color:#94a3b8; font-size:0.9rem; margin:0.2rem 0;" id="circleAccidentals">Key Signature: <strong>Natural (No sharps or flats)</strong></p>
+              </div>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button id="circleExploreScaleBtn" class="play-btn" style="padding:0.45rem 0.9rem; font-size:0.82rem;">Explore Scale →</button>
+                <button id="circleExploreProgressionBtn" class="mode-switch-btn" style="padding:0.45rem 0.9rem; font-size:0.82rem;">Voice-Leading Gym →</button>
+              </div>
+            </div>
+
+            <!-- Engraved Key Signature Staff Preview -->
+            <div style="margin-top:0.85rem; background:#f8fafc; border-radius:10px; padding:0.65rem 0.9rem; border:1px solid #cbd5e1;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+                <span style="font-size:0.76rem; font-weight:800; color:#334155; text-transform:uppercase;">Engraved Staff Key Signature</span>
+                <span id="circleKeySigBadge" style="font-size:0.75rem; font-weight:800; color:#0284c7;">0 Sharps / 0 Flats</span>
+              </div>
+              <svg id="circleKeySigSvg" width="460" height="115" viewBox="0 0 460 115" style="display:block; max-width:100%; height:auto;"></svg>
+              <div id="circleKeyRuleText" style="font-size:0.78rem; color:#475569; margin-top:0.35rem; font-weight:600;">
+                 Sight-Reading Rule: No sharps or flats! All diatonic notes are white keys (C Major / A Minor).
+              </div>
+            </div>
+
+            <!-- Interactive 7 Diatonic Chords Strip -->
+            <div style="margin-top:0.95rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <span style="font-size:0.78rem; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.04em;">🎹 7 Diatonic Chords in This Key (Click to Play & Highlight)</span>
+                <span id="circleSelectedChordRole" style="font-size:0.76rem; color:#fbbf24; font-weight:700;">Click any degree I–vii°</span>
+              </div>
+              <div class="diatonic-chord-strip" id="circleDiatonicChordsGrid"></div>
             </div>
           </div>
         </div>
@@ -3536,47 +4022,50 @@
           </div>
 
           <div class="lesson-card">
-            <h3>🎼 The Musical Staff & Clefs</h3>
-            <p>Music is written on 5 lines and 4 spaces.</p>
+            <h3>🎼 The Musical Staff & Landmark Guideposts</h3>
+            <p>Music is written on 5 lines and 4 spaces. Use the <strong>3 Conservatory Landmarks</strong> to orient instantly:</p>
             <ul>
-              <li><strong>Treble Clef (𝄞):</strong> Lines: <em>E - G - B - D - F</em> ("Every Good Boy Does Fine"). Spaces: <em>F - A - C - E</em>.</li>
-              <li><strong>Bass Clef (𝄢):</strong> Lines: <em>G - B - D - F - A</em> ("Good Boys Do Fine Always"). Spaces: <em>A - C - E - G</em> ("All Cows Eat Grass").</li>
-              <li><strong>Middle C (C4):</strong> Anchors between both clefs on its own ledger line.</li>
+              <li><strong>Treble G (G4 — Line 2):</strong> Sits inside the curl of the 𝄞 G-Clef. <button type="button" class="interactive-theory-btn" data-demo-notes="G4">🔊 Hear G4</button></li>
+              <li><strong>Middle C (C4 — Center Ledger):</strong> Bridges Treble and Bass staves. <button type="button" class="interactive-theory-btn" data-demo-notes="C4">🔊 Hear C4</button></li>
+              <li><strong>Bass F (F3 — Line 4):</strong> Sits between the two dots of the 𝄢 F-Clef. <button type="button" class="interactive-theory-btn" data-demo-notes="F3">🔊 Hear F3</button></li>
+              <li><strong>Treble Spaces (F-A-C-E):</strong> Spells "FACE" from bottom to top. <button type="button" class="interactive-theory-btn" data-demo-notes="F4,A4,C5,E5">🔊 Play FACE</button></li>
             </ul>
           </div>
 
           <div class="lesson-card">
-            <h3>⏱️ Rhythm & Note Values</h3>
-            <p>Every note duration represents beats of time:</p>
+            <h3>⏱️ Rhythm, Meter & Note Values</h3>
+            <p>Every note duration represents beats of time (at 96 BPM):</p>
             <ul>
-              <li><strong>Whole Note (𝅝):</strong> 4 beats — ring and hold.</li>
-              <li><strong>Half Note (𝅗𝅥):</strong> 2 beats — half duration.</li>
-              <li><strong>Quarter Note (♩):</strong> 1 beat — steady heartbeat.</li>
-              <li><strong>Eighth Note (♪):</strong> ½ beat — two per quarter note.</li>
-              <li><strong>Dotted Note (♩.):</strong> Adds 50% more duration (1.5 beats).</li>
+              <li><strong>Whole Note (𝅝):</strong> 4 beats — ring and hold. <button type="button" class="interactive-theory-btn" data-demo-rhythm="4">🔊 4 Beats</button></li>
+              <li><strong>Dotted Half (𝅗𝅥.):</strong> 3 beats — waltz pulse. <button type="button" class="interactive-theory-btn" data-demo-rhythm="3">🔊 3 Beats</button></li>
+              <li><strong>Half Note (𝅗𝅥):</strong> 2 beats — half measure. <button type="button" class="interactive-theory-btn" data-demo-rhythm="2">🔊 2 Beats</button></li>
+              <li><strong>Quarter Note (♩):</strong> 1 beat — steady heartbeat. <button type="button" class="interactive-theory-btn" data-demo-rhythm="1">🔊 1 Beat</button></li>
+              <li><strong>Eighth Notes (♫):</strong> ½ beat each — two per beat. <button type="button" class="interactive-theory-btn" data-demo-rhythm="0.5">🔊 Eighths</button></li>
             </ul>
           </div>
 
           <div class="lesson-card">
-            <h3>🖐️ Ergonomics & Hand Posture</h3>
-            <p>Healthy piano technique prevents strain and enhances speed:</p>
+            <h3>🖐️ Ergonomics, Hand Posture & Fingerings</h3>
+            <p>Healthy piano technique prevents strain and unlocks speed:</p>
             <ul>
-              <li><strong>Arched Fingers:</strong> Imagine holding a gentle tennis ball.</li>
-              <li><strong>Relaxed Wrists:</strong> Keep wrists flexible and level with keys.</li>
-              <li><strong>Arm Weight:</strong> Drop arm weight from shoulders rather than pushing from fingers.</li>
-              <li><strong>Fingers 1 to 5:</strong> 1 = Thumb, 2 = Index, 3 = Middle, 4 = Ring, 5 = Pinky.</li>
+              <li><strong>Arched Fingers:</strong> Imagine holding a bubble or tennis ball gently over the keys.</li>
+              <li><strong>Thumb Tuck (1 under 3):</strong> How your 5 fingers smoothly walk across an 8-note scale. <button type="button" class="interactive-theory-btn" data-demo-notes="C4,D4,E4,F4,G4">🔊 C–G Walk</button></li>
+              <li><strong>Arm Weight:</strong> Let gravity drop from relaxed shoulders rather than stiffly poking fingers.</li>
+              <li><strong>Fingers 1 to 5:</strong> 1 = Thumb • 2 = Index • 3 = Middle • 4 = Ring • 5 = Pinky.</li>
             </ul>
           </div>
 
           <div class="lesson-card">
-            <h3>🎹 Harmonic Dyads & Intervals</h3>
-            <p>Intervals measure the musical distance between notes:</p>
+            <h3>🎹 Harmonic Dyads, Intervals & Song Hooks</h3>
+            <p>Click any interval to hear it, see it on the piano, and learn its famous song hook:</p>
             <ul>
-              <li><strong>Half Step (Semitone):</strong> Closest key adjacent (white to black, or E-F, B-C).</li>
-              <li><strong>Whole Step (Tone):</strong> Two half steps (C to D, F to G).</li>
-              <li><strong>Major 3rd:</strong> 4 half steps (C to E) — bright and sweet.</li>
-              <li><strong>Minor 3rd:</strong> 3 half steps (A to C) — moody and somber.</li>
-              <li><strong>Perfect 5th:</strong> 7 half steps (C to G) — powerful and resonant.</li>
+              <li><strong>Half Step (m2 — 1 st):</strong> <em>Jaws Theme</em> <button type="button" class="interactive-theory-btn" data-demo-chord="E4+F4">🔊 E4–F4</button></li>
+              <li><strong>Whole Step (M2 — 2 st):</strong> <em>Happy Birthday</em> <button type="button" class="interactive-theory-btn" data-demo-chord="C4+D4">🔊 C4–D4</button></li>
+              <li><strong>Minor 3rd (m3 — 3 st):</strong> <em>Greensleeves</em> <button type="button" class="interactive-theory-btn" data-demo-chord="A4+C5">🔊 A4–C5</button></li>
+              <li><strong>Major 3rd (M3 — 4 st):</strong> <em>When the Saints</em> <button type="button" class="interactive-theory-btn" data-demo-chord="C4+E4">🔊 C4–E4</button></li>
+              <li><strong>Perfect 4th (P4 — 5 st):</strong> <em>Here Comes the Bride</em> <button type="button" class="interactive-theory-btn" data-demo-chord="C4+F4">🔊 C4–F4</button></li>
+              <li><strong>Perfect 5th (P5 — 7 st):</strong> <em>Star Wars / Twinkle</em> <button type="button" class="interactive-theory-btn" data-demo-chord="C4+G4">🔊 C4–G4</button></li>
+              <li><strong>Octave (P8 — 12 st):</strong> <em>Over the Rainbow</em> <button type="button" class="interactive-theory-btn" data-demo-chord="C4+C5">🔊 C4–C5</button></li>
             </ul>
           </div>
         </div>
@@ -8414,6 +8903,74 @@
       renderSheetMusicScore();
       highlightActiveCard();
       updateKeyboardRangeWarning();
+      renderSongTheoryDnaBar(song);
+    }
+
+    function renderSongTheoryDnaBar(song) {
+      if (!song || !window.MusicTheory || !window.MusicTheory.analyzeSongTheoryDNA) return;
+      const dna = window.MusicTheory.analyzeSongTheoryDNA(song);
+      if (!dna) return;
+
+      const keyEl = document.getElementById("dnaKeyText");
+      if (keyEl) keyEl.textContent = `${dna.keySignature} (${dna.accidentalSummary})`;
+
+      const meterEl = document.getElementById("dnaMeterText");
+      if (meterEl) meterEl.textContent = `${dna.timeSignature} (${dna.beatsPerMeasure} beats/bar)`;
+
+      const rangeEl = document.getElementById("dnaRangeText");
+      if (rangeEl) rangeEl.textContent = `${dna.handSpanSummary} · ${dna.totalNotes} notes`;
+
+      const chordsContainer = document.getElementById("dnaChordsContainer");
+      if (chordsContainer) {
+        chordsContainer.innerHTML = "";
+        if (dna.primaryChords && dna.primaryChords.length > 0) {
+          dna.primaryChords.forEach(ch => {
+            const chip = document.createElement("button");
+            chip.type = "button";
+            chip.className = "dna-chord-chip";
+            chip.title = "Click to hear & see this chord on the piano";
+            chip.textContent = `🎹 ${ch.label}`;
+            chip.addEventListener("click", () => {
+              initAudio();
+              document.querySelectorAll(".piano-key").forEach(k => k.classList.remove("active-rh", "active-lh", "active-dyad"));
+              (ch.pitches || []).forEach(p => {
+                playTone(window.MusicTheory.pitchToFreq(p), 0.75);
+                highlightPlaybackKey(p, "dyad", 850);
+              });
+            });
+            chordsContainer.appendChild(chip);
+          });
+        } else {
+          chordsContainer.innerHTML = `<span class="dna-value" style="font-size:0.78rem;">Single-Line Melody</span>`;
+        }
+      }
+
+      const warmupBtn = document.getElementById("dnaPlayScaleWarmupBtn");
+      if (warmupBtn) {
+        warmupBtn.onclick = () => {
+          if (!dna.warmupScale || !dna.warmupScale.notes) return;
+          initAudio();
+          let delay = 0;
+          dna.warmupScale.notes.forEach(n => {
+            setTimeout(() => {
+              playTone(n.freq, 0.32);
+              highlightPlaybackKey(n.pitch, "rh", 300);
+            }, delay);
+            delay += 260;
+          });
+        };
+      }
+
+      const bootcampBtn = document.getElementById("repLaunchBootcampBtn");
+      if (bootcampBtn && !bootcampBtn.dataset.wired) {
+        bootcampBtn.dataset.wired = "true";
+        bootcampBtn.addEventListener("click", () => {
+          const theoryNav = document.querySelector('.mode-nav-btn[data-mode="theory"]');
+          if (theoryNav) theoryNav.click();
+          const sec = document.getElementById("beginnerBootcampSection");
+          if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
     }
 
     function highlightActiveCard() {
@@ -8781,8 +9338,16 @@
       } else if (activeEducationalMode === "scales") {
         if (typeof isVoiceLeadingActive !== "undefined" && isVoiceLeadingActive && isVlPracticeActive) {
           verifyVoiceLeadingInput(pitchName);
+        } else if (typeof isChordLabActive !== "undefined" && isChordLabActive && isChordLabPracticeActive) {
+          verifyChordLabInput(pitchName);
         } else if (isScalePracticeActive) {
           verifyScalePracticeInput(pitchName);
+        } else {
+          checkAndPlayNote(pitchName);
+        }
+      } else if (activeEducationalMode === "theory") {
+        if (typeof isBootcampTaskActive !== "undefined" && isBootcampTaskActive) {
+          verifyBootcampNoteInput(pitchName);
         } else {
           checkAndPlayNote(pitchName);
         }
@@ -8820,7 +9385,11 @@
           if (activeEducationalMode === "sight-reading") stopSightReadingDrill();
           if (activeEducationalMode === "scales") {
             if (typeof isVlPracticeActive !== "undefined" && isVlPracticeActive) toggleVoiceLeadingPractice();
+            if (typeof isChordLabPracticeActive !== "undefined" && isChordLabPracticeActive) toggleChordLabPractice();
             if (typeof isScalePracticeActive !== "undefined" && isScalePracticeActive) toggleScalePractice();
+          }
+          if (activeEducationalMode === "theory") {
+            if (typeof isBootcampTaskActive !== "undefined" && isBootcampTaskActive) toggleBootcampTask();
           }
 
           activeEducationalMode = targetMode;
@@ -8843,11 +9412,14 @@
           } else if (targetMode === "scales") {
             if (typeof isVoiceLeadingActive !== "undefined" && isVoiceLeadingActive) {
               updateVoiceLeadingDisplay();
+            } else if (typeof isChordLabActive !== "undefined" && isChordLabActive) {
+              updateChordLabDisplay();
             } else {
               updateScaleDisplay();
             }
           } else if (targetMode === "theory") {
             renderCircleOfFifthsSvg();
+            if (typeof renderBootcampModule === "function") renderBootcampModule();
           }
         });
       });
@@ -9229,6 +9801,14 @@
       });
 
       document.getElementById("earPlaySoundBtn")?.addEventListener("click", playEarChallengeAudio);
+      document.getElementById("earMnemonicHintBtn")?.addEventListener("click", () => {
+        if (!earCurrentChallenge || earSubmode !== "interval_recognition") return;
+        const banner = document.getElementById("earMnemonicBanner");
+        if (banner) {
+          banner.style.display = "block";
+          banner.innerHTML = `🎶 <strong>Famous Song Hook:</strong> ${earCurrentChallenge.mnemonicAsc || "Listen for the interval step distance"} <span style="color:#c4b5fd;">(${earCurrentChallenge.feeling || earCurrentChallenge.consonance || "Harmonic interval"})</span>`;
+        }
+      });
     }
 
     function updateEarSRSHudDisplay() {
@@ -9252,16 +9832,21 @@
       const titleEl = document.getElementById("earSubmodeTitle");
       const feedbackEl = document.getElementById("earFeedbackBanner");
       const grid = document.getElementById("earOptionsGrid");
+      const mnemonicRow = document.getElementById("earMnemonicCoachRow");
+      const mnemonicBanner = document.getElementById("earMnemonicBanner");
 
       grid.innerHTML = "";
       feedbackEl.textContent = "Click 'Hear Sound' (or Spacebar) to listen.";
       feedbackEl.style.color = "#94a3b8";
+      if (mnemonicBanner) mnemonicBanner.style.display = "none";
 
       if (earSubmode === "pitch_match") {
+        if (mnemonicRow) mnemonicRow.style.display = "none";
         titleEl.textContent = "Ear Training: Single Pitch Reproduction";
         promptEl.textContent = "Listen to the note, then play it on your keyboard or piano!";
         grid.innerHTML = `<div style="color:var(--text-muted); font-size:0.9rem;">Play the matching key on your piano keyboard or MIDI device to answer!</div>`;
       } else if (earSubmode === "interval_recognition") {
+        if (mnemonicRow) mnemonicRow.style.display = "flex";
         titleEl.textContent = "Ear Training: Relative Interval Identification";
         promptEl.textContent = "Listen to the two notes in sequence. Which interval was played?";
         earCurrentChallenge.options.forEach(opt => {
@@ -9272,6 +9857,7 @@
           grid.appendChild(btn);
         });
       } else if (earSubmode === "chord_quality") {
+        if (mnemonicRow) mnemonicRow.style.display = "none";
         titleEl.textContent = "Ear Training: Major vs. Minor Triad Quality";
         promptEl.textContent = "Listen to the triad chord. Does it sound bright (Major) or somber (Minor)?";
         earCurrentChallenge.options.forEach(opt => {
@@ -9322,10 +9908,15 @@
 
       if (earSubmode === "interval_recognition") {
         correct = (choice === earCurrentChallenge.correctInterval);
-        explanation = `The interval from ${earCurrentChallenge.rootPitch} to ${earCurrentChallenge.targetPitch} is a ${earCurrentChallenge.correctInterval}!`;
+        const hook = earCurrentChallenge.mnemonicAsc ? ` · 🎵 <em>${earCurrentChallenge.mnemonicAsc}</em>` : "";
+        explanation = `The interval from <strong>${earCurrentChallenge.rootPitch}</strong> to <strong>${earCurrentChallenge.targetPitch}</strong> is a <strong>${earCurrentChallenge.correctInterval}</strong>${hook}!`;
+        highlightPlaybackKey(earCurrentChallenge.rootPitch, "rh", 1200);
+        highlightPlaybackKey(earCurrentChallenge.targetPitch, "dyad", 1200);
       } else if (earSubmode === "chord_quality") {
         correct = (choice === earCurrentChallenge.correctQuality);
-        explanation = `That was a ${earCurrentChallenge.chord.fullName} chord!`;
+        const mood = earCurrentChallenge.chord.mood ? ` (${earCurrentChallenge.chord.mood})` : "";
+        explanation = `That was a <strong>${earCurrentChallenge.chord.fullName}</strong> chord${mood}!`;
+        (earCurrentChallenge.chord.pitches || []).forEach(p => highlightPlaybackKey(p, "dyad", 1200));
       }
 
       if (window.MusicTheory && earCurrentChallenge.srsKey) {
@@ -9337,7 +9928,7 @@
         earStats.streak++;
         feedbackEl.style.color = "#34d399";
         feedbackEl.innerHTML = `✅ Brilliant! ${explanation} (${(elapsedMs / 1000).toFixed(1)}s)`;
-        setTimeout(loadEarChallenge, 1500);
+        setTimeout(loadEarChallenge, 1750);
       } else {
         earStats.streak = 0;
         feedbackEl.style.color = "#f87171";
@@ -9390,7 +9981,10 @@
     // 4. SCALES & THEORY STUDIO ENGINE
     let currentTonic = "C";
     let currentScaleFormula = "major";
+    let currentScaleHand = "rh";
+    let currentScaleDirection = "asc";
     let currentScaleObj = null;
+    let currentScalePracticeSeq = [];
     let isScalePracticeActive = false;
     let scalePracticeStepIdx = 0;
 
@@ -9413,38 +10007,87 @@
         });
       });
 
+      document.getElementById("scaleHandSelect")?.addEventListener("change", (e) => {
+        currentScaleHand = e.target.value || "rh";
+        if (isScalePracticeActive) toggleScalePractice();
+        updateScaleDisplay();
+      });
+
+      document.getElementById("scaleDirectionSelect")?.addEventListener("change", (e) => {
+        currentScaleDirection = e.target.value || "asc";
+        if (isScalePracticeActive) toggleScalePractice();
+        updateScaleDisplay();
+      });
+
       document.getElementById("scaleListenBtn")?.addEventListener("click", playScaleSequence);
       document.getElementById("scalePracticeBtn")?.addEventListener("click", toggleScalePractice);
       initVoiceLeadingModule();
+      initChordLabModule();
     }
 
     function updateScaleDisplay() {
       if (!window.MusicTheory) return;
-      currentScaleObj = window.MusicTheory.generateScale(currentTonic, currentScaleFormula, 4);
+      const startOct = currentScaleHand === "lh" ? 3 : 4;
+      currentScaleObj = window.MusicTheory.generateScale(currentTonic, currentScaleFormula, startOct);
       if (!currentScaleObj) return;
 
-      document.getElementById("scaleDisplayTitle").textContent = currentScaleObj.name;
+      document.getElementById("scaleDisplayTitle").textContent = `${currentScaleObj.name} (${currentScaleHand === "lh" ? "Left Hand · Bass Clef" : "Right Hand · Treble Clef"})`;
       document.getElementById("scaleDescriptionText").textContent = currentScaleObj.description;
 
-      // Render fingering badges
+      const formulaEl = document.getElementById("scaleFormulaFormula");
+      if (formulaEl) {
+        formulaEl.textContent = `Formula: ${currentScaleObj.stepFormula || "W - W - H - W - W - W - H"}`;
+      }
+
+      // Build practice sequence according to direction
+      const baseNotes = currentScaleObj.notes;
+      currentScalePracticeSeq = currentScaleDirection === "asc_desc"
+        ? [...baseNotes, ...[...baseNotes].reverse().slice(1)]
+        : [...baseNotes];
+
+      // Update thumb-tuck / finger-crossing coaching banner
+      const tuckTextEl = document.getElementById("scaleThumbTuckText");
+      if (tuckTextEl) {
+        const transitions = baseNotes.filter(n => currentScaleHand === "lh" ? n.lhTransition : n.rhTransition);
+        if (transitions.length > 0) {
+          const tNote = transitions[0];
+          const prevNote = baseNotes[Math.max(0, tNote.degreeIndex - 1)];
+          if (currentScaleHand === "lh") {
+            tuckTextEl.innerHTML = `<strong>Left Hand Crossover:</strong> Play <strong>${prevNote.pitch}</strong> with thumb (1), then smoothly cross <strong>Finger ${tNote.lhFinger}</strong> over your thumb onto <strong>${tNote.pitch}</strong>!`;
+          } else {
+            tuckTextEl.innerHTML = `<strong>Right Hand Thumb-Tuck:</strong> After playing <strong>${prevNote.pitch}</strong> with finger ${prevNote.rhFinger}, tuck your <strong>Thumb (1)</strong> smoothly underneath onto <strong>${tNote.pitch}</strong> to keep your hand level!`;
+          }
+        } else {
+          tuckTextEl.textContent = `Keep your wrist relaxed and fingers curved as you walk through ${currentScaleObj.name}.`;
+        }
+      }
+
+      // Render fingering badges with Solfege & Thumb-Tuck highlight
       const fRow = document.getElementById("scaleFingeringRow");
       fRow.innerHTML = "";
-      currentScaleObj.notes.forEach(n => {
+      baseNotes.forEach(n => {
         const b = document.createElement("div");
-        b.className = "finger-badge";
+        const hasTrans = currentScaleHand === "lh" ? Boolean(n.lhTransition) : Boolean(n.rhTransition);
+        b.className = "finger-badge" + (hasTrans ? " thumb-tuck-highlight" : "");
+        const transLabel = hasTrans
+          ? `<span class="fb-tuck-tag">${currentScaleHand === "lh" ? "↪ Cross" : "⚡ Tuck 1"}</span>`
+          : "";
         b.innerHTML = `
           <span class="fb-pitch">${n.pitch}</span>
+          <span class="fb-solfege">${n.degree || ""} · ${n.solfege || ""}</span>
           <span class="fb-rh">RH: ${n.rhFinger}</span>
           <span class="fb-lh">LH: ${n.lhFinger}</span>
+          ${transLabel}
         `;
         fRow.appendChild(b);
       });
 
       // Highlight keyboard keys for this scale
       document.querySelectorAll(".piano-key").forEach(k => k.classList.remove("active-rh", "active-lh", "active-dyad"));
-      currentScaleObj.notes.forEach(n => {
+      const highlightClass = currentScaleHand === "lh" ? "active-lh" : "active-rh";
+      baseNotes.forEach(n => {
         const keyEl = document.querySelector(`.piano-key[data-note="${n.pitch}"]`);
-        if (keyEl) keyEl.classList.add("active-rh");
+        if (keyEl) keyEl.classList.add(highlightClass);
       });
 
       renderScaleSvg(currentScaleObj);
@@ -9459,6 +10102,8 @@
       const staffTop = 35;
       const spacing = 11;
       const staffBottom = staffTop + 4 * spacing;
+      const isBass = currentScaleHand === "lh";
+      const refStep = isBass ? -10 : 2;
 
       // Draw 5 staff lines
       for (let i = 0; i < 5; i++) {
@@ -9473,28 +10118,42 @@
         svg.appendChild(line);
       }
 
-      // Treble Clef
+      // Clef
       const clef = document.createElementNS("http://www.w3.org/2000/svg", "text");
       clef.setAttribute("x", "50");
-      clef.setAttribute("y", staffBottom - 2);
-      clef.setAttribute("font-size", "48");
+      clef.setAttribute("y", isBass ? staffTop + 32 : staffBottom - 2);
+      clef.setAttribute("font-size", isBass ? "40" : "48");
       clef.setAttribute("class", "clef-text");
-      clef.textContent = "𝄞";
+      clef.textContent = isBass ? "𝄢" : "𝄞";
       svg.appendChild(clef);
 
       // Distribute scale notes horizontally
-      const count = scaleObj.notes.length;
+      const seqNotes = currentScalePracticeSeq.length > 0 ? currentScalePracticeSeq : scaleObj.notes;
+      const count = seqNotes.length;
       const stepX = (width - 180) / Math.max(1, count);
 
-      scaleObj.notes.forEach((note, idx) => {
+      seqNotes.forEach((note, idx) => {
         const cx = 130 + idx * stepX;
-        const step = window.MusicTheory.getDiatonicStep(note.pitch) || 0;
-        const cy = staffBottom - (step - 2) * (spacing / 2);
+        const step = window.MusicTheory.getDiatonicStep(note.pitch);
+        const validStep = step !== null ? step : refStep;
+        const cy = staffBottom - (validStep - refStep) * (spacing / 2);
 
         // Ledger lines
-        if (step <= 0) {
-          for (let s = 0; s >= step; s -= 2) {
-            const ly = staffBottom - (s - 2) * (spacing / 2);
+        if (!isBass && validStep <= 0) {
+          for (let s = 0; s >= validStep; s -= 2) {
+            const ly = staffBottom - (s - refStep) * (spacing / 2);
+            const lline = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            lline.setAttribute("x1", cx - 12);
+            lline.setAttribute("y1", ly);
+            lline.setAttribute("x2", cx + 12);
+            lline.setAttribute("y2", ly);
+            lline.setAttribute("stroke", "#94a3b8");
+            lline.setAttribute("stroke-width", "1.4");
+            svg.appendChild(lline);
+          }
+        } else if (isBass && validStep >= 0) {
+          for (let s = 0; s <= validStep; s += 2) {
+            const ly = staffBottom - (s - refStep) * (spacing / 2);
             const lline = document.createElementNS("http://www.w3.org/2000/svg", "line");
             lline.setAttribute("x1", cx - 12);
             lline.setAttribute("y1", ly);
@@ -9525,6 +10184,8 @@
           svg.appendChild(acc);
         }
 
+        const hasTrans = (idx < scaleObj.notes.length) && (isBass ? Boolean(note.lhTransition) : Boolean(note.rhTransition));
+
         // Notehead
         const head = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
         head.setAttribute("id", `scale_notehead_${idx}`);
@@ -9533,18 +10194,30 @@
         head.setAttribute("rx", "6.2");
         head.setAttribute("ry", "4.5");
         head.setAttribute("transform", `rotate(-20, ${cx}, ${cy})`);
-        head.setAttribute("fill", "#1e293b");
+        head.setAttribute("fill", hasTrans ? "#d97706" : "#1e293b");
         svg.appendChild(head);
 
-        // Degree label
+        // Solfege / Finger above staff
+        const fingerNum = isBass ? note.lhFinger : note.rhFinger;
+        const topLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        topLabel.setAttribute("x", cx);
+        topLabel.setAttribute("y", staffTop - 10);
+        topLabel.setAttribute("font-size", "10");
+        topLabel.setAttribute("font-weight", "800");
+        topLabel.setAttribute("text-anchor", "middle");
+        topLabel.setAttribute("fill", hasTrans ? "#d97706" : "#64748b");
+        topLabel.textContent = hasTrans ? `⚡${fingerNum}` : `${fingerNum}`;
+        svg.appendChild(topLabel);
+
+        // Pitch + Solfege label below staff
         const deg = document.createElementNS("http://www.w3.org/2000/svg", "text");
         deg.setAttribute("x", cx);
         deg.setAttribute("y", staffBottom + 32);
-        deg.setAttribute("font-size", "11");
+        deg.setAttribute("font-size", "10.5");
         deg.setAttribute("font-weight", "800");
         deg.setAttribute("text-anchor", "middle");
         deg.setAttribute("fill", "#0284c7");
-        deg.textContent = note.pitch;
+        deg.textContent = note.solfege ? `${note.pitch} (${note.solfege})` : note.pitch;
         svg.appendChild(deg);
       });
     }
@@ -9553,13 +10226,16 @@
       if (!currentScaleObj) return;
       initAudio();
       const notes = currentScaleObj.notes;
-      const fullSeq = [...notes, ...[...notes].reverse().slice(1)];
+      const fullSeq = currentScaleDirection === "asc"
+        ? [...notes, ...[...notes].reverse().slice(1)]
+        : currentScalePracticeSeq;
       let delay = 0;
+      const handRole = currentScaleHand === "lh" ? "lh" : "rh";
 
-      fullSeq.forEach((n, i) => {
+      fullSeq.forEach((n) => {
         setTimeout(() => {
           playTone(n.freq, 0.35);
-          highlightPlaybackKey(n.pitch, "rh", 320);
+          highlightPlaybackKey(n.pitch, handRole, 320);
         }, delay);
         delay += 320;
       });
@@ -9572,11 +10248,12 @@
       if (btn) btn.textContent = isScalePracticeActive ? "■ Stop Practice" : "🎯 Practice Scale";
       const desc = document.getElementById("scaleDescriptionText");
 
-      if (isScalePracticeActive) {
+      if (isScalePracticeActive && currentScalePracticeSeq.length > 0) {
         highlightScalePracticeNote(0);
-        desc.innerHTML = `<strong>Practice Started:</strong> Play the amber note on your piano keyboard: <strong>${currentScaleObj.notes[0].pitch}</strong> (RH Finger ${currentScaleObj.notes[0].rhFinger})`;
+        const firstN = currentScalePracticeSeq[0];
+        const fNum = currentScaleHand === "lh" ? firstN.lhFinger : firstN.rhFinger;
+        desc.innerHTML = `<strong>Practice Started:</strong> Play the amber note on your piano keyboard: <strong>${firstN.pitch}</strong> (${currentScaleHand.toUpperCase()} Finger ${fNum}, Solfège: ${firstN.solfege || "Do"})`;
       } else {
-        document.querySelectorAll("#scaleScoreSvg ellipse").forEach(e => e.setAttribute("fill", "#1e293b"));
         updateScaleDisplay();
       }
     }
@@ -9588,8 +10265,8 @@
     }
 
     function verifyScalePracticeInput(pitchName) {
-      if (!isScalePracticeActive || !currentScaleObj) return;
-      const targetNote = currentScaleObj.notes[scalePracticeStepIdx];
+      if (!isScalePracticeActive || !currentScalePracticeSeq.length) return;
+      const targetNote = currentScalePracticeSeq[scalePracticeStepIdx];
       if (!targetNote) return;
 
       const isMatch = (pitchName === targetNote.pitch) || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(pitchName, targetNote.pitch));
@@ -9597,12 +10274,16 @@
 
       if (isMatch) {
         scalePracticeStepIdx++;
-        if (scalePracticeStepIdx >= currentScaleObj.notes.length) {
+        if (scalePracticeStepIdx >= currentScalePracticeSeq.length) {
           scalePracticeStepIdx = 0;
           document.getElementById("scaleDescriptionText").innerHTML = `🎉 Superb! You completed the <strong>${currentScaleObj.name}</strong>! Ready for another pass!`;
         } else {
-          const nextN = currentScaleObj.notes[scalePracticeStepIdx];
-          document.getElementById("scaleDescriptionText").innerHTML = `✅ Nice! Now play <strong>${nextN.pitch}</strong> (RH Finger ${nextN.rhFinger}, LH Finger ${nextN.lhFinger})`;
+          const nextN = currentScalePracticeSeq[scalePracticeStepIdx];
+          const fNum = currentScaleHand === "lh" ? nextN.lhFinger : nextN.rhFinger;
+          const transHint = (currentScaleHand === "lh" ? nextN.lhTransition : nextN.rhTransition)
+            ? ` — ⚡ <strong>${currentScaleHand === "lh" ? nextN.lhTransition : nextN.rhTransition}!</strong>`
+            : "";
+          document.getElementById("scaleDescriptionText").innerHTML = `✅ Nice! Now play <strong>${nextN.pitch}</strong> (${currentScaleHand.toUpperCase()} Finger ${fNum} · ${nextN.solfege || ""})${transHint}`;
         }
         highlightScalePracticeNote(scalePracticeStepIdx);
       }
@@ -9619,32 +10300,48 @@
     let isVoiceLeadingActive = false;
     let vlFulfilledPitches = new Set();
 
+    // Submode 3: Chord & Interval Builder Lab State
+    let isChordLabActive = false;
+    let currentChordLabRoot = "C";
+    let currentChordLabType = "major";
+    let currentChordLabInversion = 0;
+    let currentChordLabRecipe = null;
+    let isChordLabPracticeActive = false;
+    let chordLabFulfilledPitches = new Set();
+
     function initVoiceLeadingModule() {
-      // Submode switcher
+      // Submode switcher (Scales / Voice-Leading / Chord Builder Lab)
       const btnScales = document.getElementById("btnSubmodeScales");
       const btnVL = document.getElementById("btnSubmodeVoiceLeading");
+      const btnChordLab = document.getElementById("btnSubmodeChordLab");
       const subviewScales = document.getElementById("subviewScales");
       const subviewVL = document.getElementById("subviewVoiceLeading");
+      const subviewChordLab = document.getElementById("subviewChordLab");
 
-      if (btnScales && btnVL) {
-        btnScales.addEventListener("click", () => {
-          btnScales.classList.add("active");
-          btnVL.classList.remove("active");
-          if (subviewScales) subviewScales.style.display = "block";
-          if (subviewVL) subviewVL.style.display = "none";
-          isVoiceLeadingActive = false;
-          updateScaleDisplay();
-        });
+      function switchScalesPanelSubmode(mode) {
+        if (isScalePracticeActive) toggleScalePractice();
+        if (isVlPracticeActive) toggleVoiceLeadingPractice();
+        if (isChordLabPracticeActive) toggleChordLabPractice();
 
-        btnVL.addEventListener("click", () => {
-          btnVL.classList.add("active");
-          btnScales.classList.remove("active");
-          if (subviewScales) subviewScales.style.display = "none";
-          if (subviewVL) subviewVL.style.display = "block";
-          isVoiceLeadingActive = true;
-          updateVoiceLeadingDisplay();
-        });
+        isVoiceLeadingActive = (mode === "vl");
+        isChordLabActive = (mode === "chordlab");
+
+        btnScales?.classList.toggle("active", mode === "scales");
+        btnVL?.classList.toggle("active", mode === "vl");
+        btnChordLab?.classList.toggle("active", mode === "chordlab");
+
+        if (subviewScales) subviewScales.style.display = (mode === "scales") ? "block" : "none";
+        if (subviewVL) subviewVL.style.display = (mode === "vl") ? "block" : "none";
+        if (subviewChordLab) subviewChordLab.style.display = (mode === "chordlab") ? "block" : "none";
+
+        if (mode === "scales") updateScaleDisplay();
+        else if (mode === "vl") updateVoiceLeadingDisplay();
+        else if (mode === "chordlab") updateChordLabDisplay();
       }
+
+      btnScales?.addEventListener("click", () => switchScalesPanelSubmode("scales"));
+      btnVL?.addEventListener("click", () => switchScalesPanelSubmode("vl"));
+      btnChordLab?.addEventListener("click", () => switchScalesPanelSubmode("chordlab"));
 
       // Key Selectors
       document.querySelectorAll("#vlKeySelectorRow .tonic-btn").forEach(btn => {
@@ -9670,6 +10367,260 @@
 
       document.getElementById("vlListenBtn")?.addEventListener("click", playVoiceLeadingProgression);
       document.getElementById("vlPracticeBtn")?.addEventListener("click", toggleVoiceLeadingPractice);
+    }
+
+    function initChordLabModule() {
+      document.querySelectorAll("#chordLabRootRow .tonic-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#chordLabRootRow .tonic-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentChordLabRoot = btn.dataset.root;
+          updateChordLabDisplay();
+        });
+      });
+
+      document.querySelectorAll("#chordLabTypePills .scale-pill-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#chordLabTypePills .scale-pill-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentChordLabType = btn.dataset.chordType;
+          updateChordLabDisplay();
+        });
+      });
+
+      document.querySelectorAll("#chordLabInversionRow .scale-pill-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#chordLabInversionRow .scale-pill-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentChordLabInversion = parseInt(btn.dataset.inv, 10) || 0;
+          updateChordLabDisplay();
+        });
+      });
+
+      document.getElementById("chordLabListenBtn")?.addEventListener("click", playChordLabSequence);
+      document.getElementById("chordLabPracticeBtn")?.addEventListener("click", toggleChordLabPractice);
+    }
+
+    function updateChordLabDisplay() {
+      if (!window.MusicTheory || !window.MusicTheory.getChordConstructionRecipe) return;
+      currentChordLabRecipe = window.MusicTheory.getChordConstructionRecipe(currentChordLabRoot, currentChordLabType, 4, currentChordLabInversion);
+      if (!currentChordLabRecipe) return;
+
+      const invNames = ["Root Position", "1st Inversion", "2nd Inversion"];
+      const titleEl = document.getElementById("chordLabDisplayTitle");
+      if (titleEl) titleEl.textContent = `${currentChordLabRecipe.fullName} (${invNames[currentChordLabInversion] || "Root Position"})`;
+
+      const formulaBadge = document.getElementById("chordLabFormulaBadge");
+      if (formulaBadge) formulaBadge.textContent = `Formula: ${currentChordLabRecipe.recipe} (${currentChordLabRecipe.stepMath})`;
+
+      const moodEl = document.getElementById("chordLabMoodText");
+      if (moodEl) {
+        moodEl.innerHTML = `<strong>Character:</strong> ${currentChordLabRecipe.mood} — <strong>RH Fingers:</strong> ${currentChordLabRecipe.rhFingers.join(" - ")} | <strong>LH Fingers:</strong> ${currentChordLabRecipe.lhFingers.join(" - ")}`;
+      }
+
+      const grid = document.getElementById("chordLabRecipeGrid");
+      if (grid) {
+        grid.innerHTML = "";
+        currentChordLabRecipe.tones.forEach((t, idx) => {
+          const card = document.createElement("div");
+          card.className = "chord-tone-recipe-card";
+          card.innerHTML = `
+            <span class="tone-role">${t.roleLabel}</span>
+            <span class="tone-pitch">${t.pitch}</span>
+            <span class="tone-interval">${t.semitonesFromRoot} semitones (${t.intervalName})</span>
+            <span class="tone-fingers">RH: ${t.rhFinger} · LH: ${t.lhFinger}</span>
+          `;
+          card.style.cursor = "pointer";
+          card.addEventListener("click", () => {
+            initAudio();
+            playTone(t.freq, 0.55);
+            highlightPlaybackKey(t.pitch, idx === 0 ? "rh" : "dyad", 550);
+          });
+          grid.appendChild(card);
+        });
+      }
+
+      document.querySelectorAll(".piano-key").forEach(k => k.classList.remove("active-rh", "active-lh", "active-dyad"));
+      currentChordLabRecipe.pitches.forEach((p, idx) => {
+        const keyEl = document.querySelector(`.piano-key[data-note="${p}"]`);
+        if (keyEl) keyEl.classList.add(idx === 0 ? "active-rh" : "active-dyad");
+      });
+
+      renderChordLabSvg(currentChordLabRecipe);
+    }
+
+    function renderChordLabSvg(recipe) {
+      const svg = document.getElementById("chordLabScoreSvg");
+      if (!svg || !recipe) return;
+      svg.innerHTML = "";
+
+      const width = 900;
+      const staffTop = 30;
+      const spacing = 11;
+      const staffBottom = staffTop + 4 * spacing;
+
+      for (let i = 0; i < 5; i++) {
+        const y = staffTop + i * spacing;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", "40");
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", width - 40);
+        line.setAttribute("y2", y);
+        line.setAttribute("stroke", "#94a3b8");
+        line.setAttribute("stroke-width", "1.2");
+        svg.appendChild(line);
+      }
+
+      const clef = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      clef.setAttribute("x", "50");
+      clef.setAttribute("y", staffBottom - 2);
+      clef.setAttribute("font-size", "48");
+      clef.setAttribute("class", "clef-text");
+      clef.textContent = "𝄞";
+      svg.appendChild(clef);
+
+      // Draw Arpeggio notes on left half + Stacked Block Chord on right half
+      const tones = recipe.tones || [];
+      tones.forEach((t, idx) => {
+        const cx = 170 + idx * 115;
+        const step = window.MusicTheory.getDiatonicStep(t.pitch) || 0;
+        const cy = staffBottom - (step - 2) * (spacing / 2);
+
+        if (step <= 0) {
+          for (let s = 0; s >= step; s -= 2) {
+            const ly = staffBottom - (s - 2) * (spacing / 2);
+            const lline = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            lline.setAttribute("x1", cx - 12);
+            lline.setAttribute("y1", ly);
+            lline.setAttribute("x2", cx + 12);
+            lline.setAttribute("y2", ly);
+            lline.setAttribute("stroke", "#94a3b8");
+            lline.setAttribute("stroke-width", "1.4");
+            svg.appendChild(lline);
+          }
+        }
+
+        if (t.pitch.includes("#") || t.pitch.includes("b")) {
+          const acc = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          acc.setAttribute("x", cx - 16);
+          acc.setAttribute("y", cy + 5);
+          acc.setAttribute("font-size", "18");
+          acc.setAttribute("fill", "#0284c7");
+          acc.textContent = t.pitch.includes("#") ? "♯" : "♭";
+          svg.appendChild(acc);
+        }
+
+        const head = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+        head.setAttribute("cx", cx);
+        head.setAttribute("cy", cy);
+        head.setAttribute("rx", "6.5");
+        head.setAttribute("ry", "4.8");
+        head.setAttribute("transform", `rotate(-20, ${cx}, ${cy})`);
+        head.setAttribute("fill", idx === 0 ? "#0284c7" : "#7c3aed");
+        svg.appendChild(head);
+
+        const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        lbl.setAttribute("x", cx);
+        lbl.setAttribute("y", staffBottom + 28);
+        lbl.setAttribute("font-size", "11");
+        lbl.setAttribute("font-weight", "800");
+        lbl.setAttribute("text-anchor", "middle");
+        lbl.setAttribute("fill", "#1e293b");
+        lbl.textContent = `${t.pitch} (RH ${t.rhFinger})`;
+        svg.appendChild(lbl);
+      });
+
+      // Block chord stack on right side
+      const stackX = 700;
+      tones.forEach((t, idx) => {
+        const step = window.MusicTheory.getDiatonicStep(t.pitch) || 0;
+        const cy = staffBottom - (step - 2) * (spacing / 2);
+        if (step <= 0) {
+          const ly = staffBottom - (0 - 2) * (spacing / 2);
+          const lline = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          lline.setAttribute("x1", stackX - 14);
+          lline.setAttribute("y1", ly);
+          lline.setAttribute("x2", stackX + 14);
+          lline.setAttribute("y2", ly);
+          lline.setAttribute("stroke", "#94a3b8");
+          lline.setAttribute("stroke-width", "1.4");
+          svg.appendChild(lline);
+        }
+        const head = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+        head.setAttribute("cx", stackX);
+        head.setAttribute("cy", cy);
+        head.setAttribute("rx", "6.8");
+        head.setAttribute("ry", "4.8");
+        head.setAttribute("transform", `rotate(-20, ${stackX}, ${cy})`);
+        head.setAttribute("fill", idx === 0 ? "#0284c7" : "#a855f7");
+        svg.appendChild(head);
+      });
+
+      const stackLbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      stackLbl.setAttribute("x", stackX);
+      stackLbl.setAttribute("y", staffBottom + 28);
+      stackLbl.setAttribute("font-size", "11.5");
+      stackLbl.setAttribute("font-weight", "800");
+      stackLbl.setAttribute("text-anchor", "middle");
+      stackLbl.setAttribute("fill", "#7c3aed");
+      stackLbl.textContent = `${recipe.symbol} Block Voicing`;
+      svg.appendChild(stackLbl);
+    }
+
+    function playChordLabSequence() {
+      if (!currentChordLabRecipe) return;
+      initAudio();
+      let delay = 0;
+      currentChordLabRecipe.tones.forEach((t, idx) => {
+        setTimeout(() => {
+          playTone(t.freq, 0.45);
+          highlightPlaybackKey(t.pitch, idx === 0 ? "rh" : "dyad", 400);
+        }, delay);
+        delay += 340;
+      });
+      setTimeout(() => {
+        currentChordLabRecipe.tones.forEach((t, idx) => {
+          playTone(t.freq, 0.9);
+          highlightPlaybackKey(t.pitch, idx === 0 ? "rh" : "dyad", 850);
+        });
+      }, delay + 120);
+    }
+
+    function toggleChordLabPractice() {
+      isChordLabPracticeActive = !isChordLabPracticeActive;
+      chordLabFulfilledPitches.clear();
+      const btn = document.getElementById("chordLabPracticeBtn");
+      if (btn) btn.textContent = isChordLabPracticeActive ? "■ Stop Practice" : "🎯 Practice Chord";
+      const moodEl = document.getElementById("chordLabMoodText");
+      if (isChordLabPracticeActive && currentChordLabRecipe) {
+        if (moodEl) {
+          moodEl.innerHTML = `🎯 <strong>Play all notes of ${currentChordLabRecipe.fullName}:</strong> <strong>${currentChordLabRecipe.pitches.join(" + ")}</strong> on your keyboard!`;
+        }
+      } else {
+        updateChordLabDisplay();
+      }
+    }
+
+    function verifyChordLabInput(pitchName) {
+      if (!isChordLabPracticeActive || !currentChordLabRecipe) return;
+      const expected = currentChordLabRecipe.pitches || [];
+      const isMatch = expected.some(p => p === pitchName || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, pitchName)));
+      playTone(window.MusicTheory.pitchToFreq(pitchName), 0.35);
+
+      if (isMatch) {
+        chordLabFulfilledPitches.add(pitchName);
+        const remaining = expected.filter(p => !chordLabFulfilledPitches.has(p) && !(window.MusicTheory && Array.from(chordLabFulfilledPitches).some(fp => window.MusicTheory.areEnharmonicEquivalent(fp, p))));
+        const moodEl = document.getElementById("chordLabMoodText");
+        if (remaining.length === 0) {
+          chordLabFulfilledPitches.clear();
+          currentChordLabRecipe.tones.forEach(t => playTone(t.freq, 0.8));
+          if (moodEl) {
+            moodEl.innerHTML = `🎉 <strong style="color:#34d399;">Chord Mastered!</strong> You built <strong>${currentChordLabRecipe.fullName}</strong> (${expected.join(" + ")})! Try another inversion or chord quality!`;
+          }
+        } else if (moodEl) {
+          moodEl.innerHTML = `✅ Locked <strong>${pitchName}</strong> — now play: <strong>${remaining.join(" + ")}</strong>`;
+        }
+      }
     }
 
     function updateVoiceLeadingDisplay() {
@@ -10462,24 +11413,379 @@
       hubText.setAttribute("font-size", "11");
       hubText.textContent = "5ths Wheel";
       svg.appendChild(hubText);
+
+      if (keys.length > 0 && !svg.dataset.initializedKey) {
+        svg.dataset.initializedKey = "true";
+        selectCircleKey(keys[0]);
+      }
     }
 
     function selectCircleKey(keyData) {
+      if (!keyData) return;
       document.getElementById("circleKeyTitle").textContent = `Key of ${keyData.key} Major`;
       document.getElementById("circleRelativeMinor").innerHTML = `Relative Minor: <strong>${keyData.relativeMinor}</strong>`;
       const accText = keyData.sharps > 0 ? `${keyData.sharps} Sharp${keyData.sharps > 1 ? 's' : ''} (${keyData.accidentalsList.join(', ')})` : (keyData.flats > 0 ? `${keyData.flats} Flat${keyData.flats > 1 ? 's' : ''} (${keyData.accidentalsList.join(', ')})` : "Natural (No sharps or flats)");
       document.getElementById("circleAccidentals").innerHTML = `Key Signature: <strong>${accText}</strong>`;
 
+      // Render Engraved Key Signature Staff & Rule
+      if (window.MusicTheory && window.MusicTheory.getKeySignatureStaffInfo) {
+        const sigInfo = window.MusicTheory.getKeySignatureStaffInfo(keyData.key);
+        renderCircleKeySignatureSvg(sigInfo);
+        const ruleEl = document.getElementById("circleKeyRuleText");
+        if (ruleEl && sigInfo) {
+          ruleEl.innerHTML = `💡 <strong>Reading Rule:</strong> ${sigInfo.ruleText}<br><span style="color:#94a3b8;">${sigInfo.tipText}</span>`;
+        }
+      }
+
+      // Render 7 Diatonic Chords strip
+      if (window.MusicTheory && window.MusicTheory.generateDiatonicChordFamily) {
+        const family = window.MusicTheory.generateDiatonicChordFamily(keyData.key);
+        renderCircleDiatonicChords(family);
+      }
+
       const expBtn = document.getElementById("circleExploreScaleBtn");
       if (expBtn) {
         expBtn.onclick = () => {
-          // Switch to scales mode and select this key
           const scaleTab = document.querySelector(`.mode-nav-btn[data-mode="scales"]`);
           if (scaleTab) scaleTab.click();
-          const tonicBtn = document.querySelector(`#tonicSelectorRow .tonic-btn[data-tonic="${keyData.key.replace('#', 'Db').replace('F#', 'F#')}"]`);
+          const btnSubScales = document.getElementById("btnSubmodeScales");
+          if (btnSubScales) btnSubScales.click();
+          const tonicTarget = keyData.key === "Gb" ? "F#" : keyData.key;
+          const tonicBtn = document.querySelector(`#tonicSelectorRow .tonic-btn[data-tonic="${tonicTarget}"]`);
           if (tonicBtn) tonicBtn.click();
         };
       }
+    }
+
+    function renderCircleKeySignatureSvg(sigInfo) {
+      const svg = document.getElementById("circleKeySigSvg");
+      if (!svg || !sigInfo) return;
+      svg.innerHTML = "";
+
+      const width = 260;
+      const staffTop = 18;
+      const spacing = 10;
+      const staffBottom = staffTop + 4 * spacing;
+
+      for (let i = 0; i < 5; i++) {
+        const y = staffTop + i * spacing;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", "14");
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", width - 14);
+        line.setAttribute("y2", y);
+        line.setAttribute("stroke", "#64748b");
+        line.setAttribute("stroke-width", "1.2");
+        svg.appendChild(line);
+      }
+
+      const clef = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      clef.setAttribute("x", "20");
+      clef.setAttribute("y", staffBottom - 2);
+      clef.setAttribute("font-size", "42");
+      clef.setAttribute("fill", "#0f172a");
+      clef.setAttribute("class", "clef-text");
+      clef.textContent = "𝄞";
+      svg.appendChild(clef);
+
+      if (!sigInfo.symbols || sigInfo.symbols.length === 0) {
+        const natLbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        natLbl.setAttribute("x", "145");
+        natLbl.setAttribute("y", staffTop + 25);
+        natLbl.setAttribute("font-size", "11");
+        natLbl.setAttribute("font-weight", "700");
+        natLbl.setAttribute("text-anchor", "middle");
+        natLbl.setAttribute("fill", "#475569");
+        natLbl.textContent = "♮ All Natural (White Keys)";
+        svg.appendChild(natLbl);
+        return;
+      }
+
+      sigInfo.symbols.forEach((sym, idx) => {
+        const cx = 66 + idx * 22;
+        const cy = staffBottom - (sym.trebleStep - 2) * (spacing / 2);
+        const acc = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        acc.setAttribute("x", cx);
+        acc.setAttribute("y", cy + 5);
+        acc.setAttribute("font-size", "19");
+        acc.setAttribute("font-weight", "700");
+        acc.setAttribute("fill", sym.symbol === "♯" ? "#0284c7" : "#7c3aed");
+        acc.textContent = sym.symbol;
+        svg.appendChild(acc);
+      });
+    }
+
+    function renderCircleDiatonicChords(family) {
+      const grid = document.getElementById("circleDiatonicChordsGrid");
+      if (!grid || !family || !family.chords) return;
+      grid.innerHTML = "";
+
+      family.chords.forEach(ch => {
+        const card = document.createElement("div");
+        card.className = "diatonic-chord-card";
+        card.title = `Click to play ${ch.chordName} (${ch.pitches.join(" - ")})`;
+        card.innerHTML = `
+          <span class="dc-roman">${ch.roman}</span>
+          <span class="dc-symbol">${ch.symbol}</span>
+          <span class="dc-role">${ch.functionRole.split(" ")[0]}</span>
+        `;
+        card.addEventListener("click", () => {
+          initAudio();
+          document.querySelectorAll(".piano-key").forEach(k => k.classList.remove("active-rh", "active-lh", "active-dyad"));
+          (ch.pitches || []).forEach((p, idx) => {
+            playTone(window.MusicTheory.pitchToFreq(p), 0.75);
+            highlightPlaybackKey(p, idx === 0 ? "rh" : "dyad", 850);
+          });
+        });
+        grid.appendChild(card);
+      });
+    }
+
+    // ==========================================
+    // 7. INTERACTIVE BEGINNER PIANO & THEORY BOOTCAMP
+    // ==========================================
+    let currentBootcampModuleIdx = 0;
+    let isBootcampTaskActive = false;
+    let bootcampFulfilledIndex = 0;
+    let bootcampCompletedIds = new Set();
+
+    function initBeginnerBootcamp() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("piano_bootcamp_progress") || "[]");
+        if (Array.isArray(saved)) saved.forEach(id => bootcampCompletedIds.add(id));
+      } catch (e) {}
+
+      document.getElementById("bootcampDemoBtn")?.addEventListener("click", playBootcampDemo);
+      document.getElementById("bootcampStartTaskBtn")?.addEventListener("click", toggleBootcampTask);
+
+      renderBootcampModule();
+    }
+
+    function renderBootcampModule() {
+      if (!window.MusicTheory || !window.MusicTheory.BEGINNER_BOOTCAMP_MODULES) return;
+      const modules = window.MusicTheory.BEGINNER_BOOTCAMP_MODULES;
+      const mod = modules[currentBootcampModuleIdx] || modules[0];
+      if (!mod) return;
+
+      const badge = document.getElementById("bootcampProgressBadge");
+      if (badge) {
+        badge.textContent = `${bootcampCompletedIds.size} / ${modules.length} Completed`;
+      }
+
+      const tabsRow = document.getElementById("bootcampModuleTabs");
+      if (tabsRow) {
+        tabsRow.innerHTML = "";
+        modules.forEach((m, idx) => {
+          const isDone = bootcampCompletedIds.has(m.id);
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `bootcamp-tab-btn ${idx === currentBootcampModuleIdx ? "active" : ""} ${isDone ? "completed" : ""}`;
+          btn.textContent = `${isDone ? "✓ " : ""}${m.number}. ${m.title.split(":")[0]}`;
+          btn.addEventListener("click", () => {
+            if (isBootcampTaskActive) toggleBootcampTask();
+            currentBootcampModuleIdx = idx;
+            renderBootcampModule();
+          });
+          tabsRow.appendChild(btn);
+        });
+      }
+
+      document.getElementById("bootcampActiveCategory").textContent = `Module ${mod.number} · ${mod.category}`;
+      document.getElementById("bootcampActiveTitle").textContent = mod.title;
+      document.getElementById("bootcampActiveSummary").textContent = mod.summary;
+
+      const stepList = document.getElementById("bootcampStepList");
+      if (stepList) {
+        stepList.innerHTML = "";
+        (mod.steps || []).forEach(s => {
+          const li = document.createElement("li");
+          li.textContent = s;
+          stepList.appendChild(li);
+        });
+      }
+
+      const goalPrompt = document.getElementById("bootcampGoalPrompt");
+      if (goalPrompt) goalPrompt.textContent = mod.interactiveTask.prompt;
+
+      const notesRow = document.getElementById("bootcampTargetNotesRow");
+      if (notesRow) {
+        notesRow.innerHTML = "";
+        (mod.interactiveTask.targetNotes || []).forEach((pitch, idx) => {
+          const chip = document.createElement("span");
+          chip.className = `bootcamp-target-note ${idx < bootcampFulfilledIndex ? "done" : ""}`;
+          chip.id = `bootcamp_target_${idx}`;
+          chip.textContent = pitch;
+          chip.style.cursor = "pointer";
+          chip.title = "Click to audition this note";
+          chip.addEventListener("click", () => {
+            initAudio();
+            playTone(window.MusicTheory.pitchToFreq(pitch), 0.45);
+            highlightPlaybackKey(pitch, "rh", 450);
+          });
+          notesRow.appendChild(chip);
+        });
+      }
+
+      const feedback = document.getElementById("bootcampLiveFeedback");
+      if (feedback && !isBootcampTaskActive) {
+        const isDone = bootcampCompletedIds.has(mod.id);
+        feedback.textContent = isDone
+          ? `✅ Module completed! Click "Try On Keyboard" to practice again or advance to the next lesson.`
+          : `Click "Try On Keyboard" (or press keys below) to complete this lesson!`;
+        feedback.style.color = isDone ? "#34d399" : "#38bdf8";
+      }
+    }
+
+    function playBootcampDemo() {
+      if (!window.MusicTheory || !window.MusicTheory.BEGINNER_BOOTCAMP_MODULES) return;
+      const mod = window.MusicTheory.BEGINNER_BOOTCAMP_MODULES[currentBootcampModuleIdx];
+      if (!mod || !mod.interactiveTask) return;
+      initAudio();
+
+      const targets = mod.interactiveTask.targetNotes || [];
+      let delay = 0;
+      targets.forEach(p => {
+        setTimeout(() => {
+          playTone(window.MusicTheory.pitchToFreq(p), 0.42);
+          highlightPlaybackKey(p, "rh", 380);
+        }, delay);
+        delay += 380;
+      });
+    }
+
+    function toggleBootcampTask() {
+      isBootcampTaskActive = !isBootcampTaskActive;
+      bootcampFulfilledIndex = 0;
+      const btn = document.getElementById("bootcampStartTaskBtn");
+      if (btn) btn.textContent = isBootcampTaskActive ? "■ Stop Task" : "🎯 Try On Keyboard";
+
+      const mod = window.MusicTheory?.BEGINNER_BOOTCAMP_MODULES?.[currentBootcampModuleIdx];
+      renderBootcampModule();
+
+      if (isBootcampTaskActive && mod) {
+        const firstPitch = mod.interactiveTask.targetNotes[0];
+        const feedback = document.getElementById("bootcampLiveFeedback");
+        if (feedback) {
+          feedback.style.color = "#fbbf24";
+          feedback.innerHTML = `🎹 <strong>Live Task Active:</strong> Play <strong>${firstPitch}</strong> on the piano keyboard below!`;
+        }
+        highlightPlaybackKey(firstPitch, "rh", 1200);
+      }
+    }
+
+    function verifyBootcampNoteInput(pitchName) {
+      if (!isBootcampTaskActive || !window.MusicTheory) return;
+      const modules = window.MusicTheory.BEGINNER_BOOTCAMP_MODULES;
+      const mod = modules[currentBootcampModuleIdx];
+      if (!mod || !mod.interactiveTask) return;
+
+      const targets = mod.interactiveTask.targetNotes || [];
+      const expectedPitch = targets[bootcampFulfilledIndex];
+      if (!expectedPitch) return;
+
+      playTone(window.MusicTheory.pitchToFreq(pitchName), 0.35);
+      const isMatch = (pitchName === expectedPitch) || window.MusicTheory.areEnharmonicEquivalent(pitchName, expectedPitch);
+      const feedback = document.getElementById("bootcampLiveFeedback");
+
+      if (isMatch) {
+        const chip = document.getElementById(`bootcamp_target_${bootcampFulfilledIndex}`);
+        if (chip) chip.classList.add("done");
+        bootcampFulfilledIndex++;
+
+        if (bootcampFulfilledIndex >= targets.length) {
+          bootcampCompletedIds.add(mod.id);
+          try {
+            localStorage.setItem("piano_bootcamp_progress", JSON.stringify(Array.from(bootcampCompletedIds)));
+          } catch (e) {}
+          isBootcampTaskActive = false;
+          const btn = document.getElementById("bootcampStartTaskBtn");
+          if (btn) btn.textContent = "🎯 Try On Keyboard";
+          renderBootcampModule();
+          if (feedback) {
+            feedback.style.color = "#34d399";
+            feedback.innerHTML = `🎉 <strong>${mod.interactiveTask.successMessage}</strong>`;
+          }
+        } else {
+          const nextPitch = targets[bootcampFulfilledIndex];
+          if (feedback) {
+            feedback.style.color = "#38bdf8";
+            feedback.innerHTML = `✅ Great! Now play <strong>${nextPitch}</strong> (${bootcampFulfilledIndex}/${targets.length})!`;
+          }
+          highlightPlaybackKey(nextPitch, "rh", 900);
+        }
+      } else if (feedback) {
+        feedback.style.color = "#f87171";
+        feedback.innerHTML = `❌ You played <strong>${pitchName}</strong> — look for <strong>${expectedPitch}</strong> on the keyboard!`;
+      }
+    }
+
+    function initInteractiveTheoryCards() {
+      // 1. Notes / Interval demo buttons
+      document.querySelectorAll(".interactive-theory-btn[data-demo-notes]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const raw = btn.dataset.demoNotes || "";
+          const notes = raw.split(",").map(s => s.trim()).filter(Boolean);
+          if (!notes.length || !window.MusicTheory) return;
+          initAudio();
+          let delay = 0;
+          notes.forEach((p, idx) => {
+            setTimeout(() => {
+              playTone(window.MusicTheory.pitchToFreq(p), 0.45);
+              highlightPlaybackKey(p, idx === 0 ? "rh" : "dyad", 450);
+            }, delay);
+            delay += 380;
+          });
+        });
+      });
+
+      // 2. Chord quality / inversion demo buttons
+      document.querySelectorAll(".interactive-theory-btn[data-demo-chord]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const parts = (btn.dataset.demoChord || "").split(":");
+          if (parts.length < 2 || !window.MusicTheory) return;
+          const root = parts[0];
+          const type = parts[1];
+          const inv = parseInt(parts[2] || "0", 10);
+          const chord = window.MusicTheory.generateChord(root, type, 4, inv);
+          if (!chord) return;
+          initAudio();
+          chord.pitches.forEach((p, idx) => {
+            playTone(window.MusicTheory.pitchToFreq(p), 0.85);
+            highlightPlaybackKey(p, idx === 0 ? "rh" : "dyad", 850);
+          });
+        });
+      });
+
+      // 3. Rhythm value demo buttons
+      document.querySelectorAll(".interactive-theory-btn[data-demo-rhythm]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const type = btn.dataset.demoRhythm;
+          if (!window.MusicTheory) return;
+          initAudio();
+          const beatMs = 600; // 100 BPM = 600ms per beat
+          // Play 4 reference metronome clicks
+          for (let b = 0; b < 4; b++) {
+            setTimeout(() => {
+              if (audioCtx && window.MusicTheory.synthesizeMetronomeClick) {
+                window.MusicTheory.synthesizeMetronomeClick(audioCtx, masterGainNode || audioCtx.destination, audioCtx.currentTime, b === 0 ? "downbeat" : "beat", currentMetroSound, 0.7);
+              }
+            }, b * beatMs);
+          }
+          // Play note pattern over the 4 beats
+          const schedules = {
+            whole: [{ offset: 0, dur: 2.2 }],
+            half: [{ offset: 0, dur: 1.05 }, { offset: 2 * beatMs, dur: 1.05 }],
+            quarter: [0, 1, 2, 3].map(i => ({ offset: i * beatMs, dur: 0.48 })),
+            eighth: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5].map(i => ({ offset: i * beatMs, dur: 0.22 }))
+          };
+          (schedules[type] || schedules.quarter).forEach(ev => {
+            setTimeout(() => {
+              playTone(window.MusicTheory.pitchToFreq("C4"), ev.dur);
+              highlightPlaybackKey("C4", "rh", ev.dur * 900);
+            }, ev.offset);
+          });
+        });
+      });
     }
 
     // Boot up
@@ -10502,6 +11808,8 @@
     initEarTrainingModule();
     initScalesModule();
     initRhythmModule();
+    initBeginnerBootcamp();
+    initInteractiveTheoryCards();
     renderCircleOfFifthsSvg();
   </script>
 </body>
