@@ -42,75 +42,123 @@
     12: "Octave"
   };
 
+  const INTERVAL_PEDAGOGY = {
+    0: { semitones: 0, name: "Unison", shortName: "P1", consonance: "Perfect Consonance", feeling: "Identical pitch anchor", songAsc: "Same Note Repeated (One Note Samba)", songDesc: "Same Note Repeated", mnemonicAsc: "Same Note Repeated (One Note Samba)", mnemonicDesc: "Same Note Repeated", example: ["C4", "C4"] },
+    1: { semitones: 1, name: "Minor 2nd (Half Step)", shortName: "m2", consonance: "Sharp Dissonance", feeling: "Tense, suspenseful, adjacent keys", songAsc: "Jaws Theme / Pink Panther", songDesc: "Für Elise (Opening E–D♯)", mnemonicAsc: "Jaws Theme / Pink Panther", mnemonicDesc: "Für Elise (Opening E–D♯)", example: ["E4", "F4"] },
+    2: { semitones: 2, name: "Major 2nd (Whole Step)", shortName: "M2", consonance: "Mild Dissonance", feeling: "Stepping forward along a scale", songAsc: "Happy Birthday / Silent Night", songDesc: "Mary Had a Little Lamb (E–D)", mnemonicAsc: "Happy Birthday / Silent Night", mnemonicDesc: "Mary Had a Little Lamb (E–D)", example: ["C4", "D4"] },
+    3: { semitones: 3, name: "Minor 3rd", shortName: "m3", consonance: "Imperfect Consonance", feeling: "Melancholic, soulful, minor triad core", songAsc: "Greensleeves / Brahms Lullaby", songDesc: "Hey Jude (Opening)", mnemonicAsc: "Greensleeves / Brahms Lullaby", mnemonicDesc: "Hey Jude (Opening)", example: ["A4", "C5"] },
+    4: { semitones: 4, name: "Major 3rd", shortName: "M3", consonance: "Imperfect Consonance", feeling: "Bright, warm, joyful major triad core", songAsc: "When the Saints Go Marching In / Oh When the Saints", songDesc: "Swing Low, Sweet Chariot / Beethoven 5th", mnemonicAsc: "When the Saints Go Marching In / Oh When the Saints", mnemonicDesc: "Swing Low, Sweet Chariot / Beethoven 5th", example: ["C4", "E4"] },
+    5: { semitones: 5, name: "Perfect 4th", shortName: "P4", consonance: "Perfect Consonance", feeling: "Heraldic, open, suspended anticipation", songAsc: "Here Comes the Bride / Amazing Grace", songDesc: "O Come, All Ye Faithful", mnemonicAsc: "Here Comes the Bride / Amazing Grace", mnemonicDesc: "O Come, All Ye Faithful", example: ["C4", "F4"] },
+    6: { semitones: 6, name: "Tritone (Dim 5th / Aug 4th)", shortName: "TT", consonance: "Restless Dissonance", feeling: "Unstable, dramatic, splits octave in half", songAsc: "The Simpsons / Maria (West Side Story)", songDesc: "YYZ (Rush)", mnemonicAsc: "The Simpsons / Maria (West Side Story)", mnemonicDesc: "YYZ (Rush)", example: ["C4", "F#4"] },
+    7: { semitones: 7, name: "Perfect 5th", shortName: "P5", consonance: "Perfect Consonance", feeling: "Powerful, heroic, rock-solid harmonic pillar", songAsc: "Twinkle, Twinkle, Little Star / Star Wars Theme", songDesc: "Flintstones Theme", mnemonicAsc: "Twinkle, Twinkle, Little Star / Star Wars Theme", mnemonicDesc: "Flintstones Theme", example: ["C4", "G4"] },
+    8: { semitones: 8, name: "Minor 6th", shortName: "m6", consonance: "Imperfect Consonance", feeling: "Bittersweet, romantic, yearning leap", songAsc: "The Entertainer (Main Leap)", songDesc: "Love Story Theme", mnemonicAsc: "The Entertainer (Main Leap)", mnemonicDesc: "Love Story Theme", example: ["E4", "C5"] },
+    9: { semitones: 9, name: "Major 6th", shortName: "M6", consonance: "Imperfect Consonance", feeling: "Lyrical, pastoral, open warmth", songAsc: "My Bonnie Lies Over the Ocean / NBC Chimes", songDesc: "Nobody Knows the Trouble I've Seen", mnemonicAsc: "My Bonnie Lies Over the Ocean / NBC Chimes", mnemonicDesc: "Nobody Knows the Trouble I've Seen", example: ["C4", "A4"] },
+    10: { semitones: 10, name: "Minor 7th", shortName: "m7", consonance: "Mild Dissonance", feeling: "Bluesy, jazzy dominant tension", songAsc: "Star Trek Original Theme / Somewhere", songDesc: "Watermelon Man", mnemonicAsc: "Star Trek Original Theme / Somewhere", mnemonicDesc: "Watermelon Man", example: ["C4", "Bb4"] },
+    11: { semitones: 11, name: "Major 7th", shortName: "M7", consonance: "Sharp Dissonance", feeling: "Dreamy jazz shimmer pulling up to the octave", songAsc: "Take On Me (Chorus Leap)", songDesc: "I Love You (Cole Porter)", mnemonicAsc: "Take On Me (Chorus Leap)", mnemonicDesc: "I Love You (Cole Porter)", example: ["C4", "B4"] },
+    12: { semitones: 12, name: "Octave", shortName: "P8", consonance: "Perfect Consonance", feeling: "Complete register doubling, soaring fullness", songAsc: "Somewhere Over the Rainbow", songDesc: "Singing in the Rain", mnemonicAsc: "Somewhere Over the Rainbow", mnemonicDesc: "Singing in the Rain", example: ["C4", "C5"] }
+  };
+
   const SCALE_FORMULAS = {
     major: {
       name: "Major (Ionian)",
       intervals: [0, 2, 4, 5, 7, 9, 11, 12],
-      description: "Bright and uplifting; the bedrock foundation of Western music harmony.",
+      stepFormula: "W - W - H - W - W - W - H",
+      degrees: ["1", "2", "3", "4", "5", "6", "7", "8"],
+      solfege: ["Do", "Re", "Mi", "Fa", "Sol", "La", "Ti", "Do"],
+      harmonicRoles: ["Tonic (Home)", "Supertonic", "Mediant", "Subdominant", "Dominant", "Submediant", "Leading Tone", "Octave Tonic"],
+      description: "Bright and uplifting; the bedrock foundation of Western music harmony. Built with Whole steps except between degrees 3–4 (Mi–Fa) and 7–8 (Ti–Do).",
       rhFinger: [1, 2, 3, 1, 2, 3, 4, 5],
       lhFinger: [5, 4, 3, 2, 1, 3, 2, 1]
     },
     natural_minor: {
       name: "Natural Minor (Aeolian)",
       intervals: [0, 2, 3, 5, 7, 8, 10, 12],
-      description: "Somber, melancholic, and introspective mood.",
+      stepFormula: "W - H - W - W - H - W - W",
+      degrees: ["1", "2", "♭3", "4", "5", "♭6", "♭7", "8"],
+      solfege: ["Do", "Re", "Me", "Fa", "Sol", "Le", "Te", "Do"],
+      harmonicRoles: ["Tonic (Home)", "Supertonic", "Minor Mediant", "Subdominant", "Dominant", "Submediant", "Subtonic", "Octave Tonic"],
+      description: "Somber, melancholic, and introspective mood. Lowering the 3rd, 6th, and 7th degrees creates dark emotional depth.",
       rhFinger: [1, 2, 3, 1, 2, 3, 4, 5],
       lhFinger: [5, 4, 3, 2, 1, 3, 2, 1]
     },
     harmonic_minor: {
       name: "Harmonic Minor",
       intervals: [0, 2, 3, 5, 7, 8, 11, 12],
-      description: "Distinctive augmented 2nd skip (flat 6 to natural 7) giving classical tension.",
+      stepFormula: "W - H - W - W - H - W+H - H",
+      degrees: ["1", "2", "♭3", "4", "5", "♭6", "7", "8"],
+      solfege: ["Do", "Re", "Me", "Fa", "Sol", "Le", "Ti", "Do"],
+      harmonicRoles: ["Tonic (Home)", "Supertonic", "Minor Mediant", "Subdominant", "Dominant", "Submediant", "Leading Tone (Raised 7th)", "Octave Tonic"],
+      description: "Distinctive 1.5-step (3 semitones) skip between ♭6 and natural 7, creating a strong Leading Tone that pulls into the minor tonic.",
       rhFinger: [1, 2, 3, 1, 2, 3, 4, 5],
       lhFinger: [5, 4, 3, 2, 1, 3, 2, 1]
     },
     major_pentatonic: {
       name: "Major Pentatonic",
       intervals: [0, 2, 4, 7, 9, 12],
-      description: "5-note scale without half steps; melodious, folk, gospel, and country staple.",
+      stepFormula: "W - W - m3 - W - m3",
+      degrees: ["1", "2", "3", "5", "6", "8"],
+      solfege: ["Do", "Re", "Mi", "Sol", "La", "Do"],
+      harmonicRoles: ["Tonic", "Supertonic", "Mediant", "Dominant", "Submediant", "Octave"],
+      description: "5-note scale omitting the tense half-steps (degrees 4 and 7); impossible to play a 'wrong' note—folk, gospel, and country staple.",
       rhFinger: [1, 2, 3, 1, 2, 3],
       lhFinger: [5, 4, 3, 2, 1, 1]
     },
     minor_pentatonic: {
       name: "Minor Pentatonic",
       intervals: [0, 3, 5, 7, 10, 12],
-      description: "Essential rock, blues, and pop soloing framework.",
+      stepFormula: "m3 - W - W - m3 - W",
+      degrees: ["1", "♭3", "4", "5", "♭7", "8"],
+      solfege: ["Do", "Me", "Fa", "Sol", "Te", "Do"],
+      harmonicRoles: ["Tonic", "Minor 3rd", "Subdominant", "Dominant", "Flat 7th", "Octave"],
+      description: "Essential rock, blues, and pop improvisation framework using 5 soulful notes.",
       rhFinger: [1, 2, 3, 4, 5, 5],
       lhFinger: [5, 4, 3, 2, 1, 1]
     },
     blues: {
       name: "Blues Scale",
       intervals: [0, 3, 5, 6, 7, 10, 12],
-      description: "Minor pentatonic with the expressive chromatic 'blue note' (flat 5th).",
-      rhFinger: [1, 2, 3, 4, 4, 5, 5],
-      lhFinger: [5, 4, 3, 2, 2, 1, 1]
+      stepFormula: "m3 - W - H - H - m3 - W",
+      degrees: ["1", "♭3", "4", "♭5", "5", "♭7", "8"],
+      solfege: ["Do", "Me", "Fa", "Fi/Se", "Sol", "Te", "Do"],
+      harmonicRoles: ["Tonic", "Minor 3rd", "Subdominant", "Blue Note (♭5)", "Dominant", "Flat 7th", "Octave"],
+      description: "Minor pentatonic injected with the expressive chromatic 'blue note' (♭5 / tritone) for soulful tension and release.",
+      rhFinger: [1, 2, 3, 4, 1, 2, 3],
+      lhFinger: [5, 4, 3, 2, 1, 3, 1]
     },
     dorian: {
       name: "Dorian Mode",
       intervals: [0, 2, 3, 5, 7, 9, 10, 12],
-      description: "Minor scale with a raised 6th degree; hallmark of medieval folk and modal jazz.",
+      stepFormula: "W - H - W - W - W - H - W",
+      degrees: ["1", "2", "♭3", "4", "5", "6", "♭7", "8"],
+      solfege: ["Do", "Re", "Me", "Fa", "Sol", "La", "Te", "Do"],
+      harmonicRoles: ["Tonic", "Supertonic", "Minor 3rd", "Subdominant", "Dominant", "Raised 6th (Dorian Color)", "Subtonic", "Octave"],
+      description: "Minor scale with a bright raised 6th degree; hallmark of Scarborough Fair, Celtic folk, funk, and modal jazz.",
       rhFinger: [1, 2, 3, 1, 2, 3, 4, 5],
       lhFinger: [5, 4, 3, 2, 1, 3, 2, 1]
     },
     mixolydian: {
       name: "Mixolydian Mode",
       intervals: [0, 2, 4, 5, 7, 9, 10, 12],
-      description: "Major scale with a lowered flat-7th; staple of rock, blues and Celtic tunes.",
+      stepFormula: "W - W - H - W - W - H - W",
+      degrees: ["1", "2", "3", "4", "5", "6", "♭7", "8"],
+      solfege: ["Do", "Re", "Mi", "Fa", "Sol", "La", "Te", "Do"],
+      harmonicRoles: ["Tonic", "Supertonic", "Major 3rd", "Subdominant", "Dominant", "Submediant", "Bluesy Flat 7th", "Octave"],
+      description: "Major scale with a lowered ♭7th degree; staple of classic rock, blues-rock, and upbeat folk tunes.",
       rhFinger: [1, 2, 3, 1, 2, 3, 4, 5],
       lhFinger: [5, 4, 3, 2, 1, 3, 2, 1]
     }
   };
 
   const CHORD_TYPES = {
-    "major": { name: "Major", intervals: [0, 4, 7], symbol: "" },
-    "minor": { name: "Minor", intervals: [0, 3, 7], symbol: "m" },
-    "diminished": { name: "Diminished", intervals: [0, 3, 6], symbol: "dim" },
-    "augmented": { name: "Augmented", intervals: [0, 4, 8], symbol: "aug" },
-    "sus4": { name: "Suspended 4th", intervals: [0, 5, 7], symbol: "sus4" },
-    "sus2": { name: "Suspended 2nd", intervals: [0, 2, 7], symbol: "sus2" },
-    "dom7": { name: "Dominant 7th", intervals: [0, 4, 7, 10], symbol: "7" },
-    "maj7": { name: "Major 7th", intervals: [0, 4, 7, 11], symbol: "maj7" },
-    "min7": { name: "Minor 7th", intervals: [0, 3, 7, 10], symbol: "m7" }
+    "major": { name: "Major Triad", intervals: [0, 4, 7], symbol: "", recipe: "Root (0) + Major 3rd (+4 st) + Perfect 5th (+7 st)", stepMath: "4 half-steps + 3 half-steps", mood: "Bright, happy, confident, and resolved", rhFingers: [[1, 3, 5], [1, 2, 5], [1, 3, 5]], lhFingers: [[5, 3, 1], [5, 3, 1], [5, 2, 1]] },
+    "minor": { name: "Minor Triad", intervals: [0, 3, 7], symbol: "m", recipe: "Root (0) + Minor 3rd (+3 st) + Perfect 5th (+7 st)", stepMath: "3 half-steps + 4 half-steps", mood: "Thoughtful, melancholic, and emotional", rhFingers: [[1, 3, 5], [1, 2, 5], [1, 3, 5]], lhFingers: [[5, 3, 1], [5, 3, 1], [5, 2, 1]] },
+    "diminished": { name: "Diminished Triad", intervals: [0, 3, 6], symbol: "dim", recipe: "Root (0) + Minor 3rd (+3 st) + Diminished 5th (+6 st)", stepMath: "3 half-steps + 3 half-steps (stacked minor 3rds)", mood: "Suspenseful, unstable leading-tone tension", rhFingers: [[1, 3, 5], [1, 2, 5], [1, 3, 5]], lhFingers: [[5, 3, 1], [5, 3, 1], [5, 2, 1]] },
+    "augmented": { name: "Augmented Triad", intervals: [0, 4, 8], symbol: "aug", recipe: "Root (0) + Major 3rd (+4 st) + Augmented 5th (+8 st)", stepMath: "4 half-steps + 4 half-steps (stacked major 3rds)", mood: "Dreamlike, mysterious, floating", rhFingers: [[1, 3, 5], [1, 2, 5], [1, 3, 5]], lhFingers: [[5, 3, 1], [5, 3, 1], [5, 2, 1]] },
+    "sus4": { name: "Suspended 4th", intervals: [0, 5, 7], symbol: "sus4", recipe: "Root (0) + Perfect 4th (+5 st) + Perfect 5th (+7 st)", stepMath: "5 half-steps + 2 half-steps (replaces 3rd with 4th)", mood: "Open, floating, wants to resolve down to the 3rd", rhFingers: [[1, 4, 5], [1, 2, 5], [1, 3, 5]], lhFingers: [[5, 2, 1], [5, 3, 1], [5, 2, 1]] },
+    "sus2": { name: "Suspended 2nd", intervals: [0, 2, 7], symbol: "sus2", recipe: "Root (0) + Major 2nd (+2 st) + Perfect 5th (+7 st)", stepMath: "2 half-steps + 5 half-steps (replaces 3rd with 2nd)", mood: "Modern, airy, cinematic openness", rhFingers: [[1, 2, 5], [1, 4, 5], [1, 2, 5]], lhFingers: [[5, 4, 1], [5, 2, 1], [5, 3, 1]] },
+    "dom7": { name: "Dominant 7th", intervals: [0, 4, 7, 10], symbol: "7", recipe: "Major Triad (0, 4, 7) + Minor 7th (+10 st)", stepMath: "4 + 3 + 3 half-steps", mood: "Bluesy & classical V7 magnet pulling strongly home to I", rhFingers: [[1, 2, 3, 5], [1, 2, 4, 5], [1, 2, 3, 5], [1, 2, 4, 5]], lhFingers: [[5, 3, 2, 1], [5, 3, 2, 1], [5, 3, 2, 1], [5, 4, 2, 1]] },
+    "maj7": { name: "Major 7th", intervals: [0, 4, 7, 11], symbol: "maj7", recipe: "Major Triad (0, 4, 7) + Major 7th (+11 st)", stepMath: "4 + 3 + 4 half-steps", mood: "Lush, warm, jazz & lo-fi sophistication", rhFingers: [[1, 2, 3, 5], [1, 2, 4, 5], [1, 2, 3, 5], [1, 2, 4, 5]], lhFingers: [[5, 3, 2, 1], [5, 3, 2, 1], [5, 3, 2, 1], [5, 4, 2, 1]] },
+    "min7": { name: "Minor 7th", intervals: [0, 3, 7, 10], symbol: "m7", recipe: "Minor Triad (0, 3, 7) + Minor 7th (+10 st)", stepMath: "3 + 4 + 3 half-steps", mood: "Smooth, soulful, R&B and jazz ii7 staple", rhFingers: [[1, 2, 3, 5], [1, 2, 4, 5], [1, 2, 3, 5], [1, 2, 4, 5]], lhFingers: [[5, 3, 2, 1], [5, 3, 2, 1], [5, 3, 2, 1], [5, 4, 2, 1]] }
   };
 
   // Diatonic letter steps for staff geometry
@@ -236,6 +284,9 @@
       ? (isMinorFamily ? MINOR_SCALE_FINGERINGS[rootPitch] : MAJOR_SCALE_FINGERINGS[rootPitch])
       : null;
 
+    const rhArr = keyFingers ? keyFingers.rh : formula.rhFinger;
+    const lhArr = keyFingers ? keyFingers.lh : formula.lhFinger;
+
     const notes = formula.intervals.map((interval, idx) => {
       const noteMidi = baseMidi + interval;
       let pitch;
@@ -245,13 +296,39 @@
       } else {
         pitch = midiToPitch(noteMidi, useFlat);
       }
+
+      const rhF = rhArr[idx] || 1;
+      const lhF = lhArr[idx] || 5;
+      const prevRhF = idx > 0 ? (rhArr[idx - 1] || 1) : null;
+      const prevLhF = idx > 0 ? (lhArr[idx - 1] || 5) : null;
+
+      let rhTransition = null;
+      if (idx > 0 && idx < formula.intervals.length - 1 && rhF === 1 && prevRhF > 1) {
+        rhTransition = `Thumb Tuck (1 under ${prevRhF})`;
+      } else if (idx > 0 && rhF > 1 && prevRhF === 1 && (rhF - prevRhF > 1)) {
+        rhTransition = `Finger Cross (${rhF} over 1)`;
+      }
+
+      let lhTransition = null;
+      if (idx > 0 && idx < formula.intervals.length - 1 && prevLhF === 1 && lhF > 1) {
+        lhTransition = `Finger Cross (${lhF} over 1)`;
+      } else if (idx > 0 && lhF === 1 && prevLhF > 2) {
+        lhTransition = `Thumb Tuck (1 under ${prevLhF})`;
+      }
+
       return {
         step: idx + 1,
+        degree: (formula.degrees && formula.degrees[idx]) ? formula.degrees[idx] : String(idx + 1),
+        solfege: (formula.solfege && formula.solfege[idx]) ? formula.solfege[idx] : "",
+        harmonicRole: (formula.harmonicRoles && formula.harmonicRoles[idx]) ? formula.harmonicRoles[idx] : "",
+        semitonesFromRoot: interval,
         midi: noteMidi,
         pitch: pitch,
         freq: midiToFreq(noteMidi),
-        rhFinger: keyFingers ? keyFingers.rh[idx] : (formula.rhFinger[idx] || 1),
-        lhFinger: keyFingers ? keyFingers.lh[idx] : (formula.lhFinger[idx] || 5)
+        rhFinger: rhF,
+        lhFinger: lhF,
+        rhTransition: rhTransition,
+        lhTransition: lhTransition
       };
     });
 
@@ -259,8 +336,23 @@
       root: rootPitch,
       scaleType: scaleType,
       name: `${rootPitch} ${formula.name}`,
+      stepFormula: formula.stepFormula || "W - W - H - W - W - W - H",
       description: formula.description,
       notes: notes
+    };
+  }
+
+  function getScalePedagogyInfo(rootPitch = "C", scaleType = "major", octave = 4) {
+    const scale = generateScale(rootPitch, scaleType, octave);
+    if (!scale) return null;
+    const rhTucks = scale.notes.filter(n => n.rhTransition).map(n => ({ pitch: n.pitch, step: n.step, label: n.rhTransition }));
+    const lhCrosses = scale.notes.filter(n => n.lhTransition).map(n => ({ pitch: n.pitch, step: n.step, label: n.lhTransition }));
+    return {
+      ...scale,
+      rhTransitions: rhTucks,
+      lhTransitions: lhCrosses,
+      thumbTucksRH: rhTucks,
+      fingerCrossesLH: lhCrosses
     };
   }
 
@@ -270,7 +362,7 @@
     const typeDef = CHORD_TYPES[chordType] || CHORD_TYPES.major;
 
     const baseMidi = (octave + 1) * 12 + rootSemi;
-    const useFlat = rootPitch.includes("b") || ["F", "Bb", "Eb", "Ab"].includes(rootPitch);
+    const useFlat = rootPitch.includes("b") || ["F", "Bb", "Eb", "Ab", "Db"].includes(rootPitch);
 
     let midiNotes = typeDef.intervals.map(intVal => baseMidi + intVal);
 
@@ -287,15 +379,81 @@
     if (inversion === 2) invLabel = "2nd Inversion";
     if (inversion === 3) invLabel = "3rd Inversion";
 
+    const invIdx = Math.min(inversion, (typeDef.rhFingers ? typeDef.rhFingers.length - 1 : 0));
+    const rhFingers = typeDef.rhFingers ? typeDef.rhFingers[invIdx] : [1, 3, 5];
+    const lhFingers = typeDef.lhFingers ? typeDef.lhFingers[invIdx] : [5, 3, 1];
+
     return {
       root: rootPitch,
       chordType: chordType,
+      typeName: typeDef.name,
+      symbol: `${rootPitch}${typeDef.symbol}`,
       fullName: `${rootPitch}${typeDef.symbol} (${invLabel})`,
       inversion: inversion,
       inversionLabel: invLabel,
       midiNotes: midiNotes,
       pitches: pitchArray,
-      freqs: midiNotes.map(midiToFreq)
+      freqs: midiNotes.map(midiToFreq),
+      intervals: typeDef.intervals,
+      recipe: typeDef.recipe || "",
+      stepMath: typeDef.stepMath || "",
+      mood: typeDef.mood || "",
+      rhFingers: rhFingers,
+      lhFingers: lhFingers
+    };
+  }
+
+  function getChordConstructionRecipe(rootPitch = "C", chordType = "major", octaveOrInv = 4, invOrOctave = 0) {
+    const isThirdArgOctave = octaveOrInv >= 3 && invOrOctave <= 3;
+    const octave = isThirdArgOctave ? octaveOrInv : invOrOctave;
+    const inversion = isThirdArgOctave ? invOrOctave : octaveOrInv;
+
+    const chord = generateChord(rootPitch, chordType, octave, inversion);
+    if (!chord) return null;
+    const lhBassOct = (NOTE_OFFSETS[rootPitch] || 0) < 5 ? 3 : 2;
+    const lhBassPitch = `${rootPitch}${lhBassOct}`;
+    const roleLabelsByType = {
+      major: ["Root (1)", "Major 3rd (3)", "Perfect 5th (5)"],
+      minor: ["Root (1)", "Minor 3rd (♭3)", "Perfect 5th (5)"],
+      diminished: ["Root (1)", "Minor 3rd (♭3)", "Dim 5th (♭5)"],
+      augmented: ["Root (1)", "Major 3rd (3)", "Aug 5th (♯5)"],
+      sus2: ["Root (1)", "Major 2nd (2)", "Perfect 5th (5)"],
+      sus4: ["Root (1)", "Perfect 4th (4)", "Perfect 5th (5)"],
+      dom7: ["Root (1)", "Major 3rd (3)", "Perfect 5th (5)", "Minor 7th (♭7)"],
+      maj7: ["Root (1)", "Major 3rd (3)", "Perfect 5th (5)", "Major 7th (7)"],
+      min7: ["Root (1)", "Minor 3rd (♭3)", "Perfect 5th (5)", "Minor 7th (♭7)"]
+    };
+    const baseRoles = roleLabelsByType[chordType] || roleLabelsByType.major;
+
+    const intervalBreakdown = chord.intervals.map(semi => {
+      const ped = INTERVAL_PEDAGOGY[semi % 12] || { name: `${semi} st`, shortName: `${semi}st` };
+      return { semitones: semi, name: ped.name, shortName: ped.shortName };
+    });
+
+    const tones = chord.pitches.map((pitch, idx) => {
+      const origIdx = (idx + inversion) % chord.intervals.length;
+      const semi = chord.intervals[origIdx];
+      const ped = INTERVAL_PEDAGOGY[semi % 12] || { name: `${semi} st`, shortName: `${semi}st` };
+      return {
+        roleLabel: baseRoles[origIdx] || `Tone ${idx + 1}`,
+        pitch,
+        midi: chord.midiNotes[idx],
+        freq: chord.freqs[idx],
+        semitonesFromRoot: semi,
+        intervalName: ped.name,
+        rhFinger: chord.rhFingers[idx] || 1,
+        lhFinger: chord.lhFingers[idx] || 5
+      };
+    });
+
+    return {
+      ...chord,
+      lhBassPitch,
+      lhBassMidi: pitchToMidi(lhBassPitch),
+      lhBassFreq: pitchToFreq(lhBassPitch),
+      intervalBreakdown,
+      tones,
+      semitoneFormula: chord.intervals.join(" – ")
     };
   }
 
@@ -537,6 +695,7 @@
         .map(i => i.label);
 
       const options = [chosenInterval.label, ...distractors].sort(() => 0.5 - Math.random());
+      const ped = INTERVAL_PEDAGOGY[chosenInterval.semitones] || {};
 
       return {
         type: "interval_recognition",
@@ -545,7 +704,12 @@
         rootMidi: rootMidi,
         targetPitch: midiToPitch(targetMidi),
         targetMidi: targetMidi,
+        semitones: chosenInterval.semitones,
         correctInterval: chosenInterval.label,
+        mnemonicAsc: ped.songAsc || "",
+        mnemonicDesc: ped.songDesc || "",
+        feeling: ped.feeling || "",
+        consonance: ped.consonance || "",
         options: options,
         srsKey: chosenInterval.label,
         srsMastery: getSRSMasteryLevel(chosenInterval.label),
@@ -2329,6 +2493,434 @@
     return { measures, steps };
   }
 
+  // ==========================================
+  // DEEP MUSIC THEORY & BEGINNER PEDAGOGY ENGINE (MILESTONE 36)
+  // ==========================================
+
+  /**
+   * Generates all 7 diatonic chords (I - ii - iii - IV - V - vi - vii° in Major,
+   * or i - ii° - III - iv - V - VI - VII in Minor) with spelled pitches and harmonic functions.
+   */
+  function generateDiatonicChordFamily(keyStr = "C") {
+    const clean = (keyStr || "C").trim();
+    const isMinorKey = clean.endsWith("m") && clean.length > 1;
+    const rootName = isMinorKey ? clean.slice(0, -1) : clean;
+    const scaleType = isMinorKey ? "natural_minor" : "major";
+    const scale = generateScale(rootName, scaleType, 4);
+    if (!scale) return null;
+
+    const majorDefs = [
+      { degree: 1, numeral: "I", quality: "major", suffix: "", fnGroup: "Tonic (Home)", role: "Home base; stable, grounded, where the piece begins and resolves." },
+      { degree: 2, numeral: "ii", quality: "minor", suffix: "m", fnGroup: "Subdominant (Pre-Dominant)", role: "Smooth stepping stone that leads naturally into the V chord." },
+      { degree: 3, numeral: "iii", quality: "minor", suffix: "m", fnGroup: "Tonic Prolongation", role: "Warm, reflective bridge sharing two notes with I and V." },
+      { degree: 4, numeral: "IV", quality: "major", suffix: "", fnGroup: "Subdominant (Departure)", role: "Open, uplifting harmonic lift moving away from home." },
+      { degree: 5, numeral: "V", quality: "major", suffix: "", fnGroup: "Dominant (Tension → I)", role: "Magnetic harmonic tension that pulls strongly back home to I." },
+      { degree: 6, numeral: "vi", quality: "minor", suffix: "m", fnGroup: "Tonic / Relative Minor", role: "The Relative Minor twin! Shares the exact same key signature as I." },
+      { degree: 7, numeral: "vii°", quality: "diminished", suffix: "dim", fnGroup: "Dominant (Leading Tone)", role: "Restless diminished triad built on Ti, urgently resolving up to Do (I)." }
+    ];
+
+    const minorDefs = [
+      { degree: 1, numeral: "i", quality: "minor", suffix: "m", fnGroup: "Tonic (Minor Home)", role: "Somber, expressive minor home base." },
+      { degree: 2, numeral: "ii°", quality: "diminished", suffix: "dim", fnGroup: "Subdominant (Pre-Dominant)", role: "Tense minor pre-dominant preparing the V chord." },
+      { degree: 3, numeral: "III", quality: "major", suffix: "", fnGroup: "Relative Major", role: "Bright Relative Major oasis sharing the same key signature." },
+      { degree: 4, numeral: "iv", quality: "minor", suffix: "m", fnGroup: "Subdominant (Deep Emotion)", role: "Rich, melancholic departure chord." },
+      { degree: 5, numeral: "V", quality: "major", suffix: "", fnGroup: "Dominant (Harmonic Pull)", role: "Classical raised leading-tone dominant pulling back to i." },
+      { degree: 6, numeral: "VI", quality: "major", suffix: "", fnGroup: "Submediant (Heroic Lift)", role: "Cinematic, warm major chord (central to the Andalusian cadence)." },
+      { degree: 7, numeral: "VII", quality: "major", suffix: "", fnGroup: "Subtonic", role: "Bold rock & folk step below the minor tonic." }
+    ];
+
+    const defs = isMinorKey ? minorDefs : majorDefs;
+    const scaleNotes = scale.notes.slice(0, 7); // 7 diatonic degrees
+
+    const chords = defs.map((d, idx) => {
+      const degNote = scaleNotes[idx];
+      const degRoot = degNote.pitch.replace(/[0-9]/g, "");
+      const chordObj = generateChord(degRoot, d.quality, 4, 0);
+      const lhOct = (NOTE_OFFSETS[degRoot] || 0) < 5 ? 3 : 2;
+      const lhPitch = `${degRoot}${lhOct}`;
+      const rhPitches = chordObj ? chordObj.pitches : [degNote.pitch];
+
+      return {
+        degree: d.degree,
+        numeral: d.numeral,
+        roman: d.numeral,
+        root: degRoot,
+        quality: d.quality,
+        symbol: `${degRoot}${d.suffix}`,
+        chordName: `${degRoot} ${d.quality.charAt(0).toUpperCase() + d.quality.slice(1)}`,
+        functionGroup: d.fnGroup,
+        functionRole: d.fnGroup,
+        roleDescription: d.role,
+        lhPitch,
+        rhPitches,
+        pitches: rhPitches,
+        allPitches: [lhPitch, ...rhPitches]
+      };
+    });
+
+    return {
+      key: clean,
+      root: rootName,
+      isMinor: isMinorKey,
+      scaleName: scale.name,
+      chords
+    };
+  }
+
+  /**
+   * Returns standard conservatory staff coordinates for engraving key signatures
+   * (up to 7 sharps F-C-G-D-A-E-B or 7 flats B-E-A-D-G-C-F) on Treble & Bass clefs.
+   */
+  function getKeySignatureStaffInfo(keyStr = "C") {
+    const clean = (keyStr || "C").trim().replace(/m$/, "");
+    const circleEntry = CIRCLE_OF_FIFTHS.find(k => k.key === clean || k.relativeMinor === keyStr) || CIRCLE_OF_FIFTHS[0];
+
+    // Standard conservatory staff placement pitches for key signatures
+    const SHARP_TREBLE_PITCHES = ["F#5", "C#5", "G#5", "D#5", "A#4", "E#5", "B#4"];
+    const SHARP_BASS_PITCHES   = ["F#3", "C#3", "G#3", "D#3", "A#2", "E#3", "B#2"];
+    const FLAT_TREBLE_PITCHES  = ["Bb4", "Eb5", "Ab4", "Db5", "Gb4", "Cb5", "Fb4"];
+    const FLAT_BASS_PITCHES    = ["Bb2", "Eb3", "Ab2", "Db3", "Gb2", "Cb3", "Fb2"];
+
+    const count = circleEntry.sharps > 0 ? circleEntry.sharps : circleEntry.flats;
+    const accType = circleEntry.sharps > 0 ? "sharps" : (circleEntry.flats > 0 ? "flats" : "natural");
+    const glyph = accType === "sharps" ? "♯" : (accType === "flats" ? "♭" : "♮");
+
+    const treblePitches = accType === "sharps"
+      ? SHARP_TREBLE_PITCHES.slice(0, count)
+      : (accType === "flats" ? FLAT_TREBLE_PITCHES.slice(0, count) : []);
+    const bassPitches = accType === "sharps"
+      ? SHARP_BASS_PITCHES.slice(0, count)
+      : (accType === "flats" ? FLAT_BASS_PITCHES.slice(0, count) : []);
+
+    let readingRule = "No sharps or flats! All diatonic notes are white keys (C Major / A Minor).";
+    if (accType === "sharps") {
+      const lastSharp = circleEntry.accidentalsList[circleEntry.accidentalsList.length - 1];
+      readingRule = `Sharp Key Rule: The last sharp is ${lastSharp} (Leading Tone Ti). Raise ${lastSharp} by 1 half-step to find ${circleEntry.key} Major! (Order of Sharps: Father Charles Goes Down And Ends Battle).`;
+    } else if (accType === "flats") {
+      if (count === 1) {
+        readingRule = "Flat Key Rule: 1 Flat (B♭) is always F Major (or D Minor).";
+      } else {
+        const secondToLast = circleEntry.accidentalsList[circleEntry.accidentalsList.length - 2];
+        readingRule = `Flat Key Rule: The second-to-last flat in the signature (${secondToLast}) names the Major key (${circleEntry.key} Major)! (Order of Flats: Battle Ends And Down Goes Charles' Father).`;
+      }
+    }
+
+    const symbols = treblePitches.map((tp, idx) => ({
+      note: circleEntry.accidentalsList[idx] || tp.replace(/[0-9]/g, ""),
+      pitch: tp,
+      symbol: glyph,
+      trebleStep: getDiatonicStep(tp) || 6,
+      bassStep: getDiatonicStep(bassPitches[idx]) || -6
+    }));
+
+    return {
+      key: circleEntry.key,
+      relativeMinor: circleEntry.relativeMinor,
+      accidentalType: accType,
+      glyph,
+      count,
+      accidentalsList: circleEntry.accidentalsList,
+      treblePitches,
+      bassPitches,
+      symbols,
+      readingRule,
+      ruleText: readingRule,
+      tipText: "Every note on these staff lines/spaces (in any octave) is played sharp or flat automatically unless cancelled by a natural (♮)."
+    };
+  }
+
+  /**
+   * 7-Module Interactive Beginner Piano & Music Theory Bootcamp Curriculum.
+   * Each module includes theory concepts, visual takeaways, and a live interactive keyboard task.
+   */
+  const BEGINNER_BOOTCAMP_MODULES = [
+    {
+      id: "module-1-geography",
+      number: 1,
+      title: "Keyboard Geography: The 2 & 3 Black Key Map",
+      subtitle: "Never get lost on the piano again",
+      badge: "🗺️ Orientation",
+      theorySummary: "The piano keyboard looks huge, but it is just a repeating 12-note pattern! Black keys are grouped in alternating sets of 2 Black Keys ('Chopsticks') and 3 Black Keys ('Fork'). The white key immediately to the left of any 2 black keys is ALWAYS C. The white key immediately to the left of any 3 black keys is ALWAYS F.",
+      keyTakeaways: [
+        "Find the 2 Black Keys in the center of your keyboard → the white key to their left is Middle C (C4).",
+        "Find the 3 Black Keys → the white key to their left is F (F4).",
+        "Moving right goes UP in pitch; moving left goes DOWN in pitch."
+      ],
+      taskPrompt: "Interactive Task: Play Low C (C3), then Middle C (C4), then F4, then High C (C5) on the keyboard!",
+      targetSequence: [
+        { pitches: ["C3"], label: "Low C (C3)", hint: "Left of the 2 black keys in the bass octave" },
+        { pitches: ["C4"], label: "Middle C (C4)", hint: "Center anchor! Left of the middle 2 black keys" },
+        { pitches: ["F4"], label: "Treble F (F4)", hint: "Left of the 3 black keys above Middle C" },
+        { pitches: ["C5"], label: "High C (C5)", hint: "One octave above Middle C" }
+      ],
+      recommendedSongs: ["ode-to-joy", "hot-cross-buns", "mary-had-a-little-lamb"]
+    },
+    {
+      id: "module-2-steps",
+      number: 2,
+      title: "Half Steps (Semitones) & Whole Steps (Tones)",
+      subtitle: "The atomic building blocks of scales and chords",
+      badge: "🧬 Intervals",
+      theorySummary: "A Half Step (Semitone) is the shortest distance on the piano: from any key to its immediate neighbor (white or black) with zero keys in between. Most white keys have a black key between them, EXCEPT E–F and B–C, which are natural half steps! A Whole Step (Whole Tone) equals 2 Half Steps (skipping one key in between).",
+      keyTakeaways: [
+        "Sharp (♯) raises a note by 1 Half Step (e.g., F → F♯).",
+        "Flat (♭) lowers a note by 1 Half Step (e.g., B → B♭).",
+        "Natural Half Steps: E to F and B to C have NO black key between them!"
+      ],
+      taskPrompt: "Interactive Task: Play the Half Step C4 → C♯4, then the natural Half Step E4 → F4, then the Whole Step F4 → G4!",
+      targetSequence: [
+        { pitches: ["C4"], label: "C4", hint: "Start on Middle C" },
+        { pitches: ["C#4"], label: "C♯4 (Half Step Up)", hint: "The black key immediately to the right of C4" },
+        { pitches: ["E4"], label: "E4", hint: "White key to the right of the 2 black keys" },
+        { pitches: ["F4"], label: "F4 (Natural Half Step!)", hint: "Notice there is NO black key between E4 and F4" },
+        { pitches: ["G4"], label: "G4 (Whole Step Up)", hint: "Skips over F♯4 (2 half steps from F4)" }
+      ],
+      recommendedSongs: ["fur-elise-motif", "pink-panther", "jaws-theme"]
+    },
+    {
+      id: "module-3-landmarks",
+      number: 3,
+      title: "The Grand Staff Landmark System",
+      subtitle: "Read sheet music 5x faster without counting from the bottom",
+      badge: "🎼 Sight-Reading",
+      theorySummary: "Beginners often struggle because they count every staff line from the bottom ('Every Good Boy...'). Professional pianists use the Landmark System: memorize 3 anchor guideposts and read all other notes by how far they step or skip from the nearest landmark! The 3 anchors are: Bass F (F3) between the two dots of the Bass Clef (𝄢), Middle C (C4) on the center ledger line, and Treble G (G4) inside the curl of the Treble G-Clef (𝄞).",
+      keyTakeaways: [
+        "𝄢 Bass F (F3): Sits on Line 4 right between the two dots of the F-Clef.",
+        "⭐ Middle C (C4): Floats on its own short ledger line between the two staves.",
+        "𝄞 Treble G (G4): Sits on Line 2 right inside the spiral crosshair of the G-Clef."
+      ],
+      taskPrompt: "Interactive Task: Lock in the 3 Grand Staff Landmarks in order: Bass F (F3) → Middle C (C4) → Treble G (G4)!",
+      targetSequence: [
+        { pitches: ["F3"], label: "Bass Landmark F3", hint: "Bass Clef Line 4 (between the 𝄢 dots)" },
+        { pitches: ["C4"], label: "Bridge Landmark Middle C4", hint: "Center ledger line between staves" },
+        { pitches: ["G4"], label: "Treble Landmark G4", hint: "Treble Clef Line 2 (inside the 𝄞 curl)" }
+      ],
+      recommendedSongs: ["au-clair-de-la-lune", "lightly-row", "twinkle-twinkle"]
+    },
+    {
+      id: "module-4-major-scale",
+      number: 4,
+      title: "The Major Scale Recipe (W-W-H-W-W-W-H) & Thumb Tuck",
+      subtitle: "How 8 notes fit smoothly under 5 fingers",
+      badge: "🖐️ Technique",
+      theorySummary: "Every Major scale follows the exact same step formula: Whole – Whole – Half – Whole – Whole – Whole – Half. In C Major, this lands entirely on the white keys (because E–F and B–C are already natural half steps!). To play 8 notes with only 5 fingers, play fingers 1 – 2 – 3 (C – D – E), then smoothly tuck your Thumb (1) under your middle finger to land on F, finishing 1 – 2 – 3 – 4 – 5!",
+      keyTakeaways: [
+        "Formula: W – W – H – W – W – W – H.",
+        "Right Hand Fingering: 1 – 2 – 3 – [Thumb Tuck 1] – 2 – 3 – 4 – 5.",
+        "Keep your wrist level when tucking your thumb—don't pop your elbow out!"
+      ],
+      taskPrompt: "Interactive Task: Play the C Major Scale ascending from C4 to C5, using the Thumb Tuck on F4!",
+      targetSequence: [
+        { pitches: ["C4"], label: "C4 (RH Finger 1 - Thumb)", hint: "Degree 1 (Do)" },
+        { pitches: ["D4"], label: "D4 (RH Finger 2)", hint: "Degree 2 (Re) — Whole step" },
+        { pitches: ["E4"], label: "E4 (RH Finger 3)", hint: "Degree 3 (Mi) — Whole step" },
+        { pitches: ["F4"], label: "F4 (🔄 THUMB TUCK 1!)", hint: "Degree 4 (Fa) — Half step! Tuck thumb under Finger 3" },
+        { pitches: ["G4"], label: "G4 (RH Finger 2)", hint: "Degree 5 (Sol) — Whole step" },
+        { pitches: ["A4"], label: "A4 (RH Finger 3)", hint: "Degree 6 (La) — Whole step" },
+        { pitches: ["B4"], label: "B4 (RH Finger 4)", hint: "Degree 7 (Ti) — Whole step" },
+        { pitches: ["C5"], label: "C5 (RH Finger 5 - Pinky)", hint: "Degree 8 (High Do) — Half step!" }
+      ],
+      recommendedSongs: ["joy-to-the-world", "scales-warmup-c", "minuet-in-g"]
+    },
+    {
+      id: "module-5-intervals",
+      number: 5,
+      title: "Harmonic Intervals: 2nds (Steps), 3rds (Skips) & 5ths",
+      subtitle: "Reading two notes at once by geometric shape",
+      badge: "📐 Harmony",
+      theorySummary: "On sheet music, you don't need to read every note in a chord individually—read the shape! A 2nd (Step) moves from a Line to the adjacent Space. A 3rd (Skip) moves from Line-to-Line or Space-to-Space. A 5th skips over one line/space to land two lines/spaces higher (forming a rock-solid open frame under fingers 1 and 5).",
+      keyTakeaways: [
+        "Major 2nd (C4+D4): Line-to-Space neighbor step.",
+        "Major 3rd (C4+E4): Line-to-Line skip (4 half-steps) — sweet & bright.",
+        "Perfect 5th (C4+G4): Double skip (7 half-steps) — played with Fingers 1 and 5."
+      ],
+      taskPrompt: "Interactive Task: Play the Major 3rd dyad (C4 + E4), then the Perfect 5th dyad (C4 + G4)!",
+      targetSequence: [
+        { pitches: ["C4", "E4"], label: "Major 3rd Dyad (C4 + E4)", hint: "Press C4 (Thumb 1) and E4 (Middle 3) together" },
+        { pitches: ["D4", "F4"], label: "Minor 3rd Dyad (D4 + F4)", hint: "Press D4 (Finger 2) and F4 (Finger 4) together" },
+        { pitches: ["C4", "G4"], label: "Perfect 5th Power Dyad (C4 + G4)", hint: "Press C4 (Thumb 1) and G4 (Pinky 5) together" }
+      ],
+      recommendedSongs: ["ode-to-joy", "lean-on-me", "heart-and-soul"]
+    },
+    {
+      id: "module-6-triads",
+      number: 6,
+      title: "Building Major & Minor Triads (The 4+3 vs 3+4 Rule)",
+      subtitle: "How 1 half-step changes happiness into melancholy",
+      badge: "🎹 Chords",
+      theorySummary: "A Triad is a 3-note chord built by stacking every other scale note (1 – 3 – 5, looking like a 'Snowman' on the staff). The outer shell (Root 1 and Fifth 5) is a Perfect 5th (7 half-steps) in BOTH Major and Minor chords! The middle note (the 3rd) controls the emotion: 4 half-steps from the root creates a bright Major Triad (4 + 3), while 3 half-steps creates a soulful Minor Triad (3 + 4).",
+      keyTakeaways: [
+        "Major Triad Recipe: Root + 4 half-steps (Major 3rd) + 3 half-steps (Perfect 5th).",
+        "Minor Triad Recipe: Lower the middle note by 1 half-step! (Root + 3 + 4).",
+        "Standard Fingering: RH 1 – 3 – 5 | LH 5 – 3 – 1."
+      ],
+      taskPrompt: "Interactive Task: Play a C Major Triad (C4+E4+G4), transform it into C Minor (C4+E♭4+G4), then play A Minor (A3+C4+E4)!",
+      targetSequence: [
+        { pitches: ["C4", "E4", "G4"], label: "C Major Triad (C4 + E4 + G4)", hint: "Bright 4+3 recipe: Thumb on C4, Middle on E4, Pinky on G4" },
+        { pitches: ["C4", "Eb4", "G4"], label: "C Minor Triad (C4 + E♭4 + G4)", hint: "Lower the middle note E4 to the black key E♭4!" },
+        { pitches: ["A3", "C4", "E4"], label: "A Minor Triad (A3 + C4 + E4)", hint: "All white keys starting on A3 — naturally forms the 3+4 minor recipe!" }
+      ],
+      recommendedSongs: ["greensleeves-primer", "scarborough-fair-primer", "house-of-the-rising-sun"]
+    },
+    {
+      id: "module-7-cadences",
+      number: 7,
+      title: "Functional Harmony & The I – IV – V – I Cadence",
+      subtitle: "How chords tell a story of Home, Adventure, and Return",
+      badge: "🏛️ Progression",
+      theorySummary: "In any key, three primary chords carry the entire harmonic story: the Tonic (I) is Home & Rest; the Subdominant (IV) is Adventure & Lift; and the Dominant (V) is Magnetic Tension that wants to resolve back to I. Instead of jumping your whole hand across the keyboard, use Inversions (re-ordering the notes of IV and V) so your fingers barely move!",
+      keyTakeaways: [
+        "I (C Major: C–E–G): Home base.",
+        "IV in 2nd Inversion (F Major: C–F–A): Keep thumb anchored on C4 and move fingers 3 & 5 up 1 key!",
+        "V in 1st Inversion (G Major: B–D–G): Step thumb down to B3 while Pinky stays anchored on G4!"
+      ],
+      taskPrompt: "Interactive Task: Play the smooth voice-led I → IV → V → I cadence in C Major!",
+      targetSequence: [
+        { pitches: ["C4", "E4", "G4"], label: "I — C Major (Root Position: C4+E4+G4)", hint: "Home base: C4 + E4 + G4" },
+        { pitches: ["C4", "F4", "A4"], label: "IV — F Major (2nd Inversion: C4+F4+A4)", hint: "Keep thumb on C4, play F4 + A4 above it!" },
+        { pitches: ["B3", "D4", "G4"], label: "V — G Major (1st Inversion: B3+D4+G4)", hint: "Step thumb 1 key left to B3, play D4 + G4!" },
+        { pitches: ["C4", "E4", "G4"], label: "I — C Major (Resolved Home: C4+E4+G4)", hint: "Return smoothly home to C4 + E4 + G4!" }
+      ],
+      recommendedSongs: ["lean-on-me", "when-the-saints", "canon-in-d"]
+    }
+  ].map(m => ({
+    ...m,
+    category: m.badge,
+    summary: m.theorySummary,
+    steps: m.keyTakeaways,
+    interactiveTask: {
+      prompt: m.taskPrompt,
+      targetNotes: m.targetSequence.flatMap(t => t.pitches),
+      successMessage: `Module ${m.number} Mastered! ${m.subtitle}`
+    }
+  }));
+
+  /**
+   * Automatically inspects any repertoire song and extracts its Music Theory DNA
+   * (Key Signature, Scale Warmup, Hand Range Landmarks, Meter, and Primary Chords).
+   */
+  function analyzeSongTheoryDNA(song) {
+    if (!song) return null;
+
+    let tonic = "C";
+    let isMinor = false;
+
+    if (song.category && song.category.includes("C 5-Finger")) {
+      tonic = "C";
+    } else if (song.id === "canon-in-d") {
+      tonic = "D";
+    } else if (song.id === "bach-minuet-g" || (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5"))) {
+      tonic = "G";
+    } else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-no-1")) {
+      tonic = "D";
+      isMinor = song.id.includes("scarborough");
+    } else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves") || song.id.includes("house-of-the-rising-sun"))) {
+      tonic = "A";
+      isMinor = true;
+    } else if (song.id && song.id.includes("amazing-grace-f")) {
+      tonic = "F";
+    } else {
+      const accs = detectKeyAccidentals(song);
+      if (accs["B"] === "b" && !accs["E"]) tonic = "F";
+      else if (accs["F"] === "#" && !accs["C"]) tonic = "G";
+      else if (accs["F"] === "#" && accs["C"] === "#") tonic = "D";
+    }
+
+    const scaleType = isMinor ? "natural_minor" : "major";
+    const keyLabel = `${tonic} ${isMinor ? "Minor" : "Major"}`;
+    const keySigInfo = getKeySignatureStaffInfo(isMinor ? `${tonic}m` : tonic);
+    const scaleObj = generateScale(tonic, scaleType, 4);
+    const warmupPitches = scaleObj ? scaleObj.notes.slice(0, 5).map(n => n.pitch) : ["C4", "D4", "E4", "F4", "G4"];
+    const fullScalePitches = scaleObj ? scaleObj.notes.map(n => n.pitch) : ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5"];
+
+    // Extract unique harmonic chords across measures
+    const model = buildScoreModel(song, true, true, true, "song", "song");
+    const seenChords = new Map();
+
+    if (model && model.measures) {
+      model.measures.forEach(m => {
+        if (!m || m.length === 0) return;
+        const beat0 = m[0];
+        if (!beat0) return;
+        const pitches = new Set();
+        if (beat0.lh && beat0.lh.pitch && beat0.lh.pitch !== "-") {
+          beat0.lh.pitch.split("+").forEach(p => pitches.add(p));
+        }
+        if (beat0.dyad && beat0.dyad.pitch && beat0.dyad.pitch !== "-") {
+          beat0.dyad.pitch.split("+").forEach(p => pitches.add(p));
+        } else if (beat0.rh && beat0.rh.pitch && beat0.rh.pitch !== "-") {
+          beat0.rh.pitch.split("+").forEach(p => pitches.add(p));
+        }
+        const pitchArr = Array.from(pitches);
+        if (pitchArr.length >= 2) {
+          const info = identifyActiveChord(pitchArr);
+          if (info && info.name && !info.type.includes("Single")) {
+            const numeral = getRomanNumeralAnalysis(info, song) || "";
+            const keyId = info.rootName || info.name.split(" ")[0];
+            if (keyId && !seenChords.has(keyId) && seenChords.size < 5) {
+              const isMin = info.name.includes("Minor") || info.type.includes("Minor");
+              const gen = generateChord(keyId, isMin ? "minor" : "major", 4, 0);
+              const sym = `${keyId}${isMin ? "m" : ""}`;
+              const num = numeral || "I";
+              seenChords.set(keyId, {
+                symbol: sym,
+                name: info.name,
+                numeral: num,
+                label: `${num} (${sym})`,
+                pitches: gen ? gen.pitches : pitchArr
+              });
+            }
+          }
+        }
+      });
+    }
+
+    if (seenChords.size === 0) {
+      const fam = generateDiatonicChordFamily(isMinor ? `${tonic}m` : tonic);
+      if (fam && fam.chords) {
+        [fam.chords[0], fam.chords[3], fam.chords[4]].forEach(c => {
+          if (c) {
+            seenChords.set(c.symbol, {
+              symbol: c.symbol,
+              name: c.chordName,
+              numeral: c.numeral,
+              label: `${c.numeral} (${c.symbol})`,
+              pitches: c.rhPitches
+            });
+          }
+        });
+      }
+    }
+
+    const range = getSongPitchRange(song);
+    const timeSig = parseTimeSignature(song.timeSig || "4/4");
+    const accSummary = keySigInfo.count === 0
+      ? "All Natural"
+      : `${keySigInfo.count} ${keySigInfo.accidentalType === "sharps" ? "♯" : "♭"} (${keySigInfo.accidentalsList.join(", ")})`;
+
+    return {
+      songId: song.id,
+      title: song.title,
+      keyLabel,
+      keySignature: keyLabel,
+      accidentalSummary: accSummary,
+      tonic,
+      isMinor,
+      scaleType,
+      keySigInfo,
+      timeSig,
+      timeSignature: `${timeSig.numerator}/${timeSig.denominator}`,
+      beatsPerMeasure: timeSig.numerator,
+      range,
+      handSpanSummary: `${range.minPitch || "C4"} – ${range.maxPitch || "G4"} (${range.span || 8} keys)`,
+      totalNotes: range.noteCount || fullScalePitches.length,
+      warmupScale: scaleObj,
+      warmupPitches,
+      fullScalePitches,
+      primaryChords: Array.from(seenChords.values())
+    };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -2338,11 +2930,13 @@
     MAJOR_SCALE_FINGERINGS,
     MINOR_SCALE_FINGERINGS,
     INTERVAL_NAMES,
+    INTERVAL_PEDAGOGY,
     SCALE_FORMULAS,
     CHORD_TYPES,
     CIRCLE_OF_FIFTHS,
     FLASHCARD_PRESETS,
     PROGRESSION_TEMPLATES,
+    BEGINNER_BOOTCAMP_MODULES,
     spellPitchOnLetter,
     pitchToMidi,
     midiToPitch,
@@ -2352,7 +2946,12 @@
     diatonicStepToPitch,
     areEnharmonicEquivalent,
     generateScale,
+    getScalePedagogyInfo,
     generateChord,
+    getChordConstructionRecipe,
+    generateDiatonicChordFamily,
+    getKeySignatureStaffInfo,
+    analyzeSongTheoryDNA,
     getInterval,
     getRandomFlashcard,
     generateEarTrainingChallenge,
