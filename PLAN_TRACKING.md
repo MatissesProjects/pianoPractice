@@ -455,6 +455,24 @@
     - [x] Tests 33.1–33.7 verifying modal DOM elements, CSS rules, letter grading logic, anti-reset early return, problem measure loop calculation, script function exports, and Node vm syntax validation.
     - [x] All 13 education suite tests and all 33 score engine tests passing with 100% success (46 total automated tests).
 
+- [x] **Milestone 35: `FIXES.MD` Complete Implementation Audit & Deep Codebase Cleanup**
+  - [x] **Part 1.1 Fix — Un-Nested Global MIDI & Audio Deck (`index.html`)**:
+    - [x] Moved `<div class="midi-deck" id="globalMidiDeck">` outside `#panelRepertoire` directly beneath `<nav class="edu-mode-nav">` so Web MIDI In, MIDI Out, 16-Channel Activity Selector, Hardware Audio Output, and Synth Audio toggle remain visible and accessible across all 6 educational modes.
+  - [x] **Part 1.3 Fix — Unified Score Engine & Theory Deduplication (`theory.js`, `index.html`, `tests/test_score_engine.js`)**:
+    - [x] Exported `parseToken`, `getRomanNumeralAnalysis`, and `buildScoreModel` directly from `theory.js` (`window.MusicTheory`).
+    - [x] Destructured `parseToken`, `getRomanNumeralAnalysis`, and `buildScoreModel` in `index.html` and `tests/test_score_engine.js`, removing ~660 lines of duplicate inline code across the repository.
+    - [x] Wrapped `songs.js` in a universal UMD wrapper supporting both browser globals (`window.songDatabase`) and Node.js CommonJS (`module.exports`).
+  - [x] **Part 2.2 Fix — Velocity-Sensitive Electric Piano `playTone()` & Damper Pedal Badge (`index.html`)**:
+    - [x] Upgraded `playTone(freq, duration = 0.35, velocity = 90)` from a single raw `sine` wave to the dual-oscillator Electric Piano synthesizer (`triangle` fundamental + `sine` 2nd harmonic overtone + dynamic velocity-scaled `lowpass` BiquadFilter envelope).
+    - [x] Added `#sustainPedalBadge` (`🦶 Damper: OFF / ON`) in `.sustain-header` and `updateSustainPedalUI()`, wired to both MIDI `CC 64` damper messages and interactive click-to-toggle.
+  - [x] **Part 2.6 Fix — Adaptive Spaced-Repetition (SRS) for Ear Training (`theory.js`, `index.html`)**:
+    - [x] Added `pickSRSWeightedItem` and upgraded `generateEarTrainingChallenge(type, useSRS = true)` in `theory.js` so all 3 Ear Training submodes (`pitch_match`, `interval_recognition`, `chord_quality`) weight candidate pitches/intervals/chords by `getSRSMasteryLevel` (`3.5x` weight for `needs_practice`).
+    - [x] Updated Ear Training in `index.html` (`loadEarChallenge`, `verifyEarTrainingChoice`, `verifyEarTrainingPitchInput`, `updateEarSRSHudDisplay`) to measure response times (`earChallengeShownTime`), call `window.MusicTheory.recordSRSAttempt()`, and display live SRS mastery status (`#earSrsPill`, `#earSrsStatsDisplay`).
+  - [x] **Comprehensive Automated Verification Test Suite (`tests/test_education.js` Test 14 & `tests/test_score_engine.js` Test 34)**:
+    - [x] Added Test 14 in `tests/test_education.js` and Test 34 in `tests/test_score_engine.js`.
+    - [x] All 14 education suite tests and all 34 score engine tests passing with 100% success (48 total automated tests).
+
+
 
 
 
