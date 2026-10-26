@@ -379,6 +379,31 @@
     - [x] Verified full syntax validation across all files (`node --check theory.js; node --check songs.js`).
     - [x] All 13 education suite tests and all 30 score engine tests passing with 100% success.
 
+- [x] **Milestone 32: Comprehensive Documentation (`README.md`), Visual Expansion & Project Cleanup**
+  - [x] **Comprehensive Project Documentation (`README.md`)**:
+    - [x] Created full production-grade `README.md` with badges, architectural diagrams, overview, and feature breakdown.
+    - [x] Detailed walkthrough of all 6 interactive educational modes (Repertoire Practice, Sight-Reading Drill, Ear Training Gym, Scales/Chords/Voice-Leading Studio, Rhythm & Metronome Workshop, Theory Lessons & Circle of 5ths).
+    - [x] Deep architectural specifications: Web Audio physical synthesizer, multi-timbre wood block acoustics, universal `setSinkId` multi-device hardware routing, 16-channel Web MIDI telemetry, and CC 64 sustain damper.
+    - [x] Music theory mathematics reference: degree-aware diatonic speller, conservatory fingerings, voice-leading optimization, and adaptive SRS formulas.
+    - [x] Complete 56-song repertoire catalog curriculum map across Levels 1–8.
+    - [x] Quick start, local setup, hardware connection guide, testing commands, and licensing.
+  - [x] **Visual Polish & Graphic Aesthetics Expansion (`index.html`)**:
+    - [x] 3D Piano Keyboard Realism: Ivory key bevels, specular acrylic gloss on black keys, realistic tactile press travel (`transform: translateY(3px) scale(0.992)` and `translateY(3.5px)`), and Middle C ruby marker.
+    - [x] Mechanical Metronome Pendulum Visualizer: Smooth GPU-accelerated mechanical swinging pendulum arm (`#metroPendulumRod`) with BPM-driven period (`--metro-swing-period`) and dynamically positioned weight bob (`--pendulum-bob-pos`).
+    - [x] Practice HUD Fiery Streak Animation: Animated flame pulse (`@keyframes streakFlame`) on `#srStreakDisplay`, `#earStreak`, and practice stats when streak reaches 5+.
+    - [x] Celebratory Performance Star Sparkles (`@keyframes starSparkle`) and high-contrast styling.
+    - [x] Ear Training Sound Wave Pulse: Radial expanding sound wave animation (`@keyframes soundWavePulse` on `.playing-sound-pulse`) when listening to target mystery pitches.
+    - [x] Sight-Reading Blitz Countdown Progress Bar: Animated timer bar (`#srTimerProgress`) tracking 60-second Blitz with urgent pulse warning under 15 seconds.
+    - [x] Sheet Music Score Presentation: Refined parchment container styling with deep ambient drop shadows.
+  - [x] **Codebase Cleanup & CSS Integrity**:
+    - [x] Resolved unclosed brace on `.circle-info-panel` in `<style>` that caused CSS cascade leakage.
+    - [x] Verified perfect brace balance across the entire stylesheet ($0$ unclosed open braces).
+    - [x] Verified syntax validity across all scripts via Node vm.
+  - [x] **Comprehensive Automated Verification Test Suite (`tests/test_score_engine.js` Test 31)**:
+    - [x] Tests 31.1–31.7 verifying `README.md` file existence and section coverage, 3D key transforms, pendulum elements and animations, streak flame rules, timer progress bar, CSS brace balance, and full inline script syntax validation.
+    - [x] All 13 education suite tests and all 31 score engine tests passing with 100% success (44 total automated tests).
+
+
 
 
 
