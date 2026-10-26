@@ -675,6 +675,162 @@
   }
 
   // ==========================================
+  // LEFT-HAND ACCOMPANIMENT & HARMONY ENGINE
+  // ==========================================
+  const LH_ACCOMPANIMENT_STYLES = [
+    { id: "song", label: "Song Arrangement (Default)", description: "Play the authentic left-hand bass arrangement as written in repertoire." },
+    { id: "roots", label: "Single Roots (1-Note Primer)", description: "Simplifies chords to single root notes with finger 5. Ideal for Level 1/2 beginners." },
+    { id: "fifths", label: "Open 5ths (Root + 5th)", description: "Rich, resonant open-fifth power chords (1-5) for rock, pop, and classical." },
+    { id: "octaves", label: "Bass Octaves (8ves)", description: "Powerful acoustic bass octaves (1-8) providing orchestral weight and anchor." },
+    { id: "triads", label: "Full Triads (1-3-5)", description: "Diatonic root-position triads (1-3-5) for rich harmonic accompaniment." },
+    { id: "thirds", label: "Thirds (3rds Above)", description: "Warm harmonic dyad intervals of a third (1-3) above the bass root." }
+  ];
+
+  function extractBassRoot(pitchStr) {
+    if (!pitchStr || pitchStr === "-") return "-";
+    const subPitches = pitchStr.split("+").filter(p => p !== "-");
+    if (subPitches.length === 0) return "-";
+    if (subPitches.length === 1) return subPitches[0];
+
+    const sorted = [...subPitches].sort((a, b) => {
+      const mA = pitchToMidi(a) ?? 0;
+      const mB = pitchToMidi(b) ?? 0;
+      return mA - mB;
+    });
+    return sorted[0];
+  }
+
+  function transformLeftHandPitch(pitchStr, lhStyle = "song", accidentalMap = {}) {
+    if (!pitchStr || pitchStr === "-") return "-";
+    if (lhStyle === "song") return pitchStr;
+
+    const root = extractBassRoot(pitchStr);
+    if (root === "-") return "-";
+    if (lhStyle === "roots") return root;
+
+    const step = getDiatonicStep(root);
+    if (step === null) return root;
+
+    let resultPitches = [root];
+
+    if (lhStyle === "fifths") {
+      const p5 = diatonicStepToPitch(step + 4, accidentalMap);
+      resultPitches = [root, p5];
+    } else if (lhStyle === "octaves") {
+      const p8 = diatonicStepToPitch(step + 7, accidentalMap);
+      resultPitches = [root, p8];
+    } else if (lhStyle === "triads") {
+      const p3 = diatonicStepToPitch(step + 2, accidentalMap);
+      const p5 = diatonicStepToPitch(step + 4, accidentalMap);
+      resultPitches = [root, p3, p5];
+    } else if (lhStyle === "thirds") {
+      const p3 = diatonicStepToPitch(step + 2, accidentalMap);
+      resultPitches = [root, p3];
+    }
+
+    const valid = resultPitches.filter(Boolean);
+    const sorted = [...new Set(valid)].sort((a, b) => {
+      const mA = pitchToMidi(a) ?? 0;
+      const mB = pitchToMidi(b) ?? 0;
+      return mA - mB;
+    });
+
+    return sorted.join("+");
+  }
+
+  function transformLeftHandToken(tokenStr, lhStyle = "song", accidentalMap = {}, fingerStr = "5") {
+    if (!tokenStr || tokenStr === "-" || tokenStr === "|") return { token: tokenStr, finger: "-" };
+    if (lhStyle === "song") return { token: tokenStr, finger: fingerStr };
+
+    const tied = tokenStr.includes("~");
+    const clean = tokenStr.replace(/~/g, "");
+    const parts = clean.split(":");
+    const pitch = parts[0];
+    const beatsPart = parts[1] ? `:${parts[1]}` : "";
+    if (pitch === "-") return { token: `-${beatsPart}${tied ? "~" : ""}`, finger: "-" };
+
+    const transformedPitch = transformLeftHandPitch(pitch, lhStyle, accidentalMap);
+
+    let finger = "5";
+    if (lhStyle === "fifths" || lhStyle === "octaves") {
+      finger = "5+1";
+    } else if (lhStyle === "triads") {
+      finger = "5+3+1";
+    } else if (lhStyle === "thirds") {
+      finger = "5+3";
+    }
+
+    return {
+      token: `${transformedPitch}${beatsPart}${tied ? "~" : ""}`,
+      finger: finger
+    };
+  }
+
+  function generateLeftHandAccompaniment(song, lhStyle = "song") {
+    if (!song) return { lh: "", lhF: "" };
+    if (lhStyle === "song") {
+      return { lh: song.lh || "", lhF: song.lhF || "" };
+    }
+
+    const accMap = detectKeyAccidentals(song);
+    let lhSource = song.lh || "";
+    let lhFSource = song.lhF || "";
+
+    // If song has no LH at all, synthesize baseline from RH
+    if (!lhSource.trim() && song.rh) {
+      const rhM = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const synthM = [];
+      const synthFM = [];
+      let expBeats = 4;
+      if (song.timeSig) {
+        const [n, d] = song.timeSig.split("/");
+        expBeats = (parseFloat(n) || 4) * (4 / (parseFloat(d) || 4));
+      }
+      rhM.forEach(measureTokens => {
+        const firstMelody = measureTokens.find(t => !t.startsWith("-"));
+        let bassPitch = "C3";
+        if (firstMelody) {
+          const rawP = firstMelody.split(":")[0].split("+")[0];
+          const m = rawP.match(/^([A-G])([#b]?)([0-8])?$/);
+          if (m) {
+            bassPitch = `${m[1]}${m[2] || ""}3`;
+          }
+        }
+        synthM.push(`${bassPitch}:${expBeats}`);
+        synthFM.push("5");
+      });
+      lhSource = synthM.join(" | ");
+      lhFSource = synthFM.join(" | ");
+    }
+
+    const lhMeasures = lhSource.split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+    const lhFMeasures = lhFSource.split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+
+    const outMeasures = [];
+    const outFMeasures = [];
+
+    lhMeasures.forEach((measureTokens, mIdx) => {
+      const fTokens = lhFMeasures[mIdx] || [];
+      const mLH = [];
+      const mLHF = [];
+
+      measureTokens.forEach((tok, tIdx) => {
+        const res = transformLeftHandToken(tok, lhStyle, accMap, fTokens[tIdx] || "5");
+        mLH.push(res.token);
+        mLHF.push(res.finger);
+      });
+
+      outMeasures.push(mLH.join(" "));
+      outFMeasures.push(mLHF.join(" "));
+    });
+
+    return {
+      lh: outMeasures.join(" | "),
+      lhF: outFMeasures.join(" | ")
+    };
+  }
+
+  // ==========================================
   // CHORD PROGRESSIONS & VOICE-LEADING GYM
   // ==========================================
   const PROGRESSION_TEMPLATES = {
@@ -1824,6 +1980,11 @@
     harmonizePitch,
     harmonizeToken,
     generateSongHarmonies,
+    LH_ACCOMPANIMENT_STYLES,
+    extractBassRoot,
+    transformLeftHandPitch,
+    transformLeftHandToken,
+    generateLeftHandAccompaniment,
     recordSRSAttempt,
     getSRSItemStats,
     getAllSRSStats,
