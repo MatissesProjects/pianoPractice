@@ -3112,6 +3112,80 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   console.log("✔ Test 30: 🪵 Multi-Timbre Metronome Engine & Acoustic Wood Block Synthesis passed");
 }
 
+// ==========================================
+// TEST 31: 🎨 Visual Expansion, 3D Realism, Metronome Pendulum & UI Cleanliness Verification
+// ==========================================
+{
+  const fs = require("fs");
+  const path = require("path");
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const readmePath = path.join(__dirname, "../README.md");
+
+  // 31.1 README.md Existence & Comprehensive Content
+  assert.ok(fs.existsSync(readmePath), "README.md must exist in project root");
+  const readme = fs.readFileSync(readmePath, "utf8");
+  assert.ok(readme.includes("# 🎹 Piano Practice Lab & Interactive Score Reader"), "README.md must have main title");
+  assert.ok(readme.includes("Repertoire Practice Lab"), "README.md must document Repertoire Practice Lab");
+  assert.ok(readme.includes("Sight-Reading Speed Drill"), "README.md must document Sight-Reading Speed Drill");
+  assert.ok(readme.includes("Ear Training & Interval Gym"), "README.md must document Ear Training & Interval Gym");
+  assert.ok(readme.includes("Scales, Chords & Theory Studio"), "README.md must document Scales, Chords & Theory Studio");
+  assert.ok(readme.includes("Rhythm & Metronome Workshop"), "README.md must document Rhythm & Metronome Workshop");
+  assert.ok(readme.includes("Theory Lessons & Circle of Fifths"), "README.md must document Theory Lessons & Circle of Fifths");
+  assert.ok(readme.includes("3D Piano Keyboard Visualizer"), "README.md must document 3D Piano Keyboard Visualizer");
+  assert.ok(readme.includes("Web Audio"), "README.md must document Web Audio architecture");
+  assert.ok(readme.includes("Web MIDI"), "README.md must document Web MIDI architecture");
+  assert.ok(readme.includes("Testing & Verification"), "README.md must document Testing & Verification");
+
+  // 31.2 3D Piano Keyboard Aesthetics & Tactile Realism
+  assert.ok(html.includes('.piano-key.white:hover'), "index.html must include .piano-key.white:hover style");
+  assert.ok(html.includes('.piano-key.black:hover'), "index.html must include .piano-key.black:hover style");
+  assert.ok(html.includes('transform: translateY(3px) scale(0.992)'), "index.html must include tactile key depression transforms");
+  assert.ok(html.includes('transform: translateY(3.5px) scale(0.99)'), "index.html must include live key tactile press transform");
+
+  // 31.3 Metronome Mechanical Pendulum Arm Visualizer
+  assert.ok(html.includes('id="metroPendulumCase"'), "index.html must include #metroPendulumCase in Rhythm Workshop");
+  assert.ok(html.includes('id="metroPendulumRod"'), "index.html must include #metroPendulumRod pendulum arm");
+  assert.ok(html.includes('id="metroPendulumWeight"'), "index.html must include #metroPendulumWeight adjustable bob");
+  assert.ok(html.includes('.metro-pendulum-rod.swinging'), "index.html must include .metro-pendulum-rod.swinging animation rule");
+  assert.ok(html.includes('@keyframes pendulumSwing'), "index.html must define @keyframes pendulumSwing");
+  assert.ok(html.includes('--metro-swing-period'), "index.html must dynamically drive --metro-swing-period");
+  assert.ok(html.includes('--pendulum-bob-pos'), "index.html must dynamically drive --pendulum-bob-pos based on BPM");
+
+  // 31.4 Practice Feedback, Streak Flame & Ear Pulse Visuals
+  assert.ok(html.includes('.hud-streak-hot'), "index.html must include .hud-streak-hot fiery streak styling");
+  assert.ok(html.includes('@keyframes streakFlame'), "index.html must include @keyframes streakFlame");
+  assert.ok(html.includes('.hud-stars-sparkle'), "index.html must include .hud-stars-sparkle celebration styling");
+  assert.ok(html.includes('@keyframes soundWavePulse'), "index.html must include @keyframes soundWavePulse");
+  assert.ok(html.includes('.playing-sound-pulse'), "index.html must include .playing-sound-pulse for audio buttons");
+
+  // 31.5 Sight-Reading Speed Drill Timer Progress Bar
+  assert.ok(html.includes('id="srTimerTrack"'), "index.html must include #srTimerTrack progress bar track");
+  assert.ok(html.includes('id="srTimerProgress"'), "index.html must include #srTimerProgress bar element");
+  assert.ok(html.includes('.sr-timer-progress.urgent'), "index.html must include .sr-timer-progress.urgent styling");
+
+  // 31.6 CSS Brace Balance & Cleanup Validation
+  const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/i);
+  assert.ok(styleMatch, "index.html must contain <style> tag");
+  const styleContent = styleMatch[1];
+  let openBraceCount = 0;
+  for (let i = 0; i < styleContent.length; i++) {
+    if (styleContent[i] === '{') openBraceCount++;
+    if (styleContent[i] === '}') openBraceCount--;
+  }
+  assert.strictEqual(openBraceCount, 0, "<style> block must have perfectly balanced curly braces (0 unclosed)");
+
+  // 31.7 Complete Script Syntax Validation via Node vm
+  const vm = require("vm");
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid with visual expansion & pendulum engine");
+
+  console.log("✔ Test 31: 🎨 Visual Expansion, 3D Realism, Metronome Pendulum & UI Cleanliness passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 
