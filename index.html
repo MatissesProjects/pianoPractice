@@ -2536,6 +2536,271 @@
       opacity: 1 !important;
       filter: drop-shadow(0 0 6px currentColor);
     }
+
+    /* COMPREHENSIVE SONG PERFORMANCE REVIEW MODAL */
+    .song-review-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 2500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: fadeInModal 0.22s ease-out;
+    }
+    .song-review-modal-backdrop.is-open {
+      display: flex;
+    }
+    .song-review-modal-dialog {
+      background: #0b1120;
+      border: 1px solid #1e293b;
+      border-radius: 20px;
+      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85), 0 0 35px rgba(56, 189, 248, 0.12);
+      max-width: 680px;
+      width: 100%;
+      max-height: 94vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: scaleInModal 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .song-review-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.1rem 1.6rem;
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
+    }
+    .review-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .review-modal-icon {
+      font-size: 1.8rem;
+    }
+    .review-modal-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #f8fafc;
+      margin: 0;
+      letter-spacing: 0.01em;
+    }
+    .review-modal-subtitle {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin: 0.15rem 0 0 0;
+      font-weight: 500;
+    }
+    .review-close-btn {
+      color: #94a3b8;
+      padding: 0.4rem 0.75rem;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .song-review-modal-body {
+      padding: 1.4rem 1.6rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .review-hero-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.95));
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    .review-grade-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 85px;
+    }
+    .review-grade-badge {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.3rem;
+      font-weight: 900;
+      color: #ffffff;
+      background: linear-gradient(135deg, #059669, #10b981);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.45);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+    }
+    .review-grade-badge.grade-s {
+      background: linear-gradient(135deg, #d97706, #fbbf24);
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.55);
+    }
+    .review-grade-badge.grade-a {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.45);
+    }
+    .review-grade-badge.grade-b {
+      background: linear-gradient(135deg, #059669, #34d399);
+      box-shadow: 0 0 25px rgba(52, 211, 153, 0.45);
+    }
+    .review-grade-badge.grade-c {
+      background: linear-gradient(135deg, #ea580c, #f97316);
+      box-shadow: 0 0 25px rgba(249, 115, 22, 0.45);
+    }
+    .review-grade-badge.grade-d {
+      background: linear-gradient(135deg, #dc2626, #f87171);
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.45);
+    }
+    .review-stars-banner {
+      font-size: 1.25rem;
+      letter-spacing: 2px;
+      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+    }
+    .review-hero-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .review-accuracy-headline {
+      display: flex;
+      align-items: baseline;
+      gap: 0.65rem;
+    }
+    .review-accuracy-val {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #f8fafc;
+      letter-spacing: -0.02em;
+    }
+    .review-accuracy-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #94a3b8;
+      letter-spacing: 0.08em;
+    }
+    .review-pedagogical-verdict {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+    .review-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+    }
+    .review-stat-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .stat-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .stat-card-icon {
+      font-size: 1rem;
+    }
+    .stat-card-title {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .stat-card-main {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #f8fafc;
+      font-family: ui-monospace, monospace;
+    }
+    .stat-card-sub {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .review-diagnostic-panel {
+      background: rgba(30, 41, 59, 0.45);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .diagnostic-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+      min-width: 240px;
+    }
+    .diagnostic-icon {
+      font-size: 1.4rem;
+    }
+    .diagnostic-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #f8fafc;
+      display: block;
+    }
+    .diagnostic-desc {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin: 0.15rem 0 0 0;
+      line-height: 1.35;
+    }
+    .review-loop-btn {
+      padding: 0.45rem 0.95rem;
+      font-size: 0.82rem;
+      background: linear-gradient(135deg, #d97706, #b45309);
+      border-color: #f59e0b;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+    .song-review-modal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.6rem;
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .footer-left-actions, .footer-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .measure-number.has-mistake {
+      fill: #f87171 !important;
+      font-weight: 900;
+      filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.8));
+    }
+    .note-group.completed-target .notehead {
+      fill: #10b981 !important;
+      filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.8));
+    }
   </style>
 </head>
 <body>
@@ -2832,6 +3097,7 @@
         <div class="hud-feedback" id="hudFeedbackText" title="Play the highlighted note to begin...">Play the highlighted note to begin...</div>
         <div class="hud-stats">
           <span id="hudProgressText">Note: 1 / 32</span>
+          <button class="hud-restart-btn" id="hudReviewResultsBtn" style="display:none; background:#0284c7; border-color:#38bdf8; color:#ffffff;" title="Review performance stats">📊 Results</button>
           <button class="hud-restart-btn" id="hudRestartBtn">↺ Restart Piece</button>
         </div>
       </div>
@@ -2866,6 +3132,7 @@
             </div>
           </div>
           <div class="sheet-tools">
+            <button class="sheet-btn" id="openReviewBtn" style="display:none; color:#38bdf8; border-color:#0284c7;" title="View performance results for this song">📊 Review Results</button>
             <button class="sheet-btn" id="paperThemeBtn">🎨 Paper Theme: Vintage</button>
           </div>
         </div>
@@ -3426,9 +3693,113 @@
 
     <!-- Session Performance Toast -->
     <div class="perf-toast" id="perfToast">
+      <button id="perfCloseBtn" class="range-shift-btn" style="position:absolute; top:8px; right:8px; padding:0.2rem 0.5rem; font-size:0.85rem;" aria-label="Close toast">✕</button>
       <div class="perf-stars" id="perfStars">⭐⭐⭐</div>
       <h4 style="font-size:1.1rem; color:#f8fafc; font-weight:800; margin-bottom:0.35rem;" id="perfTitle">Song Mastered!</h4>
       <p style="font-size:0.85rem; color:#cbd5e1; margin-bottom:0.75rem;" id="perfBody">Accuracy: 98% (32/33 notes)</p>
+    </div>
+
+    <!-- COMPREHENSIVE SONG PERFORMANCE REVIEW MODAL -->
+    <div class="song-review-modal-backdrop" id="songReviewModal" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle" style="display:none;">
+      <div class="song-review-modal-dialog">
+        <!-- Header -->
+        <div class="song-review-modal-header">
+          <div class="review-header-left">
+            <span class="review-modal-icon">🏆</span>
+            <div>
+              <h3 id="reviewModalTitle" class="review-modal-title">Performance Review</h3>
+              <p id="reviewModalSubtitle" class="review-modal-subtitle">Piece Complete</p>
+            </div>
+          </div>
+          <button id="closeReviewModalBtn" class="range-shift-btn review-close-btn" aria-label="Close review modal" title="Close and inspect score sheet">✕</button>
+        </div>
+
+        <div class="song-review-modal-body">
+          <!-- Hero Section: Stars, Grade Badge, Overall Mastery -->
+          <div class="review-hero-card">
+            <div class="review-grade-container">
+              <div class="review-grade-badge" id="reviewGradeBadge">S</div>
+              <div class="review-stars-banner" id="reviewStarsBanner">⭐⭐⭐</div>
+            </div>
+            <div class="review-hero-content">
+              <div class="review-accuracy-headline">
+                <span id="reviewAccuracyPct" class="review-accuracy-val">100%</span>
+                <span class="review-accuracy-label">OVERALL ACCURACY</span>
+              </div>
+              <div id="reviewPedagogicalVerdict" class="review-pedagogical-verdict">
+                Virtually flawless mastery! Superb finger control and note accuracy.
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Core Metric Cards Grid -->
+          <div class="review-metrics-grid">
+            <!-- Card 1: Note Precision -->
+            <div class="review-stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-icon">🎯</span>
+                <span class="stat-card-title">Note Precision</span>
+              </div>
+              <div class="stat-card-main" id="reviewNotesRatio">32 / 32</div>
+              <div class="stat-card-sub" id="reviewMissCount">0 Misses • 100% clean</div>
+            </div>
+
+            <!-- Card 2: Peak Streak -->
+            <div class="review-stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-icon">🔥</span>
+                <span class="stat-card-title">Peak Streak</span>
+              </div>
+              <div class="stat-card-main" id="reviewPeakStreak">32 Notes</div>
+              <div class="stat-card-sub" id="reviewCleanliness">Flawless uninterrupted run</div>
+            </div>
+
+            <!-- Card 3: Rhythm & Timing -->
+            <div class="review-stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-icon">⏱️</span>
+                <span class="stat-card-title">Rhythm & Timing</span>
+              </div>
+              <div class="stat-card-main" id="reviewTimingMain">Precise Rhythm</div>
+              <div class="stat-card-sub" id="reviewTimingSub">Tempo Flow / Note hold accuracy</div>
+            </div>
+
+            <!-- Card 4: Practice Time & Tempo -->
+            <div class="review-stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-icon">⏳</span>
+                <span class="stat-card-title">Time & Tempo</span>
+              </div>
+              <div class="stat-card-main" id="reviewTimeDuration">42s</div>
+              <div class="stat-card-sub" id="reviewTempoAndBest">Played @ 96 BPM • Best: 100%</div>
+            </div>
+          </div>
+
+          <!-- Problem Measures Diagnostic Banner -->
+          <div class="review-diagnostic-panel" id="reviewDiagnosticPanel">
+            <div class="diagnostic-info">
+              <span id="diagnosticIcon" class="diagnostic-icon">💡</span>
+              <div>
+                <span id="diagnosticTitle" class="diagnostic-title">Difficult Measures Identified</span>
+                <p id="diagnosticDesc" class="diagnostic-desc">Errors detected in specific measures. Loop these measures to build muscle memory.</p>
+              </div>
+            </div>
+            <button id="reviewLoopMistakesBtn" class="play-btn review-loop-btn" title="Automatically set A-B loop to trouble measures">🔁 Loop Problem Measures</button>
+          </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div class="song-review-modal-footer">
+          <div class="footer-left-actions">
+            <button id="reviewInspectScoreBtn" class="range-shift-btn" title="Close modal and inspect the full score sheet at your own pace">🎼 Review Score Sheet</button>
+          </div>
+          <div class="footer-right-actions">
+            <button id="reviewReplayBtn" class="play-btn" style="background:#0284c7; border-color:#38bdf8;" title="Restart and play this piece again">🔄 Replay Song</button>
+            <button id="reviewNextSongBtn" class="play-btn" style="background:#10b981; border-color:#34d399;" title="Advance to next repertoire piece">⏭️ Next Song</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- INTERACTIVE PIANO NOTES CHEAT SHEET MODAL (Based on pianoNotesCheatSheet.png) -->
     <div class="cheat-sheet-modal-backdrop" id="cheatSheetModal" role="dialog" aria-modal="true" aria-labelledby="csModalTitle">
       <div class="cheat-sheet-modal-dialog">
@@ -4849,7 +5220,9 @@
           const mNum = document.createElementNS("http://www.w3.org/2000/svg", "text");
           mNum.setAttribute("x", measureStartX - 6);
           mNum.setAttribute("y", startY - 7);
-          mNum.setAttribute("class", "measure-number");
+          mNum.setAttribute("id", `measure_num_${globalMeasureNum}`);
+          const hasMistake = (typeof sessionMistakeMeasures !== "undefined" && sessionMistakeMeasures.has(globalMeasureNum));
+          mNum.setAttribute("class", `measure-number${hasMistake ? " has-mistake" : ""}`);
           mNum.textContent = `${globalMeasureNum}`;
           svg.appendChild(mNum);
 
@@ -5434,6 +5807,378 @@
       attempts: 0,
       cleanLoop: true
     };
+    let lastSongPerformance = null;
+    let sessionStartTime = 0;
+    let sessionEndTime = 0;
+    let sessionCurrentStreak = 0;
+    let sessionBestStreak = 0;
+    let sessionMistakeMeasures = new Set();
+    let sessionMistakeNotes = [];
+    let sessionRhythmCounts = { flawless: 0, shortTap: 0, other: 0 };
+    let isSongFinished = false;
+
+    function playVictoryFanfare() {
+      if (!isSynthAudioEnabled() || typeof audioCtx === "undefined" || !audioCtx) return;
+      // Arpeggiated celebratory C major fanfare
+      const notes = [
+        { freq: 523.25, time: 0, dur: 0.18 },     // C5
+        { freq: 659.25, time: 0.14, dur: 0.18 },   // E5
+        { freq: 783.99, time: 0.28, dur: 0.22 },   // G5
+        { freq: 1046.50, time: 0.44, dur: 0.65 }   // C6
+      ];
+      notes.forEach(n => {
+        setTimeout(() => {
+          if (isSynthAudioEnabled()) playTone(n.freq, n.dur);
+        }, n.time * 1000);
+      });
+    }
+
+    function annotateScoreMistakeMeasures(mistakeMeasures) {
+      document.querySelectorAll(".measure-number").forEach(el => {
+        el.classList.remove("has-mistake");
+      });
+      if (!mistakeMeasures) return;
+      mistakeMeasures.forEach(mNum => {
+        const mEl = document.getElementById(`measure_num_${mNum}`);
+        if (mEl) {
+          mEl.classList.add("has-mistake");
+          mEl.setAttribute("title", `⚠️ Errors occurred in Measure ${mNum}`);
+        }
+      });
+    }
+
+    function completeSongPerformance(accuracy, mode = "wait", flowStats = null) {
+      isSongFinished = true;
+      isPracticeSessionStarted = false;
+      if (!sessionEndTime) sessionEndTime = performance.now();
+
+      const durationSec = (sessionStartTime > 0 && sessionEndTime > sessionStartTime)
+        ? Math.max(1, Math.round((sessionEndTime - sessionStartTime) / 1000))
+        : Math.max(1, Math.round((songNoteSteps.length * 60) / (currentSong ? currentSong.tempo || 90 : 90)));
+
+      let stars = "⭐";
+      if (accuracy >= 92) stars = "⭐⭐⭐";
+      else if (accuracy >= 78) stars = "⭐⭐";
+
+      let letterGrade = "D";
+      let gradeClass = "grade-d";
+      let verdict = "Needs more practice. Try slowing the tempo down and looping difficult measures!";
+      if (accuracy >= 98) {
+        letterGrade = "S";
+        gradeClass = "grade-s";
+        verdict = "Virtually flawless mastery! Superb finger control and note accuracy.";
+      } else if (accuracy >= 90) {
+        letterGrade = "A";
+        gradeClass = "grade-a";
+        verdict = "Outstanding performance! Great phrasing and fluid hand execution.";
+      } else if (accuracy >= 80) {
+        letterGrade = "B";
+        gradeClass = "grade-b";
+        verdict = "Solid playing! A few minor slips — loop the problem measures to lock it down.";
+      } else if (accuracy >= 70) {
+        letterGrade = "C";
+        gradeClass = "grade-c";
+        verdict = "Passable run. Focus on trouble measures with A-B loop before speeding up.";
+      }
+
+      // Check previous best
+      let prevBestAcc = null;
+      try {
+        const prev = localStorage.getItem(`piano_mastery_${currentSong ? currentSong.id : 'piece'}`);
+        if (prev) {
+          const parsed = JSON.parse(prev);
+          if (typeof parsed.accuracy === "number") prevBestAcc = parsed.accuracy;
+        }
+      } catch (e) {}
+
+      const totalCorrect = (mode === "tempo-flow" && flowStats) ? (flowStats.perfect + flowStats.good) : practiceStats.correct;
+      const totalAttempts = (mode === "tempo-flow" && flowStats) ? flowStats.total : practiceStats.attempts;
+
+      lastSongPerformance = {
+        songId: currentSong ? currentSong.id : "piece",
+        songTitle: currentSong ? currentSong.title : "Piece",
+        category: currentSong ? currentSong.category : "Repertoire",
+        level: (typeof activeCurriculumLevel !== "undefined" && activeCurriculumLevel) ? `Level ${activeCurriculumLevel}` : "Custom",
+        accuracy,
+        letterGrade,
+        gradeClass,
+        stars,
+        verdict,
+        correct: totalCorrect,
+        attempts: totalAttempts,
+        totalNotes: songNoteSteps ? songNoteSteps.filter(s => s.expectedPitches && s.expectedPitches.length > 0).length : totalAttempts,
+        peakStreak: Math.max(sessionBestStreak, sessionCurrentStreak),
+        durationSec,
+        bpm: currentSong ? currentSong.tempo : 96,
+        prevBestAcc,
+        mode,
+        flowStats,
+        mistakeMeasures: Array.from(sessionMistakeMeasures).sort((a, b) => a - b),
+        mistakeNotes: [...sessionMistakeNotes],
+        date: new Date().toLocaleDateString()
+      };
+
+      // Persist mastery
+      try {
+        localStorage.setItem(`piano_mastery_${currentSong ? currentSong.id : 'piece'}`, JSON.stringify({
+          stars,
+          accuracy,
+          letterGrade,
+          peakStreak: lastSongPerformance.peakStreak,
+          date: lastSongPerformance.date
+        }));
+      } catch (e) {}
+
+      // Mark celebratory final notehead on staff
+      document.querySelectorAll(".note-group").forEach(g => g.classList.remove("active-target"));
+      if (songNoteSteps && songNoteSteps.length > 0) {
+        const lastEl = document.getElementById(`staff_note_${songNoteSteps.length - 1}`);
+        if (lastEl) lastEl.classList.add("completed-target");
+      }
+
+      // Annotate mistake measures on the sheet music
+      annotateScoreMistakeMeasures(sessionMistakeMeasures);
+
+      // Play victory chime
+      playVictoryFanfare();
+
+      // Update HUD status & reveal persistent Review Results buttons
+      const feedbackText = document.getElementById("hudFeedbackText");
+      if (feedbackText) {
+        feedbackText.innerHTML = `🎉 <strong>Piece Finished (${accuracy}% • Grade ${letterGrade})!</strong> Review results or replay when ready.`;
+        feedbackText.style.color = "#34d399";
+      }
+      const targetBadge = document.getElementById("hudTargetBadge");
+      if (targetBadge) {
+        targetBadge.innerHTML = `<span style="color:#34d399; font-weight:900;">DONE! 🏆</span>`;
+      }
+      const openReviewBtn = document.getElementById("openReviewBtn");
+      if (openReviewBtn) openReviewBtn.style.display = "inline-flex";
+      const hudReviewBtn = document.getElementById("hudReviewResultsBtn");
+      if (hudReviewBtn) hudReviewBtn.style.display = "inline-flex";
+
+      // Display comprehensive review modal
+      showSongReviewModal();
+    }
+
+    function showSongReviewModal() {
+      if (!lastSongPerformance) return;
+      const modal = document.getElementById("songReviewModal");
+      if (!modal) return;
+
+      const p = lastSongPerformance;
+
+      // Title & Subtitle
+      const titleEl = document.getElementById("reviewModalTitle");
+      if (titleEl) titleEl.textContent = `${p.songTitle} Complete!`;
+      const subEl = document.getElementById("reviewModalSubtitle");
+      if (subEl) {
+        const modeLabel = p.mode === "tempo-flow" ? "🥁 Tempo Flow Mode" : "🎯 Wait-for-Me Practice";
+        subEl.textContent = `${p.songTitle} • ${p.category} (${p.level}) • ${modeLabel}`;
+      }
+
+      // Hero Grade & Stars
+      const gradeBadge = document.getElementById("reviewGradeBadge");
+      if (gradeBadge) {
+        gradeBadge.textContent = p.letterGrade;
+        gradeBadge.className = `review-grade-badge ${p.gradeClass}`;
+      }
+      const starsBanner = document.getElementById("reviewStarsBanner");
+      if (starsBanner) starsBanner.textContent = p.stars;
+
+      const accVal = document.getElementById("reviewAccuracyPct");
+      if (accVal) accVal.textContent = `${p.accuracy}%`;
+
+      const verdictEl = document.getElementById("reviewPedagogicalVerdict");
+      if (verdictEl) verdictEl.textContent = p.verdict;
+
+      // Metric 1: Note Precision
+      const notesRatio = document.getElementById("reviewNotesRatio");
+      if (notesRatio) notesRatio.textContent = `${p.correct} / ${Math.max(p.attempts, p.correct)}`;
+      const missCount = document.getElementById("reviewMissCount");
+      if (missCount) {
+        const misses = Math.max(0, p.attempts - p.correct);
+        missCount.textContent = misses === 0 ? "0 Misses • 100% clean" : `${misses} Missed Strike${misses > 1 ? 's' : ''}`;
+      }
+
+      // Metric 2: Streak & Cleanliness
+      const peakStreak = document.getElementById("reviewPeakStreak");
+      if (peakStreak) peakStreak.textContent = `${p.peakStreak} Notes`;
+      const cleanliness = document.getElementById("reviewCleanliness");
+      if (cleanliness) {
+        cleanliness.textContent = p.mistakeMeasures.length === 0 ? "Flawless uninterrupted run" : `${p.mistakeMeasures.length} trouble measure${p.mistakeMeasures.length > 1 ? 's' : ''}`;
+      }
+
+      // Metric 3: Rhythm & Timing
+      const timingMain = document.getElementById("reviewTimingMain");
+      const timingSub = document.getElementById("reviewTimingSub");
+      if (p.mode === "tempo-flow" && p.flowStats) {
+        if (timingMain) timingMain.textContent = `${p.flowStats.perfect} Perfect`;
+        if (timingSub) timingSub.textContent = `✨ ${p.flowStats.good} Good • ⚠️ ${p.flowStats.lateOrEarly} Late/Early • ❌ ${p.flowStats.missed} Miss`;
+      } else {
+        if (timingMain) timingMain.textContent = p.accuracy >= 90 ? "Precise Rhythm" : "Good Control";
+        const totalHolds = sessionRhythmCounts.flawless + sessionRhythmCounts.shortTap + sessionRhythmCounts.other;
+        if (timingSub) {
+          timingSub.textContent = totalHolds > 0
+            ? `${sessionRhythmCounts.flawless} Flawless Hold${sessionRhythmCounts.flawless !== 1 ? 's' : ''} • ${sessionRhythmCounts.shortTap} Staccato`
+            : "Standard Wait-for-Me pacing";
+        }
+      }
+
+      // Metric 4: Time & Tempo
+      const timeDur = document.getElementById("reviewTimeDuration");
+      if (timeDur) {
+        const mins = Math.floor(p.durationSec / 60);
+        const secs = p.durationSec % 60;
+        timeDur.textContent = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+      }
+      const tempoAndBest = document.getElementById("reviewTempoAndBest");
+      if (tempoAndBest) {
+        const bestStr = (p.prevBestAcc !== null && p.prevBestAcc !== undefined) ? `Best: ${Math.max(p.prevBestAcc, p.accuracy)}%` : `First Logged Run`;
+        tempoAndBest.textContent = `Played @ ${p.bpm} BPM • ${bestStr}`;
+      }
+
+      // Problem Measures Diagnostic
+      const diagPanel = document.getElementById("reviewDiagnosticPanel");
+      const diagTitle = document.getElementById("diagnosticTitle");
+      const diagDesc = document.getElementById("diagnosticDesc");
+      const loopMistakesBtn = document.getElementById("reviewLoopMistakesBtn");
+
+      if (p.mistakeMeasures.length > 0) {
+        if (diagPanel) diagPanel.style.display = "flex";
+        if (diagTitle) diagTitle.textContent = `Difficult Measures: Measure ${p.mistakeMeasures.join(", ")}`;
+        if (diagDesc) diagDesc.textContent = `Errors detected in ${p.mistakeMeasures.length} measure${p.mistakeMeasures.length > 1 ? 's' : ''}. Loop them to build muscle memory!`;
+        if (loopMistakesBtn) {
+          loopMistakesBtn.style.display = "inline-flex";
+          const minM = Math.min(...p.mistakeMeasures);
+          const maxM = Math.max(...p.mistakeMeasures);
+          loopMistakesBtn.textContent = `🔁 Loop Measures ${minM}–${maxM}`;
+        }
+      } else {
+        if (diagPanel) diagPanel.style.display = "flex";
+        if (diagTitle) diagTitle.textContent = "🌟 Flawless Mastery!";
+        if (diagDesc) diagDesc.textContent = "Zero mistakes across the entire piece. You played every note with complete confidence.";
+        if (loopMistakesBtn) loopMistakesBtn.style.display = "none";
+      }
+
+      modal.classList.add("is-open");
+      modal.style.display = "flex";
+    }
+
+    function closeSongReviewModal() {
+      const modal = document.getElementById("songReviewModal");
+      if (modal) {
+        modal.classList.remove("is-open");
+        modal.style.display = "none";
+      }
+    }
+
+    function replaySongPractice() {
+      closeSongReviewModal();
+      isSongFinished = false;
+      isPracticeSessionStarted = false;
+      sessionStartTime = 0;
+      sessionEndTime = 0;
+      sessionCurrentStreak = 0;
+      sessionBestStreak = 0;
+      sessionMistakeMeasures.clear();
+      sessionMistakeNotes = [];
+      sessionRhythmCounts = { flawless: 0, shortTap: 0, other: 0 };
+      practiceStats = { correct: 0, attempts: 0, cleanLoop: true };
+      currentPracticeStep = 0;
+
+      // Clear completed highlights
+      document.querySelectorAll(".note-group").forEach(g => g.classList.remove("completed-target", "active-target", "error-target"));
+      annotateScoreMistakeMeasures(null);
+
+      const scoreContainer = document.getElementById("sheetMusicSection");
+      if (scoreContainer) {
+        scoreContainer.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      lastScoreScrollTarget = 0;
+      lastScoreScrollTime = 0;
+
+      highlightActiveScoreNote(0, false);
+      const firstStep = songNoteSteps[0];
+      const nextLabel = (firstStep && firstStep.expectedPitches && firstStep.expectedPitches.length > 0)
+        ? firstStep.expectedPitches.join(" + ")
+        : (songNoteSteps[1] ? songNoteSteps[1].expectedPitches.join(" + ") : "first note");
+      const feedbackText = document.getElementById("hudFeedbackText");
+      if (feedbackText) {
+        feedbackText.style.color = "#38bdf8";
+        feedbackText.textContent = `Piece restarted! Play ${nextLabel} to begin...`;
+      }
+    }
+
+    function loopProblemMeasures() {
+      if (!lastSongPerformance || !lastSongPerformance.mistakeMeasures || lastSongPerformance.mistakeMeasures.length === 0) {
+        closeSongReviewModal();
+        return;
+      }
+      const minM = Math.min(...lastSongPerformance.mistakeMeasures);
+      const maxM = Math.max(...lastSongPerformance.mistakeMeasures);
+
+      const startInput = document.getElementById("loopStartMeasure");
+      const endInput = document.getElementById("loopEndMeasure");
+      const loopToggle = document.getElementById("toggleLoopSection");
+
+      if (startInput) startInput.value = minM;
+      if (endInput) endInput.value = maxM;
+      if (loopToggle) loopToggle.checked = true;
+
+      closeSongReviewModal();
+      isSongFinished = false;
+      isPracticeSessionStarted = false;
+
+      // Jump directly to the first step of minM
+      const targetStep = songNoteSteps.find(s => s.measure >= minM) || songNoteSteps[0];
+      currentPracticeStep = targetStep ? targetStep.index : 0;
+      highlightActiveScoreNote(currentPracticeStep, true);
+
+      const feedbackText = document.getElementById("hudFeedbackText");
+      if (feedbackText) {
+        feedbackText.style.color = "#fbbf24";
+        feedbackText.textContent = `🔁 Focused practice on Measures ${minM}–${maxM}. Play target note to begin!`;
+      }
+    }
+
+    function advanceToNextSong() {
+      closeSongReviewModal();
+      if (!currentSong) return;
+
+      const curLevel = (typeof activeCurriculumLevel !== "undefined" && activeCurriculumLevel && curriculumLevels[activeCurriculumLevel])
+        ? curriculumLevels[activeCurriculumLevel]
+        : null;
+      let candidateSongs = songDatabase;
+      if (curLevel && curLevel.config && curLevel.config.filter) {
+        candidateSongs = songDatabase.filter(s => s.category === curLevel.config.filter);
+      }
+      if (!candidateSongs || candidateSongs.length === 0) candidateSongs = songDatabase;
+
+      const curIdx = candidateSongs.findIndex(s => s.id === currentSong.id);
+      const nextIdx = (curIdx >= 0 && curIdx < candidateSongs.length - 1) ? curIdx + 1 : 0;
+      const nextSong = candidateSongs[nextIdx];
+      if (nextSong) {
+        loadSong(nextSong);
+      }
+    }
+
+    function openLastReview() {
+      if (!lastSongPerformance) {
+        try {
+          const saved = localStorage.getItem(`piano_mastery_${currentSong ? currentSong.id : 'piece'}`);
+          if (saved) {
+            const p = JSON.parse(saved);
+            completeSongPerformance(p.accuracy || 100, "wait");
+            return;
+          }
+        } catch (e) {}
+        const feedback = document.getElementById("hudFeedbackText");
+        if (feedback) feedback.textContent = "Finish playing this piece to see performance results!";
+        return;
+      }
+      showSongReviewModal();
+    }
 
     function showPerformanceToast(accuracy, songTitle) {
       const toast = document.getElementById("perfToast");
@@ -5479,8 +6224,28 @@
       songNoteSteps = model.steps;
       currentSongMeasures = model.measures;
 
-      // Reset practice stats for newly loaded piece
+      // Reset practice stats and session telemetry for newly loaded piece
       practiceStats = { correct: 0, attempts: 0, cleanLoop: true };
+      sessionStartTime = 0;
+      sessionEndTime = 0;
+      sessionCurrentStreak = 0;
+      sessionBestStreak = 0;
+      sessionMistakeMeasures.clear();
+      sessionMistakeNotes = [];
+      sessionRhythmCounts = { flawless: 0, shortTap: 0, other: 0 };
+      isSongFinished = false;
+      document.querySelectorAll(".measure-number").forEach(el => el.classList.remove("has-mistake"));
+      document.querySelectorAll(".note-group").forEach(el => el.classList.remove("completed-target"));
+
+      // Check if past performance exists to show review button
+      try {
+        const past = localStorage.getItem(`piano_mastery_${currentSong ? currentSong.id : 'piece'}`);
+        const showBtn = !!past;
+        const openRev = document.getElementById("openReviewBtn");
+        if (openRev) openRev.style.display = showBtn ? "inline-flex" : "none";
+        const hudRev = document.getElementById("hudReviewResultsBtn");
+        if (hudRev) hudRev.style.display = showBtn ? "inline-flex" : "none";
+      } catch (e) {}
     }
 
     function updateTargetBadgeDisplay(step, fulfilledSet) {
@@ -5726,13 +6491,18 @@
     function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
       const isFromMidi = noteAttack && noteAttack.source === "midi";
 
-      if (!isWaitPracticeMode) {
+      if (!isWaitPracticeMode || isSongFinished) {
         playSingleNoteAudit(playedPitch, "rh", !isFromMidi);
         return;
       }
 
       const currentStep = songNoteSteps[currentPracticeStep];
       if (!currentStep) return;
+
+      // Start session timer on initial strike
+      if (!sessionStartTime) {
+        sessionStartTime = performance.now();
+      }
 
       // Handle Rest Step Transition
       if (!currentStep.expectedPitches || currentStep.expectedPitches.length === 0) {
@@ -5771,6 +6541,11 @@
         if (noteAttack) noteAttack.consumedStepIndex = currentPracticeStep;
 
         practiceStats.correct++;
+        sessionCurrentStreak++;
+        if (sessionCurrentStreak > sessionBestStreak) {
+          sessionBestStreak = sessionCurrentStreak;
+        }
+
         // If note was played via MIDI, startLiveTone already handles synthesis; only audit sound for non-MIDI if synth audio is enabled
         playSingleNoteAudit(playedPitch, "rh", !isFromMidi);
         targetBadge.classList.remove("error-flash");
@@ -5822,6 +6597,15 @@
 
         // Genuine wrong note
         practiceStats.cleanLoop = false;
+        sessionCurrentStreak = 0;
+        sessionMistakeMeasures.add(currentStep.measure);
+        sessionMistakeNotes.push({
+          measure: currentStep.measure,
+          stepIndex: currentPracticeStep,
+          played: playedPitch,
+          expected: expected
+        });
+
         if (isSynthAudioEnabled()) {
           playTone(getNoteFreq(playedPitch), 0.2);
         }
@@ -5847,9 +6631,16 @@
       if (feedbackText && feedbackText.style.color === "rgb(52, 211, 153)") { // Green "Perfect" state
         const holdRatio = heldBeats / targetBeats;
         let durationDesc = "Good duration!";
-        if (holdRatio < 0.45) durationDesc = "Staccato tap — hold longer for full beat value!";
-        else if (holdRatio >= 0.75 && holdRatio <= 1.35) durationDesc = "🎯 Flawless rhythmic hold!";
-        else if (holdRatio > 1.5) durationDesc = "Held longer than value (tenuto)";
+        if (holdRatio < 0.45) {
+          durationDesc = "Staccato tap — hold longer for full beat value!";
+          sessionRhythmCounts.shortTap++;
+        } else if (holdRatio >= 0.75 && holdRatio <= 1.35) {
+          durationDesc = "🎯 Flawless rhythmic hold!";
+          sessionRhythmCounts.flawless++;
+        } else {
+          if (holdRatio > 1.5) durationDesc = "Held longer than value (tenuto)";
+          sessionRhythmCounts.other++;
+        }
 
         feedbackText.textContent += ` • Held ${heldBeats.toFixed(2)}b / ${targetBeats}b (${durationDesc})`;
       }
@@ -5884,13 +6675,8 @@
         if (nextStepIdx >= songNoteSteps.length) {
           const acc = Math.round((practiceStats.correct / Math.max(1, practiceStats.attempts)) * 100);
           showPerformanceToast(acc, currentSong ? currentSong.title : "Piece");
-          nextStepIdx = 0;
-          const scoreContainer = document.getElementById("sheetMusicSection");
-          if (scoreContainer) scoreContainer.scrollTop = 0;
-          lastScoreScrollTarget = 0;
-          lastScoreScrollTime = 0;
-          document.getElementById("hudFeedbackText").textContent = `🎉 Fantastic job! Piece finished (${acc}% Accuracy)! Restarting...`;
-          practiceStats = { correct: 0, attempts: 0, cleanLoop: true };
+          completeSongPerformance(acc, "wait");
+          return;
         }
       }
 
@@ -7664,23 +8450,47 @@
         tempoFlowToggle.textContent = "🥁 Tempo Flow Mode";
       }
       isTempoFlowActive = false;
+
+      // Complete song performance with rich review modal
+      completeSongPerformance(accuracy, "tempo-flow", tempoFlowStats);
     }
 
-    document.getElementById("hudRestartBtn").addEventListener("click", () => {
-      currentPracticeStep = 0;
-      isPracticeSessionStarted = false;
-      const scoreContainer = document.getElementById("sheetMusicSection");
-      if (scoreContainer) scoreContainer.scrollTop = 0;
-      lastScoreScrollTarget = 0;
-      lastScoreScrollTime = 0;
-      highlightActiveScoreNote(0, false);
-      const firstStep = songNoteSteps[0];
-      const nextLabel = (firstStep && firstStep.expectedPitches && firstStep.expectedPitches.length > 0)
-        ? firstStep.expectedPitches.join(" + ")
-        : (songNoteSteps[1] ? songNoteSteps[1].expectedPitches.join(" + ") : "first note");
-      document.getElementById("hudFeedbackText").textContent = (firstStep && (!firstStep.expectedPitches || firstStep.expectedPitches.length === 0))
-        ? `𝄽 Count in: play ${nextLabel} to begin!`
-        : `Piece restarted! Play ${nextLabel}...`;
+    document.getElementById("hudRestartBtn")?.addEventListener("click", () => {
+      replaySongPractice();
+    });
+
+    document.getElementById("hudReviewResultsBtn")?.addEventListener("click", () => {
+      openLastReview();
+    });
+
+    document.getElementById("openReviewBtn")?.addEventListener("click", () => {
+      openLastReview();
+    });
+
+    document.getElementById("closeReviewModalBtn")?.addEventListener("click", () => {
+      closeSongReviewModal();
+    });
+
+    document.getElementById("reviewInspectScoreBtn")?.addEventListener("click", () => {
+      closeSongReviewModal();
+    });
+
+    document.getElementById("reviewReplayBtn")?.addEventListener("click", () => {
+      replaySongPractice();
+    });
+
+    document.getElementById("reviewLoopMistakesBtn")?.addEventListener("click", () => {
+      loopProblemMeasures();
+    });
+
+    document.getElementById("reviewNextSongBtn")?.addEventListener("click", () => {
+      advanceToNextSong();
+    });
+
+    document.getElementById("songReviewModal")?.addEventListener("click", (e) => {
+      if (e.target.id === "songReviewModal") {
+        closeSongReviewModal();
+      }
     });
 
     const hudFeedbackEl = document.getElementById("hudFeedbackText");
