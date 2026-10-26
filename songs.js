@@ -1,4 +1,15 @@
-window.songDatabase = [
+(function(root, factory) {
+  const db = factory();
+  if (typeof module === "object" && module.exports) {
+    module.exports = db;
+  }
+  if (typeof window !== "undefined") {
+    window.songDatabase = db;
+  } else if (root) {
+    root.songDatabase = db;
+  }
+})(typeof self !== "undefined" ? self : this, function() {
+  return [
   {
     "id": "lean-on-me",
     "title": "Lean on Me",
@@ -783,4 +794,5 @@ window.songDatabase = [
     "dyadsF": "1 | 2 3 4 5 4 | 3 2 1 2 3 | 2 1 1 1 1 | 2 1 1 1 | 2 3 4 5 4 | 3 2 1 2 3 | 3 2 1 2 1 2 | 1",
     "tip": "Traditional 16th-century English ground in A Dorian / Melodic minor with the sharp 7 (G#) leading back to tonic."
   }
-];
+  ];
+});

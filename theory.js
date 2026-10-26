@@ -477,17 +477,44 @@
     };
   }
 
-  // Ear Training Quiz Generator
-  function generateEarTrainingChallenge(type = "pitch_match") {
+  function pickSRSWeightedItem(items, getKeyFn, useSRS = true) {
+    if (!items || items.length === 0) return null;
+    if (!useSRS || items.length === 1) {
+      return items[Math.floor(Math.random() * items.length)];
+    }
+    const weights = items.map(item => {
+      const key = getKeyFn(item);
+      const mastery = getSRSMasteryLevel(key);
+      if (mastery === "needs_practice") return 3.5;
+      if (mastery === "new") return 2.2;
+      if (mastery === "learning") return 1.8;
+      return 1.0; // mastered
+    });
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+    let randVal = Math.random() * totalWeight;
+    for (let i = 0; i < items.length; i++) {
+      randVal -= weights[i];
+      if (randVal <= 0) {
+        return items[i];
+      }
+    }
+    return items[items.length - 1];
+  }
+
+  // Ear Training Quiz Generator (with Adaptive Spaced-Repetition weighting)
+  function generateEarTrainingChallenge(type = "pitch_match", useSRS = true) {
     if (type === "pitch_match") {
       const pitches = ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5"];
-      const target = pitches[Math.floor(Math.random() * pitches.length)];
+      const target = pickSRSWeightedItem(pitches, p => p, useSRS);
       return {
         type: "pitch_match",
         prompt: "Listen to the note and play it back!",
         targetPitch: target,
         midi: pitchToMidi(target),
-        freq: pitchToFreq(target)
+        freq: pitchToFreq(target),
+        srsKey: target,
+        srsMastery: getSRSMasteryLevel(target),
+        srsStats: getSRSItemStats(target)
       };
     } else if (type === "interval_recognition") {
       const rootPitches = ["C4", "D4", "E4", "F4", "G4"];
@@ -499,7 +526,7 @@
         { semitones: 12, label: "Octave" }
       ];
       const root = rootPitches[Math.floor(Math.random() * rootPitches.length)];
-      const chosenInterval = testIntervals[Math.floor(Math.random() * testIntervals.length)];
+      const chosenInterval = pickSRSWeightedItem(testIntervals, i => i.label, useSRS);
       const rootMidi = pitchToMidi(root);
       const targetMidi = rootMidi + chosenInterval.semitones;
 
@@ -519,21 +546,28 @@
         targetPitch: midiToPitch(targetMidi),
         targetMidi: targetMidi,
         correctInterval: chosenInterval.label,
-        options: options
+        options: options,
+        srsKey: chosenInterval.label,
+        srsMastery: getSRSMasteryLevel(chosenInterval.label),
+        srsStats: getSRSItemStats(chosenInterval.label)
       };
     } else if (type === "chord_quality") {
       const roots = ["C4", "D4", "E4", "F4", "G4", "A4"];
       const qualities = ["major", "minor"];
       const root = roots[Math.floor(Math.random() * roots.length)];
-      const quality = qualities[Math.floor(Math.random() * qualities.length)];
+      const quality = pickSRSWeightedItem(qualities, q => q === "major" ? "Major Triad" : "Minor Triad", useSRS);
+      const srsKey = quality === "major" ? "Major Triad" : "Minor Triad";
       const chord = generateChord(root.replace("4", ""), quality, 4);
 
       return {
         type: "chord_quality",
         prompt: "Listen to the triad. Is it Major or Minor?",
         chord: chord,
-        correctQuality: quality === "major" ? "Major Triad" : "Minor Triad",
-        options: ["Major Triad", "Minor Triad"]
+        correctQuality: srsKey,
+        options: ["Major Triad", "Minor Triad"],
+        srsKey: srsKey,
+        srsMastery: getSRSMasteryLevel(srsKey),
+        srsStats: getSRSItemStats(srsKey)
       };
     }
   }
@@ -1949,6 +1983,352 @@
       });
   }
 
+  /**
+   * Parses a score token string (e.g. "C4+E4:2~") into pitch, beats, and tied flag.
+   */
+  function parseToken(tokenStr) {
+    if (!tokenStr || tokenStr === "|") return { pitch: tokenStr, beats: 0, tied: false };
+    const tied = tokenStr.includes("~");
+    const clean = tokenStr.replace(/~/g, "");
+    const parts = clean.split(":");
+    const pitch = parts[0];
+    const beats = parts[1] ? parseFloat(parts[1]) : 1.0;
+    return { pitch, beats, tied };
+  }
+
+  /**
+   * Computes functional Roman numeral analysis (e.g. "I", "IV", "V7", "vi") for a chord within a song's key.
+   */
+  function getRomanNumeralAnalysis(chordInfo, song) {
+    if (!chordInfo || !chordInfo.name || !song) return null;
+    let tonic = "C";
+    if (song.category && song.category.includes("C 5-Finger")) tonic = "C";
+    else if (song.id === "canon-in-d") tonic = "D";
+    else if (song.id === "bach-minuet-g" || (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5"))) tonic = "G";
+    else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-no-1")) tonic = "D";
+    else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves"))) tonic = "A";
+    else if (song.id && song.id.includes("amazing-grace-f")) tonic = "F";
+    else {
+      const firstBass = song.lh ? song.lh.match(/([A-G][#b]?)/) : null;
+      if (firstBass) tonic = firstBass[1];
+      else {
+        const firstMel = song.rh ? song.rh.match(/([A-G][#b]?)/) : null;
+        if (firstMel) tonic = firstMel[1];
+      }
+    }
+
+    const tonicSemi = NOTE_OFFSETS[tonic] ?? 0;
+    const rootMatch = chordInfo.name.match(/^([A-G][#b]?)/);
+    if (!rootMatch) return null;
+    const chordRoot = rootMatch[1];
+    const chordSemi = NOTE_OFFSETS[chordRoot];
+    if (chordSemi === undefined) return null;
+
+    const diff = (chordSemi - tonicSemi + 12) % 12;
+    const isMinor = chordInfo.name.includes("Minor") || chordInfo.name.includes("m7") || chordInfo.type === "Minor Triad";
+
+    const majorNumerals = {
+      0: "I", 1: "♭II", 2: "ii", 3: "♭III", 4: "iii", 5: "IV",
+      6: "♯IV", 7: "V", 8: "♭VI", 9: "vi", 10: "♭VII", 11: "vii°"
+    };
+
+    let base = majorNumerals[diff] || "I";
+    if (isMinor) base = base.toLowerCase();
+    else if (chordInfo.type === "Major Triad") base = base.toUpperCase();
+
+    if (chordInfo.name.includes("7")) base += "7";
+    return base;
+  }
+
+  /**
+   * Builds a synchronized multi-measure score model & step timeline from a song definition.
+   */
+  function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song", lhStyle = "song") {
+    if (!song) return { measures: [], steps: [] };
+
+    let dyadSource = song.dyads || "";
+    let dyadFSource = song.dyadsF || "";
+
+    if (showDyads && harmonyType && harmonyType !== "song") {
+      const gen = generateSongHarmonies(song, harmonyType);
+      dyadSource = gen.dyads;
+      dyadFSource = gen.dyadsF;
+    }
+
+    let lhSource = song.lh || "";
+    let lhFSource = song.lhF || "";
+
+    if (showLH && lhStyle && lhStyle !== "song") {
+      const genLH = generateLeftHandAccompaniment(song, lhStyle);
+      lhSource = genLH.lh;
+      lhFSource = genLH.lhF;
+    }
+
+    const rhM = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+    const lhM = (lhSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+    const dyadM = (dyadSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+    const rhFM = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+    const lhFM = (lhFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+    const dyadFM = (dyadFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+
+    let expMeasureBeats = 4;
+    if (song.timeSig) {
+      const [numStr, denStr] = song.timeSig.split("/");
+      const num = parseFloat(numStr) || 4;
+      const den = parseFloat(denStr) || 4;
+      expMeasureBeats = num * (4 / den);
+    }
+
+    const totalMeasures = Math.max(rhM.length, lhM.length, dyadM.length);
+    const measures = [];
+    const steps = [];
+    let stepGlobalIdx = 0;
+
+    for (let m = 0; m < totalMeasures; m++) {
+      const mRH = [...(rhM[m] || [])];
+      const mLH = [...(lhM[m] || [])];
+      const mDyad = [...(dyadM[m] || [])];
+      const mRHF = rhFM[m] || [];
+      const mLHF = lhFM[m] || [];
+      const mDyadF = dyadFM[m] || [];
+
+      const measureItems = [];
+
+      if (showDyads && showLH) {
+        let dyadBeat = 0;
+        const dyadEvents = mDyad.map((t, k) => {
+          const p = parseToken(t);
+          const ev = { ...p, f: mDyadF[k] || "", startBeat: dyadBeat };
+          dyadBeat += p.beats;
+          return ev;
+        });
+
+        let lhBeat = 0;
+        const lhEvents = mLH.map((t, k) => {
+          const p = parseToken(t);
+          const ev = { ...p, f: mLHF[k] || "", startBeat: lhBeat };
+          lhBeat += p.beats;
+          return ev;
+        });
+
+        const isPickupDyadM0 = (m === 0 && dyadBeat < expMeasureBeats - 0.01 && lhBeat < expMeasureBeats - 0.01);
+        if (dyadEvents.length === 0 && lhEvents.length > 0) {
+          dyadEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
+        } else if (dyadEvents.length > 0 && dyadBeat < expMeasureBeats - 0.01 && !isPickupDyadM0) {
+          dyadEvents.push({ pitch: "-", beats: expMeasureBeats - dyadBeat, f: "", startBeat: dyadBeat });
+        }
+        if (lhEvents.length === 0 && dyadEvents.length > 0) {
+          lhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
+        } else if (lhEvents.length > 0 && lhBeat < expMeasureBeats - 0.01 && !isPickupDyadM0) {
+          lhEvents.push({ pitch: "-", beats: expMeasureBeats - lhBeat, f: "", startBeat: lhBeat });
+        }
+
+        const onsets = Array.from(new Set([
+          ...dyadEvents.map(e => e.startBeat),
+          ...lhEvents.map(e => e.startBeat)
+        ])).sort((a, b) => a - b);
+
+        onsets.forEach((b, k) => {
+          const dyadEv = dyadEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+          const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+          const expectedList = [];
+          if (dyadEv && dyadEv.pitch && dyadEv.pitch !== "-") {
+            dyadEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
+          }
+          if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
+            lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
+          }
+          const expected = Array.from(new Set(expectedList));
+
+          const nextB = onsets[k + 1];
+          const maxMB = Math.max(
+            ...dyadEvents.map(e => e.startBeat + e.beats),
+            ...lhEvents.map(e => e.startBeat + e.beats),
+            0
+          );
+          const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(dyadEv ? dyadEv.beats : 1, lhEv ? lhEv.beats : 1));
+
+          const item = {
+            stepIndex: stepGlobalIdx,
+            index: stepGlobalIdx,
+            measure: m + 1,
+            startBeat: b,
+            dyad: dyadEv,
+            dyadF: dyadEv ? dyadEv.f : "",
+            lh: lhEv,
+            lhF: lhEv ? lhEv.f : "",
+            expectedPitches: expected,
+            displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
+            beats: stepBeats
+          };
+          measureItems.push(item);
+          steps.push(item);
+          stepGlobalIdx++;
+        });
+      } else if (showDyads && !showLH) {
+        if (mDyad.length === 0) {
+          mDyad.push(`-:${expMeasureBeats}`);
+        }
+        let dyadBeat = 0;
+        mDyad.forEach((t, k) => {
+          const parsed = parseToken(t);
+          const expected = parsed.pitch.split("+").filter(p => p !== "-");
+          const item = {
+            stepIndex: stepGlobalIdx,
+            index: stepGlobalIdx,
+            measure: m + 1,
+            startBeat: dyadBeat,
+            dyad: parsed,
+            dyadF: mDyadF[k] || "",
+            expectedPitches: expected,
+            displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
+            beats: parsed.beats
+          };
+          dyadBeat += parsed.beats;
+          measureItems.push(item);
+          steps.push(item);
+          stepGlobalIdx++;
+        });
+      } else if (showRH && !showLH) {
+        if (mRH.length === 0) {
+          mRH.push(`-:${expMeasureBeats}`);
+        }
+        let rhBeat = 0;
+        mRH.forEach((t, k) => {
+          const parsed = parseToken(t);
+          const expected = parsed.pitch.split("+").filter(p => p !== "-");
+          const item = {
+            stepIndex: stepGlobalIdx,
+            index: stepGlobalIdx,
+            measure: m + 1,
+            startBeat: rhBeat,
+            rh: parsed,
+            rhF: mRHF[k] || "",
+            expectedPitches: expected,
+            displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
+            beats: parsed.beats
+          };
+          rhBeat += parsed.beats;
+          measureItems.push(item);
+          steps.push(item);
+          stepGlobalIdx++;
+        });
+      } else if (showLH && !showRH) {
+        if (mLH.length === 0) {
+          mLH.push(`-:${expMeasureBeats}`);
+        }
+        let lhBeat = 0;
+        mLH.forEach((t, k) => {
+          const parsed = parseToken(t);
+          const expected = parsed.pitch.split("+").filter(p => p !== "-");
+          const item = {
+            stepIndex: stepGlobalIdx,
+            index: stepGlobalIdx,
+            measure: m + 1,
+            startBeat: lhBeat,
+            lh: parsed,
+            lhF: mLHF[k] || "",
+            expectedPitches: expected,
+            displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
+            beats: parsed.beats
+          };
+          lhBeat += parsed.beats;
+          measureItems.push(item);
+          steps.push(item);
+          stepGlobalIdx++;
+        });
+      } else if (showRH && showLH) {
+        let rhBeat = 0;
+        const rhEvents = mRH.map((t, k) => {
+          const p = parseToken(t);
+          const ev = { ...p, f: mRHF[k] || "", startBeat: rhBeat };
+          rhBeat += p.beats;
+          return ev;
+        });
+
+        let lhBeat = 0;
+        const lhEvents = mLH.map((t, k) => {
+          const p = parseToken(t);
+          const ev = { ...p, f: mLHF[k] || "", startBeat: lhBeat };
+          lhBeat += p.beats;
+          return ev;
+        });
+
+        const isPickupM0 = (m === 0 && rhBeat < expMeasureBeats - 0.01 && lhBeat < expMeasureBeats - 0.01);
+        if (rhEvents.length === 0 && lhEvents.length > 0) {
+          rhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
+        } else if (rhEvents.length > 0 && rhBeat < expMeasureBeats - 0.01 && !isPickupM0) {
+          rhEvents.push({ pitch: "-", beats: expMeasureBeats - rhBeat, f: "", startBeat: rhBeat });
+        }
+        if (lhEvents.length === 0 && rhEvents.length > 0) {
+          lhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
+        } else if (lhEvents.length > 0 && lhBeat < expMeasureBeats - 0.01 && !isPickupM0) {
+          lhEvents.push({ pitch: "-", beats: expMeasureBeats - lhBeat, f: "", startBeat: lhBeat });
+        }
+
+        const onsets = Array.from(new Set([
+          ...rhEvents.map(e => e.startBeat),
+          ...lhEvents.map(e => e.startBeat)
+        ])).sort((a, b) => a - b);
+
+        onsets.forEach((b, k) => {
+          const rhEv = rhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+          const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
+          const expectedList = [];
+          if (rhEv && rhEv.pitch && rhEv.pitch !== "-") {
+            rhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
+          }
+          if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
+            lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
+          }
+          const expected = Array.from(new Set(expectedList));
+
+          const nextB = onsets[k + 1];
+          const maxMB = Math.max(
+            ...rhEvents.map(e => e.startBeat + e.beats),
+            ...lhEvents.map(e => e.startBeat + e.beats),
+            0
+          );
+          const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1));
+
+          const item = {
+            stepIndex: stepGlobalIdx,
+            index: stepGlobalIdx,
+            measure: m + 1,
+            startBeat: b,
+            rh: rhEv,
+            rhF: rhEv ? rhEv.f : "",
+            lh: lhEv,
+            lhF: lhEv ? lhEv.f : "",
+            expectedPitches: expected,
+            displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
+            beats: stepBeats
+          };
+          measureItems.push(item);
+          steps.push(item);
+          stepGlobalIdx++;
+        });
+      }
+
+      measures.push(measureItems);
+    }
+
+    // Cross-step tie detection
+    for (let sIdx = 1; sIdx < steps.length; sIdx++) {
+      const prev = steps[sIdx - 1];
+      const cur = steps[sIdx];
+      const prevTied = (prev.dyad && prev.dyad.tied) || (prev.rh && prev.rh.tied) || (prev.lh && prev.lh.tied);
+      if (prevTied && prev.expectedPitches && cur.expectedPitches) {
+        const hasOverlap = cur.expectedPitches.some(p => prev.expectedPitches.includes(p));
+        if (hasOverlap) {
+          cur.tiedFromPrev = true;
+        }
+      }
+    }
+
+    return { measures, steps };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -1985,6 +2365,9 @@
     transformLeftHandPitch,
     transformLeftHandToken,
     generateLeftHandAccompaniment,
+    parseToken,
+    getRomanNumeralAnalysis,
+    buildScoreModel,
     recordSRSAttempt,
     getSRSItemStats,
     getAllSRSStats,
