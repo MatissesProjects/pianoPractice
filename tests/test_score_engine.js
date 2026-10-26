@@ -33,7 +33,7 @@ function parseToken(tokenStr) {
   return { pitch, beats, tied };
 }
 
-function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") {
+function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song", lhStyle = "song") {
   if (!song) return { measures: [], steps: [] };
 
   let dyadSource = song.dyads || "";
@@ -47,11 +47,22 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
     }
   }
 
+  let lhSource = song.lh || "";
+  let lhFSource = song.lhF || "";
+
+  if (showLH && lhStyle && lhStyle !== "song") {
+    if (typeof MusicTheory !== "undefined" && MusicTheory.generateLeftHandAccompaniment) {
+      const genLH = MusicTheory.generateLeftHandAccompaniment(song, lhStyle);
+      lhSource = genLH.lh;
+      lhFSource = genLH.lhF;
+    }
+  }
+
   const rhM = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-  const lhM = (song.lh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+  const lhM = (lhSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
   const dyadM = (dyadSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
   const rhFM = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-  const lhFM = (song.lhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+  const lhFM = (lhFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
   const dyadFM = (dyadFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
 
   let expMeasureBeats = 4;
@@ -282,7 +293,9 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
           measure: m + 1,
           startBeat: b,
           rh: rhEv,
+          rhF: rhEv ? rhEv.f : "",
           lh: lhEv,
+          lhF: lhEv ? lhEv.f : "",
           expectedPitches: expected,
           displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
           beats: stepBeats
@@ -3184,6 +3197,105 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") 
   }, "index.html inline script must be syntactically valid with visual expansion & pendulum engine");
 
   console.log("✔ Test 31: 🎨 Visual Expansion, 3D Realism, Metronome Pendulum & UI Cleanliness passed");
+}
+
+// ==========================================
+// TEST 32: 𝄢 Left-Hand Accompaniment Engine & Multi-Level Left-Hand Style Selector
+// ==========================================
+{
+  const theory = require("../theory.js");
+  const fs = require("fs");
+  const path = require("path");
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+
+  // 32.1 Exports & Style Presets in theory.js
+  assert.ok(theory.LH_ACCOMPANIMENT_STYLES, "theory must export LH_ACCOMPANIMENT_STYLES");
+  assert.strictEqual(theory.LH_ACCOMPANIMENT_STYLES.length, 6, "Must define 6 LH accompaniment styles");
+  const styleIds = theory.LH_ACCOMPANIMENT_STYLES.map(s => s.id);
+  assert.ok(styleIds.includes("song"), "Must include 'song' style");
+  assert.ok(styleIds.includes("roots"), "Must include 'roots' style");
+  assert.ok(styleIds.includes("fifths"), "Must include 'fifths' style");
+  assert.ok(styleIds.includes("octaves"), "Must include 'octaves' style");
+  assert.ok(styleIds.includes("triads"), "Must include 'triads' style");
+  assert.ok(styleIds.includes("thirds"), "Must include 'thirds' style");
+
+  // 32.2 Bass Root Extraction & Pitch Transformations
+  assert.strictEqual(theory.extractBassRoot("C3"), "C3", "Single note returns itself");
+  assert.strictEqual(theory.extractBassRoot("C3+G3+C4"), "C3", "Extracts lowest root pitch from 3-note chord");
+  assert.strictEqual(theory.extractBassRoot("F2+C3+F3"), "F2", "Extracts lowest root F2");
+  assert.strictEqual(theory.extractBassRoot("G2+F3+B3"), "G2", "Extracts lowest root G2");
+  assert.strictEqual(theory.extractBassRoot("-"), "-", "Rest returns '-'");
+
+  assert.strictEqual(theory.transformLeftHandPitch("C3+G3+C4", "roots"), "C3", "Roots style simplifies multi-note chord to single root C3");
+  assert.strictEqual(theory.transformLeftHandPitch("C3", "fifths"), "C3+G3", "Fifths style adds diatonic 5th above C3");
+  assert.strictEqual(theory.transformLeftHandPitch("G2", "fifths"), "G2+D3", "Fifths style adds diatonic 5th above G2");
+  assert.strictEqual(theory.transformLeftHandPitch("C3", "octaves"), "C3+C4", "Octaves style adds diatonic octave above C3");
+  assert.strictEqual(theory.transformLeftHandPitch("G2", "octaves"), "G2+G3", "Octaves style adds diatonic octave above G2");
+  assert.strictEqual(theory.transformLeftHandPitch("C3", "triads"), "C3+E3+G3", "Triads style builds C Major triad C3+E3+G3");
+  assert.strictEqual(theory.transformLeftHandPitch("G2", "triads"), "G2+B2+D3", "Triads style builds G Major triad G2+B2+D3");
+  assert.strictEqual(theory.transformLeftHandPitch("C3", "thirds"), "C3+E3", "Thirds style adds diatonic 3rd above C3");
+
+  // 32.3 Lean on Me Simplification with Single Roots
+  const leanSong = songDatabase.find(s => s.id === "lean-on-me");
+  assert.ok(leanSong, "Lean on Me must exist");
+  const leanRoots = theory.generateLeftHandAccompaniment(leanSong, "roots");
+
+  // Measure 1 of Lean on Me with roots: C3:3 C3:0.5 F2:0.5~
+  const leanRootsM1 = leanRoots.lh.split("|")[0].trim();
+  assert.ok(leanRootsM1.includes("C3:3") && leanRootsM1.includes("F2:0.5~"), "Lean on Me M1 simplified to C3 and F2 roots with tie preserved");
+  assert.ok(!leanRootsM1.includes("+"), "Lean on Me M1 with roots style must have zero chord plus signs");
+  assert.strictEqual(leanRoots.lhF.split("|")[0].trim(), "5 5 5", "Fingers simplified to single finger 5");
+
+  // 32.4 Ode to Joy Accompaniment Generation (Fifths, Octaves, Triads)
+  const odeSong = songDatabase.find(s => s.id === "ode-to-joy");
+  assert.ok(odeSong, "Ode to Joy must exist");
+  const odeFifths = theory.generateLeftHandAccompaniment(odeSong, "fifths");
+  assert.strictEqual(odeFifths.lh.split("|")[0].trim(), "C3+G3:2 C3+G3:2", "Ode to Joy M1 transformed to open 5ths C3+G3");
+  assert.strictEqual(odeFifths.lhF.split("|")[0].trim(), "5+1 5+1", "Fingers set to 5+1");
+
+  const odeOctaves = theory.generateLeftHandAccompaniment(odeSong, "octaves");
+  assert.strictEqual(odeOctaves.lh.split("|")[0].trim(), "C3+C4:2 C3+C4:2", "Ode to Joy M1 transformed to bass octaves C3+C4");
+  assert.strictEqual(odeOctaves.lhF.split("|")[0].trim(), "5+1 5+1", "Fingers set to 5+1");
+
+  const odeTriads = theory.generateLeftHandAccompaniment(odeSong, "triads");
+  assert.strictEqual(odeTriads.lh.split("|")[0].trim(), "C3+E3+G3:2 C3+E3+G3:2", "Ode to Joy M1 transformed to full triads C3+E3+G3");
+  assert.strictEqual(odeTriads.lhF.split("|")[0].trim(), "5+3+1 5+3+1", "Fingers set to 5+3+1");
+
+  // 32.5 Score Model Integration with lhStyle
+  const leanRootsModel = buildScoreModel(leanSong, true, true, false, "song", "roots");
+  const leanStep0 = leanRootsModel.steps[0];
+  assert.deepStrictEqual(leanStep0.expectedPitches, ["C4", "C3"], "Step 0 expected pitches simplified to RH C4 and LH C3 (no G3 or top C4)");
+  assert.strictEqual(leanStep0.lh.pitch, "C3", "LH pitch is single root C3");
+  assert.strictEqual(leanStep0.lhF, "5", "LH finger is single 5");
+
+  const odeFifthsModel = buildScoreModel(odeSong, true, true, false, "song", "fifths");
+  const odeStep0 = odeFifthsModel.steps[0];
+  assert.deepStrictEqual(odeStep0.expectedPitches, ["E4", "C3", "G3"], "Step 0 expected pitches include melody E4 and fifth C3+G3");
+  assert.strictEqual(odeStep0.lh.pitch, "C3+G3", "LH pitch is open fifth C3+G3");
+  assert.strictEqual(odeStep0.lhF, "5+1", "LH finger is 5+1");
+
+  // 32.6 UI Controls, Styling & LocalStorage in index.html
+  assert.ok(html.includes('id="lhStyleSelectWrap"'), "index.html must include #lhStyleSelectWrap");
+  assert.ok(html.includes('id="lhStyleSelect"'), "index.html must include #lhStyleSelect");
+  assert.ok(html.includes('value="roots"'), "index.html must include 'roots' option");
+  assert.ok(html.includes('value="fifths"'), "index.html must include 'fifths' option");
+  assert.ok(html.includes('value="octaves"'), "index.html must include 'octaves' option");
+  assert.ok(html.includes('value="triads"'), "index.html must include 'triads' option");
+  assert.ok(html.includes('value="thirds"'), "index.html must include 'thirds' option");
+  assert.ok(html.includes('piano_lh_style'), "index.html must persist LH style in LocalStorage (piano_lh_style)");
+  assert.ok(html.includes('.lh-style-select-wrap'), "index.html CSS must include .lh-style-select-wrap");
+  assert.ok(html.includes('.lh-style-select-wrap.active-lh-style'), "index.html CSS must include .lh-style-select-wrap.active-lh-style");
+
+  // 32.7 Complete Script Syntax Validation via Node vm
+  const vm = require("vm");
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid with Left Hand Accompaniment Engine");
+
+  console.log("✔ Test 32: 𝄢 Left-Hand Accompaniment Engine & Multi-Level Left-Hand Style Selector passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
