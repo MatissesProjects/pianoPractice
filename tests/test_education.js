@@ -290,5 +290,63 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 13: Adaptive Spaced-Repetition (SRS) Engine & Weighted Selection passed");
 }
 
-console.log("=== ALL 13 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// 14. Test Ear Training SRS Weighting, Score Engine Exports & UMD Song Database
+{
+  // 14.1 UMD Song Database Export Verification
+  const songsFromUmd = require("../songs.js");
+  assert.ok(Array.isArray(songsFromUmd), "songs.js must export an Array via UMD module.exports");
+  assert.strictEqual(songsFromUmd.length, 56, "songs.js must contain 56 songs");
+
+  // 14.2 Score Engine Exports on MusicTheory
+  assert.strictEqual(typeof MusicTheory.parseToken, "function", "parseToken must be exported on MusicTheory");
+  assert.strictEqual(typeof MusicTheory.getRomanNumeralAnalysis, "function", "getRomanNumeralAnalysis must be exported on MusicTheory");
+  assert.strictEqual(typeof MusicTheory.buildScoreModel, "function", "buildScoreModel must be exported on MusicTheory");
+
+  const parsed = MusicTheory.parseToken("F#4+A4:1.5~");
+  assert.strictEqual(parsed.pitch, "F#4+A4");
+  assert.strictEqual(parsed.beats, 1.5);
+  assert.strictEqual(parsed.tied, true);
+
+  const roman = MusicTheory.getRomanNumeralAnalysis({ name: "G Major", type: "Major Triad" }, { category: "C 5-Finger" });
+  assert.strictEqual(roman, "V", "G Major in C Major must analyze as V");
+
+  // 14.3 Adaptive SRS Weighting in Ear Training (Pitch Match, Interval, Chord Quality)
+  MusicTheory.clearSRSStats();
+
+  // Make E4 'needs_practice' (high errors) and C4 'mastered' (fast & 0 errors)
+  for (let i = 0; i < 5; i++) {
+    MusicTheory.recordSRSAttempt("C4", true, 500);
+  }
+  MusicTheory.recordSRSAttempt("E4", false, 2900);
+  MusicTheory.recordSRSAttempt("E4", false, 2600);
+  MusicTheory.recordSRSAttempt("E4", false, 2500);
+
+  assert.strictEqual(MusicTheory.getSRSMasteryLevel("C4"), "mastered");
+  assert.strictEqual(MusicTheory.getSRSMasteryLevel("E4"), "needs_practice");
+
+  const earPitchCounts = { C4: 0, E4: 0 };
+  for (let i = 0; i < 800; i++) {
+    const ch = MusicTheory.generateEarTrainingChallenge("pitch_match", true);
+    assert.ok(ch.srsKey, "Pitch match challenge must return srsKey");
+    assert.ok(ch.srsMastery, "Pitch match challenge must return srsMastery");
+    if (ch.targetPitch === "C4") earPitchCounts.C4++;
+    if (ch.targetPitch === "E4") earPitchCounts.E4++;
+  }
+  assert.ok(earPitchCounts.E4 > earPitchCounts.C4 * 1.4, `Ear Training SRS must favor needs_practice E4 (${earPitchCounts.E4}) over mastered C4 (${earPitchCounts.C4})`);
+
+  // Interval SRS metadata check
+  const intCh = MusicTheory.generateEarTrainingChallenge("interval_recognition", true);
+  assert.strictEqual(intCh.srsKey, intCh.correctInterval, "Interval challenge must return interval label as srsKey");
+  assert.strictEqual(typeof intCh.srsMastery, "string");
+
+  // Chord Quality SRS metadata check
+  const chdCh = MusicTheory.generateEarTrainingChallenge("chord_quality", true);
+  assert.strictEqual(chdCh.srsKey, chdCh.correctQuality, "Chord quality challenge must return quality label as srsKey");
+  assert.strictEqual(typeof chdCh.srsMastery, "string");
+
+  console.log("✔ Test 14: Ear Training SRS Weighting, Score Engine Exports & UMD Song Database passed");
+}
+
+console.log("=== ALL 14 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+
 

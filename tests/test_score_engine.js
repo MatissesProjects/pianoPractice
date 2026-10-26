@@ -12,318 +12,13 @@ console.log("=== Running Score Engine & Bass Clef Alignment Tests ===");
 const songDatabase = window.songDatabase;
 assert.ok(songDatabase && songDatabase.length > 0, "Song database must be loaded");
 
-const DIATONIC_BASE = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
-function getDiatonicStep(pitchStr) {
-  if (!pitchStr || pitchStr === "-") return null;
-  const clean = pitchStr.trim();
-  const match = clean.match(/^([A-G])([#b]?)([0-8])?$/);
-  if (!match) return null;
-  const letter = match[1];
-  const oct = match[3] ? parseInt(match[3], 10) : 4;
-  return (oct - 4) * 7 + DIATONIC_BASE[letter];
-}
-
-function parseToken(tokenStr) {
-  if (!tokenStr || tokenStr === "|") return { pitch: tokenStr, beats: 0, tied: false };
-  const tied = tokenStr.includes("~");
-  const clean = tokenStr.replace(/~/g, "");
-  const parts = clean.split(":");
-  const pitch = parts[0];
-  const beats = parts[1] ? parseFloat(parts[1]) : 1.0;
-  return { pitch, beats, tied };
-}
-
-function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song", lhStyle = "song") {
-  if (!song) return { measures: [], steps: [] };
-
-  let dyadSource = song.dyads || "";
-  let dyadFSource = song.dyadsF || "";
-
-  if (showDyads && harmonyType && harmonyType !== "song") {
-    if (typeof MusicTheory !== "undefined" && MusicTheory.generateSongHarmonies) {
-      const gen = MusicTheory.generateSongHarmonies(song, harmonyType);
-      dyadSource = gen.dyads;
-      dyadFSource = gen.dyadsF;
-    }
-  }
-
-  let lhSource = song.lh || "";
-  let lhFSource = song.lhF || "";
-
-  if (showLH && lhStyle && lhStyle !== "song") {
-    if (typeof MusicTheory !== "undefined" && MusicTheory.generateLeftHandAccompaniment) {
-      const genLH = MusicTheory.generateLeftHandAccompaniment(song, lhStyle);
-      lhSource = genLH.lh;
-      lhFSource = genLH.lhF;
-    }
-  }
-
-  const rhM = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-  const lhM = (lhSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-  const dyadM = (dyadSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-  const rhFM = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-  const lhFM = (lhFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-  const dyadFM = (dyadFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-
-  let expMeasureBeats = 4;
-  if (song.timeSig) {
-    const [numStr, denStr] = song.timeSig.split("/");
-    const num = parseFloat(numStr) || 4;
-    const den = parseFloat(denStr) || 4;
-    expMeasureBeats = num * (4 / den);
-  }
-
-  const totalMeasures = Math.max(rhM.length, lhM.length, dyadM.length);
-  const measures = [];
-  const steps = [];
-  let stepGlobalIdx = 0;
-
-  for (let m = 0; m < totalMeasures; m++) {
-    const mRH = [...(rhM[m] || [])];
-    const mLH = [...(lhM[m] || [])];
-    const mDyad = [...(dyadM[m] || [])];
-    const mRHF = rhFM[m] || [];
-    const mLHF = lhFM[m] || [];
-    const mDyadF = dyadFM[m] || [];
-
-    const measureItems = [];
-
-    if (showDyads && showLH) {
-      let dyadBeat = 0;
-      const dyadEvents = mDyad.map((t, k) => {
-        const p = parseToken(t);
-        const ev = { ...p, f: mDyadF[k] || "", startBeat: dyadBeat };
-        dyadBeat += p.beats;
-        return ev;
-      });
-
-      let lhBeat = 0;
-      const lhEvents = mLH.map((t, k) => {
-        const p = parseToken(t);
-        const ev = { ...p, f: mLHF[k] || "", startBeat: lhBeat };
-        lhBeat += p.beats;
-        return ev;
-      });
-
-      // Measure rest padding: if a hand is silent in this measure, synthesize a full measure rest
-      const isPickupDyadM0 = (m === 0 && dyadBeat < expMeasureBeats - 0.01 && lhBeat < expMeasureBeats - 0.01);
-      if (dyadEvents.length === 0 && lhEvents.length > 0) {
-        dyadEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
-      } else if (dyadEvents.length > 0 && dyadBeat < expMeasureBeats - 0.01 && !isPickupDyadM0) {
-        dyadEvents.push({ pitch: "-", beats: expMeasureBeats - dyadBeat, f: "", startBeat: dyadBeat });
-      }
-      if (lhEvents.length === 0 && dyadEvents.length > 0) {
-        lhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
-      } else if (lhEvents.length > 0 && lhBeat < expMeasureBeats - 0.01 && !isPickupDyadM0) {
-        lhEvents.push({ pitch: "-", beats: expMeasureBeats - lhBeat, f: "", startBeat: lhBeat });
-      }
-
-      const onsets = Array.from(new Set([
-        ...dyadEvents.map(e => e.startBeat),
-        ...lhEvents.map(e => e.startBeat)
-      ])).sort((a, b) => a - b);
-
-      onsets.forEach((b, k) => {
-        const dyadEv = dyadEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-        const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-        const expectedList = [];
-        if (dyadEv && dyadEv.pitch && dyadEv.pitch !== "-") {
-          dyadEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
-        }
-        if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
-          lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
-        }
-        const expected = Array.from(new Set(expectedList));
-
-        const nextB = onsets[k + 1];
-        const maxMB = Math.max(
-          ...dyadEvents.map(e => e.startBeat + e.beats),
-          ...lhEvents.map(e => e.startBeat + e.beats),
-          0
-        );
-        const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(dyadEv ? dyadEv.beats : 1, lhEv ? lhEv.beats : 1));
-
-        const item = {
-          stepIndex: stepGlobalIdx,
-          index: stepGlobalIdx,
-          measure: m + 1,
-          startBeat: b,
-          dyad: dyadEv,
-          dyadF: dyadEv ? dyadEv.f : "",
-          lh: lhEv,
-          lhF: lhEv ? lhEv.f : "",
-          expectedPitches: expected,
-          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-          beats: stepBeats
-        };
-        measureItems.push(item);
-        steps.push(item);
-        stepGlobalIdx++;
-      });
-    } else if (showDyads && !showLH) {
-      if (mDyad.length === 0) {
-        mDyad.push(`-:${expMeasureBeats}`);
-      }
-      let dyadBeat = 0;
-      mDyad.forEach((t, k) => {
-        const parsed = parseToken(t);
-        const expected = parsed.pitch.split("+").filter(p => p !== "-");
-        const item = {
-          stepIndex: stepGlobalIdx,
-          index: stepGlobalIdx,
-          measure: m + 1,
-          startBeat: dyadBeat,
-          dyad: parsed,
-          dyadF: mDyadF[k] || "",
-          expectedPitches: expected,
-          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-          beats: parsed.beats
-        };
-        dyadBeat += parsed.beats;
-        measureItems.push(item);
-        steps.push(item);
-        stepGlobalIdx++;
-      });
-    } else if (showRH && !showLH) {
-      if (mRH.length === 0) {
-        mRH.push(`-:${expMeasureBeats}`);
-      }
-      let rhBeat = 0;
-      mRH.forEach((t, k) => {
-        const parsed = parseToken(t);
-        const expected = parsed.pitch.split("+").filter(p => p !== "-");
-        const item = {
-          stepIndex: stepGlobalIdx,
-          index: stepGlobalIdx,
-          measure: m + 1,
-          startBeat: rhBeat,
-          rh: parsed,
-          rhF: mRHF[k] || "",
-          expectedPitches: expected,
-          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-          beats: parsed.beats
-        };
-        rhBeat += parsed.beats;
-        measureItems.push(item);
-        steps.push(item);
-        stepGlobalIdx++;
-      });
-    } else if (showLH && !showRH) {
-      if (mLH.length === 0) {
-        mLH.push(`-:${expMeasureBeats}`);
-      }
-      let lhBeat = 0;
-      mLH.forEach((t, k) => {
-        const parsed = parseToken(t);
-        const expected = parsed.pitch.split("+").filter(p => p !== "-");
-        const item = {
-          stepIndex: stepGlobalIdx,
-          index: stepGlobalIdx,
-          measure: m + 1,
-          startBeat: lhBeat,
-          lh: parsed,
-          lhF: mLHF[k] || "",
-          expectedPitches: expected,
-          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-          beats: parsed.beats
-        };
-        lhBeat += parsed.beats;
-        measureItems.push(item);
-        steps.push(item);
-        stepGlobalIdx++;
-      });
-    } else if (showRH && showLH) {
-      let rhBeat = 0;
-      const rhEvents = mRH.map((t, k) => {
-        const p = parseToken(t);
-        const ev = { ...p, f: mRHF[k] || "", startBeat: rhBeat };
-        rhBeat += p.beats;
-        return ev;
-      });
-
-      let lhBeat = 0;
-      const lhEvents = mLH.map((t, k) => {
-        const p = parseToken(t);
-        const ev = { ...p, f: mLHF[k] || "", startBeat: lhBeat };
-        lhBeat += p.beats;
-        return ev;
-      });
-
-      // Measure rest padding: if a hand is silent in this measure, synthesize a full measure rest
-      const isPickupM0 = (m === 0 && rhBeat < expMeasureBeats - 0.01 && lhBeat < expMeasureBeats - 0.01);
-      if (rhEvents.length === 0 && lhEvents.length > 0) {
-        rhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
-      } else if (rhEvents.length > 0 && rhBeat < expMeasureBeats - 0.01 && !isPickupM0) {
-        rhEvents.push({ pitch: "-", beats: expMeasureBeats - rhBeat, f: "", startBeat: rhBeat });
-      }
-      if (lhEvents.length === 0 && rhEvents.length > 0) {
-        lhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
-      } else if (lhEvents.length > 0 && lhBeat < expMeasureBeats - 0.01 && !isPickupM0) {
-        lhEvents.push({ pitch: "-", beats: expMeasureBeats - lhBeat, f: "", startBeat: lhBeat });
-      }
-
-      const onsets = Array.from(new Set([
-        ...rhEvents.map(e => e.startBeat),
-        ...lhEvents.map(e => e.startBeat)
-      ])).sort((a, b) => a - b);
-
-      onsets.forEach((b, k) => {
-        const rhEv = rhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-        const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-        const expectedList = [];
-        if (rhEv && rhEv.pitch && rhEv.pitch !== "-") {
-          rhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
-        }
-        if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
-          lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
-        }
-        const expected = Array.from(new Set(expectedList));
-
-        const nextB = onsets[k + 1];
-        const maxMB = Math.max(
-          ...rhEvents.map(e => e.startBeat + e.beats),
-          ...lhEvents.map(e => e.startBeat + e.beats),
-          0
-        );
-        const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1));
-
-        const item = {
-          stepIndex: stepGlobalIdx,
-          index: stepGlobalIdx,
-          measure: m + 1,
-          startBeat: b,
-          rh: rhEv,
-          rhF: rhEv ? rhEv.f : "",
-          lh: lhEv,
-          lhF: lhEv ? lhEv.f : "",
-          expectedPitches: expected,
-          displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-          beats: stepBeats
-        };
-        measureItems.push(item);
-        steps.push(item);
-        stepGlobalIdx++;
-      });
-    }
-
-    measures.push(measureItems);
-  }
-
-  // Cross-step tie detection
-  for (let sIdx = 1; sIdx < steps.length; sIdx++) {
-    const prev = steps[sIdx - 1];
-    const cur = steps[sIdx];
-    const prevTied = (prev.dyad && prev.dyad.tied) || (prev.rh && prev.rh.tied) || (prev.lh && prev.lh.tied);
-    if (prevTied && prev.expectedPitches && cur.expectedPitches) {
-      const hasOverlap = cur.expectedPitches.some(p => prev.expectedPitches.includes(p));
-      if (hasOverlap) {
-        cur.tiedFromPrev = true;
-      }
-    }
-  }
-
-  return { measures, steps };
-}
+const {
+  DIATONIC_BASE,
+  getDiatonicStep,
+  parseToken,
+  getRomanNumeralAnalysis,
+  buildScoreModel
+} = window.MusicTheory;
 
 // 1. Test Left Hand Solo Mode (Level 4: Bass Clef Foundation) across all songs
 {
@@ -3432,7 +3127,55 @@ function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song", 
   console.log("✔ Test 33: 🏆 Post-Song Comprehensive Performance Review, Score Inspection & Anti-Reset Engine passed");
 }
 
+// ============================================================================
+// TEST 34: 🛠️ FIXES.MD Complete Audit & Codebase Deduplication Verification
+// ============================================================================
+{
+  const fs = require("fs");
+  const vm = require("vm");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+
+  // 34.1 Global MIDI Deck Un-Nested Above #panelRepertoire
+  const midiDeckIdx = html.indexOf('id="globalMidiDeck"');
+  const panelRepIdx = html.indexOf('id="panelRepertoire"');
+  assert.ok(midiDeckIdx > 0, "globalMidiDeck must exist in index.html");
+  assert.ok(panelRepIdx > 0, "panelRepertoire must exist in index.html");
+  assert.ok(midiDeckIdx < panelRepIdx, "globalMidiDeck must be placed BEFORE #panelRepertoire so it persists across all 6 educational tabs");
+
+  // 34.2 Unified Score Engine Destructured from window.MusicTheory (No Duplicate Inline Definitions)
+  assert.ok(html.includes("parseToken,\n      getRomanNumeralAnalysis,\n      buildScoreModel,"), "index.html must destructure parseToken, getRomanNumeralAnalysis, and buildScoreModel from MusicTheory");
+  assert.ok(!html.includes("function buildScoreModel(song, showRH"), "index.html must not contain duplicate inline function buildScoreModel definition");
+
+  // 34.3 Velocity-Sensitive Multi-Oscillator playTone() + Sustain Pedal UI Badge
+  const playToneMatch = html.match(/function playTone\(freq, duration = 0\.35, velocity = 90\)[\s\S]*?osc2\.stop\(now \+ duration \+ 0\.02\);\s*\}/);
+  assert.ok(playToneMatch, "playTone must accept velocity and use dual oscillators (osc1 + osc2) with lowpass filter");
+  assert.ok(playToneMatch[0].includes('osc1.type = "triangle"'), "playTone fundamental oscillator must be triangle");
+  assert.ok(playToneMatch[0].includes('osc2.type = "sine"'), "playTone 2nd harmonic oscillator must be sine");
+  assert.ok(playToneMatch[0].includes('filter.type = "lowpass"'), "playTone must include dynamic lowpass BiquadFilter");
+
+  assert.ok(html.includes('id="sustainPedalBadge"'), "index.html must include #sustainPedalBadge in the sustain header");
+  assert.ok(html.includes("function updateSustainPedalUI()"), "index.html must define updateSustainPedalUI()");
+
+  // 34.4 Adaptive SRS Integration in Ear Training UI
+  assert.ok(html.includes('id="earSrsPill"'), "Ear Training header must include #earSrsPill");
+  assert.ok(html.includes('id="earSrsStatsDisplay"'), "Ear Training header must include #earSrsStatsDisplay");
+  assert.ok(html.includes("function updateEarSRSHudDisplay("), "index.html must define updateEarSRSHudDisplay");
+  assert.ok(html.includes('window.MusicTheory.generateEarTrainingChallenge(earSubmode, true)'), "loadEarChallenge must request SRS-weighted challenges");
+  assert.ok(html.includes("window.MusicTheory.recordSRSAttempt(earCurrentChallenge.srsKey"), "Ear Training verification must record SRS attempts with response time");
+
+  // 34.5 Full Inline Script Syntax Check
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid");
+
+  console.log("✔ Test 34: 🛠️ FIXES.MD Complete Audit & Codebase Deduplication Verification passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
+
 
 
 
