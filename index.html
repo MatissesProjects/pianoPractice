@@ -2867,32 +2867,8 @@
       </button>
     </nav>
 
-    <!-- REPERTOIRE PRACTICE PANEL -->
-    <div id="panelRepertoire" class="edu-view-panel active-panel">
-      <!-- PROGRESSIVE CURRICULUM LEVEL SELECTOR -->
-      <div class="curriculum-deck">
-        <div class="curriculum-top">
-          <div class="curriculum-title">
-            <span>🎓 Pedagogical Lesson Pathway</span>
-          </div>
-          <div class="level-pills">
-            <button class="level-btn active" data-level="1">Level 1: Root Primer</button>
-            <button class="level-btn" data-level="2">Level 2: Skips & Sight Reading</button>
-            <button class="level-btn" data-level="3">Level 3: Harmonic Dyads</button>
-            <button class="level-btn" data-level="4">Level 4: Bass Clef (𝄢)</button>
-            <button class="level-btn" data-level="5">Level 5: 2-Hand Coordination</button>
-            <button class="level-btn" data-level="6">Level 6: Extended Scales</button>
-            <button class="level-btn" data-level="7">Level 7: Minor & Modal</button>
-            <button class="level-btn" data-level="8">Level 8: Classical Fluency</button>
-          </div>
-        </div>
-        <div class="curriculum-insight" id="curriculumBriefing">
-          <strong>Lesson 1: Root Primer</strong> — Learn single melody notes on the right hand (𝄞). Keep fingers arched over the 5-finger C position (Thumb on Middle C). The cheat sheet letters and finger numbers guide each note without colliding with lines.
-        </div>
-      </div>
-
-    <!-- Live MIDI Bar -->
-    <div class="midi-deck">
+    <!-- Live MIDI Bar (Persistent across all 6 educational modes) -->
+    <div class="midi-deck" id="globalMidiDeck">
       <div class="midi-deck-title">
         <div class="status-dot" id="midiStatusDot"></div>
         <span id="midiStatusText">Web MIDI: Initializing...</span>
@@ -2978,7 +2954,31 @@
       </div>
     </div>
 
-    <!-- PRACTICE STAGE -->
+    <!-- REPERTOIRE PRACTICE PANEL -->
+    <div id="panelRepertoire" class="edu-view-panel active-panel">
+      <!-- PROGRESSIVE CURRICULUM LEVEL SELECTOR -->
+      <div class="curriculum-deck">
+        <div class="curriculum-top">
+          <div class="curriculum-title">
+            <span>🎓 Pedagogical Lesson Pathway</span>
+          </div>
+          <div class="level-pills">
+            <button class="level-btn active" data-level="1">Level 1: Root Primer</button>
+            <button class="level-btn" data-level="2">Level 2: Skips & Sight Reading</button>
+            <button class="level-btn" data-level="3">Level 3: Harmonic Dyads</button>
+            <button class="level-btn" data-level="4">Level 4: Bass Clef (𝄢)</button>
+            <button class="level-btn" data-level="5">Level 5: 2-Hand Coordination</button>
+            <button class="level-btn" data-level="6">Level 6: Extended Scales</button>
+            <button class="level-btn" data-level="7">Level 7: Minor & Modal</button>
+            <button class="level-btn" data-level="8">Level 8: Classical Fluency</button>
+          </div>
+        </div>
+        <div class="curriculum-insight" id="curriculumBriefing">
+          <strong>Lesson 1: Root Primer</strong> — Learn single melody notes on the right hand (𝄞). Keep fingers arched over the 5-finger C position (Thumb on Middle C). The cheat sheet letters and finger numbers guide each note without colliding with lines.
+        </div>
+      </div>
+
+      <!-- PRACTICE STAGE -->
     <div class="practice-stage">
       <div class="stage-top">
         <div class="dropdown-container">
@@ -3217,6 +3217,7 @@
             <div class="stat-pill"><span>🎯 Accuracy:</span><span id="earAccuracy" class="stat-val">100%</span></div>
             <div class="stat-pill"><span>🔥 Streak:</span><span id="earStreak" class="stat-val">0</span></div>
             <div class="stat-pill"><span>🏆 Score:</span><span id="earScore" class="stat-val">0</span></div>
+            <div class="stat-pill srs-stat-pill" id="earSrsPill" title="Adaptive Spaced Repetition mastery"><span>🧠 SRS:</span><span id="earSrsStatsDisplay" class="stat-val">Adaptive</span></div>
           </div>
         </div>
 
@@ -3652,8 +3653,9 @@
             <span>🎸 Live Sustain & Chord Recognizer</span>
             <span id="activeChordPill" class="chord-pill" style="display: none;">Single Note</span>
           </div>
-          <div style="font-size: 0.8rem; color: var(--text-muted);">
-            Active Held Keys: <span id="activeCount" style="color: #fbbf24; font-weight: 700;">0</span>
+          <div style="display:flex; align-items:center; gap:0.85rem; font-size: 0.8rem; color: var(--text-muted);">
+            <button type="button" id="sustainPedalBadge" class="range-shift-btn" style="padding:0.2rem 0.55rem; font-size:0.75rem; color:var(--text-muted);" title="MIDI CC 64 Damper Sustain Pedal Status (Click to toggle sustain)">🦶 Damper: OFF</button>
+            <span>Active Held Keys: <span id="activeCount" style="color: #fbbf24; font-weight: 700;">0</span></span>
           </div>
         </div>
 
@@ -3936,6 +3938,9 @@
       pitchToFreq: getNoteFreq,
       midiToPitch: midiNumberToPitch,
       pitchToMidi: getPitchMidiNumber,
+      parseToken,
+      getRomanNumeralAnalysis,
+      buildScoreModel,
       identifyActiveChord,
       STANDARD_KEYBOARD_PRESETS,
       getSongPitchRange,
@@ -3953,16 +3958,6 @@
         if (keyEl) return keyEl;
       }
       return null;
-    }
-
-    function parseToken(tokenStr) {
-      if (!tokenStr || tokenStr === "|") return { pitch: tokenStr, beats: 0, tied: false };
-      const tied = tokenStr.includes("~");
-      const cleanToken = tokenStr.replace(/~/g, "");
-      const parts = cleanToken.split(":");
-      const pitch = parts[0];
-      const beats = parts[1] ? parseFloat(parts[1]) : 1.0;
-      return { pitch, beats, tied };
     }
 
     function isCheatSheetColorsEnabled() {
@@ -4646,12 +4641,12 @@
       }
     }
 
-    function playTone(freq, duration = 0.35) {
+    function playTone(freq, duration = 0.35, velocity = 90) {
       if (!freq) return;
       if (typeof sendMidiOutputNoteOn === "function" && typeof selectedMidiOutput !== "undefined" && selectedMidiOutput) {
         const midiNum = Math.round(69 + 12 * Math.log2(freq / 440));
         if (midiNum >= 0 && midiNum <= 127) {
-          sendMidiOutputNoteOn(midiNum, 80);
+          sendMidiOutputNoteOn(midiNum, velocity);
           setTimeout(() => {
             if (typeof sendMidiOutputNoteOff === "function") sendMidiOutputNoteOff(midiNum);
           }, duration * 1000);
@@ -4662,29 +4657,72 @@
       if (effectiveVol <= 0.0001) return; // Muted / zero volume
 
       initAudio();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+      const velNorm = Math.max(0.15, Math.min(1, velocity / 127));
+      const volScale = Math.pow(effectiveVol, 2) * velNorm;
 
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      const voiceGain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(freq * (2.5 + velNorm * 5.5), now);
+      filter.frequency.exponentialRampToValueAtTime(freq * 1.8, now + Math.max(0.15, duration));
 
-      const volScale = Math.pow(effectiveVol, 2);
-      const targetPeak = 0.2 * volScale;
+      // Fundamental (triangle) + 2nd harmonic (sine overtone) for warm electric piano tone
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const g2 = audioCtx.createGain();
 
-      gain.gain.setValueAtTime(0, audioCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(targetPeak, audioCtx.currentTime + 0.02);
-      gain.gain.setValueAtTime(targetPeak * 0.9, audioCtx.currentTime + Math.max(0.03, duration - 0.05));
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(freq, now);
 
-      osc.connect(gain);
-      gain.connect(masterGainNode || audioCtx.destination);
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(freq * 2, now);
+      g2.gain.setValueAtTime(0.24 * velNorm, now);
+      g2.gain.exponentialRampToValueAtTime(0.008, now + Math.max(0.1, duration * 0.8));
 
-      osc.start(audioCtx.currentTime);
-      osc.stop(audioCtx.currentTime + duration);
+      const targetPeak = 0.24 * volScale;
+      voiceGain.gain.setValueAtTime(0.0001, now);
+      voiceGain.gain.linearRampToValueAtTime(targetPeak, now + 0.01);
+      voiceGain.gain.exponentialRampToValueAtTime(targetPeak * 0.65, now + Math.max(0.04, duration - 0.04));
+      voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc1.connect(filter);
+      osc2.connect(g2);
+      g2.connect(filter);
+      filter.connect(voiceGain);
+      voiceGain.connect(masterGainNode || audioCtx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + duration + 0.02);
+      osc2.stop(now + duration + 0.02);
     }
 
     let isSustainPedalDown = false;
     const pedaledNotes = new Set(); // MIDI note numbers kept ringing by pedal
+
+    function updateSustainPedalUI() {
+      const badge = document.getElementById("sustainPedalBadge");
+      if (!badge) return;
+      badge.textContent = isSustainPedalDown ? "🦶 Damper: ON" : "🦶 Damper: OFF";
+      badge.style.color = isSustainPedalDown ? "#34d399" : "var(--text-muted)";
+      badge.style.borderColor = isSustainPedalDown ? "#10b981" : "var(--border)";
+    }
+
+    document.getElementById("sustainPedalBadge")?.addEventListener("click", () => {
+      isSustainPedalDown = !isSustainPedalDown;
+      if (typeof sendMidiOutputSustain === "function") {
+        sendMidiOutputSustain(isSustainPedalDown);
+      }
+      if (!isSustainPedalDown) {
+        pedaledNotes.forEach(num => {
+          if (!activeHeldMidiNotes.has(num)) stopLiveTone(num, true);
+        });
+        pedaledNotes.clear();
+      }
+      updateSustainPedalUI();
+      updateActiveChordRecognizer();
+    });
 
     function startLiveTone(noteNumber, velocity = 100) {
       if (typeof sendMidiOutputNoteOn === "function") {
@@ -4760,339 +4798,7 @@
       liveOscillators.delete(noteNumber);
     }
 
-    function getRomanNumeralAnalysis(chordInfo, song) {
-      if (!chordInfo || !chordInfo.name || !song) return null;
-      let tonic = "C";
-      if (song.category && song.category.includes("C 5-Finger")) tonic = "C";
-      else if (song.id === "canon-in-d") tonic = "D";
-      else if (song.id === "bach-minuet-g" || (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5"))) tonic = "G";
-      else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-no-1")) tonic = "D";
-      else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves"))) tonic = "A";
-      else if (song.id && song.id.includes("amazing-grace-f")) tonic = "F";
-      else {
-        const firstBass = song.lh ? song.lh.match(/([A-G][#b]?)/) : null;
-        if (firstBass) tonic = firstBass[1];
-        else {
-          const firstMel = song.rh ? song.rh.match(/([A-G][#b]?)/) : null;
-          if (firstMel) tonic = firstMel[1];
-        }
-      }
-
-      const tonicSemi = NOTE_OFFSETS[tonic] ?? 0;
-      const rootMatch = chordInfo.name.match(/^([A-G][#b]?)/);
-      if (!rootMatch) return null;
-      const chordRoot = rootMatch[1];
-      const chordSemi = NOTE_OFFSETS[chordRoot];
-      if (chordSemi === undefined) return null;
-
-      const diff = (chordSemi - tonicSemi + 12) % 12;
-      const isMinor = chordInfo.name.includes("Minor") || chordInfo.name.includes("m7") || chordInfo.type === "Minor Triad";
-
-      const majorNumerals = {
-        0: "I", 1: "♭II", 2: "ii", 3: "♭III", 4: "iii", 5: "IV",
-        6: "♯IV", 7: "V", 8: "♭VI", 9: "vi", 10: "♭VII", 11: "vii°"
-      };
-
-      let base = majorNumerals[diff] || "I";
-      if (isMinor) base = base.toLowerCase();
-      else if (chordInfo.type === "Major Triad") base = base.toUpperCase();
-
-      if (chordInfo.name.includes("7")) base += "7";
-      return base;
-    }
-
     // MULTI-SYSTEM (WRAPPING) SCORE RENDERER & TIMELINE ENGINE
-    function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song", lhStyle = "song") {
-      if (!song) return { measures: [], steps: [] };
-
-      let dyadSource = song.dyads || "";
-      let dyadFSource = song.dyadsF || "";
-
-      if (showDyads && harmonyType && harmonyType !== "song") {
-        if (typeof MusicTheory !== "undefined" && MusicTheory.generateSongHarmonies) {
-          const gen = MusicTheory.generateSongHarmonies(song, harmonyType);
-          dyadSource = gen.dyads;
-          dyadFSource = gen.dyadsF;
-        }
-      }
-
-      let lhSource = song.lh || "";
-      let lhFSource = song.lhF || "";
-
-      if (showLH && lhStyle && lhStyle !== "song") {
-        if (typeof MusicTheory !== "undefined" && MusicTheory.generateLeftHandAccompaniment) {
-          const genLH = MusicTheory.generateLeftHandAccompaniment(song, lhStyle);
-          lhSource = genLH.lh;
-          lhFSource = genLH.lhF;
-        }
-      }
-
-      const rhM = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-      const lhM = (lhSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-      const dyadM = (dyadSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-      const rhFM = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-      const lhFM = (lhFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-      const dyadFM = (dyadFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-
-      let expMeasureBeats = 4;
-      if (song.timeSig) {
-        const [numStr, denStr] = song.timeSig.split("/");
-        const num = parseFloat(numStr) || 4;
-        const den = parseFloat(denStr) || 4;
-        expMeasureBeats = num * (4 / den);
-      }
-
-      const totalMeasures = Math.max(rhM.length, lhM.length, dyadM.length);
-      const measures = [];
-      const steps = [];
-      let stepGlobalIdx = 0;
-
-      for (let m = 0; m < totalMeasures; m++) {
-        const mRH = [...(rhM[m] || [])];
-        const mLH = [...(lhM[m] || [])];
-        const mDyad = [...(dyadM[m] || [])];
-        const mRHF = rhFM[m] || [];
-        const mLHF = lhFM[m] || [];
-        const mDyadF = dyadFM[m] || [];
-
-        const measureItems = [];
-
-        if (showDyads && showLH) {
-          let dyadBeat = 0;
-          const dyadEvents = mDyad.map((t, k) => {
-            const p = parseToken(t);
-            const ev = { ...p, f: mDyadF[k] || "", startBeat: dyadBeat };
-            dyadBeat += p.beats;
-            return ev;
-          });
-
-          let lhBeat = 0;
-          const lhEvents = mLH.map((t, k) => {
-            const p = parseToken(t);
-            const ev = { ...p, f: mLHF[k] || "", startBeat: lhBeat };
-            lhBeat += p.beats;
-            return ev;
-          });
-
-          // Measure rest padding: if a hand is silent in this measure, synthesize a full measure rest
-          const isPickupDyadM0 = (m === 0 && dyadBeat < expMeasureBeats - 0.01 && lhBeat < expMeasureBeats - 0.01);
-          if (dyadEvents.length === 0 && lhEvents.length > 0) {
-            dyadEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
-          } else if (dyadEvents.length > 0 && dyadBeat < expMeasureBeats - 0.01 && !isPickupDyadM0) {
-            dyadEvents.push({ pitch: "-", beats: expMeasureBeats - dyadBeat, f: "", startBeat: dyadBeat });
-          }
-          if (lhEvents.length === 0 && dyadEvents.length > 0) {
-            lhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
-          } else if (lhEvents.length > 0 && lhBeat < expMeasureBeats - 0.01 && !isPickupDyadM0) {
-            lhEvents.push({ pitch: "-", beats: expMeasureBeats - lhBeat, f: "", startBeat: lhBeat });
-          }
-
-          const onsets = Array.from(new Set([
-            ...dyadEvents.map(e => e.startBeat),
-            ...lhEvents.map(e => e.startBeat)
-          ])).sort((a, b) => a - b);
-
-          onsets.forEach((b, k) => {
-            const dyadEv = dyadEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-            const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-            const expectedList = [];
-            if (dyadEv && dyadEv.pitch && dyadEv.pitch !== "-") {
-              dyadEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
-            }
-            if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
-              lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
-            }
-            const expected = Array.from(new Set(expectedList));
-
-            const nextB = onsets[k + 1];
-            const maxMB = Math.max(
-              ...dyadEvents.map(e => e.startBeat + e.beats),
-              ...lhEvents.map(e => e.startBeat + e.beats),
-              0
-            );
-            const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(dyadEv ? dyadEv.beats : 1, lhEv ? lhEv.beats : 1));
-
-            const item = {
-              stepIndex: stepGlobalIdx,
-              index: stepGlobalIdx,
-              measure: m + 1,
-              startBeat: b,
-              dyad: dyadEv,
-              dyadF: dyadEv ? dyadEv.f : "",
-              lh: lhEv,
-              lhF: lhEv ? lhEv.f : "",
-              expectedPitches: expected,
-              displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-              beats: stepBeats
-            };
-            measureItems.push(item);
-            steps.push(item);
-            stepGlobalIdx++;
-          });
-        } else if (showDyads && !showLH) {
-          if (mDyad.length === 0) {
-            mDyad.push(`-:${expMeasureBeats}`);
-          }
-          let dyadBeat = 0;
-          mDyad.forEach((t, k) => {
-            const parsed = parseToken(t);
-            const expected = parsed.pitch.split("+").filter(p => p !== "-");
-            const item = {
-              stepIndex: stepGlobalIdx,
-              index: stepGlobalIdx,
-              measure: m + 1,
-              startBeat: dyadBeat,
-              dyad: parsed,
-              dyadF: mDyadF[k] || "",
-              expectedPitches: expected,
-              displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-              beats: parsed.beats
-            };
-            dyadBeat += parsed.beats;
-            measureItems.push(item);
-            steps.push(item);
-            stepGlobalIdx++;
-          });
-        } else if (showRH && !showLH) {
-          if (mRH.length === 0) {
-            mRH.push(`-:${expMeasureBeats}`);
-          }
-          let rhBeat = 0;
-          mRH.forEach((t, k) => {
-            const parsed = parseToken(t);
-            const expected = parsed.pitch.split("+").filter(p => p !== "-");
-            const item = {
-              stepIndex: stepGlobalIdx,
-              index: stepGlobalIdx,
-              measure: m + 1,
-              startBeat: rhBeat,
-              rh: parsed,
-              rhF: mRHF[k] || "",
-              expectedPitches: expected,
-              displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-              beats: parsed.beats
-            };
-            rhBeat += parsed.beats;
-            measureItems.push(item);
-            steps.push(item);
-            stepGlobalIdx++;
-          });
-        } else if (showLH && !showRH) {
-          if (mLH.length === 0) {
-            mLH.push(`-:${expMeasureBeats}`);
-          }
-          let lhBeat = 0;
-          mLH.forEach((t, k) => {
-            const parsed = parseToken(t);
-            const expected = parsed.pitch.split("+").filter(p => p !== "-");
-            const item = {
-              stepIndex: stepGlobalIdx,
-              index: stepGlobalIdx,
-              measure: m + 1,
-              startBeat: lhBeat,
-              lh: parsed,
-              lhF: mLHF[k] || "",
-              expectedPitches: expected,
-              displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-              beats: parsed.beats
-            };
-            lhBeat += parsed.beats;
-            measureItems.push(item);
-            steps.push(item);
-            stepGlobalIdx++;
-          });
-        } else if (showRH && showLH) {
-          let rhBeat = 0;
-          const rhEvents = mRH.map((t, k) => {
-            const p = parseToken(t);
-            const ev = { ...p, f: mRHF[k] || "", startBeat: rhBeat };
-            rhBeat += p.beats;
-            return ev;
-          });
-
-          let lhBeat = 0;
-          const lhEvents = mLH.map((t, k) => {
-            const p = parseToken(t);
-            const ev = { ...p, f: mLHF[k] || "", startBeat: lhBeat };
-            lhBeat += p.beats;
-            return ev;
-          });
-
-          // Measure rest padding: if a hand is silent in this measure, synthesize a full measure rest
-          const isPickupM0 = (m === 0 && rhBeat < expMeasureBeats - 0.01 && lhBeat < expMeasureBeats - 0.01);
-          if (rhEvents.length === 0 && lhEvents.length > 0) {
-            rhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
-          } else if (rhEvents.length > 0 && rhBeat < expMeasureBeats - 0.01 && !isPickupM0) {
-            rhEvents.push({ pitch: "-", beats: expMeasureBeats - rhBeat, f: "", startBeat: rhBeat });
-          }
-          if (lhEvents.length === 0 && rhEvents.length > 0) {
-            lhEvents.push({ pitch: "-", beats: expMeasureBeats, f: "", startBeat: 0 });
-          } else if (lhEvents.length > 0 && lhBeat < expMeasureBeats - 0.01 && !isPickupM0) {
-            lhEvents.push({ pitch: "-", beats: expMeasureBeats - lhBeat, f: "", startBeat: lhBeat });
-          }
-
-          const onsets = Array.from(new Set([
-            ...rhEvents.map(e => e.startBeat),
-            ...lhEvents.map(e => e.startBeat)
-          ])).sort((a, b) => a - b);
-
-          onsets.forEach((b, k) => {
-            const rhEv = rhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-            const lhEv = lhEvents.find(e => Math.abs(e.startBeat - b) < 0.001) || null;
-            const expectedList = [];
-            if (rhEv && rhEv.pitch && rhEv.pitch !== "-") {
-              rhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
-            }
-            if (lhEv && lhEv.pitch && lhEv.pitch !== "-") {
-              lhEv.pitch.split("+").filter(p => p !== "-").forEach(p => expectedList.push(p));
-            }
-            const expected = Array.from(new Set(expectedList));
-
-            const nextB = onsets[k + 1];
-            const maxMB = Math.max(
-              ...rhEvents.map(e => e.startBeat + e.beats),
-              ...lhEvents.map(e => e.startBeat + e.beats),
-              0
-            );
-            const stepBeats = nextB !== undefined ? (nextB - b) : (maxMB > b ? (maxMB - b) : Math.max(rhEv ? rhEv.beats : 1, lhEv ? lhEv.beats : 1));
-
-            const item = {
-              stepIndex: stepGlobalIdx,
-              index: stepGlobalIdx,
-              measure: m + 1,
-              startBeat: b,
-              rh: rhEv,
-              rhF: rhEv ? rhEv.f : "",
-              lh: lhEv,
-              lhF: lhEv ? lhEv.f : "",
-              expectedPitches: expected,
-              displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
-              beats: stepBeats
-            };
-            measureItems.push(item);
-            steps.push(item);
-            stepGlobalIdx++;
-          });
-        }
-
-        measures.push(measureItems);
-      }
-
-      // Cross-step tie detection
-      for (let sIdx = 1; sIdx < steps.length; sIdx++) {
-        const prev = steps[sIdx - 1];
-        const cur = steps[sIdx];
-        const prevTied = (prev.dyad && prev.dyad.tied) || (prev.rh && prev.rh.tied) || (prev.lh && prev.lh.tied);
-        if (prevTied && prev.expectedPitches && cur.expectedPitches) {
-          const hasOverlap = cur.expectedPitches.some(p => prev.expectedPitches.includes(p));
-          if (hasOverlap) {
-            cur.tiedFromPrev = true;
-          }
-        }
-      }
-
-      return { measures, steps };
-    }
 
     function renderSheetMusicScore() {
       if (!currentSong) return;
@@ -7968,6 +7674,7 @@
           });
           pedaledNotes.clear();
         }
+        updateSustainPedalUI();
         updateActiveChordRecognizer();
         return;
       }
@@ -9508,6 +9215,7 @@
     // 3. EAR TRAINING GYM ENGINE
     let earSubmode = "pitch_match";
     let earCurrentChallenge = null;
+    let earChallengeShownTime = 0;
     let earStats = { correct: 0, attempts: 0, streak: 0 };
 
     function initEarTrainingModule() {
@@ -9523,9 +9231,23 @@
       document.getElementById("earPlaySoundBtn")?.addEventListener("click", playEarChallengeAudio);
     }
 
+    function updateEarSRSHudDisplay() {
+      const srsDisplay = document.getElementById("earSrsStatsDisplay");
+      if (!srsDisplay || !window.MusicTheory) return;
+      const stats = window.MusicTheory.getAllSRSStats();
+      const keys = Object.keys(stats);
+      if (keys.length === 0) {
+        srsDisplay.textContent = "Adaptive";
+        return;
+      }
+      const masteredCount = keys.filter(k => window.MusicTheory.getSRSMasteryLevel(k) === "mastered").length;
+      srsDisplay.textContent = `${masteredCount} Mastered`;
+    }
+
     function loadEarChallenge() {
       if (!window.MusicTheory) return;
-      earCurrentChallenge = window.MusicTheory.generateEarTrainingChallenge(earSubmode);
+      earCurrentChallenge = window.MusicTheory.generateEarTrainingChallenge(earSubmode, true);
+      earChallengeShownTime = performance.now();
       const promptEl = document.getElementById("earPromptText");
       const titleEl = document.getElementById("earSubmodeTitle");
       const feedbackEl = document.getElementById("earFeedbackBanner");
@@ -9561,6 +9283,7 @@
         });
       }
 
+      updateEarSRSHudDisplay();
       playEarChallengeAudio();
     }
 
@@ -9591,6 +9314,7 @@
     function verifyEarTrainingChoice(choice) {
       if (!earCurrentChallenge) return;
       earStats.attempts++;
+      const elapsedMs = earChallengeShownTime ? Math.round(performance.now() - earChallengeShownTime) : 1500;
       const feedbackEl = document.getElementById("earFeedbackBanner");
 
       let correct = false;
@@ -9604,11 +9328,15 @@
         explanation = `That was a ${earCurrentChallenge.chord.fullName} chord!`;
       }
 
+      if (window.MusicTheory && earCurrentChallenge.srsKey) {
+        window.MusicTheory.recordSRSAttempt(earCurrentChallenge.srsKey, correct, elapsedMs);
+      }
+
       if (correct) {
         earStats.correct++;
         earStats.streak++;
         feedbackEl.style.color = "#34d399";
-        feedbackEl.innerHTML = `✅ Brilliant! ${explanation}`;
+        feedbackEl.innerHTML = `✅ Brilliant! ${explanation} (${(elapsedMs / 1000).toFixed(1)}s)`;
         setTimeout(loadEarChallenge, 1500);
       } else {
         earStats.streak = 0;
@@ -9622,17 +9350,22 @@
     function verifyEarTrainingPitchInput(pitchName) {
       if (earSubmode !== "pitch_match" || !earCurrentChallenge) return;
       earStats.attempts++;
+      const elapsedMs = earChallengeShownTime ? Math.round(performance.now() - earChallengeShownTime) : 1500;
       playTone(window.MusicTheory.pitchToFreq(pitchName), 0.4);
 
       const target = earCurrentChallenge.targetPitch;
       const feedbackEl = document.getElementById("earFeedbackBanner");
       const isMatch = (pitchName === target) || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(pitchName, target));
 
+      if (window.MusicTheory && (earCurrentChallenge.srsKey || target)) {
+        window.MusicTheory.recordSRSAttempt(earCurrentChallenge.srsKey || target, isMatch, elapsedMs);
+      }
+
       if (isMatch) {
         earStats.correct++;
         earStats.streak++;
         feedbackEl.style.color = "#34d399";
-        feedbackEl.innerHTML = `✅ Spot on! You played <strong>${target}</strong>!`;
+        feedbackEl.innerHTML = `✅ Spot on! You played <strong>${target}</strong> (${(elapsedMs / 1000).toFixed(1)}s)!`;
         setTimeout(loadEarChallenge, 1400);
       } else {
         earStats.streak = 0;
@@ -9651,6 +9384,7 @@
         streakEl.classList.toggle("hud-streak-hot", earStats.streak >= 5);
       }
       document.getElementById("earScore").textContent = `${earStats.correct}`;
+      updateEarSRSHudDisplay();
     }
 
     // 4. SCALES & THEORY STUDIO ENGINE
