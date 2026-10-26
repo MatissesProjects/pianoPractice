@@ -403,6 +403,32 @@
     - [x] Tests 31.1–31.7 verifying `README.md` file existence and section coverage, 3D key transforms, pendulum elements and animations, streak flame rules, timer progress bar, CSS brace balance, and full inline script syntax validation.
     - [x] All 13 education suite tests and all 31 score engine tests passing with 100% success (44 total automated tests).
 
+- [x] **Milestone 33: Left-Hand Accompaniment Engine & Multi-Level Left-Hand Style Selector**
+  - [x] **Core Music Theory Left-Hand Accompaniment Engine (`theory.js`)**:
+    - [x] `extractBassRoot(pitchStr)`: Extracts the lowest root bass fundamental across multi-note chords.
+    - [x] `transformLeftHandPitch(pitchStr, lhStyle, accidentalMap)`: Algorithmic transformation supporting all 6 accompaniment styles:
+      - `roots`: Simplifies dense chords (e.g. `C3+G3+C4` $\to$ `C3`, `F2+C3+F3` $\to$ `F2`, `G2+F3+B3` $\to$ `G2`) to clean, single root bass anchors with finger 5, making pieces accessible for Level 1/2 beginners.
+      - `fifths`: Generates resonant open-fifth power chords (e.g. `C3` $\to$ `C3+G3`, `G2` $\to$ `G2+D3`) with finger 5+1.
+      - `octaves`: Generates bass octaves (e.g. `C3` $\to$ `C3+C4`, `G2` $\to$ `G2+G3`) with finger 5+1.
+      - `triads`: Diatonic root-position triads (e.g. `C3` $\to$ `C3+E3+G3`, `G2` $\to$ `G2+B2+D3`) with finger 5+3+1.
+      - `thirds`: Diatonic thirds (e.g. `C3` $\to$ `C3+E3`, `G2` $\to$ `G2+B2`) with finger 5+3.
+      - `song`: Authentic transcriptions as written.
+    - [x] `transformLeftHandToken(tokenStr, lhStyle, accidentalMap, fingerStr)`: Preserves beat durations and ties (`~`) while applying pitch transformations.
+    - [x] `generateLeftHandAccompaniment(song, lhStyle)`: Generates complete measure-by-measure LH accompaniment and fingering lines, with automatic root bass synthesis for melodies lacking a left hand.
+    - [x] `LH_ACCOMPANIMENT_STYLES`: Exported style dictionary with user-friendly labels and descriptions.
+  - [x] **Score Model & Practice Timeline Integration (`index.html` & `buildScoreModel`)**:
+    - [x] Extended `buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song", lhStyle = "song")` to route LH source through `generateLeftHandAccompaniment` when `lhStyle !== "song"`.
+    - [x] Synchronized dual-hand alignment, measure rest padding, tie detections, practice step fulfillments, and independent playback across all LH accompaniment styles.
+  - [x] **Interactive UI Controls & LocalStorage Persistence (`index.html`)**:
+    - [x] Added `#lhStyleSelectWrap` and `<select id="lhStyleSelect">` to the `layer-toggles-bar` right alongside `Left Hand (𝄢)`.
+    - [x] Styled with Left-Hand emerald theme (`--lh-color: #34d399` and `--lh-bg: rgba(52, 211, 153, 0.15)`).
+    - [x] LocalStorage persistence (`piano_lh_style`).
+    - [x] Updated Curriculum Level pathway: configured Level 1, 2, 4, and 5 to default `lhStyle: "roots"`, ensuring beginners enjoy clean single-note bass accompaniment.
+  - [x] **Comprehensive Automated Verification Test Suite (`tests/test_score_engine.js` Test 32)**:
+    - [x] Tests 32.1–32.7 verifying theory exports, root extraction, pitch transformations, Lean on Me single-root simplification, Ode to Joy 5ths/octaves/triads, score model integration, and DOM elements.
+    - [x] All 13 education suite tests and all 32 score engine tests passing with 100% success (45 total automated tests).
+
+
 
 
 

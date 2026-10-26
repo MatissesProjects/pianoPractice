@@ -4,7 +4,7 @@
 [![Web Audio API](https://img.shields.io/badge/Web%20Audio-2.0-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 [![Web MIDI API](https://img.shields.io/badge/Web%20MIDI-16--Channel-purple.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-emerald.svg)](#technical-architecture)
-[![Test Suite](https://img.shields.io/badge/Automated%20Tests-44%20Passing-brightgreen.svg)](#testing--verification)
+[![Test Suite](https://img.shields.io/badge/Automated%20Tests-45%20Passing-brightgreen.svg)](#testing--verification)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A modern, comprehensive, zero-dependency browser-based piano learning and practice workstation. Built with vanilla modern JavaScript, SVG score rendering, physical Web Audio synthesis, and real-time Web MIDI hardware telemetry, **Piano Practice Lab** guides players from their very first Middle C note to advanced classical repertoire, ear training mastery, and harmonic voice leading.
@@ -95,6 +95,16 @@ The primary performance stage featuring dynamic SVG Grand Staff rendering:
 - **A-B Measure Looping & Tempo Ramp**: Isolate difficult measures and configure progressive tempo ramps ($+5\text{ BPM}$ per repetition).
 - **Harmonic Roman Numeral Analysis**: Functional harmonic analysis overlay on Beat 0 of each measure (e.g., $\text{I}$, $\text{IV}$, $\text{V}^7$, $\text{vi}$).
 - **Non-Bouncing Viewport Auto-Scroll**: Container-isolated auto-scroll algorithm with an ergonomic reading comfort zone, eliminating Chromium SVG viewport bounce bugs.
+- **Dual-Hand Multi-Level Accompaniment Engine**:
+  - **Left Hand Style Selector (`#lhStyleSelect`)**:
+    - **Single Roots (1-Note Primer)**: Automatically simplifies complex multi-finger chords (such as Lean on Me's $C3+G3+C4$ and $F2+C3+F3$) down to clean, single root bass anchors ($C3$, $F2$, $G2$ with finger 5), making repertoire approachable for Level 1/2 beginners.
+    - **Open 5ths (Root + 5th)**: Elevates 1-note primer bass lines into resonant power chords (e.g., $C3+G3$, $G2+D3$ with finger 5+1).
+    - **Bass Octaves (8ves)**: Generates orchestral bass octaves (e.g., $C2+C3$, $C3+C4$).
+    - **Full Triads (1-3-5)**: Diatonic root-position triads (e.g., $C3+E3+G3$, $G2+B2+D3$ with finger 5+3+1).
+    - **Thirds (3rds Above)**: Diatonic thirds above the root.
+    - **Song Arrangement (Default)**: Authentic multi-measure arrangement as transcribed in repertoire.
+  - **Right Hand Harmonies Selector (`#harmonyTypeSelect`)**:
+    - Diatonic generator for Thirds Above, Thirds Below, Fifths, Sixths, Octaves, and Full Triads.
 
 ### 2. Sight-Reading Speed Drill
 A high-velocity flashcard trainer for instantaneous notation recognition:
