@@ -680,6 +680,48 @@
     .layer-toggle.active-fingers { border-color: #facc15; color: #facc15; background: rgba(250, 204, 21, 0.15); }
     .layer-toggle.active-cheat { border-color: #ec4899; color: #ec4899; background: rgba(236, 72, 153, 0.15); }
 
+    .lh-style-select-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.18s ease;
+    }
+    .lh-style-select-wrap.active-lh-style {
+      border-color: var(--lh-color);
+      background: var(--lh-bg);
+      color: var(--lh-color);
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.25);
+    }
+    .lh-style-select-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .lh-style-select {
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .lh-style-select:hover, .lh-style-select:focus {
+      border-color: var(--lh-color);
+      box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
+    }
+
     .harmony-select-wrap {
       display: inline-flex;
       align-items: center;
@@ -2690,6 +2732,17 @@
               <input type="checkbox" id="toggleLH">
               <span>Left Hand (𝄢)</span>
             </label>
+            <div class="lh-style-select-wrap" id="lhStyleSelectWrap" title="Select Left Hand Accompaniment Style">
+              <span class="lh-style-select-label">LH Style:</span>
+              <select id="lhStyleSelect" class="lh-style-select" aria-label="Select Left Hand Accompaniment Style">
+                <option value="song" selected>Song Arrangement (Default)</option>
+                <option value="roots">Single Roots (1-Note Primer)</option>
+                <option value="fifths">Open 5ths (Root + 5th)</option>
+                <option value="octaves">Bass Octaves (8ves)</option>
+                <option value="triads">Full Triads (1-3-5)</option>
+                <option value="thirds">Thirds (3rds Above)</option>
+              </select>
+            </div>
             <label class="layer-toggle" id="toggleLabelDyads">
               <input type="checkbox" id="toggleDyads">
               <span>Harmonies (Dyads)</span>
@@ -3464,42 +3517,42 @@
       1: {
         name: "Level 1: Root Primer",
         briefing: "<strong>Lesson 1: Root Primer</strong> — Learn single melody notes on the right hand (𝄞). Keep fingers arched over the 5-finger C position (Thumb on Middle C). The cheat sheet letters and finger numbers guide each note without colliding with lines.",
-        config: { rh: true, lh: false, dyads: false, cheat: true, fingers: true, filter: "C 5-Finger" }
+        config: { rh: true, lh: false, dyads: false, cheat: true, fingers: true, filter: "C 5-Finger", lhStyle: "roots" }
       },
       2: {
         name: "Level 2: Skips & Sight Reading",
         briefing: "<strong>Lesson 2: Skips & Reading</strong> — Train reading melodic skips of a 3rd (e.g., C to E, G down to E). We turn off the crutch labels so you build real staff sight-reading intuition.",
-        config: { rh: true, lh: false, dyads: false, cheat: false, fingers: true, filter: "C 5-Finger" }
+        config: { rh: true, lh: false, dyads: false, cheat: false, fingers: true, filter: "C 5-Finger", lhStyle: "roots" }
       },
       3: {
         name: "Level 3: Harmonic Dyads & Intervals",
         briefing: "<strong>Lesson 3: Harmonic Dyads & Intervals</strong> — Master simultaneous multi-note harmonies! Choose your harmony interval (Thirds, Fifths, Sixths, Octaves, or Triads) using the Level selector. You can keep Left Hand active to practice 2-hand harmony coordination simultaneously.",
-        config: { rh: true, lh: false, dyads: true, cheat: true, fingers: true, filter: "Harmonic / Dyads", harmonyType: "thirds" }
+        config: { rh: true, lh: false, dyads: true, cheat: true, fingers: true, filter: "Harmonic / Dyads", harmonyType: "thirds", lhStyle: "song" }
       },
       4: {
         name: "Level 4: Left-Hand Bass Clef Foundation",
-        briefing: "<strong>Lesson 4: Bass Clef Foundation (𝄢)</strong> — Focus on the left hand reading the F clef. Master root bass anchors (C3, G2, F2) establishing rock-solid harmonic foundation.",
-        config: { rh: false, lh: true, dyads: false, cheat: true, fingers: true, filter: "all" }
+        briefing: "<strong>Lesson 4: Bass Clef Foundation (𝄢)</strong> — Focus on the left hand reading the F clef. Master single root bass anchors (C3, G2, F2) or customize your accompaniment using the LH Style selector (Single Roots, Open 5ths, Octaves, Triads).",
+        config: { rh: false, lh: true, dyads: false, cheat: true, fingers: true, filter: "all", lhStyle: "roots" }
       },
       5: {
         name: "Level 5: 2-Hand Coordination",
-        briefing: "<strong>Lesson 5: 2-Hand Coordination</strong> — Coordinate hands playing simultaneously: Left Hand (𝄢) holds bass roots while Right Hand (𝄞) plays melodies. Watch the stacked measure bars sync up.",
-        config: { rh: true, lh: true, dyads: false, cheat: true, fingers: true, filter: "all" }
+        briefing: "<strong>Lesson 5: 2-Hand Coordination</strong> — Coordinate hands playing simultaneously: Left Hand (𝄢) holds bass roots (or full chords/5ths) while Right Hand (𝄞) plays melodies. Watch the stacked measure bars sync up.",
+        config: { rh: true, lh: true, dyads: false, cheat: true, fingers: true, filter: "all", lhStyle: "roots" }
       },
       6: {
         name: "Level 6: Extended Scales & Velocity",
         briefing: "<strong>Lesson 6: Extended Scales</strong> — Break out of the static 5-finger position! Practice thumb-under crossings, octave arpeggio sweeps, and Hanon finger dexterity exercises.",
-        config: { rh: true, lh: true, dyads: false, cheat: false, fingers: true, filter: "Extended Scale" }
+        config: { rh: true, lh: true, dyads: false, cheat: false, fingers: true, filter: "Extended Scale", lhStyle: "song" }
       },
       7: {
         name: "Level 7: Minor & Modal Exploration",
         briefing: "<strong>Lesson 7: Minor & Modal</strong> — Explore rich tonalities: Aeolian natural minor, Dorian modes, and blues scales (e.g. Gymnopédie, Scarborough Fair, Greensleeves). Both Left Hand and Harmonies are fully active for grand staff polyphony.",
-        config: { rh: true, lh: true, dyads: true, cheat: false, fingers: true, filter: "Minor / Modal", harmonyType: "song" }
+        config: { rh: true, lh: true, dyads: true, cheat: false, fingers: true, filter: "Minor / Modal", harmonyType: "song", lhStyle: "song" }
       },
       8: {
         name: "Level 8: Classical Master Repertoire",
         briefing: "<strong>Lesson 8: Classical Fluency</strong> — The pinnacle: Performance-ready classical masterpieces (Für Elise, Bach Minuet in G, Canon in D) at brisk concert tempo with both hands active on grand staff harmony without crutches.",
-        config: { rh: true, lh: true, dyads: true, cheat: false, fingers: false, filter: "Classical Mastery", harmonyType: "song" }
+        config: { rh: true, lh: true, dyads: true, cheat: false, fingers: false, filter: "Classical Mastery", harmonyType: "song", lhStyle: "song" }
       }
     };
 
@@ -4378,7 +4431,7 @@
     }
 
     // MULTI-SYSTEM (WRAPPING) SCORE RENDERER & TIMELINE ENGINE
-    function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song") {
+    function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song", lhStyle = "song") {
       if (!song) return { measures: [], steps: [] };
 
       let dyadSource = song.dyads || "";
@@ -4392,11 +4445,22 @@
         }
       }
 
+      let lhSource = song.lh || "";
+      let lhFSource = song.lhF || "";
+
+      if (showLH && lhStyle && lhStyle !== "song") {
+        if (typeof MusicTheory !== "undefined" && MusicTheory.generateLeftHandAccompaniment) {
+          const genLH = MusicTheory.generateLeftHandAccompaniment(song, lhStyle);
+          lhSource = genLH.lh;
+          lhFSource = genLH.lhF;
+        }
+      }
+
       const rhM = (song.rh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-      const lhM = (song.lh || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const lhM = (lhSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
       const dyadM = (dyadSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
       const rhFM = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
-      const lhFM = (song.lhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+      const lhFM = (lhFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
       const dyadFM = (dyadFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
 
       let expMeasureBeats = 4;
@@ -4627,7 +4691,9 @@
               measure: m + 1,
               startBeat: b,
               rh: rhEv,
+              rhF: rhEv ? rhEv.f : "",
               lh: lhEv,
+              lhF: lhEv ? lhEv.f : "",
               expectedPitches: expected,
               displayLabel: expected.length > 0 ? expected.join(" + ") : "REST",
               beats: stepBeats
@@ -5406,8 +5472,10 @@
       const showDyads = document.getElementById("toggleDyads").checked;
       const harmSelect = document.getElementById("harmonyTypeSelect");
       const harmonyType = harmSelect ? harmSelect.value : "song";
+      const lhSelect = document.getElementById("lhStyleSelect");
+      const lhStyle = lhSelect ? lhSelect.value : "song";
 
-      const model = buildScoreModel(currentSong, showRH, showLH, showDyads, harmonyType);
+      const model = buildScoreModel(currentSong, showRH, showLH, showDyads, harmonyType, lhStyle);
       songNoteSteps = model.steps;
       currentSongMeasures = model.measures;
 
@@ -8049,6 +8117,13 @@
           harmonyTypeSelect.value = data.config.harmonyType;
           localStorage.setItem("piano_harmony_type", data.config.harmonyType);
         }
+        if (data.config.lhStyle) {
+          const lhSel = document.getElementById("lhStyleSelect");
+          if (lhSel) {
+            lhSel.value = data.config.lhStyle;
+            localStorage.setItem("piano_lh_style", data.config.lhStyle);
+          }
+        }
 
         updateLayerToggleClasses();
 
@@ -8069,6 +8144,7 @@
     const toggleCheat = document.getElementById("toggleCheat");
     const toggleFingers = document.getElementById("toggleFingers");
     const harmonyTypeSelect = document.getElementById("harmonyTypeSelect");
+    const lhStyleSelect = document.getElementById("lhStyleSelect");
 
     if (harmonyTypeSelect) {
       const savedHarmony = localStorage.getItem("piano_harmony_type");
@@ -8084,12 +8160,31 @@
       });
     }
 
+    if (lhStyleSelect) {
+      const savedLhStyle = localStorage.getItem("piano_lh_style");
+      if (savedLhStyle && Array.from(lhStyleSelect.options).some(o => o.value === savedLhStyle)) {
+        lhStyleSelect.value = savedLhStyle;
+      }
+      lhStyleSelect.addEventListener("change", (e) => {
+        localStorage.setItem("piano_lh_style", e.target.value);
+        if (!toggleLH.checked) {
+          toggleLH.checked = true;
+        }
+        updateLayerToggleClasses();
+      });
+    }
+
     function updateLayerToggleClasses() {
       document.getElementById("toggleLabelRH").classList.toggle("active-rh", toggleRH.checked);
       document.getElementById("toggleLabelLH").classList.toggle("active-lh", toggleLH.checked);
       document.getElementById("toggleLabelDyads").classList.toggle("active-dyad", toggleDyads.checked);
       document.getElementById("toggleLabelCheat").classList.toggle("active-cheat", toggleCheat.checked);
       document.getElementById("toggleLabelFingers").classList.toggle("active-fingers", toggleFingers.checked);
+
+      const lhWrap = document.getElementById("lhStyleSelectWrap");
+      if (lhWrap) {
+        lhWrap.classList.toggle("active-lh-style", toggleLH.checked);
+      }
 
       const harmWrap = document.getElementById("harmonySelectWrap");
       if (harmWrap) {
