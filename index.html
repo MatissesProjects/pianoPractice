@@ -908,16 +908,54 @@
       border-radius: 6px;
       cursor: pointer;
       white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .hud-restart-btn:hover {
+      background: #27354f;
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+    /* Animated Streak Flame and Performance Star Sparkles */
+    .hud-streak-hot {
+      animation: streakFlame 0.8s ease-in-out infinite alternate !important;
+      color: #f59e0b !important;
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.85);
+      display: inline-block;
+    }
+    @keyframes streakFlame {
+      0% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 4px #f59e0b); }
+      100% { transform: scale(1.15) rotate(4deg); filter: drop-shadow(0 0 12px #ef4444); }
+    }
+
+    .hud-stars-sparkle {
+      animation: starSparkle 1.2s ease-in-out !important;
+      display: inline-block;
+    }
+    @keyframes starSparkle {
+      0% { transform: scale(0.85); opacity: 0.7; }
+      50% { transform: scale(1.3); filter: drop-shadow(0 0 14px #fbbf24); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Sound wave pulse for Ear Training & Audio Buttons */
+    .playing-sound-pulse {
+      animation: soundWavePulse 0.85s ease-out !important;
+    }
+    @keyframes soundWavePulse {
+      0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.85); }
+      50% { box-shadow: 0 0 0 16px rgba(56, 189, 248, 0.3); }
+      100% { box-shadow: 0 0 0 28px rgba(56, 189, 248, 0); }
     }
 
     /* MULTI-SYSTEM VERTICAL SHEET MUSIC SCORE VIEW */
     .sheet-music-container {
       background: var(--paper-bg);
       border: 1px solid var(--paper-border);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 1.5rem 1.25rem;
       margin-bottom: 1.5rem;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.06), 0 4px 14px rgba(0,0,0,0.25);
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.06), 0 8px 26px rgba(0,0,0,0.3);
       position: relative;
       max-height: 520px;
       overflow-y: auto;
@@ -1144,10 +1182,10 @@
       position: relative;
       width: 44px;
       height: 165px;
-      background: linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 100%);
+      background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 60%, #e2e8f0 100%);
       border: 1px solid #0f172a;
-      border-radius: 0 0 5px 5px;
-      box-shadow: inset 0 -4px 6px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.2);
+      border-radius: 0 0 6px 6px;
+      box-shadow: inset 1px 0 0 rgba(255,255,255,0.9), inset -1px 0 0 rgba(0,0,0,0.08), inset 0 -5px 8px rgba(0,0,0,0.12), 0 5px 8px rgba(0,0,0,0.28);
       cursor: pointer;
       display: flex;
       flex-direction: column;
@@ -1157,7 +1195,11 @@
       font-size: 0.72rem;
       font-weight: 700;
       color: #64748b;
-      transition: background 0.05s, transform 0.05s;
+      transition: background 0.05s, transform 0.05s, box-shadow 0.05s;
+    }
+
+    .piano-key.white:hover {
+      background: linear-gradient(to bottom, #ffffff 0%, #f1f5f9 60%, #cbd5e1 100%);
     }
 
     /* Distinct Beginner Guide Marker for Middle C from pianoNotesCheatSheet.png */
@@ -1168,10 +1210,10 @@
       font-size: 0.58rem;
       font-weight: 800;
       color: #ffffff;
-      background: #ef4444;
-      padding: 0.15rem 0.35rem;
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      padding: 0.16rem 0.4rem;
       border-radius: 4px;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
       pointer-events: none;
       letter-spacing: 0.04em;
       white-space: nowrap;
@@ -1210,10 +1252,10 @@
       right: -13px;
       width: 26px;
       height: 104px;
-      background: linear-gradient(to bottom, #1e293b 0%, #0f172a 100%);
+      background: linear-gradient(180deg, #334155 0%, #1e293b 18%, #090e1a 100%);
       border: 1px solid #020617;
       border-radius: 0 0 4px 4px;
-      box-shadow: inset 0 -2px 4px rgba(255,255,255,0.1), 0 3px 6px rgba(0,0,0,0.5);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -3px 4px rgba(0,0,0,0.85), 0 4px 8px rgba(0,0,0,0.6);
       z-index: 10;
       cursor: pointer;
       display: flex;
@@ -1224,35 +1266,39 @@
       font-size: 0.65rem;
       font-weight: 700;
       color: #94a3b8;
-      transition: background 0.05s, transform 0.05s;
+      transition: background 0.05s, transform 0.05s, box-shadow 0.05s;
+    }
+
+    .piano-key.black:hover {
+      background: linear-gradient(180deg, #475569 0%, #334155 18%, #0f172a 100%);
     }
 
     .piano-key.white.active-rh, .piano-key.black.active-rh {
       background: linear-gradient(to bottom, #38bdf8 0%, #0284c7 100%) !important;
       color: #0f172a !important;
-      box-shadow: 0 0 16px var(--rh-glow) !important;
-      transform: translateY(2px);
+      box-shadow: 0 0 18px var(--rh-glow), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+      transform: translateY(3px) scale(0.992);
     }
 
     .piano-key.white.active-lh, .piano-key.black.active-lh {
       background: linear-gradient(to bottom, #34d399 0%, #059669 100%) !important;
       color: #0f172a !important;
-      box-shadow: 0 0 16px var(--lh-glow) !important;
-      transform: translateY(2px);
+      box-shadow: 0 0 18px var(--lh-glow), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+      transform: translateY(3px) scale(0.992);
     }
 
     .piano-key.white.active-dyad, .piano-key.black.active-dyad {
       background: linear-gradient(to bottom, #c084fc 0%, #7e22ce 100%) !important;
       color: #ffffff !important;
-      box-shadow: 0 0 18px rgba(192, 132, 252, 0.6) !important;
-      transform: translateY(2px);
+      box-shadow: 0 0 20px rgba(192, 132, 252, 0.65), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+      transform: translateY(3px) scale(0.992);
     }
 
     .piano-key.white.active-live, .piano-key.black.active-live {
       background: linear-gradient(to bottom, #fbbf24 0%, #d97706 100%) !important;
       color: #0f172a !important;
-      box-shadow: 0 0 22px var(--live-amber-glow) !important;
-      transform: translateY(3px) !important;
+      box-shadow: 0 0 24px var(--live-amber-glow), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+      transform: translateY(3.5px) scale(0.99) !important;
     }
 
     /* GUITAR HERO STYLE SUSTAIN STAGE */
@@ -2089,9 +2135,34 @@
       border: 1px solid rgba(56, 189, 248, 0.25);
       color: #38bdf8;
     }
-    .srs-badge-mastered { color: #38bdf8; background: rgba(56, 189, 248, 0.15); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.7rem; font-weight: 700; }
-    .srs-badge-needs-practice { color: #f43f5e; background: rgba(244, 63, 94, 0.15); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.7rem; font-weight: 700; }
-    .srs-badge-learning { color: #f59e0b; background: rgba(245, 158, 11, 0.15); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.7rem; font-weight: 700; }
+    .srs-badge-mastered { color: #10b981; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 4px; padding: 0.12rem 0.45rem; font-size: 0.7rem; font-weight: 700; }
+    .srs-badge-familiar { color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 4px; padding: 0.12rem 0.45rem; font-size: 0.7rem; font-weight: 700; }
+    .srs-badge-learning { color: #f59e0b; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 4px; padding: 0.12rem 0.45rem; font-size: 0.7rem; font-weight: 700; }
+    .srs-badge-needs-practice { color: #f43f5e; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 4px; padding: 0.12rem 0.45rem; font-size: 0.7rem; font-weight: 700; }
+
+    /* Flashcard Speed Drill Countdown Bar */
+    .sr-timer-track {
+      width: 100%;
+      height: 6px;
+      background: #1e293b;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin: 0.65rem 0;
+    }
+    .sr-timer-progress {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #10b981 0%, #38bdf8 65%, #f59e0b 100%);
+      transition: width 0.2s linear;
+    }
+    .sr-timer-progress.urgent {
+      background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
+      animation: timerUrgentPulse 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes timerUrgentPulse {
+      0% { opacity: 0.8; }
+      100% { opacity: 1; filter: drop-shadow(0 0 6px #ef4444); }
+    }
 
     /* RHYTHM & METRONOME WORKSHOP */
     .rhythm-studio-box {
@@ -2105,11 +2176,96 @@
       background: #090e1a;
       border: 1px solid #1e293b;
       border-radius: 14px;
-      padding: 2rem 1rem;
+      padding: 1.75rem 1rem 2rem;
       text-align: center;
       max-width: 540px;
       margin: 0 auto 1.5rem;
       position: relative;
+      box-shadow: inset 0 2px 14px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    /* Classic Mechanical Metronome Pendulum Arm Visualizer */
+    .metro-pendulum-case {
+      width: 220px;
+      height: 105px;
+      margin: 0.5rem auto 1.1rem;
+      background: linear-gradient(180deg, #101726 0%, #070b14 100%);
+      border: 1px solid #233554;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 3px 10px rgba(0,0,0,0.7), 0 4px 14px rgba(0,0,0,0.35);
+    }
+    .metro-pendulum-track {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .metro-pendulum-scale-ticks {
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      right: 18px;
+      height: 10px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+    .pendulum-tick {
+      width: 1px;
+      height: 8px;
+      background: #94a3b8;
+    }
+    .pendulum-tick.center {
+      background: #f59e0b;
+      height: 12px;
+      width: 2px;
+      opacity: 0.95;
+    }
+    .metro-pendulum-rod {
+      width: 3.5px;
+      height: 82px;
+      background: linear-gradient(180deg, #f8fafc 0%, #94a3b8 100%);
+      position: absolute;
+      bottom: 6px;
+      left: calc(50% - 1.75px);
+      transform-origin: bottom center;
+      transform: rotate(0deg);
+      border-radius: 2px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.6);
+      transition: transform 0.15s ease-out;
+    }
+    .metro-pendulum-rod.swinging {
+      animation: pendulumSwing var(--metro-swing-period, 1.25s) ease-in-out infinite alternate !important;
+    }
+    @keyframes pendulumSwing {
+      0% { transform: rotate(-26deg); }
+      100% { transform: rotate(26deg); }
+    }
+    .metro-pendulum-weight {
+      position: absolute;
+      top: var(--pendulum-bob-pos, 22px);
+      left: -9px;
+      width: 21px;
+      height: 15px;
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      border: 1px solid #78350f;
+      border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.45);
+      cursor: pointer;
+      transition: top 0.2s ease-out;
+    }
+    .metro-pendulum-pivot {
+      position: absolute;
+      bottom: -4px;
+      left: -4.5px;
+      width: 12px;
+      height: 12px;
+      background: #334155;
+      border: 2px solid #cbd5e1;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.7);
     }
     .bpm-display-big {
       font-size: 3.5rem;
@@ -2249,6 +2405,9 @@
       background: #111a2d;
       border: 1px solid #233554;
       border-radius: 10px;
+      padding: 1.25rem;
+    }
+
     /* Live Sustain Staff Position Badge from pianoNotesCheatSheet.png */
     .lane-staff-badge {
       font-size: 0.65rem;
@@ -2701,6 +2860,9 @@
         <!-- Single Flashcard Card -->
         <div class="flashcard-card">
           <div class="flashcard-prompt" id="srPromptText">Press "Start Drill" to begin flashcards!</div>
+          <div class="sr-timer-track" id="srTimerTrack" style="display:none;" title="60-Second Blitz Progress">
+            <div class="sr-timer-progress" id="srTimerProgress"></div>
+          </div>
           <svg id="srSvg" width="340" height="180" style="display:block; margin:0 auto;"></svg>
           <div style="font-size:0.8rem; color:#64748b; margin-top:0.5rem;" id="srInputHint">
             Answer by clicking note buttons below, pressing piano keys, or playing your MIDI keyboard.
@@ -2899,7 +3061,24 @@
         <div class="metronome-visualizer">
           <div style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color:#94a3b8; font-weight:700;">Precision Audio-Visual Metronome</div>
           <div class="bpm-display-big" id="metroBpmDisplay">96 BPM</div>
-          <div style="font-size:0.95rem; color:#38bdf8; font-weight:600; margin-bottom:1rem;" id="metroItalianTerm">Andante (Walking Pace)</div>
+          <div style="font-size:0.95rem; color:#38bdf8; font-weight:600; margin-bottom:0.75rem;" id="metroItalianTerm">Andante (Walking Pace)</div>
+
+          <!-- Classic Mechanical Metronome Pendulum Arm Visualizer -->
+          <div class="metro-pendulum-case" id="metroPendulumCase" title="Mechanical Metronome Pendulum">
+            <div class="metro-pendulum-track">
+              <div class="metro-pendulum-scale-ticks">
+                <span class="pendulum-tick" style="left:15%"></span>
+                <span class="pendulum-tick" style="left:30%"></span>
+                <span class="pendulum-tick center" style="left:50%"></span>
+                <span class="pendulum-tick" style="left:70%"></span>
+                <span class="pendulum-tick" style="left:85%"></span>
+              </div>
+              <div class="metro-pendulum-rod" id="metroPendulumRod">
+                <div class="metro-pendulum-weight" id="metroPendulumWeight"></div>
+                <div class="metro-pendulum-pivot"></div>
+              </div>
+            </div>
+          </div>
 
           <div style="display:flex; justify-content:center; align-items:center; gap:0.75rem; margin-bottom:1rem;">
             <button class="tempo-preset-btn" id="metroBpmMinus5">-5</button>
@@ -8115,19 +8294,31 @@
       updateSightReadingHUD();
 
       const mode = document.getElementById("srModeSelect").value;
+      const track = document.getElementById("srTimerTrack");
+      const prog = document.getElementById("srTimerProgress");
       if (mode === "timed") {
         srTimeRemaining = 60;
         document.getElementById("srTimerDisplay").textContent = "60s";
+        if (track && prog) {
+          track.style.display = "block";
+          prog.style.width = "100%";
+          prog.classList.remove("urgent");
+        }
         clearInterval(srTimerInterval);
         srTimerInterval = setInterval(() => {
           srTimeRemaining--;
           document.getElementById("srTimerDisplay").textContent = `${srTimeRemaining}s`;
+          if (prog) {
+            prog.style.width = `${Math.max(0, (srTimeRemaining / 60) * 100)}%`;
+            if (srTimeRemaining <= 15) prog.classList.add("urgent");
+          }
           if (srTimeRemaining <= 0) {
             stopSightReadingDrill();
             document.getElementById("srPromptText").textContent = `🎉 Time's up! You solved ${srStats.solved} notes with ${getSRAccuracy()}% accuracy!`;
           }
         }, 1000);
       } else {
+        if (track) track.style.display = "none";
         document.getElementById("srTimerDisplay").textContent = mode === "sprint" ? "20 Cards" : "Zen ∞";
       }
 
@@ -8137,6 +8328,8 @@
     function stopSightReadingDrill() {
       srIsRunning = false;
       clearInterval(srTimerInterval);
+      const track = document.getElementById("srTimerTrack");
+      if (track) track.style.display = "none";
       const startBtn = document.getElementById("srStartBtn");
       if (startBtn) startBtn.textContent = "▶ Start Drill";
     }
@@ -8398,7 +8591,11 @@
 
     function updateSightReadingHUD() {
       document.getElementById("srAccuracyDisplay").textContent = `${getSRAccuracy()}%`;
-      document.getElementById("srStreakDisplay").textContent = `${srStats.streak}`;
+      const streakEl = document.getElementById("srStreakDisplay");
+      if (streakEl) {
+        streakEl.textContent = `${srStats.streak}`;
+        streakEl.classList.toggle("hud-streak-hot", srStats.streak >= 5);
+      }
       document.getElementById("srBestStreakDisplay").textContent = `${srStats.bestStreak}`;
       document.getElementById("srSolvedDisplay").textContent = `${srStats.solved}`;
     }
@@ -8465,6 +8662,14 @@
     function playEarChallengeAudio() {
       if (!earCurrentChallenge) return;
       initAudio();
+
+      const soundBtn = document.getElementById("earPlaySoundBtn");
+      if (soundBtn) {
+        soundBtn.classList.remove("playing-sound-pulse");
+        void soundBtn.offsetWidth;
+        soundBtn.classList.add("playing-sound-pulse");
+        setTimeout(() => soundBtn.classList.remove("playing-sound-pulse"), 850);
+      }
 
       if (earSubmode === "pitch_match") {
         playTone(earCurrentChallenge.freq, 0.6);
@@ -8535,7 +8740,11 @@
     function updateEarStatsHUD() {
       const acc = earStats.attempts === 0 ? 100 : Math.round((earStats.correct / earStats.attempts) * 100);
       document.getElementById("earAccuracy").textContent = `${acc}%`;
-      document.getElementById("earStreak").textContent = `${earStats.streak}`;
+      const streakEl = document.getElementById("earStreak");
+      if (streakEl) {
+        streakEl.textContent = `${earStats.streak}`;
+        streakEl.classList.toggle("hud-streak-hot", earStats.streak >= 5);
+      }
       document.getElementById("earScore").textContent = `${earStats.correct}`;
     }
 
@@ -9195,6 +9404,13 @@
       const slider = document.getElementById("metroBpmSlider");
       if (slider) slider.value = metroBpm;
 
+      const rod = document.getElementById("metroPendulumRod");
+      if (rod) {
+        rod.style.setProperty("--metro-swing-period", `${(60.0 / metroBpm)}s`);
+        const bobPos = Math.round(10 + ((220 - metroBpm) / 180) * 44);
+        rod.style.setProperty("--pendulum-bob-pos", `${bobPos}px`);
+      }
+
       const termEl = document.getElementById("metroItalianTerm");
       if (metroBpm < 66) termEl.textContent = "Largo (Broad & Slow)";
       else if (metroBpm < 84) termEl.textContent = "Andante (Walking Pace)";
@@ -9256,6 +9472,14 @@
       const startBtn = document.getElementById("metroStartBtn");
       if (startBtn) startBtn.textContent = "■ Stop Metronome";
 
+      const rod = document.getElementById("metroPendulumRod");
+      if (rod) {
+        rod.style.setProperty("--metro-swing-period", `${(60.0 / metroBpm)}s`);
+        const bobPos = Math.round(10 + ((220 - metroBpm) / 180) * 44);
+        rod.style.setProperty("--pendulum-bob-pos", `${bobPos}px`);
+        rod.classList.add("swinging");
+      }
+
       metroNextTickTime = audioCtx.currentTime;
       schedulerMetro();
     }
@@ -9269,6 +9493,10 @@
       metroTickIndex = 0;
       const startBtn = document.getElementById("metroStartBtn");
       if (startBtn) startBtn.textContent = "▶ Start Metronome";
+
+      const rod = document.getElementById("metroPendulumRod");
+      if (rod) rod.classList.remove("swinging");
+
       document.querySelectorAll("#metroBeatLights .beat-light").forEach(l => l.classList.remove("active-downbeat", "active-secondary", "active-upbeat"));
       document.querySelectorAll("#metroBeatLights .sub-light").forEach(sl => sl.classList.remove("active-sub"));
     }
