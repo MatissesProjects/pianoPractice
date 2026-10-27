@@ -3241,6 +3241,26 @@ const {
   console.log("✔ Test 35: 🎓 Milestone 36 Beginner Pedagogy, Bootcamp, Chord Lab & Theory DNA UI passed");
 }
 
+// ============================================================================
+// TEST 36: 📈 Milestone 38 Rhythm & Metronome Live BPM Graph & Clear Data UI
+// ============================================================================
+{
+  const fs = require("fs");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+
+  assert.ok(html.includes('id="rhythmClearDataBtn"'), "Rhythm panel must include Clear Data button #rhythmClearDataBtn");
+  assert.ok(html.includes('id="rhythmBpmGraphSvg"'), "Rhythm panel must include Live BPM Proximity Graph SVG #rhythmBpmGraphSvg");
+  assert.ok(html.includes('id="rhythmGraphTargetBpm"'), "Rhythm panel must include #rhythmGraphTargetBpm");
+  assert.ok(html.includes('id="rhythmGraphLiveBpm"'), "Rhythm panel must include #rhythmGraphLiveBpm");
+  assert.ok(html.includes('id="rhythmGraphAvgBpm"'), "Rhythm panel must include #rhythmGraphAvgBpm");
+  assert.ok(html.includes('id="rhythmGraphStability"'), "Rhythm panel must include #rhythmGraphStability");
+  assert.ok(html.includes('id="rhythmGraphTapCount"'), "Rhythm panel must include #rhythmGraphTapCount");
+  assert.ok(html.includes("function clearRhythmTapData()"), "index.html must define clearRhythmTapData()");
+  assert.ok(html.includes("function renderRhythmBpmGraph()"), "index.html must define renderRhythmBpmGraph()");
+
+  console.log("✔ Test 36: 📈 Milestone 38 Rhythm & Metronome Live BPM Graph & Clear Data UI passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 

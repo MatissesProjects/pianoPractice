@@ -2943,6 +2943,137 @@
     };
   }
 
+  /**
+   * Analyzes a sequence of user rhythm taps against a target BPM to drive the
+   * Live BPM Proximity & Timing Stability Graph in the Rhythm & Metronome tab.
+   */
+  function analyzeRhythmTapHistory(tapSamples = [], targetBpm = 96, windowSize = 24) {
+    const cleanTarget = Math.max(20, Math.min(300, Number(targetBpm) || 96));
+    if (!Array.isArray(tapSamples) || tapSamples.length === 0) {
+      return {
+        tapCount: 0,
+        validBpmCount: 0,
+        targetBpm: cleanTarget,
+        currentBpm: null,
+        averageBpm: null,
+        bpmDelta: null,
+        avgBpmError: null,
+        avgOffsetMs: null,
+        stabilityScore: null,
+        statusLabel: "Tap to start plotting your BPM!",
+        points: []
+      };
+    }
+
+    const normalized = tapSamples.map((s, idx) => {
+      if (typeof s === "number") {
+        return { timestamp: s, offsetMs: null, targetBpm: cleanTarget, index: idx };
+      }
+      return {
+        timestamp: typeof s.timestamp === "number" ? s.timestamp : 0,
+        instantBpm: typeof s.instantBpm === "number" ? s.instantBpm : null,
+        offsetMs: typeof s.offsetMs === "number" ? s.offsetMs : null,
+        targetBpm: typeof s.targetBpm === "number" ? s.targetBpm : cleanTarget,
+        index: idx
+      };
+    });
+
+    const bpmPoints = [];
+    const offsets = [];
+
+    for (let i = 0; i < normalized.length; i++) {
+      const cur = normalized[i];
+      if (typeof cur.offsetMs === "number" && !isNaN(cur.offsetMs)) {
+        offsets.push(Math.abs(cur.offsetMs));
+      }
+
+      let instBpm = cur.instantBpm;
+      if ((instBpm === null || instBpm === undefined) && i > 0) {
+        const dt = cur.timestamp - normalized[i - 1].timestamp;
+        if (dt >= 150 && dt <= 2500) {
+          instBpm = 60000 / dt;
+        }
+      }
+
+      if (typeof instBpm === "number" && !isNaN(instBpm) && instBpm >= 24 && instBpm <= 400) {
+        const roundedBpm = Math.round(instBpm * 10) / 10;
+        const tBpm = cur.targetBpm || cleanTarget;
+        const diff = Math.round((roundedBpm - tBpm) * 10) / 10;
+        const absDiff = Math.abs(diff);
+        let zone = "locked";
+        if (absDiff <= 3) zone = "locked";
+        else if (absDiff <= 7) zone = "good";
+        else if (diff > 7) zone = "rushing";
+        else zone = "dragging";
+
+        bpmPoints.push({
+          stepNumber: bpmPoints.length + 1,
+          tapIndex: i + 1,
+          instantBpm: roundedBpm,
+          targetBpm: tBpm,
+          bpmDiff: diff,
+          offsetMs: cur.offsetMs !== null ? Math.round(cur.offsetMs) : null,
+          zone
+        });
+      }
+    }
+
+    const avgOffsetMs = offsets.length > 0
+      ? Math.round(offsets.reduce((a, b) => a + b, 0) / offsets.length)
+      : null;
+
+    const windowedPoints = bpmPoints.slice(-Math.max(2, windowSize));
+    if (windowedPoints.length === 0) {
+      return {
+        tapCount: normalized.length,
+        validBpmCount: 0,
+        targetBpm: cleanTarget,
+        currentBpm: null,
+        averageBpm: null,
+        bpmDelta: null,
+        avgBpmError: null,
+        avgOffsetMs,
+        stabilityScore: null,
+        statusLabel: "Tap one more beat to measure BPM interval...",
+        points: []
+      };
+    }
+
+    const lastPt = windowedPoints[windowedPoints.length - 1];
+    const currentBpm = lastPt.instantBpm;
+    const bpmDelta = Math.round((currentBpm - cleanTarget) * 10) / 10;
+    const avgBpmRaw = windowedPoints.reduce((sum, p) => sum + p.instantBpm, 0) / windowedPoints.length;
+    const averageBpm = Math.round(avgBpmRaw * 10) / 10;
+    const avgErrRaw = windowedPoints.reduce((sum, p) => sum + Math.abs(p.instantBpm - cleanTarget), 0) / windowedPoints.length;
+    const avgBpmError = Math.round(avgErrRaw * 10) / 10;
+    const stabilityScore = Math.max(0, Math.min(100, Math.round(100 - avgErrRaw * 4)));
+
+    let statusLabel = "Locked In 🎯";
+    if (Math.abs(bpmDelta) <= 3) {
+      statusLabel = `Locked In 🎯 (${bpmDelta >= 0 ? "+" : ""}${bpmDelta} BPM)`;
+    } else if (Math.abs(bpmDelta) <= 7) {
+      statusLabel = `Close to Target 👍 (${bpmDelta >= 0 ? "+" : ""}${bpmDelta} BPM)`;
+    } else if (bpmDelta > 7) {
+      statusLabel = `Rushing / Fast ⚡ (+${bpmDelta} BPM)`;
+    } else {
+      statusLabel = `Dragging / Slow ⏳ (${bpmDelta} BPM)`;
+    }
+
+    return {
+      tapCount: normalized.length,
+      validBpmCount: bpmPoints.length,
+      targetBpm: cleanTarget,
+      currentBpm,
+      averageBpm,
+      bpmDelta,
+      avgBpmError,
+      avgOffsetMs,
+      stabilityScore,
+      statusLabel,
+      points: windowedPoints
+    };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -3019,7 +3150,8 @@
     classifyAudioDevice,
     METRONOME_SOUND_PRESETS,
     getMetronomeSoundParameters,
-    synthesizeMetronomeClick
+    synthesizeMetronomeClick,
+    analyzeRhythmTapHistory
   };
 });
 

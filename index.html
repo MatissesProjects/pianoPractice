@@ -2372,26 +2372,96 @@
     .tap-trainer-card {
       background: #111a2d;
       border: 1px solid #233554;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 1.5rem;
       text-align: center;
-      max-width: 540px;
+      max-width: 780px;
       margin: 0 auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     }
     .tap-hit-btn {
       background: linear-gradient(135deg, #ec4899, #be185d);
       color: #ffffff;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 800;
-      padding: 1.1rem 2.5rem;
+      padding: 1rem 2.2rem;
       border-radius: 12px;
       border: none;
       cursor: pointer;
       box-shadow: 0 0 18px rgba(236, 72, 153, 0.4);
       user-select: none;
-      margin: 1rem 0;
+      margin: 0.75rem 0;
+      transition: transform 0.08s ease, box-shadow 0.15s ease;
     }
     .tap-hit-btn:active { transform: scale(0.97); }
+    .rhythm-clear-btn {
+      background: rgba(244, 63, 94, 0.14);
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      color: #fda4af;
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 0.48rem 0.95rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .rhythm-clear-btn:hover {
+      background: rgba(244, 63, 94, 0.28);
+      border-color: #f43f5e;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.35);
+    }
+    .rhythm-telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+      gap: 0.65rem;
+      margin: 1rem 0;
+    }
+    .rhythm-stat-pill {
+      background: #090e1a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 0.55rem 0.65rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.18rem;
+    }
+    .rhythm-stat-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+    }
+    .rhythm-stat-value {
+      font-size: 1.05rem;
+      font-weight: 900;
+      font-family: ui-monospace, monospace;
+      color: #f8fafc;
+    }
+    .rhythm-bpm-graph-wrap {
+      background: #070b14;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 0.85rem 0.9rem 0.65rem;
+      margin-top: 0.85rem;
+      box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.6);
+    }
+    .rhythm-graph-legend {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.74rem;
+      color: #94a3b8;
+      font-weight: 700;
+      margin-top: 0.45rem;
+    }
 
     /* THEORY LESSONS & CIRCLE OF FIFTHS */
     .theory-studio-box {
@@ -3880,18 +3950,67 @@
           </div>
         </div>
 
-        <!-- Rhythm Tap Precision Trainer -->
-        <div class="tap-trainer-card">
-          <h3 style="font-size:1.15rem; color:#f8fafc; font-weight:800; margin-bottom:0.5rem;">Interactive Rhythm Timing Challenge</h3>
-          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
-            Tap along to the beat click with your Spacebar or the button below. Test your internal clock!
-          </p>
-          <button id="rhythmTapHitBtn" class="tap-hit-btn">🎯 TAP BEAT HERE (Spacebar)</button>
-          <div id="rhythmAccuracyResult" style="font-size:1.15rem; font-weight:800; color:#fbbf24; min-height:28px;">
-            Tap to test your rhythm timing!
+        <!-- Rhythm Tap Precision Trainer & Live BPM Proximity Graph -->
+        <div class="tap-trainer-card" id="rhythmTapTrainerCard">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:0.5rem; text-align:left;">
+            <div>
+              <h3 style="font-size:1.18rem; color:#f8fafc; font-weight:800; margin:0;">📈 Live BPM Proximity & Rhythm Timing Analyzer</h3>
+              <p style="font-size:0.83rem; color:var(--text-muted); margin:0.2rem 0 0;">
+                Tap along with <strong>Spacebar</strong>, any <strong>MIDI / Piano Key</strong>, or the button below to graph how close your tempo is to the target BPM!
+              </p>
+            </div>
+            <button type="button" id="rhythmClearDataBtn" class="rhythm-clear-btn" title="Clear all recorded BPM & tap timing data">
+              🗑️ Clear Data
+            </button>
           </div>
-          <div style="font-size:0.8rem; color:#94a3b8; margin-top:0.5rem;" id="rhythmAccuracyStats">
+
+          <button id="rhythmTapHitBtn" class="tap-hit-btn">🎯 TAP BEAT HERE (Spacebar / Piano Key)</button>
+
+          <div id="rhythmAccuracyResult" style="font-size:1.12rem; font-weight:800; color:#fbbf24; min-height:26px;">
+            Tap to test your rhythm timing & plot your live BPM!
+          </div>
+          <div style="font-size:0.8rem; color:#94a3b8; margin-top:0.3rem;" id="rhythmAccuracyStats">
             Timing offset: -- ms | Average error: -- ms
+          </div>
+
+          <!-- Live BPM Telemetry Summary Cards -->
+          <div class="rhythm-telemetry-grid" id="rhythmTelemetryGrid">
+            <div class="rhythm-stat-pill">
+              <span class="rhythm-stat-label">Target BPM</span>
+              <span class="rhythm-stat-value" id="rhythmGraphTargetBpm" style="color:#38bdf8;">96 BPM</span>
+            </div>
+            <div class="rhythm-stat-pill">
+              <span class="rhythm-stat-label">Your Live BPM</span>
+              <span class="rhythm-stat-value" id="rhythmGraphLiveBpm" style="color:#10b981;">-- BPM</span>
+            </div>
+            <div class="rhythm-stat-pill">
+              <span class="rhythm-stat-label">Average BPM</span>
+              <span class="rhythm-stat-value" id="rhythmGraphAvgBpm" style="color:#fbbf24;">-- BPM</span>
+            </div>
+            <div class="rhythm-stat-pill">
+              <span class="rhythm-stat-label">Tempo Stability</span>
+              <span class="rhythm-stat-value" id="rhythmGraphStability" style="color:#c084fc;">--%</span>
+            </div>
+            <div class="rhythm-stat-pill">
+              <span class="rhythm-stat-label">Taps Logged</span>
+              <span class="rhythm-stat-value" id="rhythmGraphTapCount">0</span>
+            </div>
+          </div>
+
+          <!-- Interactive SVG BPM Proximity Graph -->
+          <div class="rhythm-bpm-graph-wrap" id="rhythmBpmGraphWrap">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; font-size:0.76rem; font-weight:800; color:#cbd5e1;">
+              <span>BPM Proximity Curve (Last 24 Beats vs Target Tempo)</span>
+              <span id="rhythmGraphStatusBadge" style="color:#38bdf8;">Tap at least 2 beats to plot BPM</span>
+            </div>
+            <svg id="rhythmBpmGraphSvg" width="720" height="210" viewBox="0 0 720 210" style="display:block; width:100%; height:auto;"></svg>
+            <div class="rhythm-graph-legend">
+              <span><strong style="color:#10b981;">●</strong> Locked In (±3 BPM)</span>
+              <span><strong style="color:#38bdf8;">●</strong> Close (±7 BPM)</span>
+              <span><strong style="color:#f59e0b;">●</strong> Rushing (+BPM)</span>
+              <span><strong style="color:#fb7185;">●</strong> Dragging (-BPM)</span>
+              <span><strong style="color:#10b981;">- - -</strong> Target BPM Line</span>
+            </div>
           </div>
         </div>
       </div>
@@ -10988,9 +11107,11 @@
       document.getElementById("metroStartBtn")?.addEventListener("click", toggleMetronome);
       document.getElementById("metroTapTempoBtn")?.addEventListener("click", handleTapTempo);
       document.getElementById("rhythmTapHitBtn")?.addEventListener("click", registerRhythmTap);
+      document.getElementById("rhythmClearDataBtn")?.addEventListener("click", clearRhythmTapData);
 
       buildMetroBeatLights();
       updateMetroBpmDisplay();
+      renderRhythmBpmGraph();
     }
 
     function adjustMetroBpm(delta) {
@@ -11017,6 +11138,8 @@
       else if (metroBpm < 132) termEl.textContent = "Allegro (Fast & Bright)";
       else if (metroBpm < 168) termEl.textContent = "Vivace (Lively)";
       else termEl.textContent = "Presto (Very Fast)";
+
+      renderRhythmBpmGraph();
     }
 
     function buildMetroBeatLights() {
@@ -11174,6 +11297,240 @@
       }, Math.max(0, timeMs));
     }
 
+    let rhythmTapHistory = [];
+
+    function clearRhythmTapData() {
+      rhythmTapHistory = [];
+      metroTapTimes = [];
+      const resEl = document.getElementById("rhythmAccuracyResult");
+      if (resEl) {
+        resEl.style.color = "#fbbf24";
+        resEl.textContent = "Data cleared! Tap to test your rhythm timing & plot your live BPM!";
+      }
+      const statEl = document.getElementById("rhythmAccuracyStats");
+      if (statEl) {
+        statEl.textContent = "Timing offset: -- ms | Average error: -- ms";
+      }
+      renderRhythmBpmGraph();
+    }
+
+    function renderRhythmBpmGraph() {
+      const targetEl = document.getElementById("rhythmGraphTargetBpm");
+      if (targetEl) targetEl.textContent = `${metroBpm} BPM`;
+
+      const stats = (window.MusicTheory && window.MusicTheory.analyzeRhythmTapHistory)
+        ? window.MusicTheory.analyzeRhythmTapHistory(rhythmTapHistory, metroBpm, 24)
+        : {
+            tapCount: rhythmTapHistory.length,
+            validBpmCount: 0,
+            targetBpm: metroBpm,
+            currentBpm: null,
+            averageBpm: null,
+            bpmDelta: null,
+            avgBpmError: null,
+            avgOffsetMs: null,
+            stabilityScore: null,
+            statusLabel: "Tap to start plotting your BPM!",
+            points: []
+          };
+
+      const liveEl = document.getElementById("rhythmGraphLiveBpm");
+      if (liveEl) {
+        if (stats.currentBpm !== null) {
+          const sign = stats.bpmDelta >= 0 ? "+" : "";
+          liveEl.textContent = `${stats.currentBpm} (${sign}${stats.bpmDelta})`;
+          liveEl.style.color = Math.abs(stats.bpmDelta) <= 3 ? "#10b981" : (Math.abs(stats.bpmDelta) <= 7 ? "#38bdf8" : "#f59e0b");
+        } else {
+          liveEl.textContent = "-- BPM";
+          liveEl.style.color = "#94a3b8";
+        }
+      }
+
+      const avgEl = document.getElementById("rhythmGraphAvgBpm");
+      if (avgEl) {
+        avgEl.textContent = stats.averageBpm !== null ? `${stats.averageBpm} BPM` : "-- BPM";
+      }
+
+      const stabEl = document.getElementById("rhythmGraphStability");
+      if (stabEl) {
+        stabEl.textContent = stats.stabilityScore !== null ? `${stats.stabilityScore}%` : "--%";
+        if (stats.stabilityScore !== null) {
+          stabEl.style.color = stats.stabilityScore >= 88 ? "#10b981" : (stats.stabilityScore >= 72 ? "#38bdf8" : "#f59e0b");
+        } else {
+          stabEl.style.color = "#c084fc";
+        }
+      }
+
+      const countEl = document.getElementById("rhythmGraphTapCount");
+      if (countEl) countEl.textContent = String(stats.tapCount);
+
+      const badgeEl = document.getElementById("rhythmGraphStatusBadge");
+      if (badgeEl) {
+        badgeEl.textContent = stats.statusLabel;
+        if (stats.bpmDelta === null) badgeEl.style.color = "#38bdf8";
+        else if (Math.abs(stats.bpmDelta) <= 3) badgeEl.style.color = "#10b981";
+        else if (Math.abs(stats.bpmDelta) <= 7) badgeEl.style.color = "#38bdf8";
+        else badgeEl.style.color = "#f59e0b";
+      }
+
+      const svg = document.getElementById("rhythmBpmGraphSvg");
+      if (!svg) return;
+      svg.innerHTML = "";
+
+      const W = 720;
+      const H = 210;
+      const padL = 56;
+      const padR = 24;
+      const padT = 18;
+      const padB = 28;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      // Determine Y-axis BPM range centered on metroBpm
+      let maxDev = 22;
+      stats.points.forEach(pt => {
+        const d = Math.abs(pt.instantBpm - metroBpm);
+        if (d + 4 > maxDev) maxDev = Math.min(60, Math.ceil(d + 4));
+      });
+      const minBpm = metroBpm - maxDev;
+      const maxBpm = metroBpm + maxDev;
+
+      const bpmToY = (bpmVal) => {
+        const clamped = Math.max(minBpm, Math.min(maxBpm, bpmVal));
+        const norm = (clamped - minBpm) / (maxBpm - minBpm);
+        return padT + plotH - norm * plotH;
+      };
+
+      // 1. Shaded Good Zone (±7 BPM) & Locked-In Zone (±3 BPM)
+      const goodTopY = bpmToY(metroBpm + 7);
+      const goodBotY = bpmToY(metroBpm - 7);
+      const goodRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      goodRect.setAttribute("x", padL);
+      goodRect.setAttribute("y", goodTopY);
+      goodRect.setAttribute("width", plotW);
+      goodRect.setAttribute("height", Math.max(2, goodBotY - goodTopY));
+      goodRect.setAttribute("fill", "rgba(56, 189, 248, 0.06)");
+      svg.appendChild(goodRect);
+
+      const lockTopY = bpmToY(metroBpm + 3);
+      const lockBotY = bpmToY(metroBpm - 3);
+      const lockRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      lockRect.setAttribute("x", padL);
+      lockRect.setAttribute("y", lockTopY);
+      lockRect.setAttribute("width", plotW);
+      lockRect.setAttribute("height", Math.max(2, lockBotY - lockTopY));
+      lockRect.setAttribute("fill", "rgba(16, 185, 129, 0.13)");
+      svg.appendChild(lockRect);
+
+      // 2. Horizontal Grid Lines & Y-Axis Labels
+      const stepBpm = maxDev > 30 ? 20 : 10;
+      const tickOffsets = [-stepBpm * 2, -stepBpm, 0, stepBpm, stepBpm * 2];
+      tickOffsets.forEach(off => {
+        const val = metroBpm + off;
+        if (val < minBpm || val > maxBpm) return;
+        const y = bpmToY(val);
+        const isTarget = (off === 0);
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", padL);
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", W - padR);
+        line.setAttribute("y2", y);
+        line.setAttribute("stroke", isTarget ? "#10b981" : "#1e293b");
+        line.setAttribute("stroke-width", isTarget ? "1.8" : "1");
+        if (isTarget) line.setAttribute("stroke-dasharray", "6 4");
+        svg.appendChild(line);
+
+        const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        lbl.setAttribute("x", padL - 8);
+        lbl.setAttribute("y", y + 4);
+        lbl.setAttribute("text-anchor", "end");
+        lbl.setAttribute("font-size", isTarget ? "11" : "10");
+        lbl.setAttribute("font-weight", isTarget ? "800" : "600");
+        lbl.setAttribute("font-family", "ui-monospace, monospace");
+        lbl.setAttribute("fill", isTarget ? "#10b981" : "#64748b");
+        lbl.textContent = `${val}`;
+        svg.appendChild(lbl);
+      });
+
+      // 3. Empty state message if fewer than 1 plotted BPM point
+      const pts = stats.points;
+      if (!pts || pts.length === 0) {
+        const emptyTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        emptyTxt.setAttribute("x", padL + plotW / 2);
+        emptyTxt.setAttribute("y", padT + plotH / 2 - 6);
+        emptyTxt.setAttribute("text-anchor", "middle");
+        emptyTxt.setAttribute("font-size", "12.5");
+        emptyTxt.setAttribute("font-weight", "700");
+        emptyTxt.setAttribute("fill", "#94a3b8");
+        emptyTxt.textContent = stats.tapCount === 1
+          ? "1st tap logged — tap the next beat to plot your BPM!"
+          : `Target Line: ${metroBpm} BPM — Tap along (Spacebar / Button / Piano Key) to graph your tempo!`;
+        svg.appendChild(emptyTxt);
+        return;
+      }
+
+      // 4. Compute X/Y coordinates for each point
+      const maxSlots = Math.max(8, pts.length);
+      const coords = pts.map((pt, i) => {
+        const x = pts.length === 1
+          ? padL + plotW / 2
+          : padL + (i / (maxSlots - 1)) * plotW;
+        const y = bpmToY(pt.instantBpm);
+        return { x, y, pt };
+      });
+
+      // 5. Connect trend line
+      if (coords.length >= 2) {
+        const polyPoints = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(" ");
+        const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        polyline.setAttribute("points", polyPoints);
+        polyline.setAttribute("fill", "none");
+        polyline.setAttribute("stroke", "#38bdf8");
+        polyline.setAttribute("stroke-width", "2.4");
+        polyline.setAttribute("stroke-linecap", "round");
+        polyline.setAttribute("stroke-linejoin", "round");
+        svg.appendChild(polyline);
+      }
+
+      // 6. Draw tap nodes & latest BPM badge
+      coords.forEach((c, idx) => {
+        let color = "#10b981";
+        if (c.pt.zone === "good") color = "#38bdf8";
+        else if (c.pt.zone === "rushing") color = "#f59e0b";
+        else if (c.pt.zone === "dragging") color = "#fb7185";
+
+        const isLast = (idx === coords.length - 1);
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", c.x);
+        circle.setAttribute("cy", c.y);
+        circle.setAttribute("r", isLast ? "6" : "4.2");
+        circle.setAttribute("fill", color);
+        circle.setAttribute("stroke", "#070b14");
+        circle.setAttribute("stroke-width", "1.6");
+
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        const sign = c.pt.bpmDiff >= 0 ? "+" : "";
+        title.textContent = `Beat #${c.pt.stepNumber}: ${c.pt.instantBpm} BPM (${sign}${c.pt.bpmDiff} vs ${c.pt.targetBpm} BPM)`;
+        circle.appendChild(title);
+        svg.appendChild(circle);
+
+        if (isLast) {
+          const valLbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          const labelY = c.y > padT + 22 ? c.y - 10 : c.y + 18;
+          valLbl.setAttribute("x", Math.min(W - padR - 36, Math.max(padL + 36, c.x)));
+          valLbl.setAttribute("y", labelY);
+          valLbl.setAttribute("text-anchor", "middle");
+          valLbl.setAttribute("font-size", "11");
+          valLbl.setAttribute("font-weight", "800");
+          valLbl.setAttribute("font-family", "ui-monospace, monospace");
+          valLbl.setAttribute("fill", color);
+          valLbl.textContent = `${c.pt.instantBpm} BPM (${sign}${c.pt.bpmDiff})`;
+          svg.appendChild(valLbl);
+        }
+      });
+    }
+
     function handleTapTempo() {
       const now = performance.now();
       metroTapTimes.push(now);
@@ -11203,19 +11560,56 @@
       const offset = delta > beatMs / 2 ? delta - beatMs : delta;
       const absOffset = Math.abs(offset);
 
+      // Compute instantaneous BPM from previous tap if within 150ms–2500ms
+      let instantBpm = null;
+      if (rhythmTapHistory.length > 0) {
+        const prevTap = rhythmTapHistory[rhythmTapHistory.length - 1];
+        const dt = now - prevTap.timestamp;
+        if (dt >= 150 && dt <= 2500) {
+          // Normalize to quarter-note / main beat BPM if subdivision > 1
+          instantBpm = (60000 / dt) / (metroSubdivision > 1 ? metroSubdivision : 1);
+        }
+      }
+
+      rhythmTapHistory.push({
+        timestamp: now,
+        instantBpm,
+        targetBpm: metroBpm,
+        offsetMs: metroIsPlaying ? offset : null
+      });
+      if (rhythmTapHistory.length > 60) {
+        rhythmTapHistory.shift();
+      }
+
       const resEl = document.getElementById("rhythmAccuracyResult");
       const statEl = document.getElementById("rhythmAccuracyStats");
 
-      if (absOffset < 35) {
-        resEl.innerHTML = `<span style="color:#10b981;">PERFECT! ⭐ (${offset > 0 ? '+' : ''}${Math.round(offset)} ms)</span>`;
-      } else if (absOffset < 75) {
-        resEl.innerHTML = `<span style="color:#38bdf8;">GOOD! 👍 (${offset > 0 ? '+' : ''}${Math.round(offset)} ms)</span>`;
+      if (metroIsPlaying) {
+        if (absOffset < 35) {
+          resEl.innerHTML = `<span style="color:#10b981;">PERFECT! ⭐ (${offset > 0 ? '+' : ''}${Math.round(offset)} ms)</span>`;
+        } else if (absOffset < 75) {
+          resEl.innerHTML = `<span style="color:#38bdf8;">GOOD! 👍 (${offset > 0 ? '+' : ''}${Math.round(offset)} ms)</span>`;
+        } else {
+          const desc = offset > 0 ? "LATE ⏳" : "EARLY ⚡";
+          resEl.innerHTML = `<span style="color:#f59e0b;">${desc} (${offset > 0 ? '+' : ''}${Math.round(offset)} ms)</span>`;
+        }
+      } else if (instantBpm !== null) {
+        const diff = Math.round((instantBpm - metroBpm) * 10) / 10;
+        const sign = diff >= 0 ? "+" : "";
+        const col = Math.abs(diff) <= 3 ? "#10b981" : (Math.abs(diff) <= 7 ? "#38bdf8" : "#f59e0b");
+        resEl.innerHTML = `<span style="color:${col};">Your Tempo: ${Math.round(instantBpm * 10) / 10} BPM (${sign}${diff} vs Target ${metroBpm} BPM)</span>`;
       } else {
-        const desc = offset > 0 ? "LATE ⏳" : "EARLY ⚡";
-        resEl.innerHTML = `<span style="color:#f59e0b;">${desc} (${offset > 0 ? '+' : ''}${Math.round(offset)} ms)</span>`;
+        resEl.innerHTML = `<span style="color:#38bdf8;">First beat logged — keep tapping to measure your BPM!</span>`;
       }
 
-      statEl.textContent = `Target beat interval: ${Math.round(beatMs)} ms | Delta: ${Math.round(offset)} ms`;
+      const stats = (window.MusicTheory && window.MusicTheory.analyzeRhythmTapHistory)
+        ? window.MusicTheory.analyzeRhythmTapHistory(rhythmTapHistory, metroBpm, 24)
+        : null;
+      const avgErrStr = (stats && stats.avgOffsetMs !== null) ? `${stats.avgOffsetMs} ms` : "-- ms";
+      const curOffStr = metroIsPlaying ? `${Math.round(offset)} ms` : "-- ms (Free Tap)";
+      statEl.textContent = `Target beat interval: ${Math.round(beatMs)} ms | Timing offset: ${curOffStr} | Average error: ${avgErrStr}`;
+
+      renderRhythmBpmGraph();
     }
 
     // ==========================================

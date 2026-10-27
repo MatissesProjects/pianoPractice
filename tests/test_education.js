@@ -451,7 +451,47 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 15: 🎓 Milestone 36 Beginner Pedagogy, Bootcamp, Diatonic Family & Song Theory DNA passed");
 }
 
-console.log("=== ALL 15 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// 16. Test Milestone 38 Live BPM Proximity & Rhythm Stability Graph Engine
+{
+  assert.strictEqual(typeof MusicTheory.analyzeRhythmTapHistory, "function", "analyzeRhythmTapHistory must be exported on MusicTheory");
+
+  // 16.1 Empty tap history state (after Clear Data)
+  const emptyStats = MusicTheory.analyzeRhythmTapHistory([], 100);
+  assert.strictEqual(emptyStats.tapCount, 0);
+  assert.strictEqual(emptyStats.currentBpm, null);
+  assert.strictEqual(emptyStats.averageBpm, null);
+  assert.strictEqual(emptyStats.points.length, 0);
+
+  // 16.2 Single tap state
+  const oneTap = MusicTheory.analyzeRhythmTapHistory([{ timestamp: 1000, instantBpm: null, targetBpm: 100, offsetMs: 12 }], 100);
+  assert.strictEqual(oneTap.tapCount, 1);
+  assert.strictEqual(oneTap.validBpmCount, 0);
+  assert.strictEqual(oneTap.avgOffsetMs, 12);
+
+  // 16.3 Multi-tap sequence: Locked In (100 BPM = 600ms intervals), Rushing (110 BPM), Dragging (88 BPM)
+  const tapSeq = [
+    { timestamp: 0, instantBpm: null, targetBpm: 100, offsetMs: 5 },
+    { timestamp: 600, instantBpm: 100, targetBpm: 100, offsetMs: -4 },
+    { timestamp: 1190, instantBpm: 101.7, targetBpm: 100, offsetMs: -10 },
+    { timestamp: 1735, instantBpm: 110.1, targetBpm: 100, offsetMs: -25 },
+    { timestamp: 2417, instantBpm: 88.0, targetBpm: 100, offsetMs: 30 }
+  ];
+  const stats = MusicTheory.analyzeRhythmTapHistory(tapSeq, 100, 24);
+  assert.strictEqual(stats.tapCount, 5);
+  assert.strictEqual(stats.validBpmCount, 4);
+  assert.strictEqual(stats.points.length, 4);
+  assert.strictEqual(stats.points[0].zone, "locked", "100 BPM vs 100 target is locked");
+  assert.strictEqual(stats.points[1].zone, "locked", "101.7 BPM vs 100 target is locked (±3 BPM)");
+  assert.strictEqual(stats.points[2].zone, "rushing", "110.1 BPM vs 100 target is rushing (> +7 BPM)");
+  assert.strictEqual(stats.points[3].zone, "dragging", "88.0 BPM vs 100 target is dragging (< -7 BPM)");
+  assert.strictEqual(stats.currentBpm, 88);
+  assert.strictEqual(stats.bpmDelta, -12);
+  assert.ok(typeof stats.stabilityScore === "number" && stats.stabilityScore >= 0 && stats.stabilityScore <= 100);
+
+  console.log("✔ Test 16: 📈 Milestone 38 Live BPM Proximity & Rhythm Stability Graph Engine passed");
+}
+
+console.log("=== ALL 16 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
 
 
 

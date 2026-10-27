@@ -510,6 +510,15 @@
   - [x] **Updated Automated Test Suite (`tests/test_education.js` & `tests/test_score_engine.js`)**:
     - [x] Updated Tests 13, 20.3, 32.3/32.5, and 35.5 in `tests/test_score_engine.js` and Tests 15.2 & 15.7 in `tests/test_education.js` — all 50/50 tests passing.
 
+- [x] **Milestone 38: Live BPM Proximity & Timing Stability Graph with Clear Data Controls (`#panelRhythm`)**
+  - [x] **BPM Tap Telemetry & Proximity Analysis Engine (`theory.js`)**:
+    - [x] Added `analyzeRhythmTapHistory(tapSamples, targetBpm, windowSize = 24)` to compute instantaneous BPM (`60000 / intervalMs`), BPM delta vs target, rolling average BPM, mean absolute timing offset (`ms`), tempo stability score (`0–100%`), and proximity zone classification (`locked` `±3 BPM`, `good` `±7 BPM`, `rushing` `> +7 BPM`, `dragging` `< -7 BPM`).
+  - [x] **Interactive Live BPM Proximity Graph & Clear Data Button (`index.html`)**:
+    - [x] Added **🗑️ Clear Data (`#rhythmClearDataBtn`)** button and `clearRhythmTapData()` in `#panelRhythm` to wipe recorded tap history, reset telemetry cards, and redraw the clean reference chart on demand.
+    - [x] Added 5 live telemetry stat pills (`#rhythmGraphTargetBpm`, `#rhythmGraphLiveBpm`, `#rhythmGraphAvgBpm`, `#rhythmGraphStability`, `#rhythmGraphTapCount`) and the dynamic SVG chart (`#rhythmBpmGraphSvg`) with shaded green/blue proximity bands, dashed Target BPM centerline, trend line, and color-coded beat nodes.
+  - [x] **Automated Test Suite (`tests/test_education.js` Test 16 & `tests/test_score_engine.js` Test 36)**:
+    - [x] Added Test 16 in `tests/test_education.js` and Test 36 in `tests/test_score_engine.js` — all 52/52 automated tests passing.
+
 
 
 
