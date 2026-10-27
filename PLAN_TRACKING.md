@@ -503,8 +503,12 @@
     - [x] Set `<option value="roots" selected>Single Roots (1-Note Primer)</option>` as the default first option in `#lhStyleSelect` and enforced `lhStyle: "roots"` across Curriculum Levels 1–5 so basic setups always start with clean 1-note bass roots while still allowing progressive upgrades to `Open 5ths`, `Thirds`, `Full Triads`, or `Bass Octaves`.
   - [x] **Accurate Song Theory DNA Bar (`theory.js`, `index.html`)**:
     - [x] Upgraded `analyzeSongTheoryDNA(song, handOptions)` to derive primary harmonic chords directly from left-hand bass roots (yielding clean `I (C)`, `IV (F)`, `V (G)` for `Lean on Me` instead of false-positive `vi7 (Am7)` / `ii7 (Dm7)` from melodic passing tones) and compute exact playable note count and active hand key range dynamically when hand toggles change.
+  - [x] **Runtime DOM ID & Scale Transition Property Fixes (`theory.js`, `index.html`)**:
+    - [x] Fixed `TypeError: Cannot read properties of undefined (reading 'pitch')` at lines 10068 & 10070 in `updateScaleDisplay()` by adding `degreeIndex: idx` to each note in `generateScale()` (`theory.js`) and adding a safe fallback `baseNotes.indexOf(tNote)` in `updateScaleDisplay()` (`index.html`).
+    - [x] Fixed `TypeError: Cannot set properties of null (setting 'textContent')` at line 11605 in `renderBootcampModule()` by aligning all Bootcamp DOM queries (`#bootcampModBadge`, `#bootcampModStatus`, `#bootcampModTitle`, `#bootcampModSubtitle`, `#bootcampModSummary`, `#bootcampModTakeaways`, `#bootcampRecSongs`, `#bootcampStepProgress`, `#bootcampTaskPrompt`, `#bootcampStepList`) with the HTML markup in `#beginnerBootcampSection`, and fixed Chord Lab stat card updates (`#chordLabRecipeText`, `#chordLabMathText`, `#chordLabFingersText`, `#chordLabMoodText`).
+    - [x] Added a static DOM ID integrity audit in `tests/test_score_engine.js` (Test 35.5) verifying that 100% of `document.getElementById()` calls in `index.html` match existing HTML `id="..."` attributes.
   - [x] **Updated Automated Test Suite (`tests/test_education.js` & `tests/test_score_engine.js`)**:
-    - [x] Updated Tests 13, 20.3, and 32.3/32.5 in `tests/test_score_engine.js` and Test 15.7 in `tests/test_education.js` — all 50/50 tests passing.
+    - [x] Updated Tests 13, 20.3, 32.3/32.5, and 35.5 in `tests/test_score_engine.js` and Tests 15.2 & 15.7 in `tests/test_education.js` — all 50/50 tests passing.
 
 
 

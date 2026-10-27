@@ -3225,13 +3225,18 @@ const {
   assert.ok(html.includes("function verifyBootcampNoteInput("), "index.html must define verifyBootcampNoteInput");
   assert.ok(html.includes("function initInteractiveTheoryCards("), "index.html must define initInteractiveTheoryCards");
 
-  // 35.5 Full Inline Script Syntax Check
+  // 35.5 Full Inline Script Syntax Check & Static DOM ID Integrity Audit
   const scriptStart = html.indexOf("<script>");
   const scriptEnd = html.lastIndexOf("</script>");
   const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
   assert.doesNotThrow(() => {
     new vm.Script(scriptContent);
   }, "index.html inline script must be syntactically valid after Milestone 36 upgrades");
+
+  const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
+  const queriedStaticIds = [...scriptContent.matchAll(/document\.getElementById\("([^"$]+)"\)/g)].map(m => m[1]);
+  const missingIds = [...new Set(queriedStaticIds.filter(id => !htmlIds.has(id)))];
+  assert.deepStrictEqual(missingIds, [], `All static document.getElementById() calls must match existing HTML IDs (missing: ${missingIds.join(", ")})`);
 
   console.log("✔ Test 35: 🎓 Milestone 36 Beginner Pedagogy, Bootcamp, Chord Lab & Theory DNA UI passed");
 }

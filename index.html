@@ -10063,11 +10063,12 @@
         const transitions = baseNotes.filter(n => currentScaleHand === "lh" ? n.lhTransition : n.rhTransition);
         if (transitions.length > 0) {
           const tNote = transitions[0];
-          const prevNote = baseNotes[Math.max(0, tNote.degreeIndex - 1)];
+          const rawIdx = typeof tNote.degreeIndex === "number" ? tNote.degreeIndex : baseNotes.indexOf(tNote);
+          const prevNote = baseNotes[Math.max(0, rawIdx - 1)] || tNote;
           if (currentScaleHand === "lh") {
-            tuckTextEl.innerHTML = `<strong>Left Hand Crossover:</strong> Play <strong>${prevNote.pitch}</strong> with thumb (1), then smoothly cross <strong>Finger ${tNote.lhFinger}</strong> over your thumb onto <strong>${tNote.pitch}</strong>!`;
+            tuckTextEl.innerHTML = `<strong>Left Hand Crossover:</strong> Play <strong>${prevNote.pitch}</strong> with finger ${prevNote.lhFinger || 1}, then smoothly cross <strong>Finger ${tNote.lhFinger}</strong> over onto <strong>${tNote.pitch}</strong>!`;
           } else {
-            tuckTextEl.innerHTML = `<strong>Right Hand Thumb-Tuck:</strong> After playing <strong>${prevNote.pitch}</strong> with finger ${prevNote.rhFinger}, tuck your <strong>Thumb (1)</strong> smoothly underneath onto <strong>${tNote.pitch}</strong> to keep your hand level!`;
+            tuckTextEl.innerHTML = `<strong>Right Hand Thumb-Tuck:</strong> After playing <strong>${prevNote.pitch}</strong> with finger ${prevNote.rhFinger || 3}, tuck your <strong>Thumb (1)</strong> smoothly underneath onto <strong>${tNote.pitch}</strong> to keep your hand level!`;
           }
         } else {
           tuckTextEl.textContent = `Keep your wrist relaxed and fingers curved as you walk through ${currentScaleObj.name}.`;
@@ -10395,7 +10396,7 @@
         btn.addEventListener("click", () => {
           document.querySelectorAll("#chordLabTypePills .scale-pill-btn").forEach(b => b.classList.remove("active"));
           btn.classList.add("active");
-          currentChordLabType = btn.dataset.chordType;
+          currentChordLabType = btn.dataset.chordtype || btn.dataset.chordType || "major";
           updateChordLabDisplay();
         });
       });
@@ -10420,36 +10421,32 @@
 
       const invNames = ["Root Position", "1st Inversion", "2nd Inversion"];
       const titleEl = document.getElementById("chordLabDisplayTitle");
-      if (titleEl) titleEl.textContent = `${currentChordLabRecipe.fullName} (${invNames[currentChordLabInversion] || "Root Position"})`;
+      if (titleEl) titleEl.textContent = `${currentChordLabRecipe.symbol} — ${currentChordLabRecipe.typeName} (${invNames[currentChordLabInversion] || "Root Position"})`;
 
-      const formulaBadge = document.getElementById("chordLabFormulaBadge");
-      if (formulaBadge) formulaBadge.textContent = `Formula: ${currentChordLabRecipe.recipe} (${currentChordLabRecipe.stepMath})`;
+      const notesListEl = document.getElementById("chordLabNotesList");
+      if (notesListEl) {
+        notesListEl.textContent = `Notes: ${currentChordLabRecipe.pitches.join(" + ")} (Bass: ${currentChordLabRecipe.lhBassPitch})`;
+      }
+
+      const recipeTextEl = document.getElementById("chordLabRecipeText");
+      if (recipeTextEl) recipeTextEl.textContent = currentChordLabRecipe.recipe;
+
+      const mathTextEl = document.getElementById("chordLabMathText");
+      if (mathTextEl) mathTextEl.textContent = currentChordLabRecipe.stepMath;
+
+      const fingersTextEl = document.getElementById("chordLabFingersText");
+      if (fingersTextEl) {
+        fingersTextEl.textContent = `RH: ${currentChordLabRecipe.rhFingers.join(" – ")} | LH: ${currentChordLabRecipe.lhFingers.join(" – ")}`;
+      }
 
       const moodEl = document.getElementById("chordLabMoodText");
       if (moodEl) {
-        moodEl.innerHTML = `<strong>Character:</strong> ${currentChordLabRecipe.mood} — <strong>RH Fingers:</strong> ${currentChordLabRecipe.rhFingers.join(" - ")} | <strong>LH Fingers:</strong> ${currentChordLabRecipe.lhFingers.join(" - ")}`;
+        moodEl.textContent = currentChordLabRecipe.mood;
       }
 
-      const grid = document.getElementById("chordLabRecipeGrid");
-      if (grid) {
-        grid.innerHTML = "";
-        currentChordLabRecipe.tones.forEach((t, idx) => {
-          const card = document.createElement("div");
-          card.className = "chord-tone-recipe-card";
-          card.innerHTML = `
-            <span class="tone-role">${t.roleLabel}</span>
-            <span class="tone-pitch">${t.pitch}</span>
-            <span class="tone-interval">${t.semitonesFromRoot} semitones (${t.intervalName})</span>
-            <span class="tone-fingers">RH: ${t.rhFinger} · LH: ${t.lhFinger}</span>
-          `;
-          card.style.cursor = "pointer";
-          card.addEventListener("click", () => {
-            initAudio();
-            playTone(t.freq, 0.55);
-            highlightPlaybackKey(t.pitch, idx === 0 ? "rh" : "dyad", 550);
-          });
-          grid.appendChild(card);
-        });
+      const feedbackEl = document.getElementById("chordLabFeedbackText");
+      if (feedbackEl && !isChordLabPracticeActive) {
+        feedbackEl.innerHTML = `Click <strong>"▶ Arpeggiate & Block Play"</strong> to hear each interval stack, or click <strong>"🎯 Practice Chord on Piano"</strong> to build <strong>${currentChordLabRecipe.pitches.join(" + ")}</strong> on your keyboard!`;
       }
 
       document.querySelectorAll(".piano-key").forEach(k => k.classList.remove("active-rh", "active-lh", "active-dyad"));
@@ -11579,20 +11576,21 @@
       const mod = modules[currentBootcampModuleIdx] || modules[0];
       if (!mod) return;
 
+      const isDone = bootcampCompletedIds.has(mod.id);
       const badge = document.getElementById("bootcampProgressBadge");
       if (badge) {
-        badge.textContent = `${bootcampCompletedIds.size} / ${modules.length} Completed`;
+        badge.textContent = `${bootcampCompletedIds.size} / ${modules.length} Modules Mastered`;
       }
 
       const tabsRow = document.getElementById("bootcampModuleTabs");
       if (tabsRow) {
         tabsRow.innerHTML = "";
         modules.forEach((m, idx) => {
-          const isDone = bootcampCompletedIds.has(m.id);
+          const mDone = bootcampCompletedIds.has(m.id);
           const btn = document.createElement("button");
           btn.type = "button";
-          btn.className = `bootcamp-tab-btn ${idx === currentBootcampModuleIdx ? "active" : ""} ${isDone ? "completed" : ""}`;
-          btn.textContent = `${isDone ? "✓ " : ""}${m.number}. ${m.title.split(":")[0]}`;
+          btn.className = `bootcamp-tab-btn ${idx === currentBootcampModuleIdx ? "active" : ""} ${mDone ? "completed" : ""}`;
+          btn.textContent = `${mDone ? "✓ " : ""}${m.number}. ${m.title.split(":")[0]}`;
           btn.addEventListener("click", () => {
             if (isBootcampTaskActive) toggleBootcampTask();
             currentBootcampModuleIdx = idx;
@@ -11602,27 +11600,68 @@
         });
       }
 
-      document.getElementById("bootcampActiveCategory").textContent = `Module ${mod.number} · ${mod.category}`;
-      document.getElementById("bootcampActiveTitle").textContent = mod.title;
-      document.getElementById("bootcampActiveSummary").textContent = mod.summary;
+      const modBadgeEl = document.getElementById("bootcampModBadge");
+      if (modBadgeEl) modBadgeEl.textContent = `Module ${mod.number} · ${mod.category || mod.badge || ""}`;
 
-      const stepList = document.getElementById("bootcampStepList");
-      if (stepList) {
-        stepList.innerHTML = "";
-        (mod.steps || []).forEach(s => {
+      const modStatusEl = document.getElementById("bootcampModStatus");
+      if (modStatusEl) {
+        modStatusEl.textContent = isDone ? "✅ Completed" : "In Progress";
+        modStatusEl.style.color = isDone ? "#34d399" : "#94a3b8";
+      }
+
+      const modTitleEl = document.getElementById("bootcampModTitle");
+      if (modTitleEl) modTitleEl.textContent = mod.title;
+
+      const modSubtitleEl = document.getElementById("bootcampModSubtitle");
+      if (modSubtitleEl) modSubtitleEl.textContent = mod.subtitle || "";
+
+      const modSummaryEl = document.getElementById("bootcampModSummary");
+      if (modSummaryEl) modSummaryEl.textContent = mod.summary || mod.theorySummary || "";
+
+      const takeawaysList = document.getElementById("bootcampModTakeaways");
+      if (takeawaysList) {
+        takeawaysList.innerHTML = "";
+        (mod.steps || mod.keyTakeaways || []).forEach(s => {
           const li = document.createElement("li");
           li.textContent = s;
-          stepList.appendChild(li);
+          takeawaysList.appendChild(li);
         });
       }
 
-      const goalPrompt = document.getElementById("bootcampGoalPrompt");
-      if (goalPrompt) goalPrompt.textContent = mod.interactiveTask.prompt;
+      const recSongsContainer = document.getElementById("bootcampRecSongs");
+      if (recSongsContainer) {
+        recSongsContainer.innerHTML = "";
+        (mod.recommendedSongs || []).forEach(songId => {
+          const found = songDatabase.find(s => s.id === songId);
+          if (!found) return;
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "dna-chord-chip";
+          chip.textContent = `🎵 ${found.title}`;
+          chip.addEventListener("click", () => {
+            const repTab = document.querySelector('.mode-nav-btn[data-mode="repertoire"]');
+            if (repTab) repTab.click();
+            loadSong(found);
+          });
+          recSongsContainer.appendChild(chip);
+        });
+      }
 
-      const notesRow = document.getElementById("bootcampTargetNotesRow");
+      const targets = (mod.interactiveTask && mod.interactiveTask.targetNotes) ? mod.interactiveTask.targetNotes : [];
+      const stepProgEl = document.getElementById("bootcampStepProgress");
+      if (stepProgEl) {
+        stepProgEl.textContent = `Note ${Math.min(bootcampFulfilledIndex + 1, Math.max(1, targets.length))} / ${targets.length}`;
+      }
+
+      const goalPrompt = document.getElementById("bootcampTaskPrompt");
+      if (goalPrompt && mod.interactiveTask) {
+        goalPrompt.textContent = mod.interactiveTask.prompt;
+      }
+
+      const notesRow = document.getElementById("bootcampStepList");
       if (notesRow) {
         notesRow.innerHTML = "";
-        (mod.interactiveTask.targetNotes || []).forEach((pitch, idx) => {
+        targets.forEach((pitch, idx) => {
           const chip = document.createElement("span");
           chip.className = `bootcamp-target-note ${idx < bootcampFulfilledIndex ? "done" : ""}`;
           chip.id = `bootcamp_target_${idx}`;
@@ -11640,10 +11679,9 @@
 
       const feedback = document.getElementById("bootcampLiveFeedback");
       if (feedback && !isBootcampTaskActive) {
-        const isDone = bootcampCompletedIds.has(mod.id);
         feedback.textContent = isDone
-          ? `✅ Module completed! Click "Try On Keyboard" to practice again or advance to the next lesson.`
-          : `Click "Try On Keyboard" (or press keys below) to complete this lesson!`;
+          ? `✅ Module completed! Click "Start Interactive Task" to practice again or advance to the next lesson.`
+          : `Click "Start Interactive Task" (or press keys below) to complete this lesson!`;
         feedback.style.color = isDone ? "#34d399" : "#38bdf8";
       }
     }

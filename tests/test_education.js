@@ -366,9 +366,15 @@ console.log("=== Running Piano Education Suite Tests ===");
   assert.strictEqual(cMajScale.notes[0].degree, "1");
   // In C Major RH (1,2,3,1,2,3,4,5), index 3 (F4) is where thumb tucks under finger 3
   assert.strictEqual(cMajScale.notes[3].pitch, "F4");
+  assert.strictEqual(cMajScale.notes[3].degreeIndex, 3, "Scale note must include numeric degreeIndex");
+  const prevRhNote = cMajScale.notes[Math.max(0, cMajScale.notes[3].degreeIndex - 1)];
+  assert.strictEqual(prevRhNote.pitch, "E4", "Previous note before F4 thumb-tuck must resolve to E4");
   assert.ok(cMajScale.notes[3].rhTransition && cMajScale.notes[3].rhTransition.includes("Thumb Tuck"), "F4 in C Major RH must have Thumb Tuck transition");
   // In C Major LH (5,4,3,2,1,3,2,1), index 5 (A4) is where finger 3 crosses over thumb 1
   assert.strictEqual(cMajScale.notes[5].pitch, "A4");
+  assert.strictEqual(cMajScale.notes[5].degreeIndex, 5, "Scale note at index 5 must have degreeIndex 5");
+  const prevLhNote = cMajScale.notes[Math.max(0, cMajScale.notes[5].degreeIndex - 1)];
+  assert.strictEqual(prevLhNote.pitch, "G4", "Previous note before A4 crossover must resolve to G4");
   assert.ok(cMajScale.notes[5].lhTransition && cMajScale.notes[5].lhTransition.includes("Finger Cross"), "A4 in C Major LH must have Finger Cross transition");
 
   const aMinScale = MusicTheory.generateScale("A", "natural_minor", 4);

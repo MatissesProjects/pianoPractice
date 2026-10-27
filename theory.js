@@ -318,6 +318,7 @@
 
       return {
         step: idx + 1,
+        degreeIndex: idx,
         degree: (formula.degrees && formula.degrees[idx]) ? formula.degrees[idx] : String(idx + 1),
         solfege: (formula.solfege && formula.solfege[idx]) ? formula.solfege[idx] : "",
         harmonicRole: (formula.harmonicRoles && formula.harmonicRoles[idx]) ? formula.harmonicRoles[idx] : "",
