@@ -2126,26 +2126,376 @@
 
   /**
    * Filters and formats an array of MediaDeviceInfo for audio output destinations.
+   * Normalizes empty pre-permission deviceIds to "default" and merges any manually authorized devices.
    */
-  function filterAudioOutputDevices(devices) {
-    if (!Array.isArray(devices)) return [];
-    return devices
-      .filter(d => d.kind === "audiooutput")
-      .map((d, idx) => {
-        const deviceId = d.deviceId || "";
-        const rawLabel = d.label || "";
-        const fallback = (deviceId === "default" ? "System Default Output" : `Audio Output ${idx + 1}`);
-        const label = rawLabel || fallback;
-        const info = classifyAudioDevice(label, deviceId);
-        return {
-          deviceId,
-          groupId: d.groupId || "",
-          label,
-          type: info.type,
-          icon: info.icon,
-          category: info.category
-        };
+  function filterAudioOutputDevices(devices, authorizedDevices = []) {
+    const rawList = Array.isArray(devices) ? devices.filter(d => d && d.kind === "audiooutput") : [];
+    const extraList = Array.isArray(authorizedDevices) ? authorizedDevices.filter(d => d && (!d.kind || d.kind === "audiooutput")) : [];
+    const combined = [...rawList];
+
+    extraList.forEach(ext => {
+      const extId = ext.deviceId || "default";
+      if (!combined.some(c => (c.deviceId || "default") === extId)) {
+        combined.push({
+          kind: "audiooutput",
+          deviceId: extId,
+          groupId: ext.groupId || "",
+          label: ext.label || ""
+        });
+      }
+    });
+
+    return combined.map((d, idx) => {
+      const deviceId = d.deviceId || "default";
+      const rawLabel = (d.label || "").trim();
+      const fallback = (deviceId === "default" ? "System Default Output" : `Audio Output ${idx + 1}`);
+      const label = rawLabel || fallback;
+      const info = classifyAudioDevice(label, deviceId);
+      return {
+        deviceId,
+        groupId: d.groupId || "",
+        label,
+        type: info.type,
+        icon: info.icon,
+        category: info.category
+      };
+    });
+  }
+
+  /**
+   * Standard & Multi-Channel Hardware Audio Output Routing Modes.
+   */
+  const AUDIO_OUTPUT_CHANNEL_MODES = {
+    stereo: {
+      id: "stereo",
+      label: "Stereo (Ch 1+2 Both)",
+      shortLabel: "Ch 1+2 (Stereo)",
+      icon: "🔊",
+      channels: [1, 2],
+      mode: "stereo",
+      description: "Full stereo output across Channel 1 (Left) and Channel 2 (Right)"
+    },
+    ch1: {
+      id: "ch1",
+      label: "Channel 1 Only (Left / Out 1)",
+      shortLabel: "Ch 1 (Left)",
+      icon: "◀️",
+      channels: [1],
+      mode: "discrete",
+      description: "Routes 100% of audio strictly to Hardware Output Channel 1 (Left)"
+    },
+    ch2: {
+      id: "ch2",
+      label: "Channel 2 Only (Right / Out 2)",
+      shortLabel: "Ch 2 (Right)",
+      icon: "▶️",
+      channels: [2],
+      mode: "discrete",
+      description: "Routes 100% of audio strictly to Hardware Output Channel 2 (Right)"
+    },
+    split_hands: {
+      id: "split_hands",
+      label: "Split Hands (LH → Ch 1, RH → Ch 2)",
+      shortLabel: "LH:Ch1 / RH:Ch2",
+      icon: "🎹",
+      channels: [1, 2],
+      mode: "split_hands",
+      description: "Routes Left Hand bass notes to Channel 1 (Left) and Right Hand / Harmony notes to Channel 2 (Right)"
+    },
+    mono: {
+      id: "mono",
+      label: "Mono Sum (Ch 1+2 Equal)",
+      shortLabel: "Mono (1+2)",
+      icon: "⏺️",
+      channels: [1, 2],
+      mode: "mono",
+      description: "Sums Left and Right signals equally across Channels 1 and 2"
+    },
+    ch3_4: {
+      id: "ch3_4",
+      label: "Channels 3+4 (Aux Stereo Pair 2)",
+      shortLabel: "Ch 3+4",
+      icon: "🎛️",
+      channels: [3, 4],
+      mode: "pair",
+      description: "Routes stereo output to Hardware Output Channels 3 and 4"
+    },
+    ch5_6: {
+      id: "ch5_6",
+      label: "Channels 5+6 (Aux Stereo Pair 3)",
+      shortLabel: "Ch 5+6",
+      icon: "🎛️",
+      channels: [5, 6],
+      mode: "pair",
+      description: "Routes stereo output to Hardware Output Channels 5 and 6"
+    },
+    ch7_8: {
+      id: "ch7_8",
+      label: "Channels 7+8 (Aux Stereo Pair 4)",
+      shortLabel: "Ch 7+8",
+      icon: "🎛️",
+      channels: [7, 8],
+      mode: "pair",
+      description: "Routes stereo output to Hardware Output Channels 7 and 8"
+    },
+    ch3: {
+      id: "ch3",
+      label: "Channel 3 Only (Out 3)",
+      shortLabel: "Ch 3",
+      icon: "3️⃣",
+      channels: [3],
+      mode: "discrete",
+      description: "Routes audio strictly to Hardware Output Channel 3"
+    },
+    ch4: {
+      id: "ch4",
+      label: "Channel 4 Only (Out 4)",
+      shortLabel: "Ch 4",
+      icon: "4️⃣",
+      channels: [4],
+      mode: "discrete",
+      description: "Routes audio strictly to Hardware Output Channel 4"
+    },
+    ch5: {
+      id: "ch5",
+      label: "Channel 5 Only (Out 5)",
+      shortLabel: "Ch 5",
+      icon: "5️⃣",
+      channels: [5],
+      mode: "discrete",
+      description: "Routes audio strictly to Hardware Output Channel 5"
+    },
+    ch6: {
+      id: "ch6",
+      label: "Channel 6 Only (Out 6)",
+      shortLabel: "Ch 6",
+      icon: "6️⃣",
+      channels: "discrete",
+      channelsList: [6],
+      description: "Routes audio strictly to Hardware Output Channel 6"
+    },
+    ch7: {
+      id: "ch7",
+      label: "Channel 7 Only (Out 7)",
+      shortLabel: "Ch 7",
+      icon: "7️⃣",
+      channels: [7],
+      mode: "discrete",
+      description: "Routes audio strictly to Hardware Output Channel 7"
+    },
+    ch8: {
+      id: "ch8",
+      label: "Channel 8 Only (Out 8)",
+      shortLabel: "Ch 8",
+      icon: "8️⃣",
+      channels: [8],
+      mode: "discrete",
+      description: "Routes audio strictly to Hardware Output Channel 8"
+    },
+    all_multi: {
+      id: "all_multi",
+      label: "All Hardware Channels (Broadcast 1..N)",
+      shortLabel: "All Ch (1..N)",
+      icon: "📡",
+      channels: [1, 2, 3, 4, 5, 6, 7, 8],
+      mode: "broadcast",
+      description: "Broadcasts audio simultaneously across all available hardware output channels"
+    }
+  };
+  // Normalize ch6.channels array
+  AUDIO_OUTPUT_CHANNEL_MODES.ch6.channels = [6];
+  AUDIO_OUTPUT_CHANNEL_MODES.ch6.mode = "discrete";
+
+  /**
+   * Returns available audio output channel routing options for a given hardware maxChannelCount.
+   */
+  function getAudioChannelRoutingOptions(maxChannelCount = 2) {
+    const hwMax = Math.max(2, Math.min(32, parseInt(maxChannelCount, 10) || 2));
+    const primaryKeys = ["stereo", "ch1", "ch2", "split_hands", "mono"];
+    const multiKeys = ["ch3_4", "ch5_6", "ch7_8", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "all_multi"];
+
+    const options = [];
+    primaryKeys.forEach(k => {
+      const item = AUDIO_OUTPUT_CHANNEL_MODES[k];
+      options.push({ ...item, group: "primary", isHardwareNative: true });
+    });
+
+    multiKeys.forEach(k => {
+      const item = AUDIO_OUTPUT_CHANNEL_MODES[k];
+      const maxReq = Math.max(...item.channels);
+      options.push({
+        ...item,
+        group: "multi",
+        isHardwareNative: maxReq <= hwMax
       });
+    });
+
+    // If hardware supports > 8 channels (e.g. 16-ch interface), add pairs and discrete channels up to hwMax
+    for (let ch = 9; ch <= hwMax; ch += 2) {
+      if (ch + 1 <= hwMax) {
+        options.push({
+          id: `ch${ch}_${ch + 1}`,
+          label: `Channels ${ch}+${ch + 1} (Aux Pair)`,
+          shortLabel: `Ch ${ch}+${ch + 1}`,
+          icon: "🎛️",
+          channels: [ch, ch + 1],
+          mode: "pair",
+          group: "multi",
+          isHardwareNative: true,
+          description: `Routes stereo output to Hardware Output Channels ${ch} and ${ch + 1}`
+        });
+      }
+    }
+    for (let ch = 9; ch <= hwMax; ch++) {
+      options.push({
+        id: `ch${ch}`,
+        label: `Channel ${ch} Only (Out ${ch})`,
+        shortLabel: `Ch ${ch}`,
+        icon: "🎛️",
+        channels: [ch],
+        mode: "discrete",
+        group: "multi",
+        isHardwareNative: true,
+        description: `Routes audio strictly to Hardware Output Channel ${ch}`
+      });
+    }
+
+    return options;
+  }
+
+  /**
+   * Computes per-channel gain vector and routing matrix for Web Audio ChannelMergerNode.
+   * @param {string} channelMode - e.g. "stereo", "ch1", "ch2", "split_hands", "mono", "ch3_4", "ch3", "all_multi"
+   * @param {number} hardwareChannelCount - maxChannelCount of destination (default 2)
+   * @param {string} voiceRole - "rh", "lh", "dyad", "center", "metro"
+   */
+  function computeAudioChannelGains(channelMode = "stereo", hardwareChannelCount = 2, voiceRole = "center") {
+    const modeStr = String(channelMode || "stereo").toLowerCase();
+    const hwCount = Math.max(2, Math.min(32, parseInt(hardwareChannelCount, 10) || 2));
+    const role = String(voiceRole || "center").toLowerCase();
+
+    // Parse target channel numbers from mode
+    let targetChannels = [1, 2];
+    if (modeStr === "ch1") {
+      targetChannels = [1];
+    } else if (modeStr === "ch2") {
+      targetChannels = [2];
+    } else if (modeStr === "split_hands") {
+      if (role === "lh") targetChannels = [1];
+      else if (role === "rh" || role === "dyad") targetChannels = [2];
+      else targetChannels = [1, 2];
+    } else if (modeStr === "mono" || modeStr === "stereo") {
+      targetChannels = [1, 2];
+    } else if (modeStr === "all_multi") {
+      const total = Math.max(hwCount, 2);
+      targetChannels = Array.from({ length: total }, (_, i) => i + 1);
+    } else {
+      const pairMatch = modeStr.match(/^ch(\d+)_(\d+)$/);
+      const singleMatch = modeStr.match(/^ch(\d+)$/);
+      if (pairMatch) {
+        targetChannels = [parseInt(pairMatch[1], 10), parseInt(pairMatch[2], 10)];
+      } else if (singleMatch) {
+        targetChannels = [parseInt(singleMatch[1], 10)];
+      }
+    }
+
+    const maxTarget = Math.max(...targetChannels, 2);
+    const activeChannelCount = Math.min(32, Math.max(hwCount, maxTarget));
+    const gains = new Array(activeChannelCount).fill(0);
+
+    targetChannels.forEach(chNum => {
+      if (chNum >= 1 && chNum <= activeChannelCount) {
+        gains[chNum - 1] = 1.0;
+      }
+    });
+
+    // Also compute Left/Right bus feed matrix (leftGains, rightGains) for a 2-bus (LH/Left, RH/Right) splitter
+    const leftBusGains = new Array(activeChannelCount).fill(0);
+    const rightBusGains = new Array(activeChannelCount).fill(0);
+
+    if (modeStr === "stereo") {
+      leftBusGains[0] = 1.0;
+      rightBusGains[1] = 1.0;
+    } else if (modeStr === "mono") {
+      leftBusGains[0] = 0.7; rightBusGains[0] = 0.7;
+      leftBusGains[1] = 0.7; rightBusGains[1] = 0.7;
+    } else if (modeStr === "split_hands") {
+      // Left bus carries LH (-1 pan), Right bus carries RH (+1 pan)
+      leftBusGains[0] = 1.0;
+      rightBusGains[1] = 1.0;
+    } else if (modeStr === "all_multi") {
+      for (let i = 0; i < activeChannelCount; i++) {
+        if (i % 2 === 0) {
+          leftBusGains[i] = 0.85;
+          rightBusGains[i] = 0.35;
+        } else {
+          leftBusGains[i] = 0.35;
+          rightBusGains[i] = 0.85;
+        }
+      }
+    } else if (targetChannels.length === 2) {
+      const c1 = targetChannels[0] - 1;
+      const c2 = targetChannels[1] - 1;
+      leftBusGains[c1] = 1.0;
+      rightBusGains[c2] = 1.0;
+    } else if (targetChannels.length === 1) {
+      const c = targetChannels[0] - 1;
+      leftBusGains[c] = 0.85;
+      rightBusGains[c] = 0.85;
+    }
+
+    const modeInfo = AUDIO_OUTPUT_CHANNEL_MODES[modeStr] || {
+      id: modeStr,
+      label: `Channel ${targetChannels.join("+")}`,
+      shortLabel: `Ch ${targetChannels.join("+")}`
+    };
+
+    return {
+      channelMode: modeStr,
+      activeChannelCount,
+      hardwareChannelCount: hwCount,
+      targetChannels,
+      gains,
+      leftBusGains,
+      rightBusGains,
+      voiceRole: role,
+      shortLabel: modeInfo.shortLabel || `Ch ${targetChannels.join("+")}`,
+      label: modeInfo.label || `Channel ${targetChannels.join("+")}`
+    };
+  }
+
+  /**
+   * Resolves 1-indexed MIDI output channel(s) (1..16) for a given channel selector setting and voice role.
+   * Supports:
+   * - "1".."16": Single specific MIDI channel [1..16]
+   * - "split": Split hands (RH -> Ch 1, LH -> Ch 2, Dyad/Harmony -> Ch 3)
+   * - "omni_out": Broadcast across all 16 MIDI channels [1..16]
+   * - "all": Default Omni input mode -> sends on Ch 1 (or voice-mapped if specified)
+   */
+  function resolveMidiOutputChannels(channelSetting = "1", voiceRole = "rh") {
+    const setting = String(channelSetting || "1").trim().toLowerCase();
+    const role = String(voiceRole || "rh").trim().toLowerCase();
+
+    if (setting === "omni_out" || setting === "broadcast") {
+      return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+    }
+
+    if (setting === "split" || setting === "split_hands") {
+      if (role === "lh" || role === "bass") return [2];
+      if (role === "dyad" || role === "harmony") return [3];
+      return [1];
+    }
+
+    if (setting === "all") {
+      return [1];
+    }
+
+    const parsed = parseInt(setting, 10);
+    if (!isNaN(parsed) && parsed >= 1 && parsed <= 16) {
+      return [parsed];
+    }
+
+    return [1];
   }
 
   /**
@@ -3074,6 +3424,264 @@
     };
   }
 
+  // ==========================================
+  // MULTI-INSTRUMENT SYNTHESIZER TIMBRE LIBRARY (MILESTONE 40)
+  // ==========================================
+
+  const INSTRUMENT_PRESETS = {
+    grand_piano: {
+      id: "grand_piano",
+      name: "Acoustic Grand Piano",
+      shortName: "Grand Piano",
+      icon: "🎹",
+      category: "Keyboard",
+      description: "Rich concert acoustic grand with warm wooden body resonance, hammer attack transient, and multi-harmonic decay",
+      attackSec: 0.005,
+      decaySec: 2.5,
+      sustainLevel: 0.45,
+      releaseSec: 0.28,
+      velocitySensitivity: 1.0,
+      filterType: "lowpass",
+      filterMultiplier: 4.5
+    },
+    electric_piano: {
+      id: "electric_piano",
+      name: "Electric Piano (Rhodes)",
+      shortName: "Electric Piano",
+      icon: "⚡",
+      category: "Keyboard",
+      description: "Warm vintage Rhodes tine electric piano with mellow bell attack and soulful vibrato resonance",
+      attackSec: 0.006,
+      decaySec: 1.8,
+      sustainLevel: 0.55,
+      releaseSec: 0.22,
+      velocitySensitivity: 0.85,
+      filterType: "lowpass",
+      filterMultiplier: 3.5
+    },
+    harpsichord: {
+      id: "harpsichord",
+      name: "Baroque Harpsichord",
+      shortName: "Harpsichord",
+      icon: "🎼",
+      category: "Keyboard",
+      description: "Authentic plucked metallic string with brilliant upper harmonics, crisp pluck transient, and fast baroque decay",
+      attackSec: 0.002,
+      decaySec: 0.9,
+      sustainLevel: 0.15,
+      releaseSec: 0.12,
+      velocitySensitivity: 0.0,
+      filterType: "lowpass",
+      filterMultiplier: 6.0
+    },
+    church_organ: {
+      id: "church_organ",
+      name: "Church Pipe Organ",
+      shortName: "Pipe Organ",
+      icon: "⛪",
+      category: "Organ",
+      description: "Majestic cathedral pipe organ registration blending 16' sub-bass, 8' principal, and 4' octave pipes with continuous sustain",
+      attackSec: 0.035,
+      decaySec: 0.0,
+      sustainLevel: 1.0,
+      releaseSec: 0.35,
+      velocitySensitivity: 0.2,
+      filterType: "lowpass",
+      filterMultiplier: 4.0
+    },
+    rock_organ: {
+      id: "rock_organ",
+      name: "Vintage Drawbar Organ",
+      shortName: "Drawbar Organ",
+      icon: "🎸",
+      category: "Organ",
+      description: "Iconic Hammond tonewheel drawbar organ with percussive 3rd harmonic key-click and warm harmonic growl",
+      attackSec: 0.005,
+      decaySec: 0.0,
+      sustainLevel: 0.95,
+      releaseSec: 0.08,
+      velocitySensitivity: 0.4,
+      filterType: "lowpass",
+      filterMultiplier: 5.0
+    },
+    celesta: {
+      id: "celesta",
+      name: "Celesta & Music Box",
+      shortName: "Celesta",
+      icon: "✨",
+      category: "Percussion/Bell",
+      description: "Enchanting crystalline bell chime featuring metallic inharmonic overtones and sparkling bell decay",
+      attackSec: 0.001,
+      decaySec: 2.2,
+      sustainLevel: 0.2,
+      releaseSec: 0.4,
+      velocitySensitivity: 0.7,
+      filterType: "bandpass",
+      filterMultiplier: 5.5
+    },
+    acoustic_guitar: {
+      id: "acoustic_guitar",
+      name: "Acoustic Folk Guitar",
+      shortName: "Acoustic Guitar",
+      icon: "🪕",
+      category: "Plucked String",
+      description: "Warm nylon/steel string acoustic pluck with fast string attack, wooden body resonance, and natural damping",
+      attackSec: 0.003,
+      decaySec: 1.4,
+      sustainLevel: 0.25,
+      releaseSec: 0.2,
+      velocitySensitivity: 0.9,
+      filterType: "lowpass",
+      filterMultiplier: 4.2
+    },
+    chiptune: {
+      id: "chiptune",
+      name: "8-Bit Chiptune Lead",
+      shortName: "8-Bit Retro",
+      icon: "👾",
+      category: "Electronic",
+      description: "Authentic retro NES/Game Boy square pulse wave with downward pitch-blip attack and crisp arcade punch",
+      attackSec: 0.001,
+      decaySec: 0.5,
+      sustainLevel: 0.8,
+      releaseSec: 0.04,
+      velocitySensitivity: 0.3,
+      filterType: "lowpass",
+      filterMultiplier: 8.0
+    },
+    strings_synth: {
+      id: "strings_synth",
+      name: "Orchestral Strings Synth",
+      shortName: "Strings",
+      icon: "🎻",
+      category: "Ensemble",
+      description: "Lush detuned orchestral string ensemble with slow bowing swell, rich unison chorus, and warm lowpass filter",
+      attackSec: 0.09,
+      decaySec: 1.5,
+      sustainLevel: 0.85,
+      releaseSec: 0.45,
+      velocitySensitivity: 0.75,
+      filterType: "lowpass",
+      filterMultiplier: 3.2
+    },
+    vibraphone: {
+      id: "vibraphone",
+      name: "Jazz Vibraphone",
+      shortName: "Vibraphone",
+      icon: "🎷",
+      category: "Percussion/Bell",
+      description: "Cool jazz tuned metal bars with warm bar resonance, metallic strike ping, and motor tremolo modulation",
+      attackSec: 0.002,
+      decaySec: 2.4,
+      sustainLevel: 0.35,
+      releaseSec: 0.35,
+      velocitySensitivity: 0.85,
+      filterType: "lowpass",
+      filterMultiplier: 4.0
+    },
+    honky_tonk: {
+      id: "honky_tonk",
+      name: "Ragtime Honky-Tonk Piano",
+      shortName: "Honky-Tonk",
+      icon: "🍺",
+      category: "Keyboard",
+      description: "Jangly saloon upright piano with chorused detuned strings (+8/-7 cents) and sharp percussive ragtime hammer",
+      attackSec: 0.004,
+      decaySec: 2.0,
+      sustainLevel: 0.4,
+      releaseSec: 0.25,
+      velocitySensitivity: 0.95,
+      filterType: "lowpass",
+      filterMultiplier: 5.2
+    }
+  };
+
+  /**
+   * Resolves the default authentic instrument for any repertoire song object.
+   * Priority:
+   * 1. song.instrument (if explicitly set and valid in INSTRUMENT_PRESETS)
+   * 2. Song ID / Title keyword heuristics (Tetris -> chiptune, Hedwig -> celesta, etc.)
+   * 3. Fallback: "grand_piano"
+   */
+  function getSongDefaultInstrument(song) {
+    if (!song) return "grand_piano";
+
+    // 1. Explicit instrument attribute on song object
+    if (song.instrument && INSTRUMENT_PRESETS[song.instrument]) {
+      return song.instrument;
+    }
+
+    const id = (song.id || "").toLowerCase();
+    const title = (song.title || "").toLowerCase();
+
+    // 2. 8-Bit Chiptune Lead
+    if (id.includes("tetris") || id.includes("korobeiniki") || id.includes("mario") || id.includes("megalovania") || id.includes("arcade")) {
+      return "chiptune";
+    }
+
+    // 3. Celesta / Music Box / Glockenspiel
+    if (id.includes("hedwig") || id.includes("harry-potter") || id.includes("sugar-plum") ||
+        id.includes("lullaby") || id.includes("twinkle") || id.includes("morning-mood") ||
+        id.includes("jingle-bells") || id.includes("mary-had-a-little-lamb") || id.includes("lightly-row") ||
+        id.includes("au-clair") || id.includes("alouette") || id.includes("pop-goes") ||
+        id.includes("frere-jacques") || id.includes("this-old-man") || id.includes("london-bridge") ||
+        id.includes("row-row") || id.includes("lavender") || id.includes("hot-cross") ||
+        id.includes("rain-rain") || id.includes("happy-birthday")) {
+      return "celesta";
+    }
+
+    // 4. Jazz Vibraphone
+    if (id.includes("pink-panther") || id.includes("take-five")) {
+      return "vibraphone";
+    }
+
+    // 5. Ragtime Honky-Tonk Piano
+    if (id.includes("entertainer") || id.includes("can-can") || id.includes("heart-and-soul") || id.includes("maple-leaf")) {
+      return "honky_tonk";
+    }
+
+    // 6. Baroque Harpsichord
+    if (id.includes("bach") || id.includes("minuet") || id.includes("greensleeves") || id.includes("vivaldi") || id.includes("scarlatti")) {
+      return "harpsichord";
+    }
+
+    // 7. Church Pipe Organ
+    if (id.includes("amazing-grace") || id.includes("joy-to-the-world") || id.includes("interstellar") || id.includes("toccata") || id.includes("hymn")) {
+      return "church_organ";
+    }
+
+    // 8. Vintage Drawbar / Rock Organ
+    if (id.includes("smoke-on-the-water") || id.includes("when-the-saints") || id.includes("riverside")) {
+      return "rock_organ";
+    }
+
+    // 9. Electric Piano / Rhodes
+    if (id.includes("lean-on-me") || id.includes("let-it-be") || id.includes("stand-by-me") || id.includes("hallelujah") || id.includes("love-me-tender") || id.includes("clocks")) {
+      return "electric_piano";
+    }
+
+    // 10. Acoustic Folk Guitar
+    if (id.includes("scarborough") || id.includes("bella-ciao") || id.includes("sunshine") || id.includes("macdonald") || id.includes("yankee") || id.includes("aunt-rhody")) {
+      return "acoustic_guitar";
+    }
+
+    // 11. Orchestral Strings Synth
+    if (id.includes("star-wars") || id.includes("chariots-of-fire") || id.includes("going-home")) {
+      return "strings_synth";
+    }
+
+    // Default: Acoustic Grand Piano
+    return "grand_piano";
+  }
+
+  /**
+   * Retrieves the full preset profile for an instrument ID with fallback to grand_piano.
+   */
+  function getInstrumentParameters(instrumentId) {
+    const cleanId = String(instrumentId || "grand_piano").toLowerCase();
+    return INSTRUMENT_PRESETS[cleanId] || INSTRUMENT_PRESETS.grand_piano;
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -3148,10 +3756,17 @@
     createMidiCC,
     filterAudioOutputDevices,
     classifyAudioDevice,
+    AUDIO_OUTPUT_CHANNEL_MODES,
+    getAudioChannelRoutingOptions,
+    computeAudioChannelGains,
+    resolveMidiOutputChannels,
     METRONOME_SOUND_PRESETS,
     getMetronomeSoundParameters,
     synthesizeMetronomeClick,
-    analyzeRhythmTapHistory
+    analyzeRhythmTapHistory,
+    INSTRUMENT_PRESETS,
+    getSongDefaultInstrument,
+    getInstrumentParameters
   };
 });
 

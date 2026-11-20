@@ -13,6 +13,7 @@
   {
     "id": "lean-on-me",
     "title": "Lean on Me",
+    "instrument": "electric_piano",
     "category": "C 5-Finger",
     "tempo": 80,
     "timeSig": "4/4",
@@ -27,6 +28,7 @@
   {
     "id": "ode-to-joy",
     "title": "Ode to Joy",
+    "instrument": "grand_piano",
     "category": "C 5-Finger",
     "tempo": 104,
     "timeSig": "4/4",
@@ -41,6 +43,7 @@
   {
     "id": "mary-had-a-little-lamb",
     "title": "Mary Had a Little Lamb",
+    "instrument": "celesta",
     "category": "C 5-Finger",
     "tempo": 100,
     "timeSig": "4/4",
@@ -55,6 +58,7 @@
   {
     "id": "jingle-bells",
     "title": "Jingle Bells",
+    "instrument": "celesta",
     "category": "C 5-Finger",
     "tempo": 120,
     "timeSig": "4/4",
@@ -69,6 +73,7 @@
   {
     "id": "when-the-saints",
     "title": "When the Saints Go Marching In",
+    "instrument": "rock_organ",
     "category": "C 5-Finger",
     "tempo": 120,
     "timeSig": "4/4",
@@ -83,6 +88,7 @@
   {
     "id": "lightly-row",
     "title": "Lightly Row",
+    "instrument": "celesta",
     "category": "C 5-Finger",
     "tempo": 100,
     "timeSig": "4/4",
@@ -97,6 +103,7 @@
   {
     "id": "love-me-tender",
     "title": "Love Me Tender / Aura Lee",
+    "instrument": "electric_piano",
     "category": "C 5-Finger",
     "tempo": 84,
     "timeSig": "4/4",
@@ -111,6 +118,7 @@
   {
     "id": "going-home",
     "title": "Going Home (New World Symphony)",
+    "instrument": "strings_synth",
     "category": "C 5-Finger",
     "tempo": 72,
     "timeSig": "4/4",
@@ -125,6 +133,7 @@
   {
     "id": "morning-mood",
     "title": "Morning Mood (Peer Gynt)",
+    "instrument": "celesta",
     "category": "C 5-Finger",
     "tempo": 90,
     "timeSig": "6/8",
@@ -139,6 +148,7 @@
   {
     "id": "au-clair-de-la-lune",
     "title": "Au Clair de la Lune",
+    "instrument": "celesta",
     "category": "C 5-Finger",
     "tempo": 95,
     "timeSig": "4/4",
@@ -153,6 +163,7 @@
   {
     "id": "alouette",
     "title": "Alouette",
+    "instrument": "celesta",
     "category": "C 5-Finger",
     "tempo": 112,
     "timeSig": "4/4",
@@ -167,6 +178,7 @@
   {
     "id": "pop-goes-the-weasel",
     "title": "Pop Goes the Weasel",
+    "instrument": "celesta",
     "category": "C 5-Finger",
     "tempo": 110,
     "timeSig": "4/4",
@@ -181,6 +193,7 @@
   {
     "id": "heart-and-soul",
     "title": "Heart and Soul",
+    "instrument": "honky_tonk",
     "category": "Harmonic / Dyads",
     "tempo": 108,
     "timeSig": "4/4",
@@ -195,6 +208,7 @@
   {
     "id": "stand-by-me",
     "title": "Stand by Me",
+    "instrument": "electric_piano",
     "category": "Harmonic / Dyads",
     "tempo": 116,
     "timeSig": "4/4",
@@ -209,6 +223,7 @@
   {
     "id": "let-it-be",
     "title": "Let It Be",
+    "instrument": "electric_piano",
     "category": "Harmonic / Dyads",
     "tempo": 80,
     "timeSig": "4/4",
@@ -223,6 +238,7 @@
   {
     "id": "pachelbel-canon",
     "title": "Pachelbel's Canon",
+    "instrument": "grand_piano",
     "category": "Harmonic / Dyads",
     "tempo": 78,
     "timeSig": "4/4",
@@ -237,6 +253,7 @@
   {
     "id": "smoke-on-the-water",
     "title": "Smoke on the Water",
+    "instrument": "rock_organ",
     "category": "Harmonic / Dyads",
     "tempo": 112,
     "timeSig": "4/4",
@@ -251,6 +268,7 @@
   {
     "id": "clocks",
     "title": "Clocks (Coldplay)",
+    "instrument": "grand_piano",
     "category": "Harmonic / Dyads",
     "tempo": 130,
     "timeSig": "4/4",
@@ -265,6 +283,7 @@
   {
     "id": "hallelujah",
     "title": "Hallelujah",
+    "instrument": "electric_piano",
     "category": "Harmonic / Dyads",
     "tempo": 84,
     "timeSig": "4/4",
@@ -279,6 +298,7 @@
   {
     "id": "you-are-my-sunshine",
     "title": "You Are My Sunshine",
+    "instrument": "acoustic_guitar",
     "category": "Harmonic / Dyads",
     "tempo": 104,
     "timeSig": "4/4",
@@ -293,6 +313,7 @@
   {
     "id": "amazing-grace-f",
     "title": "Amazing Grace (Key of F)",
+    "instrument": "church_organ",
     "category": "Harmonic / Dyads",
     "tempo": 75,
     "timeSig": "3/4",
@@ -307,6 +328,7 @@
   {
     "id": "down-by-the-riverside",
     "title": "Down by the Riverside",
+    "instrument": "rock_organ",
     "category": "Harmonic / Dyads",
     "tempo": 116,
     "timeSig": "4/4",
@@ -321,6 +343,7 @@
   {
     "id": "twinkle-twinkle",
     "title": "Twinkle, Twinkle, Little Star",
+    "instrument": "celesta",
     "category": "Extended Scale",
     "tempo": 96,
     "timeSig": "4/4",
@@ -335,6 +358,7 @@
   {
     "id": "joy-to-the-world",
     "title": "Joy to the World",
+    "instrument": "church_organ",
     "category": "Extended Scale",
     "tempo": 100,
     "timeSig": "4/4",
@@ -349,6 +373,7 @@
   {
     "id": "frere-jacques",
     "title": "Frère Jacques",
+    "instrument": "celesta",
     "category": "Extended Scale",
     "tempo": 105,
     "timeSig": "4/4",
@@ -363,6 +388,7 @@
   {
     "id": "this-old-man",
     "title": "This Old Man",
+    "instrument": "celesta",
     "category": "Extended Scale",
     "tempo": 100,
     "timeSig": "4/4",
@@ -377,6 +403,7 @@
   {
     "id": "old-macdonald",
     "title": "Old MacDonald Had a Farm",
+    "instrument": "acoustic_guitar",
     "category": "Extended Scale",
     "tempo": 110,
     "timeSig": "4/4",
@@ -391,6 +418,7 @@
   {
     "id": "london-bridge",
     "title": "London Bridge Is Falling Down",
+    "instrument": "celesta",
     "category": "Extended Scale",
     "tempo": 104,
     "timeSig": "4/4",
@@ -405,6 +433,7 @@
   {
     "id": "row-row-boat",
     "title": "Row, Row, Row Your Boat",
+    "instrument": "celesta",
     "category": "Extended Scale",
     "tempo": 96,
     "timeSig": "6/8",
@@ -419,6 +448,7 @@
   {
     "id": "the-can-can",
     "title": "The Can-Can",
+    "instrument": "honky_tonk",
     "category": "Extended Scale",
     "tempo": 130,
     "timeSig": "4/4",
@@ -433,6 +463,7 @@
   {
     "id": "yankee-doodle",
     "title": "Yankee Doodle",
+    "instrument": "acoustic_guitar",
     "category": "Extended Scale",
     "tempo": 110,
     "timeSig": "4/4",
@@ -447,6 +478,7 @@
   {
     "id": "lavenders-blue",
     "title": "Lavender's Blue",
+    "instrument": "celesta",
     "category": "Extended Scale",
     "tempo": 90,
     "timeSig": "3/4",
@@ -461,6 +493,7 @@
   {
     "id": "star-wars-theme",
     "title": "Star Wars (Main Theme)",
+    "instrument": "strings_synth",
     "category": "Extended Scale",
     "tempo": 108,
     "timeSig": "4/4",
@@ -475,6 +508,7 @@
   {
     "id": "fur-elise-motif",
     "title": "Für Elise (Hook Motif)",
+    "instrument": "grand_piano",
     "category": "Minor / Modal",
     "tempo": 90,
     "timeSig": "3/4",
@@ -489,6 +523,7 @@
   {
     "id": "hedwigs-theme",
     "title": "Hedwig's Theme (Harry Potter)",
+    "instrument": "celesta",
     "category": "Minor / Modal",
     "tempo": 125,
     "timeSig": "3/4",
@@ -503,6 +538,7 @@
   {
     "id": "pink-panther",
     "title": "The Pink Panther Theme",
+    "instrument": "vibraphone",
     "category": "Minor / Modal",
     "tempo": 116,
     "timeSig": "4/4",
@@ -517,6 +553,7 @@
   {
     "id": "scarborough-fair-primer",
     "title": "Scarborough Fair (Primer)",
+    "instrument": "acoustic_guitar",
     "category": "Minor / Modal",
     "tempo": 92,
     "timeSig": "3/4",
@@ -531,6 +568,7 @@
   {
     "id": "greensleeves-primer",
     "title": "Greensleeves (Primer)",
+    "instrument": "harpsichord",
     "category": "Minor / Modal",
     "tempo": 104,
     "timeSig": "6/8",
@@ -545,6 +583,7 @@
   {
     "id": "korobeiniki-tetris",
     "title": "Tetris Theme (Korobeiniki)",
+    "instrument": "chiptune",
     "category": "Minor / Modal",
     "tempo": 130,
     "timeSig": "4/4",
@@ -559,6 +598,7 @@
   {
     "id": "bella-ciao",
     "title": "Bella Ciao",
+    "instrument": "acoustic_guitar",
     "category": "Minor / Modal",
     "tempo": 120,
     "timeSig": "4/4",
@@ -573,6 +613,7 @@
   {
     "id": "the-entertainer",
     "title": "The Entertainer",
+    "instrument": "honky_tonk",
     "category": "Extended Scale",
     "tempo": 95,
     "timeSig": "4/4",
@@ -587,6 +628,7 @@
   {
     "id": "hot-cross-buns",
     "title": "Hot Cross Buns",
+    "instrument": "celesta",
     "category": "C 5-Finger",
     "tempo": 90,
     "timeSig": "4/4",
@@ -601,6 +643,7 @@
   {
     "id": "brahms-lullaby",
     "title": "Brahms' Lullaby",
+    "instrument": "celesta",
     "category": "Extended Scale",
     "tempo": 80,
     "timeSig": "3/4",
@@ -615,6 +658,7 @@
   {
     "id": "rain-rain-go-away",
     "title": "Rain, Rain, Go Away",
+    "instrument": "celesta",
     "category": "C 5-Finger",
     "tempo": 96,
     "timeSig": "4/4",
@@ -629,6 +673,7 @@
   {
     "id": "chariots-of-fire",
     "title": "Chariots of Fire",
+    "instrument": "strings_synth",
     "category": "C 5-Finger",
     "tempo": 75,
     "timeSig": "4/4",
@@ -643,6 +688,7 @@
   {
     "id": "go-tell-aunt-rhody",
     "title": "Go Tell Aunt Rhody",
+    "instrument": "acoustic_guitar",
     "category": "C 5-Finger",
     "tempo": 92,
     "timeSig": "4/4",
@@ -657,6 +703,7 @@
   {
     "id": "william-tell",
     "title": "William Tell Overture",
+    "instrument": "grand_piano",
     "category": "C 5-Finger",
     "tempo": 130,
     "timeSig": "4/4",
@@ -671,6 +718,7 @@
   {
     "id": "happy-birthday",
     "title": "Happy Birthday",
+    "instrument": "celesta",
     "category": "Extended Scale",
     "tempo": 100,
     "timeSig": "3/4",
@@ -685,6 +733,7 @@
   {
     "id": "fur-elise",
     "title": "Für Elise (Theme)",
+    "instrument": "grand_piano",
     "category": "Classical Mastery",
     "tempo": 120,
     "timeSig": "3/8",
@@ -699,6 +748,7 @@
   {
     "id": "bach-minuet-g",
     "title": "Minuet in G Major",
+    "instrument": "harpsichord",
     "category": "Classical Mastery",
     "tempo": 116,
     "timeSig": "3/4",
@@ -713,6 +763,7 @@
   {
     "id": "canon-in-d",
     "title": "Canon in D (Pachelbel)",
+    "instrument": "grand_piano",
     "category": "Classical Mastery",
     "tempo": 76,
     "timeSig": "4/4",
@@ -727,6 +778,7 @@
   {
     "id": "gymnopedie-1",
     "title": "Gymnopédie No. 1",
+    "instrument": "grand_piano",
     "category": "Minor / Modal",
     "tempo": 68,
     "timeSig": "3/4",
@@ -741,6 +793,7 @@
   {
     "id": "hanon-ex-1",
     "title": "Hanon Exercise No. 1",
+    "instrument": "grand_piano",
     "category": "Extended Scale",
     "tempo": 100,
     "timeSig": "4/4",
@@ -755,6 +808,7 @@
   {
     "id": "scarborough-fair",
     "title": "Scarborough Fair (Dorian)",
+    "instrument": "acoustic_guitar",
     "category": "Minor / Modal",
     "tempo": 92,
     "timeSig": "3/4",
@@ -769,6 +823,7 @@
   {
     "id": "amazing-grace",
     "title": "Amazing Grace",
+    "instrument": "church_organ",
     "category": "Extended Scale",
     "tempo": 84,
     "timeSig": "3/4",
@@ -783,6 +838,7 @@
   {
     "id": "greensleeves",
     "title": "Greensleeves (What Child Is This)",
+    "instrument": "harpsichord",
     "category": "Minor / Modal",
     "tempo": 104,
     "timeSig": "6/8",
