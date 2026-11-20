@@ -123,11 +123,31 @@
       padding: 0.2rem 0.45rem;
       font-size: 0.8rem;
       font-family: inherit;
-      max-width: 220px;
-      min-width: 170px;
+      max-width: 210px;
+      min-width: 155px;
       cursor: pointer;
       outline: none;
       transition: border-color 0.15s ease;
+    }
+
+    .audio-channel-select {
+      max-width: 175px;
+      min-width: 135px;
+    }
+
+    .audio-route-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: ui-monospace, monospace;
+      padding: 0.12rem 0.42rem;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+      white-space: nowrap;
     }
 
     .audio-output-select:focus, .audio-output-select:hover {
@@ -1034,6 +1054,34 @@
       font-size: 1.35rem;
       font-weight: 700;
       color: var(--paper-ink);
+    }
+
+    .current-instrument-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      background: var(--bg-card, #1e293b);
+      border: 1px solid var(--border, #334155);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--primary, #38bdf8);
+      vertical-align: middle;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card-inst-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--primary, #38bdf8);
     }
 
     .rhythm-legend {
@@ -3164,15 +3212,40 @@
         <div class="audio-output-control" id="audioOutputControl" title="Audio Output Destination (Headphones, Speakers, Audio Interface)">
           <span class="audio-output-icon" id="audioOutputStatusIcon">🎧</span>
           <div class="audio-output-select-wrap">
-            <span class="audio-output-label" id="audioOutputLabel">Audio Output:</span>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:0.4rem;">
+              <span class="audio-output-label" id="audioOutputLabel">Audio Output:</span>
+              <span class="audio-route-badge" id="audioOutputRouteBadge" title="Active Hardware Audio Output & Channel Routing">Ch 1+2</span>
+            </div>
             <select id="audioOutputSelect" class="audio-output-select" aria-label="Select Audio Output Device">
               <option value="default">Default Audio Device</option>
+            </select>
+          </div>
+          <div class="audio-output-select-wrap">
+            <span class="audio-output-label" id="audioOutputChannelLabel">Output Channel:</span>
+            <select id="audioOutputChannelSelect" class="audio-output-select audio-channel-select" aria-label="Select Audio Output Channel Routing" title="Route audio output to Stereo (Ch 1+2), Channel 1 (Left), Channel 2 (Right), Split Hands (LH→Ch1 / RH→Ch2), or Multi-Channel Interface Outputs">
+              <option value="stereo">🔊 Stereo (Ch 1+2 Both)</option>
+              <option value="ch1">◀️ Channel 1 Only (Left / Out 1)</option>
+              <option value="ch2">▶️ Channel 2 Only (Right / Out 2)</option>
+              <option value="split_hands">🎹 Split Hands (LH→Ch1 / RH→Ch2)</option>
+              <option value="mono">⏺️ Mono Sum (Ch 1+2 Equal)</option>
+              <optgroup label="─── Multi-Channel Interface ───" id="audioMultiChannelOptGroup">
+                <option value="ch3_4">🎛️ Channels 3+4 (Aux Pair 2)</option>
+                <option value="ch5_6">🎛️ Channels 5+6 (Aux Pair 3)</option>
+                <option value="ch7_8">🎛️ Channels 7+8 (Aux Pair 4)</option>
+                <option value="ch3">3️⃣ Channel 3 Only (Out 3)</option>
+                <option value="ch4">4️⃣ Channel 4 Only (Out 4)</option>
+                <option value="ch5">5️⃣ Channel 5 Only (Out 5)</option>
+                <option value="ch6">6️⃣ Channel 6 Only (Out 6)</option>
+                <option value="ch7">7️⃣ Channel 7 Only (Out 7)</option>
+                <option value="ch8">8️⃣ Channel 8 Only (Out 8)</option>
+                <option value="all_multi">📡 All Hardware Channels (1..N)</option>
+              </optgroup>
             </select>
           </div>
           <div class="audio-output-actions">
             <button type="button" id="openAudioPickerBtn" class="refresh-devices-btn" title="Open native system audio output picker (Chrome/Edge)">✨</button>
             <button type="button" id="refreshAudioDevicesBtn" class="refresh-devices-btn" title="Discover & rescan all computer audio output devices">🔄</button>
-            <button type="button" id="testAudioOutputBtn" class="refresh-devices-btn" title="Play test audio chime through selected output">🔔</button>
+            <button type="button" id="testAudioOutputBtn" class="refresh-devices-btn" title="Play test audio chime through selected output & channel">🔔</button>
           </div>
         </div>
 
@@ -3238,6 +3311,7 @@
           <select id="midiOutputSelect" class="midi-select" title="Send MIDI note output to digital piano or external synth">
             <option value="">None (Audio Synth Only)</option>
           </select>
+          <button type="button" id="testMidiOutputBtn" class="refresh-devices-btn" title="Send test MIDI chord over selected MIDI output & channel(s)">🔔</button>
         </div>
 
         <div class="midi-select-group midi-channel-picker-group" id="midiChannelPickerGroup">
@@ -3252,6 +3326,8 @@
           <!-- Hidden synced select for programmatic access & test compatibility -->
           <select id="midiChannelSelect" class="midi-select" style="display: none;">
             <option value="all">All Channels (Omni)</option>
+            <option value="split">Split Hands (RH→Ch1 / LH→Ch2)</option>
+            <option value="omni_out">Broadcast All 16 Ch (1–16)</option>
             <option value="1">Channel 1</option>
             <option value="2">Channel 2</option>
             <option value="3">Channel 3</option>
@@ -3285,6 +3361,24 @@
               </div>
               <span class="ch-badge" id="chBadge_all">OMNI</span>
             </button>
+
+            <!-- Split Hands & Broadcast Multi-Channel Output Options -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.35rem;">
+              <button type="button" class="channel-opt-btn" data-channel="split" id="chOpt_split" title="Route Right Hand to Ch 1, Left Hand to Ch 2, Harmonies to Ch 3">
+                <div class="opt-left">
+                  <span class="ch-led" id="chLed_split"></span>
+                  <span class="ch-name">Split LH/RH</span>
+                </div>
+                <span class="ch-badge" id="chBadge_split">CH 1+2</span>
+              </button>
+              <button type="button" class="channel-opt-btn" data-channel="omni_out" id="chOpt_omni_out" title="Broadcast MIDI output simultaneously across all 16 channels">
+                <div class="opt-left">
+                  <span class="ch-led" id="chLed_omni_out"></span>
+                  <span class="ch-name">All 16 Out</span>
+                </div>
+                <span class="ch-badge" id="chBadge_omni_out">1–16</span>
+              </button>
+            </div>
 
             <div class="channel-grid" id="channelGridContainer">
               <!-- Dynamically populated 16 channels -->
@@ -3400,6 +3494,20 @@
             <option value="cowbell">🔔 Cowbell</option>
             <option value="stick">🥁 Rimshot / Sticks</option>
           </select>
+          <select id="synthInstrumentSelect" class="midi-select" title="Synthesizer Instrument Timbre" style="background:var(--bg-card); padding:0.35rem 0.6rem; border:1px solid var(--border); border-radius:8px; font-size:0.8rem; font-weight:600; color:var(--text); cursor:pointer;">
+            <option value="auto" selected>✨ Auto (Song Default)</option>
+            <option value="grand_piano">🎹 Acoustic Grand Piano</option>
+            <option value="electric_piano">⚡ Electric Piano (Rhodes)</option>
+            <option value="harpsichord">🎼 Baroque Harpsichord</option>
+            <option value="church_organ">⛪ Church Pipe Organ</option>
+            <option value="rock_organ">🎸 Vintage Drawbar Organ</option>
+            <option value="celesta">✨ Celesta & Music Box</option>
+            <option value="acoustic_guitar">🪕 Acoustic Folk Guitar</option>
+            <option value="chiptune">👾 8-Bit Retro Chiptune</option>
+            <option value="strings_synth">🎻 Orchestral Strings</option>
+            <option value="vibraphone">🎷 Jazz Vibraphone</option>
+            <option value="honky_tonk">🍺 Ragtime Honky-Tonk</option>
+          </select>
           <button id="mainPlayBtn" class="play-btn">▶ Auto Play Preview</button>
           
           <div class="tempo-control">
@@ -3488,6 +3596,7 @@
         <div class="sheet-music-header">
           <div class="sheet-title-group">
             <span class="sheet-piece-name" id="sheetPieceTitle">Lean on Me</span>
+            <span class="current-instrument-badge" id="currentSongInstrumentBadge" title="Current Synthesizer Instrument">⚡ Electric Piano</span>
             <div class="rhythm-legend">
               <span>Timing:</span>
               <span class="rhythm-chip">𝅝 = 4b</span>
@@ -4478,6 +4587,7 @@
           {
             id: "ode-to-joy",
             title: "Ode to Joy",
+            instrument: "grand_piano",
             category: "C 5-Finger",
             tempo: 104,
             timeSig: "4/4",
@@ -4653,6 +4763,68 @@
     const liveOscillators = new Map();
     const activeHeldMidiNotes = new Map();
 
+    // Synthesizer Timbre & Instrument State (Milestone 40)
+    let currentSynthInstrument = "auto";
+    try {
+      const savedSynthInst = localStorage.getItem("piano_synth_instrument");
+      if (savedSynthInst) currentSynthInstrument = savedSynthInst;
+    } catch (e) {}
+
+    function getActiveSynthInstrument() {
+      if (currentSynthInstrument && currentSynthInstrument !== "auto") {
+        return currentSynthInstrument;
+      }
+      if (currentSong && typeof window.MusicTheory !== "undefined" && typeof window.MusicTheory.getSongDefaultInstrument === "function") {
+        return window.MusicTheory.getSongDefaultInstrument(currentSong);
+      }
+      return "grand_piano";
+    }
+
+    function updateSongInstrumentUI() {
+      const effectiveId = getActiveSynthInstrument();
+      const instParams = (window.MusicTheory && window.MusicTheory.getInstrumentParameters)
+        ? window.MusicTheory.getInstrumentParameters(effectiveId)
+        : { name: "Acoustic Grand Piano", shortName: "Grand Piano", icon: "🎹" };
+
+      const badge = document.getElementById("currentSongInstrumentBadge");
+      if (badge) {
+        badge.textContent = `${instParams.icon} ${instParams.name || instParams.shortName}`;
+        badge.title = `Active Synthesizer Instrument: ${instParams.name} (${currentSynthInstrument === "auto" ? "Song Default" : "Manual Override"})`;
+      }
+
+      const sel = document.getElementById("synthInstrumentSelect");
+      if (sel) {
+        const autoOpt = sel.querySelector('option[value="auto"]');
+        if (autoOpt) {
+          const defaultSongInst = (currentSong && window.MusicTheory && window.MusicTheory.getSongDefaultInstrument)
+            ? window.MusicTheory.getSongDefaultInstrument(currentSong)
+            : "grand_piano";
+          const defParams = (window.MusicTheory && window.MusicTheory.getInstrumentParameters)
+            ? window.MusicTheory.getInstrumentParameters(defaultSongInst)
+            : { shortName: "Grand Piano" };
+          autoOpt.textContent = `✨ Auto (${defParams.shortName || "Default"})`;
+        }
+        if (sel.value !== currentSynthInstrument) {
+          sel.value = currentSynthInstrument;
+        }
+      }
+    }
+
+    function setSynthInstrument(instId, playPreview = false) {
+      currentSynthInstrument = instId || "auto";
+      try {
+        localStorage.setItem("piano_synth_instrument", currentSynthInstrument);
+      } catch (e) {}
+
+      updateSongInstrumentUI();
+
+      if (playPreview && isSynthAudioEnabled()) {
+        initAudio();
+        const effective = getActiveSynthInstrument();
+        playTone(523.25, 0.45, 95, "rh", effective);
+      }
+    }
+
     // Configurable Keyboard Visualizer Range & Offset
     let currentStartMidi = 36; // C2 (MIDI 36) default
     let currentKeyCount = 37;  // 37 keys (C2 – C5) default
@@ -4672,6 +4844,268 @@
       return toggle ? toggle.checked : true;
     }
 
+    // Multi-Channel Web Audio Router & MediaStream Sink Fallback Bridge State
+    let selectedAudioChannelMode = "stereo";
+    let lhVoiceBus = null;
+    let rhVoiceBus = null;
+    let masterChannelSplitter = null;
+    let audioChannelMerger = null;
+    let channelRouteNodes = [];
+    let mediaStreamDestNode = null;
+    let audioSinkBridgeElement = null;
+    let isUsingMediaStreamBridge = false;
+    const authorizedAudioDevicesMap = new Map();
+
+    function getVoiceAudioDestination(voiceRole = "center") {
+      if (!audioCtx) initAudio();
+      if (!audioCtx) return null;
+      const role = String(voiceRole || "center").toLowerCase();
+      if (role === "lh" || role === "bass") {
+        return lhVoiceBus || masterGainNode || audioCtx.destination;
+      }
+      if (role === "rh" || role === "dyad" || role === "treble" || role === "harmony") {
+        return rhVoiceBus || masterGainNode || audioCtx.destination;
+      }
+      return masterGainNode || audioCtx.destination;
+    }
+
+    function setupWebAudioChannelRouter() {
+      if (!audioCtx || !masterGainNode) return;
+      try {
+        // Disconnect previous router nodes if rebuilding
+        try { masterGainNode.disconnect(); } catch (e) {}
+        if (masterChannelSplitter) { try { masterChannelSplitter.disconnect(); } catch (e) {} }
+        if (audioChannelMerger) { try { audioChannelMerger.disconnect(); } catch (e) {} }
+        channelRouteNodes.forEach(pair => {
+          try { pair.leftGain.disconnect(); } catch (e) {}
+          try { pair.rightGain.disconnect(); } catch (e) {}
+        });
+        channelRouteNodes = [];
+
+        const maxHwCh = Math.max(2, Math.min(32, (audioCtx.destination && audioCtx.destination.maxChannelCount) ? audioCtx.destination.maxChannelCount : 2));
+        const routing = (window.MusicTheory && window.MusicTheory.computeAudioChannelGains)
+          ? window.MusicTheory.computeAudioChannelGains(selectedAudioChannelMode, maxHwCh, "center")
+          : { activeChannelCount: 2, leftBusGains: [1, 0], rightBusGains: [0, 1] };
+
+        const targetMergerChannels = Math.max(2, Math.min(maxHwCh, routing.activeChannelCount || 2));
+
+        // Configure hardware destination channel count for multi-channel interfaces
+        if (audioCtx.destination) {
+          try {
+            audioCtx.destination.channelCount = targetMergerChannels;
+            audioCtx.destination.channelCountMode = "explicit";
+            audioCtx.destination.channelInterpretation = targetMergerChannels > 2 ? "discrete" : "speakers";
+          } catch (e) {}
+        }
+
+        // Configure masterGainNode as 2-channel stereo bus so L/R hand panners and mono oscillators preserve stereo image
+        try {
+          masterGainNode.channelCount = 2;
+          masterGainNode.channelCountMode = "explicit";
+          masterGainNode.channelInterpretation = "speakers";
+        } catch (e) {}
+
+        // Create Left-Hand and Right-Hand stereo panner buses feeding masterGainNode
+        if (!lhVoiceBus && typeof audioCtx.createStereoPanner === "function") {
+          lhVoiceBus = audioCtx.createStereoPanner();
+          lhVoiceBus.connect(masterGainNode);
+        } else if (!lhVoiceBus) {
+          lhVoiceBus = audioCtx.createGain();
+          lhVoiceBus.connect(masterGainNode);
+        }
+
+        if (!rhVoiceBus && typeof audioCtx.createStereoPanner === "function") {
+          rhVoiceBus = audioCtx.createStereoPanner();
+          rhVoiceBus.connect(masterGainNode);
+        } else if (!rhVoiceBus) {
+          rhVoiceBus = audioCtx.createGain();
+          rhVoiceBus.connect(masterGainNode);
+        }
+
+        if (typeof audioCtx.createChannelSplitter === "function" && typeof audioCtx.createChannelMerger === "function") {
+          masterChannelSplitter = audioCtx.createChannelSplitter(2);
+          audioChannelMerger = audioCtx.createChannelMerger(targetMergerChannels);
+          masterGainNode.connect(masterChannelSplitter);
+
+          for (let ch = 0; ch < targetMergerChannels; ch++) {
+            const leftGain = audioCtx.createGain();
+            const rightGain = audioCtx.createGain();
+            leftGain.gain.value = 0;
+            rightGain.gain.value = 0;
+            masterChannelSplitter.connect(leftGain, 0);
+            masterChannelSplitter.connect(rightGain, 1);
+            leftGain.connect(audioChannelMerger, 0, ch);
+            rightGain.connect(audioChannelMerger, 0, ch);
+            channelRouteNodes.push({ leftGain, rightGain });
+          }
+
+          const finalDest = (isUsingMediaStreamBridge && mediaStreamDestNode) ? mediaStreamDestNode : audioCtx.destination;
+          audioChannelMerger.connect(finalDest);
+        } else {
+          const finalDest = (isUsingMediaStreamBridge && mediaStreamDestNode) ? mediaStreamDestNode : audioCtx.destination;
+          masterGainNode.connect(finalDest);
+        }
+
+        applyAudioChannelGainsMatrix();
+      } catch (err) {
+        console.warn("setupWebAudioChannelRouter fallback to direct destination:", err);
+        try {
+          masterGainNode.connect(audioCtx.destination);
+        } catch (e) {}
+      }
+    }
+
+    function applyAudioChannelGainsMatrix() {
+      if (!audioCtx) return;
+      const maxHwCh = Math.max(2, Math.min(32, (audioCtx.destination && audioCtx.destination.maxChannelCount) ? audioCtx.destination.maxChannelCount : 2));
+      const routing = (window.MusicTheory && window.MusicTheory.computeAudioChannelGains)
+        ? window.MusicTheory.computeAudioChannelGains(selectedAudioChannelMode, maxHwCh, "center")
+        : { channelMode: selectedAudioChannelMode, activeChannelCount: 2, leftBusGains: [1, 0], rightBusGains: [0, 1], shortLabel: "Ch 1+2" };
+
+      const isSplit = (selectedAudioChannelMode === "split_hands");
+      if (lhVoiceBus && lhVoiceBus.pan) {
+        lhVoiceBus.pan.setValueAtTime(isSplit ? -1.0 : 0.0, audioCtx.currentTime);
+        lhVoiceBus.pan.value = isSplit ? -1.0 : 0.0;
+      }
+      if (rhVoiceBus && rhVoiceBus.pan) {
+        rhVoiceBus.pan.setValueAtTime(isSplit ? 1.0 : 0.0, audioCtx.currentTime);
+        rhVoiceBus.pan.value = isSplit ? 1.0 : 0.0;
+      }
+
+      if (channelRouteNodes.length > 0) {
+        const numMergerCh = channelRouteNodes.length;
+        // Clear all channel gains first
+        for (let c = 0; c < numMergerCh; c++) {
+          channelRouteNodes[c].leftGain.gain.setValueAtTime(0, audioCtx.currentTime);
+          channelRouteNodes[c].leftGain.gain.value = 0;
+          channelRouteNodes[c].rightGain.gain.setValueAtTime(0, audioCtx.currentTime);
+          channelRouteNodes[c].rightGain.gain.value = 0;
+        }
+
+        // Map requested gains onto available hardware channels (mirroring onto odd/even if hardware has fewer channels than requested)
+        for (let i = 0; i < routing.leftBusGains.length; i++) {
+          const lVal = routing.leftBusGains[i] || 0;
+          const rVal = routing.rightBusGains[i] || 0;
+          if (lVal > 0 || rVal > 0) {
+            const targetIdx = i < numMergerCh ? i : (i % numMergerCh);
+            const curL = channelRouteNodes[targetIdx].leftGain.gain.value || 0;
+            const curR = channelRouteNodes[targetIdx].rightGain.gain.value || 0;
+            const nextL = Math.min(1.0, curL + lVal);
+            const nextR = Math.min(1.0, curR + rVal);
+            channelRouteNodes[targetIdx].leftGain.gain.setValueAtTime(nextL, audioCtx.currentTime);
+            channelRouteNodes[targetIdx].leftGain.gain.value = nextL;
+            channelRouteNodes[targetIdx].rightGain.gain.setValueAtTime(nextR, audioCtx.currentTime);
+            channelRouteNodes[targetIdx].rightGain.gain.value = nextR;
+          }
+        }
+      }
+
+      updateAudioOutputRouteBadge();
+    }
+
+    function updateAudioOutputRouteBadge() {
+      const badge = document.getElementById("audioOutputRouteBadge");
+      if (!badge) return;
+      const maxHwCh = (audioCtx && audioCtx.destination && audioCtx.destination.maxChannelCount) ? audioCtx.destination.maxChannelCount : 2;
+      const routing = (window.MusicTheory && window.MusicTheory.computeAudioChannelGains)
+        ? window.MusicTheory.computeAudioChannelGains(selectedAudioChannelMode, maxHwCh, "center")
+        : { shortLabel: "Ch 1+2", label: "Stereo (Ch 1+2)" };
+
+      badge.textContent = routing.shortLabel || "Ch 1+2";
+      const devSelect = document.getElementById("audioOutputSelect");
+      const devName = (devSelect && devSelect.selectedOptions[0]) ? devSelect.selectedOptions[0].textContent : "System Default";
+      badge.title = `Active Audio Sink: ${devName} • Channel Mode: ${routing.label || selectedAudioChannelMode} (${maxHwCh} HW Ch max)`;
+    }
+
+    function setAudioOutputChannelMode(channelMode, playConfirm = false) {
+      selectedAudioChannelMode = channelMode || "stereo";
+      try {
+        localStorage.setItem("piano_audio_output_channel", selectedAudioChannelMode);
+      } catch (e) {}
+
+      const chSelect = document.getElementById("audioOutputChannelSelect");
+      if (chSelect && chSelect.value !== selectedAudioChannelMode) {
+        chSelect.value = selectedAudioChannelMode;
+      }
+
+      if (audioCtx) {
+        setupWebAudioChannelRouter();
+      } else {
+        updateAudioOutputRouteBadge();
+      }
+
+      if (playConfirm) {
+        playTestAudioChime();
+      }
+    }
+
+    async function routeAudioViaMediaStreamBridge(sinkVal) {
+      if (!audioCtx || typeof audioCtx.createMediaStreamDestination !== "function" || typeof Audio === "undefined") {
+        return false;
+      }
+      try {
+        if (!mediaStreamDestNode) {
+          mediaStreamDestNode = audioCtx.createMediaStreamDestination();
+        }
+        if (!audioSinkBridgeElement) {
+          audioSinkBridgeElement = new Audio();
+          audioSinkBridgeElement.autoplay = true;
+        }
+        if (audioSinkBridgeElement.srcObject !== mediaStreamDestNode.stream) {
+          audioSinkBridgeElement.srcObject = mediaStreamDestNode.stream;
+        }
+        if (typeof audioSinkBridgeElement.setSinkId === "function") {
+          await audioSinkBridgeElement.setSinkId(sinkVal);
+        }
+        isUsingMediaStreamBridge = true;
+        setupWebAudioChannelRouter();
+        await audioSinkBridgeElement.play().catch(() => {});
+        return true;
+      } catch (err) {
+        console.warn("MediaStream audio output bridge fallback failed:", err);
+        isUsingMediaStreamBridge = false;
+        return false;
+      }
+    }
+
+    async function applyAudioOutputSink(deviceId) {
+      if (!audioCtx) return false;
+      const sinkVal = (!deviceId || deviceId === "default") ? "" : deviceId;
+
+      if (audioCtx.state === "suspended") {
+        try { await audioCtx.resume(); } catch (e) {}
+      }
+
+      // 1. Primary Web Audio API AudioContext.setSinkId
+      if (typeof audioCtx.setSinkId === "function") {
+        try {
+          await audioCtx.setSinkId(sinkVal);
+          if (isUsingMediaStreamBridge) {
+            isUsingMediaStreamBridge = false;
+            if (audioSinkBridgeElement) {
+              try { audioSinkBridgeElement.pause(); } catch (e) {}
+            }
+          }
+          setupWebAudioChannelRouter();
+          return true;
+        } catch (err) {
+          console.warn("audioCtx.setSinkId failed, attempting MediaStream bridge fallback:", selectedAudioOutputId, err);
+        }
+      }
+
+      // 2. Fallback HTMLAudioElement.setSinkId via MediaStreamAudioDestinationNode
+      if (sinkVal === "") {
+        isUsingMediaStreamBridge = false;
+        if (audioSinkBridgeElement) {
+          try { audioSinkBridgeElement.pause(); } catch (e) {}
+        }
+        setupWebAudioChannelRouter();
+        return true;
+      }
+
+      return await routeAudioViaMediaStreamBridge(sinkVal);
+    }
+
     function initAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -4682,12 +5116,24 @@
         masterGainNode.gain.value = volScale;
         masterGainNode.connect(audioCtx.destination);
 
+        setupWebAudioChannelRouter();
+
         // Apply audio output sink if supported and configured
-        if (typeof audioCtx.setSinkId === "function" && typeof selectedAudioOutputId !== "undefined" && selectedAudioOutputId && selectedAudioOutputId !== "default") {
-          audioCtx.setSinkId(selectedAudioOutputId).catch(() => {});
+        if (typeof selectedAudioOutputId !== "undefined" && selectedAudioOutputId && selectedAudioOutputId !== "default") {
+          if (typeof audioCtx.setSinkId === "function") {
+            audioCtx.setSinkId(selectedAudioOutputId).then(() => {
+              setupWebAudioChannelRouter();
+            }).catch(() => {
+              routeAudioViaMediaStreamBridge(selectedAudioOutputId);
+            });
+          } else {
+            routeAudioViaMediaStreamBridge(selectedAudioOutputId);
+          }
         }
       }
-      if (audioCtx.state === "suspended") audioCtx.resume();
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+      }
     }
 
     function setMasterVolume(val) {
@@ -4819,6 +5265,7 @@
 
     async function initAudioOutputRouting() {
       const select = document.getElementById("audioOutputSelect");
+      const channelSelect = document.getElementById("audioOutputChannelSelect");
       const refreshBtn = document.getElementById("refreshAudioDevicesBtn");
       const pickerBtn = document.getElementById("openAudioPickerBtn");
       const testBtn = document.getElementById("testAudioOutputBtn");
@@ -4826,11 +5273,21 @@
       try {
         const saved = localStorage.getItem("piano_audio_output_device");
         if (saved) selectedAudioOutputId = saved;
+        const savedCh = localStorage.getItem("piano_audio_output_channel");
+        if (savedCh) selectedAudioChannelMode = savedCh;
       } catch (e) {}
+
+      if (channelSelect) {
+        channelSelect.value = selectedAudioChannelMode;
+        channelSelect.addEventListener("change", (e) => {
+          initAudio();
+          setAudioOutputChannelMode(e.target.value, true);
+        });
+      }
 
       if (select) {
         select.addEventListener("change", async (e) => {
-          await setAudioOutputDevice(e.target.value);
+          await setAudioOutputDevice(e.target.value, true);
         });
       }
 
@@ -4863,17 +5320,36 @@
       }
 
       await updateAudioOutputDeviceList(false);
+      updateAudioOutputRouteBadge();
     }
 
     async function requestAudioOutputAccess() {
+      let unlockedViaMic = false;
       try {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           stream.getTracks().forEach(track => track.stop());
+          unlockedViaMic = true;
         }
       } catch (err) {
-        console.info("Audio device access request:", err.message || err);
+        console.info("Audio device access request (getUserMedia):", err.message || err);
       }
+
+      // If getUserMedia failed (e.g. desktop PC without microphone) and selectAudioOutput is available, invoke native picker
+      if (!unlockedViaMic && navigator.mediaDevices && typeof navigator.mediaDevices.selectAudioOutput === "function") {
+        try {
+          const device = await navigator.mediaDevices.selectAudioOutput();
+          if (device && device.deviceId) {
+            authorizedAudioDevicesMap.set(device.deviceId, device);
+            selectedAudioOutputId = device.deviceId;
+          }
+        } catch (pickerErr) {
+          if (pickerErr.name !== "AbortError") {
+            console.info("selectAudioOutput fallback:", pickerErr.message || pickerErr);
+          }
+        }
+      }
+
       await updateAudioOutputDeviceList(true);
     }
 
@@ -4882,8 +5358,10 @@
         try {
           const device = await navigator.mediaDevices.selectAudioOutput();
           if (device && device.deviceId) {
+            authorizedAudioDevicesMap.set(device.deviceId, device);
+            selectedAudioOutputId = device.deviceId;
             await updateAudioOutputDeviceList(true);
-            await setAudioOutputDevice(device.deviceId);
+            await setAudioOutputDevice(device.deviceId, true);
             return;
           }
         } catch (err) {
@@ -4902,11 +5380,19 @@
         if (!audioCtx) return;
         if (audioCtx.state === "suspended") audioCtx.resume();
         const now = audioCtx.currentTime;
-        const notes = [
-          { freq: 523.25, time: 0, dur: 0.28 },
-          { freq: 659.25, time: 0.12, dur: 0.32 },
-          { freq: 783.99, time: 0.24, dur: 0.45 }
-        ];
+        const isSplit = (selectedAudioChannelMode === "split_hands");
+        const notes = isSplit
+          ? [
+              { freq: 261.63, midi: 48, time: 0, dur: 0.30, role: "lh" },
+              { freq: 523.25, midi: 72, time: 0.16, dur: 0.30, role: "rh" },
+              { freq: 659.25, midi: 76, time: 0.30, dur: 0.35, role: "rh" },
+              { freq: 783.99, midi: 79, time: 0.44, dur: 0.45, role: "rh" }
+            ]
+          : [
+              { freq: 523.25, midi: 72, time: 0, dur: 0.28, role: "center" },
+              { freq: 659.25, midi: 76, time: 0.12, dur: 0.32, role: "center" },
+              { freq: 783.99, midi: 79, time: 0.24, dur: 0.45, role: "center" }
+            ];
         const effectiveVol = (typeof isMasterMuted !== "undefined" && isMasterMuted) ? 0 : (typeof currentMasterVolume !== "undefined" ? currentMasterVolume : 0.8);
         const vol = 0.22 * Math.pow(effectiveVol, 2);
         notes.forEach(n => {
@@ -4918,9 +5404,19 @@
           gain.gain.linearRampToValueAtTime(vol, now + n.time + 0.015);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + n.time + n.dur);
           osc.connect(gain);
-          gain.connect((typeof masterGainNode !== "undefined" && masterGainNode) ? masterGainNode : audioCtx.destination);
+          const destNode = (typeof getVoiceAudioDestination === "function")
+            ? getVoiceAudioDestination(n.role)
+            : ((typeof masterGainNode !== "undefined" && masterGainNode) ? masterGainNode : audioCtx.destination);
+          gain.connect(destNode);
           osc.start(now + n.time);
           osc.stop(now + n.time + n.dur);
+
+          if (typeof sendMidiOutputNoteOn === "function" && selectedMidiOutput) {
+            setTimeout(() => {
+              sendMidiOutputNoteOn(n.midi, 88, n.role === "center" ? "rh" : n.role);
+              setTimeout(() => sendMidiOutputNoteOff(n.midi, n.role === "center" ? "rh" : n.role), n.dur * 900);
+            }, n.time * 1000);
+          }
         });
       } catch (err) {
         console.warn("Unable to play test audio chime:", err);
@@ -4940,15 +5436,17 @@
 
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
+        const extraDevices = Array.from(authorizedAudioDevicesMap.values());
         const outputs = (window.MusicTheory && window.MusicTheory.filterAudioOutputDevices)
-          ? window.MusicTheory.filterAudioOutputDevices(devices)
+          ? window.MusicTheory.filterAudioOutputDevices(devices, extraDevices)
           : devices.filter(d => d.kind === "audiooutput").map((d, i) => {
-              const label = d.label || (d.deviceId === "default" ? "System Default Output" : `Audio Output ${i + 1}`);
+              const devId = d.deviceId || "default";
+              const label = d.label || (devId === "default" ? "System Default Output" : `Audio Output ${i + 1}`);
               const info = (window.MusicTheory && window.MusicTheory.classifyAudioDevice)
-                ? window.MusicTheory.classifyAudioDevice(label, d.deviceId)
+                ? window.MusicTheory.classifyAudioDevice(label, devId)
                 : { type: "speakers", icon: "🔊", category: "Audio Output Device" };
               return {
-                deviceId: d.deviceId || "",
+                deviceId: devId,
                 groupId: d.groupId || "",
                 label,
                 type: info.type,
@@ -5042,13 +5540,13 @@
           selectedAudioOutputId = "default";
         }
 
-        await setAudioOutputDevice(selectedAudioOutputId);
+        await setAudioOutputDevice(selectedAudioOutputId, isManual);
       } catch (err) {
         console.warn("Unable to enumerate audio output devices:", err);
       }
     }
 
-    async function setAudioOutputDevice(deviceId) {
+    async function setAudioOutputDevice(deviceId, isUserAction = true) {
       if (deviceId === "__discover__") {
         await requestAudioOutputAccess();
         return;
@@ -5064,21 +5562,27 @@
       } catch (e) {}
 
       const select = document.getElementById("audioOutputSelect");
-      if (select && select.value !== selectedAudioOutputId) {
-        select.value = selectedAudioOutputId;
+      if (select) {
+        const hasOption = Array.from(select.options).some(o => o.value === selectedAudioOutputId);
+        if (!hasOption && selectedAudioOutputId !== "default") {
+          const customOpt = document.createElement("option");
+          customOpt.value = selectedAudioOutputId;
+          const authDev = authorizedAudioDevicesMap.get(selectedAudioOutputId);
+          customOpt.textContent = `🔊 ${(authDev && authDev.label) ? authDev.label : "Selected Output Device"}`;
+          select.insertBefore(customOpt, select.firstChild);
+        }
+        if (select.value !== selectedAudioOutputId) {
+          select.value = selectedAudioOutputId;
+        }
       }
 
-      if (!audioCtx && typeof initAudio === "function") {
+      // Only initialize or resume AudioContext when triggered by user action (or if audioCtx already exists)
+      if (isUserAction && !audioCtx && typeof initAudio === "function") {
         initAudio();
       }
 
-      if (audioCtx && typeof audioCtx.setSinkId === "function") {
-        try {
-          const sinkVal = (selectedAudioOutputId === "default" || !selectedAudioOutputId) ? "" : selectedAudioOutputId;
-          await audioCtx.setSinkId(sinkVal);
-        } catch (err) {
-          console.warn("audioCtx.setSinkId failed for sink:", selectedAudioOutputId, err);
-        }
+      if (audioCtx) {
+        await applyAudioOutputSink(selectedAudioOutputId);
       }
 
       const icon = document.getElementById("audioOutputStatusIcon");
@@ -5093,13 +5597,16 @@
           icon.textContent = l.includes("headphone") ? "🎧" : "🔊";
         }
       }
+
+      updateAudioOutputRouteBadge();
     }
 
     // ==========================================
-    // MIDI OUTPUT ROUTING (WEB MIDI API)
+    // MIDI OUTPUT ROUTING & MULTI-CHANNEL ENGINE (WEB MIDI API)
     // ==========================================
     function initMidiOutputRouting() {
       const select = document.getElementById("midiOutputSelect");
+      const testMidiBtn = document.getElementById("testMidiOutputBtn");
       try {
         const saved = localStorage.getItem("piano_midi_output_device");
         if (saved) selectedMidiOutputId = saved;
@@ -5110,6 +5617,43 @@
           setMidiOutputDevice(e.target.value);
         });
       }
+
+      if (testMidiBtn) {
+        testMidiBtn.addEventListener("click", () => {
+          playTestMidiOutputChime();
+        });
+      }
+    }
+
+    function playTestMidiOutputChime() {
+      const chSelect = document.getElementById("midiChannelSelect");
+      const chMode = chSelect ? chSelect.value : "1";
+      const isSplit = (chMode === "split");
+      const testNotes = isSplit
+        ? [
+            { midi: 48, pitch: "C3", delay: 0, dur: 320, role: "lh" },
+            { midi: 60, pitch: "C4", delay: 160, dur: 320, role: "rh" },
+            { midi: 64, pitch: "E4", delay: 300, dur: 360, role: "dyad" },
+            { midi: 67, pitch: "G4", delay: 440, dur: 450, role: "rh" }
+          ]
+        : [
+            { midi: 60, pitch: "C4", delay: 0, dur: 280, role: "rh" },
+            { midi: 64, pitch: "E4", delay: 130, dur: 320, role: "rh" },
+            { midi: 67, pitch: "G4", delay: 260, dur: 420, role: "rh" }
+          ];
+
+      testNotes.forEach(n => {
+        setTimeout(() => {
+          sendMidiOutputNoteOn(n.midi, 92, n.role);
+          if (isSynthAudioEnabled()) {
+            playTone(440 * Math.pow(2, (n.midi - 69) / 12), n.dur / 1000, 92, n.role);
+          }
+          highlightPlaybackKey(n.pitch, n.role === "lh" ? "lh" : "rh", n.dur);
+          setTimeout(() => {
+            sendMidiOutputNoteOff(n.midi, n.role);
+          }, n.dur);
+        }, n.delay);
+      });
     }
 
     function updateMidiOutputDeviceList() {
@@ -5134,8 +5678,8 @@
         const opt = document.createElement("option");
         opt.value = output.id;
         let label = `${output.name || "MIDI Port " + (index + 1)} (${output.manufacturer || "Generic"})`;
-        if (label.length > 32) {
-          label = label.substring(0, 30) + "…";
+        if (label.length > 38) {
+          label = label.substring(0, 36) + "…";
         }
         opt.textContent = label;
         select.appendChild(opt);
@@ -5144,6 +5688,10 @@
       const matchesSelection = outputs.some(o => o.id === selectedMidiOutputId);
       if (matchesSelection) {
         select.value = selectedMidiOutputId;
+      } else if (outputs.length > 0 && (!selectedMidiOutputId || selectedMidiOutputId === "none")) {
+        // Keep "none" unless user selects an output port or had one saved
+        select.value = "none";
+        selectedMidiOutputId = "none";
       } else {
         select.value = "none";
         selectedMidiOutputId = "none";
@@ -5175,64 +5723,91 @@
       selectedMidiOutput = midiAccess.outputs.get(selectedMidiOutputId) || null;
     }
 
-    function getActiveMidiOutputChannel() {
+    function getActiveMidiOutputChannels(voiceRole = "rh") {
       const chSelect = document.getElementById("midiChannelSelect");
-      if (chSelect && chSelect.value && chSelect.value !== "all") {
-        const parsed = parseInt(chSelect.value, 10);
-        if (parsed >= 1 && parsed <= 16) return parsed;
+      const setting = (chSelect && chSelect.value) ? chSelect.value : "all";
+      if (window.MusicTheory && typeof window.MusicTheory.resolveMidiOutputChannels === "function") {
+        return window.MusicTheory.resolveMidiOutputChannels(setting, voiceRole);
       }
-      return 1;
+      if (setting !== "all") {
+        const parsed = parseInt(setting, 10);
+        if (parsed >= 1 && parsed <= 16) return [parsed];
+      }
+      return [1];
     }
 
-    function sendMidiOutputNoteOn(pitchOrMidi, velocity = 85) {
-      if (!selectedMidiOutput) return;
-      try {
-        const ch = getActiveMidiOutputChannel();
-        const msg = (window.MusicTheory && window.MusicTheory.createMidiNoteOn)
-          ? window.MusicTheory.createMidiNoteOn(pitchOrMidi, velocity, ch)
-          : null;
-        if (msg) {
-          selectedMidiOutput.send(msg);
-        } else {
-          const num = typeof pitchOrMidi === "number" ? pitchOrMidi : 60;
-          const vel = Math.max(1, Math.min(127, Math.round(velocity)));
-          selectedMidiOutput.send([0x90 | ((ch - 1) & 0x0F), num, vel]);
-        }
-      } catch (err) {
-        console.warn("sendMidiOutputNoteOn failed:", err);
-      }
+    function getActiveMidiOutputChannel(voiceRole = "rh") {
+      const channels = getActiveMidiOutputChannels(voiceRole);
+      return (channels && channels.length > 0) ? channels[0] : 1;
     }
 
-    function sendMidiOutputNoteOff(pitchOrMidi) {
-      if (!selectedMidiOutput) return;
-      try {
-        const ch = getActiveMidiOutputChannel();
-        const msg = (window.MusicTheory && window.MusicTheory.createMidiNoteOff)
-          ? window.MusicTheory.createMidiNoteOff(pitchOrMidi, ch)
-          : null;
-        if (msg) {
-          selectedMidiOutput.send(msg);
-        } else {
-          const num = typeof pitchOrMidi === "number" ? pitchOrMidi : 60;
-          selectedMidiOutput.send([0x80 | ((ch - 1) & 0x0F), num, 0]);
+    function sendMidiOutputNoteOn(pitchOrMidi, velocity = 85, voiceRole = "rh") {
+      const channels = getActiveMidiOutputChannels(voiceRole);
+      const noteNum = (typeof pitchOrMidi === "number")
+        ? pitchOrMidi
+        : ((window.MusicTheory && window.MusicTheory.pitchToMidi) ? (window.MusicTheory.pitchToMidi(pitchOrMidi) ?? 60) : 60);
+      const vel = Math.max(1, Math.min(127, Math.round(velocity || 85)));
+
+      channels.forEach(ch => {
+        if (typeof recordMidiChannelActivity === "function") {
+          recordMidiChannelActivity(ch, 9, noteNum, vel);
         }
-      } catch (err) {
-        console.warn("sendMidiOutputNoteOff failed:", err);
-      }
+        if (!selectedMidiOutput) return;
+        try {
+          const msg = (window.MusicTheory && window.MusicTheory.createMidiNoteOn)
+            ? window.MusicTheory.createMidiNoteOn(noteNum, vel, ch)
+            : [0x90 | ((ch - 1) & 0x0F), noteNum, vel];
+          selectedMidiOutput.send(msg);
+        } catch (err) {
+          console.warn("sendMidiOutputNoteOn failed on Ch", ch, err);
+        }
+      });
+    }
+
+    function sendMidiOutputNoteOff(pitchOrMidi, voiceRole = "rh") {
+      const channels = getActiveMidiOutputChannels(voiceRole);
+      const noteNum = (typeof pitchOrMidi === "number")
+        ? pitchOrMidi
+        : ((window.MusicTheory && window.MusicTheory.pitchToMidi) ? (window.MusicTheory.pitchToMidi(pitchOrMidi) ?? 60) : 60);
+
+      channels.forEach(ch => {
+        if (typeof recordMidiChannelActivity === "function") {
+          recordMidiChannelActivity(ch, 8, noteNum, 0);
+        }
+        if (!selectedMidiOutput) return;
+        try {
+          const msg = (window.MusicTheory && window.MusicTheory.createMidiNoteOff)
+            ? window.MusicTheory.createMidiNoteOff(noteNum, ch)
+            : [0x80 | ((ch - 1) & 0x0F), noteNum, 0];
+          selectedMidiOutput.send(msg);
+        } catch (err) {
+          console.warn("sendMidiOutputNoteOff failed on Ch", ch, err);
+        }
+      });
     }
 
     function sendMidiOutputSustain(isDown) {
-      if (!selectedMidiOutput) return;
-      try {
-        const ch = getActiveMidiOutputChannel();
-        const val = isDown ? 127 : 0;
-        const msg = (window.MusicTheory && window.MusicTheory.createMidiCC)
-          ? window.MusicTheory.createMidiCC(64, val, ch)
-          : [0xB0 | ((ch - 1) & 0x0F), 64, val];
-        selectedMidiOutput.send(msg);
-      } catch (err) {
-        console.warn("sendMidiOutputSustain failed:", err);
-      }
+      const chSelect = document.getElementById("midiChannelSelect");
+      const setting = (chSelect && chSelect.value) ? chSelect.value : "all";
+      const channels = (setting === "split")
+        ? [1, 2, 3]
+        : getActiveMidiOutputChannels("rh");
+      const val = isDown ? 127 : 0;
+
+      channels.forEach(ch => {
+        if (typeof recordMidiChannelActivity === "function") {
+          recordMidiChannelActivity(ch, 11, 64, val);
+        }
+        if (!selectedMidiOutput) return;
+        try {
+          const msg = (window.MusicTheory && window.MusicTheory.createMidiCC)
+            ? window.MusicTheory.createMidiCC(64, val, ch)
+            : [0xB0 | ((ch - 1) & 0x0F), 64, val];
+          selectedMidiOutput.send(msg);
+        } catch (err) {
+          console.warn("sendMidiOutputSustain failed on Ch", ch, err);
+        }
+      });
     }
 
     function sendMidiAllNotesOff() {
@@ -5249,60 +5824,828 @@
       }
     }
 
+    function synthesizeTimbre(freq, duration = 0.35, velocity = 90, voiceRole = "rh", isLive = false, instrumentOverride = null) {
+      if (!freq || typeof audioCtx === "undefined" || !audioCtx) return null;
+      const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
+      if (effectiveVol <= 0.0001) return null;
+
+      initAudio();
+      const now = audioCtx.currentTime;
+      const instId = instrumentOverride || getActiveSynthInstrument();
+      const instParams = (window.MusicTheory && window.MusicTheory.getInstrumentParameters)
+        ? window.MusicTheory.getInstrumentParameters(instId)
+        : {
+            attackSec: 0.005,
+            decaySec: 2.5,
+            sustainLevel: 0.45,
+            releaseSec: 0.28,
+            velocitySensitivity: 1.0,
+            filterType: "lowpass",
+            filterMultiplier: 4.5
+          };
+
+      const velSens = typeof instParams.velocitySensitivity === "number" ? instParams.velocitySensitivity : 1.0;
+      const rawVelNorm = Math.max(0.15, Math.min(1.0, velocity / 127));
+      const velNorm = (1 - velSens) * 0.9 + velSens * rawVelNorm;
+      const volScale = Math.pow(effectiveVol, 2) * velNorm;
+
+      const destNode = (typeof getVoiceAudioDestination === "function")
+        ? getVoiceAudioDestination(voiceRole)
+        : (masterGainNode || audioCtx.destination);
+
+      const voiceGain = audioCtx.createGain();
+      voiceGain.connect(destNode);
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.connect(voiceGain);
+
+      const oscillators = [];
+      let lfoNode = null;
+      let peakGain = 0.25 * volScale;
+      let sustainGain = peakGain * (instParams.sustainLevel !== undefined ? instParams.sustainLevel : 0.5);
+
+      const dur = Math.max(0.08, duration || 0.35);
+
+      switch (instId) {
+        case "electric_piano": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(freq * (2.6 + velNorm * 3.5), now);
+          filter.frequency.exponentialRampToValueAtTime(freq * 1.8, now + Math.max(0.2, dur));
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = "triangle";
+          osc2.frequency.setValueAtTime(freq * 2, now); // Bell tine overtone
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.30 * velNorm, now);
+          g2.gain.exponentialRampToValueAtTime(0.008, now + Math.max(0.1, dur * 0.6));
+
+          osc1.connect(filter);
+          osc2.connect(g2);
+          g2.connect(filter);
+          oscillators.push(osc1, osc2);
+
+          peakGain = 0.25 * volScale;
+          sustainGain = peakGain * 0.55;
+          break;
+        }
+
+        case "harpsichord": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(12000, freq * 7.0), now);
+          filter.Q.setValueAtTime(1.8, now);
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "sawtooth";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = "sawtooth";
+          osc2.frequency.setValueAtTime(freq * 2 * Math.pow(2, 3 / 1200), now); // Octave + 3 cents
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.28, now);
+
+          osc1.connect(filter);
+          osc2.connect(g2);
+          g2.connect(filter);
+          oscillators.push(osc1, osc2);
+
+          peakGain = 0.20 * volScale;
+          sustainGain = peakGain * 0.15;
+          break;
+        }
+
+        case "church_organ": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(10000, freq * 4.5), now);
+
+          const osc1 = audioCtx.createOscillator(); // 8' principal
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = audioCtx.createOscillator(); // 4' octave
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(freq * 2 * Math.pow(2, 2 / 1200), now);
+
+          const osc3 = audioCtx.createOscillator(); // 16' sub-bass
+          osc3.type = "triangle";
+          osc3.frequency.setValueAtTime(freq * 0.5, now);
+
+          const osc4 = audioCtx.createOscillator(); // 2 2/3' quint
+          osc4.type = "sine";
+          osc4.frequency.setValueAtTime(freq * 3, now);
+
+          const g2 = audioCtx.createGain(); g2.gain.setValueAtTime(0.35, now);
+          const g3 = audioCtx.createGain(); g3.gain.setValueAtTime(0.32, now);
+          const g4 = audioCtx.createGain(); g4.gain.setValueAtTime(0.15, now);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          osc4.connect(g4); g4.connect(filter);
+          oscillators.push(osc1, osc2, osc3, osc4);
+
+          peakGain = 0.22 * volScale;
+          sustainGain = peakGain * 1.0;
+          break;
+        }
+
+        case "rock_organ": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(9000, freq * 5.5), now);
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(freq * 2, now);
+
+          const osc3 = audioCtx.createOscillator();
+          osc3.type = "sine";
+          osc3.frequency.setValueAtTime(freq * 4, now);
+
+          const oscClick = audioCtx.createOscillator();
+          oscClick.type = "sine";
+          oscClick.frequency.setValueAtTime(freq * 3, now);
+
+          const g2 = audioCtx.createGain(); g2.gain.setValueAtTime(0.35, now);
+          const g3 = audioCtx.createGain(); g3.gain.setValueAtTime(0.20, now);
+          const gClick = audioCtx.createGain();
+          gClick.gain.setValueAtTime(0.65 * velNorm, now);
+          gClick.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          oscClick.connect(gClick); gClick.connect(filter);
+          oscillators.push(osc1, osc2, osc3, oscClick);
+
+          peakGain = 0.22 * volScale;
+          sustainGain = peakGain * 0.95;
+          break;
+        }
+
+        case "celesta": {
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(Math.min(10000, Math.max(800, freq * 2.2)), now);
+          filter.Q.setValueAtTime(0.8, now);
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(freq * 2.756, now);
+
+          const osc3 = audioCtx.createOscillator();
+          osc3.type = "sine";
+          osc3.frequency.setValueAtTime(freq * 5.404, now);
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.42 * velNorm, now);
+          g2.gain.exponentialRampToValueAtTime(0.002, now + 0.45);
+
+          const g3 = audioCtx.createGain();
+          g3.gain.setValueAtTime(0.22 * velNorm, now);
+          g3.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          oscillators.push(osc1, osc2, osc3);
+
+          peakGain = 0.24 * volScale;
+          sustainGain = peakGain * 0.20;
+          break;
+        }
+
+        case "acoustic_guitar": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(freq * 5.5, now);
+          filter.frequency.exponentialRampToValueAtTime(freq * 1.3, now + 0.07);
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "triangle";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = "sawtooth";
+          osc2.frequency.setValueAtTime(freq, now);
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.35 * velNorm, now);
+          g2.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          oscillators.push(osc1, osc2);
+
+          peakGain = 0.24 * volScale;
+          sustainGain = peakGain * 0.25;
+          break;
+        }
+
+        case "chiptune": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(14000, now);
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "square";
+          osc1.frequency.setValueAtTime(freq * 1.08, now);
+          osc1.frequency.exponentialRampToValueAtTime(freq, now + 0.018);
+
+          osc1.connect(filter);
+          oscillators.push(osc1);
+
+          peakGain = 0.18 * volScale;
+          sustainGain = peakGain * 0.85;
+          break;
+        }
+
+        case "strings_synth": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(9000, freq * 3.2), now);
+          filter.Q.setValueAtTime(1.5, now);
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "sawtooth";
+          osc1.frequency.setValueAtTime(freq * Math.pow(2, -6 / 1200), now); // -6 cents
+
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = "sawtooth";
+          osc2.frequency.setValueAtTime(freq * Math.pow(2, 6 / 1200), now); // +6 cents
+
+          const osc3 = audioCtx.createOscillator();
+          osc3.type = "triangle";
+          osc3.frequency.setValueAtTime(freq, now);
+
+          const g1 = audioCtx.createGain(); g1.gain.setValueAtTime(0.40, now);
+          const g2 = audioCtx.createGain(); g2.gain.setValueAtTime(0.40, now);
+          const g3 = audioCtx.createGain(); g3.gain.setValueAtTime(0.30, now);
+
+          osc1.connect(g1); g1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          oscillators.push(osc1, osc2, osc3);
+
+          peakGain = 0.22 * volScale;
+          sustainGain = peakGain * 0.85;
+          break;
+        }
+
+        case "vibraphone": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(10000, freq * 4.0), now);
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(freq * 4, now); // Metallic strike ping
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.35 * velNorm, now);
+          g2.gain.exponentialRampToValueAtTime(0.002, now + 0.08);
+
+          // Motor tremolo modulation (5.5 Hz)
+          const tremoloOsc = audioCtx.createOscillator();
+          tremoloOsc.frequency.setValueAtTime(5.5, now);
+          const tremoloGain = audioCtx.createGain();
+          tremoloGain.gain.setValueAtTime(0.04, now);
+          tremoloOsc.connect(tremoloGain);
+          tremoloGain.connect(voiceGain.gain);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          oscillators.push(osc1, osc2);
+          lfoNode = tremoloOsc;
+
+          peakGain = 0.24 * volScale;
+          sustainGain = peakGain * 0.35;
+          break;
+        }
+
+        case "honky_tonk": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(11000, freq * 5.2), now);
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "triangle";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = "triangle";
+          osc2.frequency.setValueAtTime(freq * Math.pow(2, 8 / 1200), now); // +8 cents
+
+          const osc3 = audioCtx.createOscillator();
+          osc3.type = "sawtooth";
+          osc3.frequency.setValueAtTime(freq * Math.pow(2, -7 / 1200), now); // -7 cents
+
+          const oscClick = audioCtx.createOscillator();
+          oscClick.type = "sine";
+          oscClick.frequency.setValueAtTime(freq * 4.5, now);
+
+          const g2 = audioCtx.createGain(); g2.gain.setValueAtTime(0.35, now);
+          const g3 = audioCtx.createGain(); g3.gain.setValueAtTime(0.25, now);
+          const gClick = audioCtx.createGain();
+          gClick.gain.setValueAtTime(0.30 * velNorm, now);
+          gClick.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          oscClick.connect(gClick); gClick.connect(filter);
+          oscillators.push(osc1, osc2, osc3, oscClick);
+
+          peakGain = 0.24 * volScale;
+          sustainGain = peakGain * 0.40;
+          break;
+        }
+
+        case "grand_piano":
+        default: {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(freq * (2.8 + velNorm * 4.5), now);
+          filter.frequency.exponentialRampToValueAtTime(freq * 1.6, now + Math.max(0.2, dur * 0.7));
+
+          const osc1 = audioCtx.createOscillator();
+          osc1.type = "triangle";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = "triangle";
+          osc2.frequency.setValueAtTime(freq * Math.pow(2, 2 / 1200), now); // +2 cents
+
+          const osc3 = audioCtx.createOscillator();
+          osc3.type = "sine";
+          osc3.frequency.setValueAtTime(freq * 2, now); // 2nd harmonic hammer
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.35, now);
+
+          const g3 = audioCtx.createGain();
+          g3.gain.setValueAtTime(0.25 * velNorm, now);
+          g3.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          oscillators.push(osc1, osc2, osc3);
+
+          peakGain = 0.26 * volScale;
+          sustainGain = peakGain * 0.45;
+          break;
+        }
+      }
+
+      const attackSec = instParams.attackSec || 0.005;
+      const decaySec = instParams.decaySec || 2.2;
+      const releaseSec = instParams.releaseSec || 0.25;
+
+      if (!isLive) {
+        // One-shot scheduled note playback
+        voiceGain.gain.setValueAtTime(0.0001, now);
+        voiceGain.gain.linearRampToValueAtTime(peakGain, now + attackSec);
+        const midTime = now + attackSec + Math.max(0.04, (dur - attackSec) * 0.5);
+        voiceGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, sustainGain), midTime);
+        voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + dur + releaseSec);
+
+        oscillators.forEach(osc => {
+          osc.start(now);
+          osc.stop(now + dur + releaseSec + 0.03);
+        });
+        if (lfoNode) {
+          lfoNode.start(now);
+          try { lfoNode.stop(now + dur + releaseSec + 0.03); } catch (e) {}
+        }
+      } else {
+        // Live keyboard / MIDI performance
+        voiceGain.gain.setValueAtTime(0.0001, now);
+        voiceGain.gain.linearRampToValueAtTime(peakGain, now + attackSec);
+        voiceGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, sustainGain), now + attackSec + 0.35);
+        if (decaySec > 0 && decaySec < 8) {
+          voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + attackSec + 0.35 + decaySec);
+        }
+        oscillators.forEach(osc => osc.start(now));
+        if (lfoNode) lfoNode.start(now);
+      }
+
+      return {
+        osc: oscillators[0],
+        osc2: oscillators[1] || null,
+        oscillators,
+        gain: voiceGain,
+        filter,
+        lfoNode,
+        voiceRole,
+        instId,
+        releaseSec
+      };
+    }
+
     function playTone(freq, duration = 0.35, velocity = 90) {
       if (!freq) return;
+      const midiNum = Math.round(69 + 12 * Math.log2(freq / 440));
+      const voiceRole = arguments.length > 3 && arguments[3] ? arguments[3] : (midiNum < 60 ? "lh" : "rh");
+      const instOverride = arguments.length > 4 ? arguments[4] : null;
+
       if (typeof sendMidiOutputNoteOn === "function" && typeof selectedMidiOutput !== "undefined" && selectedMidiOutput) {
-        const midiNum = Math.round(69 + 12 * Math.log2(freq / 440));
         if (midiNum >= 0 && midiNum <= 127) {
-          sendMidiOutputNoteOn(midiNum, velocity);
+          sendMidiOutputNoteOn(midiNum, velocity, voiceRole);
           setTimeout(() => {
-            if (typeof sendMidiOutputNoteOff === "function") sendMidiOutputNoteOff(midiNum);
+            if (typeof sendMidiOutputNoteOff === "function") sendMidiOutputNoteOff(midiNum, voiceRole);
           }, duration * 1000);
         }
       }
 
+      if (!isSynthAudioEnabled()) return;
       const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
       if (effectiveVol <= 0.0001) return; // Muted / zero volume
 
       initAudio();
       const now = audioCtx.currentTime;
-      const velNorm = Math.max(0.15, Math.min(1, velocity / 127));
+      const instId = instOverride || getActiveSynthInstrument();
+      const instParams = (window.MusicTheory && window.MusicTheory.getInstrumentParameters)
+        ? window.MusicTheory.getInstrumentParameters(instId)
+        : {
+            attackSec: 0.005,
+            decaySec: 2.5,
+            sustainLevel: 0.45,
+            releaseSec: 0.28,
+            velocitySensitivity: 1.0,
+            filterType: "lowpass",
+            filterMultiplier: 4.5
+          };
+
+      const velSens = typeof instParams.velocitySensitivity === "number" ? instParams.velocitySensitivity : 1.0;
+      const rawVelNorm = Math.max(0.15, Math.min(1.0, velocity / 127));
+      const velNorm = (1 - velSens) * 0.9 + velSens * rawVelNorm;
       const volScale = Math.pow(effectiveVol, 2) * velNorm;
 
+      const destNode = (typeof getVoiceAudioDestination === "function")
+        ? getVoiceAudioDestination(voiceRole)
+        : (masterGainNode || audioCtx.destination);
+
       const voiceGain = audioCtx.createGain();
+      voiceGain.connect(destNode);
+
       const filter = audioCtx.createBiquadFilter();
       filter.type = "lowpass";
-      filter.frequency.setValueAtTime(freq * (2.5 + velNorm * 5.5), now);
-      filter.frequency.exponentialRampToValueAtTime(freq * 1.8, now + Math.max(0.15, duration));
+      filter.connect(voiceGain);
 
-      // Fundamental (triangle) + 2nd harmonic (sine overtone) for warm electric piano tone
-      const osc1 = audioCtx.createOscillator();
-      const osc2 = audioCtx.createOscillator();
-      const g2 = audioCtx.createGain();
+      let osc1 = audioCtx.createOscillator();
+      let osc2 = audioCtx.createOscillator();
+      const oscillators = [];
+      let lfoNode = null;
+      let peakGain = 0.25 * volScale;
+      let sustainGain = peakGain * (instParams.sustainLevel !== undefined ? instParams.sustainLevel : 0.5);
 
-      osc1.type = "triangle";
-      osc1.frequency.setValueAtTime(freq, now);
+      const dur = Math.max(0.08, duration || 0.35);
 
-      osc2.type = "sine";
-      osc2.frequency.setValueAtTime(freq * 2, now);
-      g2.gain.setValueAtTime(0.24 * velNorm, now);
-      g2.gain.exponentialRampToValueAtTime(0.008, now + Math.max(0.1, duration * 0.8));
+      switch (instId) {
+        case "electric_piano": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(freq * (2.6 + velNorm * 3.5), now);
+          filter.frequency.exponentialRampToValueAtTime(freq * 1.8, now + Math.max(0.2, dur));
 
-      const targetPeak = 0.24 * volScale;
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = "triangle";
+          osc2.frequency.setValueAtTime(freq * 2, now); // Bell tine overtone
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.30 * velNorm, now);
+          g2.gain.exponentialRampToValueAtTime(0.008, now + Math.max(0.1, dur * 0.6));
+
+          osc1.connect(filter);
+          osc2.connect(g2);
+          g2.connect(filter);
+          oscillators.push(osc1, osc2);
+
+          peakGain = 0.25 * volScale;
+          sustainGain = peakGain * 0.55;
+          break;
+        }
+
+        case "harpsichord": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(12000, freq * 7.0), now);
+          filter.Q.setValueAtTime(1.8, now);
+
+          osc1.type = "sawtooth";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = "sawtooth";
+          osc2.frequency.setValueAtTime(freq * 2 * Math.pow(2, 3 / 1200), now); // Octave + 3 cents
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.28, now);
+
+          osc1.connect(filter);
+          osc2.connect(g2);
+          g2.connect(filter);
+          oscillators.push(osc1, osc2);
+
+          peakGain = 0.20 * volScale;
+          sustainGain = peakGain * 0.15;
+          break;
+        }
+
+        case "church_organ": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(10000, freq * 4.5), now);
+
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(freq * 2 * Math.pow(2, 2 / 1200), now);
+
+          const osc3 = audioCtx.createOscillator(); // 16' sub-bass
+          osc3.type = "triangle";
+          osc3.frequency.setValueAtTime(freq * 0.5, now);
+
+          const osc4 = audioCtx.createOscillator(); // 2 2/3' quint
+          osc4.type = "sine";
+          osc4.frequency.setValueAtTime(freq * 3, now);
+
+          const g2 = audioCtx.createGain(); g2.gain.setValueAtTime(0.35, now);
+          const g3 = audioCtx.createGain(); g3.gain.setValueAtTime(0.32, now);
+          const g4 = audioCtx.createGain(); g4.gain.setValueAtTime(0.15, now);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          osc4.connect(g4); g4.connect(filter);
+          oscillators.push(osc1, osc2, osc3, osc4);
+
+          peakGain = 0.22 * volScale;
+          sustainGain = peakGain * 1.0;
+          break;
+        }
+
+        case "rock_organ": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(9000, freq * 5.5), now);
+
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(freq * 2, now);
+
+          const osc3 = audioCtx.createOscillator();
+          osc3.type = "sine";
+          osc3.frequency.setValueAtTime(freq * 4, now);
+
+          const oscClick = audioCtx.createOscillator();
+          oscClick.type = "sine";
+          oscClick.frequency.setValueAtTime(freq * 3, now);
+
+          const g2 = audioCtx.createGain(); g2.gain.setValueAtTime(0.35, now);
+          const g3 = audioCtx.createGain(); g3.gain.setValueAtTime(0.20, now);
+          const gClick = audioCtx.createGain();
+          gClick.gain.setValueAtTime(0.65 * velNorm, now);
+          gClick.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          oscClick.connect(gClick); gClick.connect(filter);
+          oscillators.push(osc1, osc2, osc3, oscClick);
+
+          peakGain = 0.22 * volScale;
+          sustainGain = peakGain * 0.95;
+          break;
+        }
+
+        case "celesta": {
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(Math.min(10000, Math.max(800, freq * 2.2)), now);
+          filter.Q.setValueAtTime(0.8, now);
+
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(freq * 2.756, now);
+
+          const osc3 = audioCtx.createOscillator();
+          osc3.type = "sine";
+          osc3.frequency.setValueAtTime(freq * 5.404, now);
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.42 * velNorm, now);
+          g2.gain.exponentialRampToValueAtTime(0.002, now + 0.45);
+
+          const g3 = audioCtx.createGain();
+          g3.gain.setValueAtTime(0.22 * velNorm, now);
+          g3.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          oscillators.push(osc1, osc2, osc3);
+
+          peakGain = 0.24 * volScale;
+          sustainGain = peakGain * 0.20;
+          break;
+        }
+
+        case "acoustic_guitar": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(freq * 5.5, now);
+          filter.frequency.exponentialRampToValueAtTime(freq * 1.3, now + 0.07);
+
+          osc1.type = "triangle";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = "sawtooth";
+          osc2.frequency.setValueAtTime(freq, now);
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.35 * velNorm, now);
+          g2.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          oscillators.push(osc1, osc2);
+
+          peakGain = 0.24 * volScale;
+          sustainGain = peakGain * 0.25;
+          break;
+        }
+
+        case "chiptune": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(14000, now);
+
+          osc1.type = "square";
+          osc1.frequency.setValueAtTime(freq * 1.08, now);
+          osc1.frequency.exponentialRampToValueAtTime(freq, now + 0.018);
+
+          osc1.connect(filter);
+          oscillators.push(osc1);
+
+          peakGain = 0.18 * volScale;
+          sustainGain = peakGain * 0.85;
+          break;
+        }
+
+        case "strings_synth": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(9000, freq * 3.2), now);
+          filter.Q.setValueAtTime(1.5, now);
+
+          osc1.type = "sawtooth";
+          osc1.frequency.setValueAtTime(freq * Math.pow(2, -6 / 1200), now); // -6 cents
+
+          osc2.type = "sawtooth";
+          osc2.frequency.setValueAtTime(freq * Math.pow(2, 6 / 1200), now); // +6 cents
+
+          const osc3 = audioCtx.createOscillator();
+          osc3.type = "triangle";
+          osc3.frequency.setValueAtTime(freq, now);
+
+          const g1 = audioCtx.createGain(); g1.gain.setValueAtTime(0.40, now);
+          const g2 = audioCtx.createGain(); g2.gain.setValueAtTime(0.40, now);
+          const g3 = audioCtx.createGain(); g3.gain.setValueAtTime(0.30, now);
+
+          osc1.connect(g1); g1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          oscillators.push(osc1, osc2, osc3);
+
+          peakGain = 0.22 * volScale;
+          sustainGain = peakGain * 0.85;
+          break;
+        }
+
+        case "vibraphone": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(10000, freq * 4.0), now);
+
+          osc1.type = "sine";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(freq * 4, now);
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.35 * velNorm, now);
+          g2.gain.exponentialRampToValueAtTime(0.002, now + 0.08);
+
+          const tremoloOsc = audioCtx.createOscillator();
+          tremoloOsc.frequency.setValueAtTime(5.5, now);
+          const tremoloGain = audioCtx.createGain();
+          tremoloGain.gain.setValueAtTime(0.04, now);
+          tremoloOsc.connect(tremoloGain);
+          tremoloGain.connect(voiceGain.gain);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          oscillators.push(osc1, osc2);
+          lfoNode = tremoloOsc;
+
+          peakGain = 0.24 * volScale;
+          sustainGain = peakGain * 0.35;
+          break;
+        }
+
+        case "honky_tonk": {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(Math.min(11000, freq * 5.2), now);
+
+          osc1.type = "triangle";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = "triangle";
+          osc2.frequency.setValueAtTime(freq * Math.pow(2, 8 / 1200), now); // +8 cents
+
+          const osc3 = audioCtx.createOscillator();
+          osc3.type = "sawtooth";
+          osc3.frequency.setValueAtTime(freq * Math.pow(2, -7 / 1200), now); // -7 cents
+
+          const oscClick = audioCtx.createOscillator();
+          oscClick.type = "sine";
+          oscClick.frequency.setValueAtTime(freq * 4.5, now);
+
+          const g2 = audioCtx.createGain(); g2.gain.setValueAtTime(0.35, now);
+          const g3 = audioCtx.createGain(); g3.gain.setValueAtTime(0.25, now);
+          const gClick = audioCtx.createGain();
+          gClick.gain.setValueAtTime(0.30 * velNorm, now);
+          gClick.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
+          osc1.connect(filter);
+          osc2.connect(g2); g2.connect(filter);
+          osc3.connect(g3); g3.connect(filter);
+          oscClick.connect(gClick); gClick.connect(filter);
+          oscillators.push(osc1, osc2, osc3, oscClick);
+
+          peakGain = 0.24 * volScale;
+          sustainGain = peakGain * 0.40;
+          break;
+        }
+
+        case "grand_piano":
+        default: {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(freq * (2.8 + velNorm * 4.5), now);
+          filter.frequency.exponentialRampToValueAtTime(freq * 1.6, now + Math.max(0.2, dur * 0.7));
+
+          osc1.type = "triangle";
+          osc1.frequency.setValueAtTime(freq, now);
+
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(freq * 2, now);
+
+          const g2 = audioCtx.createGain();
+          g2.gain.setValueAtTime(0.24 * velNorm, now);
+          g2.gain.exponentialRampToValueAtTime(0.008, now + Math.max(0.1, duration * 0.8));
+
+          osc1.connect(filter);
+          osc2.connect(g2);
+          g2.connect(filter);
+          oscillators.push(osc1, osc2);
+
+          peakGain = 0.24 * volScale;
+          sustainGain = peakGain * 0.45;
+          break;
+        }
+      }
+
+      const attackSec = instParams.attackSec || 0.005;
+      const releaseSec = instParams.releaseSec || 0.25;
+
       voiceGain.gain.setValueAtTime(0.0001, now);
-      voiceGain.gain.linearRampToValueAtTime(targetPeak, now + 0.01);
-      voiceGain.gain.exponentialRampToValueAtTime(targetPeak * 0.65, now + Math.max(0.04, duration - 0.04));
+      voiceGain.gain.linearRampToValueAtTime(peakGain, now + attackSec);
+      const midTime = now + attackSec + Math.max(0.04, (dur - attackSec) * 0.5);
+      voiceGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, sustainGain), midTime);
       voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-      osc1.connect(filter);
-      osc2.connect(g2);
-      g2.connect(filter);
-      filter.connect(voiceGain);
-      voiceGain.connect(masterGainNode || audioCtx.destination);
-
-      osc1.start(now);
-      osc2.start(now);
-      osc1.stop(now + duration + 0.02);
+      oscillators.forEach(osc => {
+        try {
+          osc.start(now);
+          osc.stop(now + duration + 0.02);
+        } catch (e) {}
+      });
+      if (lfoNode) {
+        try {
+          lfoNode.start(now);
+          lfoNode.stop(now + duration + 0.02);
+        } catch (e) {}
+      }
       osc2.stop(now + duration + 0.02);
     }
 
@@ -5333,63 +6676,29 @@
     });
 
     function startLiveTone(noteNumber, velocity = 100) {
+      const voiceRole = arguments.length > 2 && arguments[2] ? arguments[2] : (noteNumber < 60 ? "lh" : "rh");
+      const instOverride = arguments.length > 3 ? arguments[3] : null;
+
       if (typeof sendMidiOutputNoteOn === "function") {
-        sendMidiOutputNoteOn(noteNumber, velocity);
+        sendMidiOutputNoteOn(noteNumber, velocity, voiceRole);
       }
       if (!isSynthAudioEnabled()) return;
       if (liveOscillators.has(noteNumber)) {
         stopLiveTone(noteNumber, true); // Re-strike cleanly if pedaled
       }
-      const effectiveVol = isMasterMuted ? 0 : currentMasterVolume;
-      if (effectiveVol <= 0.0001) return;
 
-      initAudio();
-      const now = audioCtx.currentTime;
       const freq = 440 * Math.pow(2, (noteNumber - 69) / 12);
-      const velNorm = Math.max(0.15, Math.min(1, velocity / 127));
-      const volScale = Math.pow(effectiveVol, 2) * velNorm;
-
-      const voiceGain = audioCtx.createGain();
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = "lowpass";
-      // Brighter filter cutoff on harder key strikes
-      filter.frequency.setValueAtTime(freq * (2.5 + velNorm * 6), now);
-      filter.frequency.exponentialRampToValueAtTime(freq * 1.8, now + 1.2);
-
-      // Fundamental (triangle) + 2nd harmonic (sine overtone)
-      const osc1 = audioCtx.createOscillator();
-      const osc2 = audioCtx.createOscillator();
-      const g2 = audioCtx.createGain();
-
-      osc1.type = "triangle";
-      osc1.frequency.setValueAtTime(freq, now);
-
-      osc2.type = "sine";
-      osc2.frequency.setValueAtTime(freq * 2, now);
-      g2.gain.setValueAtTime(0.28 * velNorm, now);
-      g2.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-
-      const peak = 0.25 * volScale;
-      voiceGain.gain.setValueAtTime(0.0001, now);
-      voiceGain.gain.linearRampToValueAtTime(peak, now + 0.008); // Crisp hammer attack
-      voiceGain.gain.exponentialRampToValueAtTime(peak * 0.45, now + 0.4); // Natural piano decay
-      voiceGain.gain.exponentialRampToValueAtTime(0.001, now + 4.5);
-
-      osc1.connect(filter);
-      osc2.connect(g2);
-      g2.connect(filter);
-      filter.connect(voiceGain);
-      voiceGain.connect(masterGainNode || audioCtx.destination);
-
-      osc1.start(now);
-      osc2.start(now);
-
-      liveOscillators.set(noteNumber, { osc: osc1, osc2, gain: voiceGain, filter });
+      const voice = synthesizeTimbre(freq, 0, velocity, voiceRole, true, instOverride);
+      if (voice) {
+        liveOscillators.set(noteNumber, voice);
+      }
     }
 
     function stopLiveTone(noteNumber, forceImmediate = false) {
+      const existingVoice = liveOscillators.get(noteNumber);
+      const voiceRole = existingVoice && existingVoice.voiceRole ? existingVoice.voiceRole : (noteNumber < 60 ? "lh" : "rh");
       if (typeof sendMidiOutputNoteOff === "function") {
-        sendMidiOutputNoteOff(noteNumber);
+        sendMidiOutputNoteOff(noteNumber, voiceRole);
       }
       if (isSustainPedalDown && !forceImmediate) {
         pedaledNotes.add(noteNumber);
@@ -5398,11 +6707,25 @@
       const voice = liveOscillators.get(noteNumber);
       if (!voice) return;
       const now = audioCtx.currentTime;
-      voice.gain.gain.cancelScheduledValues(now);
-      voice.gain.gain.setValueAtTime(voice.gain.gain.value || 0.05, now);
-      voice.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
-      voice.osc.stop(now + 0.07);
-      if (voice.osc2) voice.osc2.stop(now + 0.07);
+      const rel = forceImmediate ? 0.03 : Math.min(0.5, voice.releaseSec || 0.2);
+
+      if (voice.gain && voice.gain.gain) {
+        voice.gain.gain.cancelScheduledValues(now);
+        const curG = Math.max(0.0001, voice.gain.gain.value || 0.05);
+        voice.gain.gain.setValueAtTime(curG, now);
+        voice.gain.gain.exponentialRampToValueAtTime(0.0001, now + rel);
+      }
+      if (Array.isArray(voice.oscillators)) {
+        voice.oscillators.forEach(osc => {
+          try { osc.stop(now + rel + 0.02); } catch (e) {}
+        });
+      } else if (voice.osc) {
+        try { voice.osc.stop(now + rel + 0.02); } catch (e) {}
+        if (voice.osc2) try { voice.osc2.stop(now + rel + 0.02); } catch (e) {}
+      }
+      if (voice.lfoNode) {
+        try { voice.lfoNode.stop(now + rel + 0.02); } catch (e) {}
+      }
       liveOscillators.delete(noteNumber);
     }
 
@@ -7718,13 +9041,13 @@
       document.querySelectorAll(`.cs-guide-${pitch.replace('#', 's')}`).forEach(g => g.classList.add("is-active"));
 
       // Play Sound & trigger Live Sustain stage
-      if (playSound && isSynthAudioEnabled()) {
-        initAudio();
+      const midiNum = window.MusicTheory.pitchToMidi(pitch);
+      if (playSound) {
+        if (isSynthAudioEnabled()) initAudio();
         const freq = window.MusicTheory.pitchToFreq(pitch);
-        if (freq) playTone(freq, 0.7);
+        if (freq) playTone(freq, 0.7, 90, (midiNum && midiNum < 60) ? "lh" : "rh");
       }
 
-      const midiNum = window.MusicTheory.pitchToMidi(pitch);
       if (midiNum) {
         createSustainLane(midiNum, pitch);
         setTimeout(() => removeSustainLane(midiNum), 750);
@@ -7772,7 +9095,7 @@
 
     function playSingleNoteAudit(noteStr, hand = "rh", playSound = true) {
       const freq = getNoteFreq(noteStr);
-      if (freq && playSound && isSynthAudioEnabled()) playTone(freq, 0.4);
+      if (freq && playSound) playTone(freq, 0.4, 90, hand);
       highlightPlaybackKey(noteStr, hand, 400);
     }
 
@@ -8014,10 +9337,18 @@
         }
       }
 
-      // Update Omni option
+      // Update Omni, Split, and Broadcast options
       const omniLed = document.getElementById("chLed_all");
       const omniBadge = document.getElementById("chBadge_all");
       const omniBtn = document.getElementById("chOpt_all");
+      const splitLed = document.getElementById("chLed_split");
+      const splitBadge = document.getElementById("chBadge_split");
+      const splitBtn = document.getElementById("chOpt_split");
+      const omniOutLed = document.getElementById("chLed_omni_out");
+      const omniOutBadge = document.getElementById("chBadge_omni_out");
+      const omniOutBtn = document.getElementById("chOpt_omni_out");
+
+      const splitActive = (midiChannelActivity[1]?.isActive || midiChannelActivity[2]?.isActive || midiChannelActivity[3]?.isActive);
 
       if (anyChannelActive) {
         if (omniLed) {
@@ -8029,12 +9360,40 @@
           omniBadge.className = "ch-badge live";
           omniBadge.textContent = "LIVE";
         }
+        if (omniOutLed) omniOutLed.classList.add("live-signal");
+        if (omniOutBtn) omniOutBtn.classList.add("channel-signal-pulse");
+        if (omniOutBadge) {
+          omniOutBadge.className = "ch-badge live";
+          omniOutBadge.textContent = "LIVE";
+        }
       } else {
         if (omniLed) omniLed.classList.remove("live-signal", "recent-signal");
         if (omniBtn) omniBtn.classList.remove("channel-signal-pulse");
         if (omniBadge) {
           omniBadge.className = "ch-badge";
           omniBadge.textContent = "OMNI";
+        }
+        if (omniOutLed) omniOutLed.classList.remove("live-signal");
+        if (omniOutBtn) omniOutBtn.classList.remove("channel-signal-pulse");
+        if (omniOutBadge) {
+          omniOutBadge.className = "ch-badge";
+          omniOutBadge.textContent = "1–16";
+        }
+      }
+
+      if (splitActive) {
+        if (splitLed) splitLed.classList.add("live-signal");
+        if (splitBtn) splitBtn.classList.add("channel-signal-pulse");
+        if (splitBadge) {
+          splitBadge.className = "ch-badge live";
+          splitBadge.textContent = "LIVE";
+        }
+      } else {
+        if (splitLed) splitLed.classList.remove("live-signal");
+        if (splitBtn) splitBtn.classList.remove("channel-signal-pulse");
+        if (splitBadge) {
+          splitBadge.className = "ch-badge";
+          splitBadge.textContent = "CH 1+2";
         }
       }
 
@@ -8044,6 +9403,10 @@
         Array.from(nativeSelect.options).forEach(opt => {
           if (opt.value === "all") {
             opt.textContent = anyChannelActive ? "All Channels (Omni) 🟢 LIVE" : "All Channels (Omni)";
+          } else if (opt.value === "split") {
+            opt.textContent = splitActive ? "Split Hands (RH→Ch1 / LH→Ch2) 🟢 LIVE" : "Split Hands (RH→Ch1 / LH→Ch2)";
+          } else if (opt.value === "omni_out") {
+            opt.textContent = anyChannelActive ? "Broadcast All 16 Ch (1–16) 🟢 LIVE" : "Broadcast All 16 Ch (1–16)";
           } else {
             const ch = parseInt(opt.value, 10);
             const st = midiChannelActivity[ch];
@@ -8117,6 +9480,27 @@
         });
       }
 
+      const splitBtn = document.getElementById("chOpt_split");
+      if (splitBtn) {
+        splitBtn.addEventListener("click", () => {
+          selectMidiChannel("split");
+        });
+      }
+
+      const omniOutBtn = document.getElementById("chOpt_omni_out");
+      if (omniOutBtn) {
+        omniOutBtn.addEventListener("click", () => {
+          selectMidiChannel("omni_out");
+        });
+      }
+
+      try {
+        const savedCh = localStorage.getItem("piano_midi_channel");
+        if (savedCh) {
+          selectMidiChannel(savedCh);
+        }
+      } catch (e) {}
+
       const triggerBtn = document.getElementById("midiChannelBtn");
       const menu = document.getElementById("midiChannelMenu");
 
@@ -8163,13 +9547,20 @@
       const select = document.getElementById("midiChannelSelect");
       const btnText = document.getElementById("midiChannelBtnText");
 
+      try {
+        localStorage.setItem("piano_midi_channel", val);
+      } catch (e) {}
+
       if (select) {
         select.value = val;
         select.dispatchEvent(new Event("change"));
       }
 
       if (btnText) {
-        btnText.textContent = val === "all" ? "All Channels (Omni)" : `Channel ${val}`;
+        if (val === "all") btnText.textContent = "All Channels (Omni)";
+        else if (val === "split") btnText.textContent = "Split (RH→Ch1 / LH→Ch2)";
+        else if (val === "omni_out") btnText.textContent = "All 16 Channels Out";
+        else btnText.textContent = `Channel ${val}`;
       }
 
       const allButtons = document.querySelectorAll(".channel-opt-btn");
@@ -8268,7 +9659,7 @@
       }
 
       const filterCh = document.getElementById("midiChannelSelect").value;
-      if (filterCh !== "all" && channel !== parseInt(filterCh, 10)) return;
+      if (filterCh !== "all" && filterCh !== "split" && filterCh !== "omni_out" && channel !== parseInt(filterCh, 10)) return;
 
       // Sustain Pedal Handling (CC 64)
       if (cmd === 11 && data1 === 64) {
@@ -8294,7 +9685,7 @@
         const keyEl = document.querySelector(`.piano-key[data-note="${pitchName}"]`);
         if (keyEl) keyEl.classList.add("active-live");
 
-        if (document.getElementById("midiSoundToggle").checked) startLiveTone(noteNumber, velocity);
+        startLiveTone(noteNumber, velocity, noteNumber < 60 ? "lh" : "rh");
 
         createSustainLane(noteNumber, pitchName);
 
@@ -8416,17 +9807,7 @@
           if (!clean.match(/[1-7]/)) {
             clean += defaultOct;
           }
-          if (isSynthAudioEnabled()) {
-            playTone(getNoteFreq(clean), voiceSoundDuration);
-          } else if (typeof sendMidiOutputNoteOn === "function" && selectedMidiOutput) {
-            const num = getPitchMidiNumber(clean, defaultOct);
-            if (num !== null) {
-              sendMidiOutputNoteOn(num, 85);
-              setTimeout(() => {
-                if (typeof sendMidiOutputNoteOff === "function") sendMidiOutputNoteOff(num);
-              }, voiceSoundDuration * 1000);
-            }
-          }
+          playTone(getNoteFreq(clean), voiceSoundDuration, 85, voiceKey);
           const num = getPitchMidiNumber(clean, defaultOct);
           if (num !== null) {
             voiceNotes.push({ num, pitch: clean });
@@ -9023,6 +10404,7 @@
       highlightActiveCard();
       updateKeyboardRangeWarning();
       renderSongTheoryDnaBar(song);
+      updateSongInstrumentUI();
     }
 
     function renderSongTheoryDnaBar(song) {
@@ -9142,6 +10524,14 @@
           ? `<span class="card-action-auto-fit" data-action="autofit" title="Auto-expand keyboard to ${compat.recommendedPreset} keys and load">⚡ Auto-Fit (${compat.recommendedPreset}k) & Load</span>`
           : `<span>Load Piece →</span>`;
 
+        const songInstId = (window.MusicTheory && window.MusicTheory.getSongDefaultInstrument)
+          ? window.MusicTheory.getSongDefaultInstrument(song)
+          : (song.instrument || "grand_piano");
+        const songInstParams = (window.MusicTheory && window.MusicTheory.getInstrumentParameters)
+          ? window.MusicTheory.getInstrumentParameters(songInstId)
+          : { icon: "🎹", shortName: "Piano" };
+        const instBadgeHtml = `<span class="card-inst-badge" title="Authentic Instrument: ${songInstParams.name || songInstParams.shortName}">${songInstParams.icon} ${songInstParams.shortName}</span>`;
+
         card.innerHTML = `
           <div>
             <div class="card-top">
@@ -9151,6 +10541,7 @@
             <div class="card-meta-row">
               <span class="card-range-badge" title="Pitch Range">${compat.range.minPitch || 'C4'} – ${compat.range.maxPitch || 'C4'} (${compat.range.span}k)</span>
               ${compatTagHtml}
+              ${instBadgeHtml}
             </div>
             <div class="card-preview">Score: ${song.rh.slice(0, 36)}...</div>
           </div>
@@ -11651,6 +13042,14 @@
         repSoundSel.value = currentMetroSound;
         repSoundSel.addEventListener("change", (e) => {
           setMetroSound(e.target.value, true);
+        });
+      }
+
+      const synthInstSel = document.getElementById("synthInstrumentSelect");
+      if (synthInstSel) {
+        synthInstSel.value = currentSynthInstrument;
+        synthInstSel.addEventListener("change", (e) => {
+          setSynthInstrument(e.target.value, true);
         });
       }
     }
