@@ -716,7 +716,107 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 19: 🎛️ Milestone 42 Playback Transport Timeline, Loop Bounds, Speed % & Clock Formatting passed");
 }
 
-console.log("=== ALL 19 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// ==========================================
+// TEST 20: 🎹 Milestone 43 GM Program Change, Per-Voice Ties, Attack Gate & Tempo Flow Precision
+// ==========================================
+{
+  const songDatabase = require("../songs.js");
+
+  // 20.1 GM Program Numbers & MIDI Program Change Messages
+  Object.values(MusicTheory.INSTRUMENT_PRESETS).forEach(inst => {
+    assert.ok(typeof inst.gmProgram === "number" && inst.gmProgram >= 0 && inst.gmProgram <= 127, `${inst.id} must define valid gmProgram (0..127)`);
+  });
+  assert.deepStrictEqual(MusicTheory.createMidiProgramChange(4, 1), [0xC0, 4], "Program change Ch 1 Electric Piano");
+  assert.deepStrictEqual(MusicTheory.createMidiProgramChange(19, 2), [0xC1, 19], "Program change Ch 2 Church Organ");
+  assert.deepStrictEqual(MusicTheory.createMidiProgramChange(200, 99), [0xCF, 127], "Program & channel clamp safely");
+
+  // 20.2 Per-Voice Cross-Step Tie Model (2-hand Lean on Me + 3-step chain + rest break)
+  const lean = songDatabase.find(s => s.id === "lean-on-me");
+  const leanModel = MusicTheory.buildScoreModel(lean, true, true, false);
+  const m2Step0 = leanModel.measures[1][0];
+  const m1Last = leanModel.measures[0][leanModel.measures[0].length - 1];
+  assert.strictEqual(m2Step0.tiedFromPrev, true, "Lean on Me M2 Beat 0 has tied RH note F4");
+  assert.deepStrictEqual(m2Step0.tiedPitches, ["F4"], "Only RH F4 is in tiedPitches; untied LH F2 is NOT treated as tied");
+  assert.deepStrictEqual(m2Step0.newExpectedPitches, ["F2"], "LH F2 remains a fresh required note attack");
+  assert.strictEqual(m2Step0.rh.isTiedContinuation, true, "RH F4:2 is marked as tied continuation");
+  assert.strictEqual(m1Last.rh.tiedTotalBeats, 2.5, "Chain head F4:0.5~ accumulates 0.5 + 2.0 = 2.5 beats");
+
+  const chainSong = { timeSig: "4/4", rh: "C4:1~ C4:1~ C4:2 | C4:1~ -:1 C4:2", lh: "C3:4 | C3:4", dyads: "" };
+  const chainModel = MusicTheory.buildScoreModel(chainSong, true, false, false);
+  assert.strictEqual(chainModel.steps[0].rh.tiedTotalBeats, 4, "3-step tie chain sums to 4 beats on head event");
+  assert.strictEqual(chainModel.steps[1].rh.isTiedContinuation, true);
+  assert.strictEqual(chainModel.steps[2].rh.isTiedContinuation, true);
+  assert.strictEqual(chainModel.steps[5].tiedFromPrev, false, "Intervening rest breaks tie chain cleanly");
+
+  // 20.3 Repeated-Note Anti-Skip & Switch-Bounce Attack Gate
+  const heldGate = MusicTheory.evaluateRepeatedNoteAttackGate({ isCurrentlyHeld: true, nowMs: 2000, lastReleaseMs: 0, debounceMs: 30 });
+  assert.deepStrictEqual(heldGate, { allowed: false, reason: "already_held" }, "Held key without release must ALWAYS be rejected");
+
+  const bounceGate = MusicTheory.evaluateRepeatedNoteAttackGate({ isCurrentlyHeld: false, nowMs: 1020, lastReleaseMs: 1005, debounceMs: 30 });
+  assert.deepStrictEqual(bounceGate, { allowed: false, reason: "switch_bounce" }, "Sub-30ms contact bounce after release is rejected");
+
+  const freshGate = MusicTheory.evaluateRepeatedNoteAttackGate({ isCurrentlyHeld: false, nowMs: 1045, lastReleaseMs: 1005, debounceMs: 30 });
+  assert.deepStrictEqual(freshGate, { allowed: true, reason: "fresh_attack" }, "Deliberate release & re-press >= 30ms is accepted");
+
+  // 20.4 Hold Duration Evaluation
+  assert.strictEqual(MusicTheory.evaluateNoteHoldDuration(100, 120, 1.0).category, "staccato");
+  assert.strictEqual(MusicTheory.evaluateNoteHoldDuration(500, 120, 1.0).category, "flawless");
+  assert.strictEqual(MusicTheory.evaluateNoteHoldDuration(300, 120, 1.0).category, "good");
+  assert.strictEqual(MusicTheory.evaluateNoteHoldDuration(900, 120, 1.0).category, "tenuto");
+
+  // 20.5 Tempo Flow Hit Evaluator (Early Lookahead, Multi-Note Chords & Late Grace)
+  const flowSteps = [
+    { stepIndex: 0, beats: 1, expectedPitches: ["E4"] },
+    { stepIndex: 1, beats: 1, expectedPitches: ["E4"] },
+    { stepIndex: 2, beats: 1, expectedPitches: ["F4", "C3"] },
+    { stepIndex: 3, beats: 1, expectedPitches: [] },
+    { stepIndex: 4, beats: 1, expectedPitches: ["G4"] }
+  ];
+  const onsets = [1000, 1500, 2000, 2500, 3000];
+  const fulfilled = new Map();
+
+  // Play step 0 on time (+10ms)
+  const h0 = MusicTheory.evaluateTempoFlowHit({ hitTimeMs: 1010, steps: flowSteps, stepOnsetTimes: onsets, currentStepIndex: 0, playedPitch: "E4", stepFulfilledSets: fulfilled, bpm: 120 });
+  assert.strictEqual(h0.matched, true);
+  assert.strictEqual(h0.stepIndex, 0);
+  assert.strictEqual(h0.grade, "PERFECT");
+  fulfilled.set(0, new Set([h0.matchedPitch]));
+
+  // Anticipate repeated note step 1 early by -20ms while playhead is still on step 0
+  const h1 = MusicTheory.evaluateTempoFlowHit({ hitTimeMs: 1480, steps: flowSteps, stepOnsetTimes: onsets, currentStepIndex: 0, playedPitch: "E4", stepFulfilledSets: fulfilled, bpm: 120 });
+  assert.strictEqual(h1.matched, true);
+  assert.strictEqual(h1.stepIndex, 1, "Anticipated repeated note matches step 1 instead of failing");
+  assert.strictEqual(h1.offsetMs, -20);
+  assert.strictEqual(h1.grade, "PERFECT");
+  fulfilled.set(1, new Set([h1.matchedPitch]));
+
+  // Anticipate step 2 first pitch by -75ms -> GOOD
+  const h2a = MusicTheory.evaluateTempoFlowHit({ hitTimeMs: 1925, steps: flowSteps, stepOnsetTimes: onsets, currentStepIndex: 1, playedPitch: "F4", stepFulfilledSets: fulfilled, bpm: 120 });
+  assert.strictEqual(h2a.stepIndex, 2);
+  assert.strictEqual(h2a.grade, "GOOD");
+  fulfilled.set(2, new Set([h2a.matchedPitch]));
+
+  // Re-playing F4 on step 2 must not re-match F4; C3 completes the chord on step 2 (+25ms -> PERFECT)
+  const h2Dup = MusicTheory.evaluateTempoFlowHit({ hitTimeMs: 2010, steps: flowSteps, stepOnsetTimes: onsets, currentStepIndex: 2, playedPitch: "F4", stepFulfilledSets: fulfilled, bpm: 120 });
+  assert.strictEqual(h2Dup.matched, false, "Already-fulfilled chord pitch does not double match");
+  const h2b = MusicTheory.evaluateTempoFlowHit({ hitTimeMs: 2025, steps: flowSteps, stepOnsetTimes: onsets, currentStepIndex: 2, playedPitch: "C3", stepFulfilledSets: fulfilled, bpm: 120 });
+  assert.strictEqual(h2b.matched, true);
+  assert.strictEqual(h2b.stepIndex, 2);
+  assert.strictEqual(h2b.grade, "PERFECT");
+  fulfilled.set(2, new Set(["F4", "C3"]));
+
+  // Late grace on unfulfilled step 4 after playhead would advance, vs skipping rest step 3
+  const flowLateOnsets = [1000, 1500];
+  const flowLateSteps = [{ stepIndex: 0, beats: 1, expectedPitches: ["C4"] }, { stepIndex: 1, beats: 1, expectedPitches: ["D4"] }];
+  const lateGraceHit = MusicTheory.evaluateTempoFlowHit({ hitTimeMs: 1580, steps: flowLateSteps, stepOnsetTimes: flowLateOnsets, currentStepIndex: 1, playedPitch: "C4", stepFulfilledSets: new Map(), bpm: 120 });
+  assert.strictEqual(lateGraceHit.matched, true, "Unfulfilled step 0 receives late grace within 140ms after beat 1");
+  assert.strictEqual(lateGraceHit.stepIndex, 0);
+  assert.strictEqual(lateGraceHit.grade, "LATE");
+
+  console.log("✔ Test 20: 🎹 Milestone 43 GM Program Change, Per-Voice Ties, Attack Gate & Tempo Flow Precision passed");
+}
+
+console.log("=== ALL 20 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
 
 
 

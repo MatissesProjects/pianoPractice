@@ -2091,6 +2091,15 @@
   }
 
   /**
+   * Generates a 2-byte MIDI Program Change message (0xCn, program).
+   */
+  function createMidiProgramChange(program, channel = 1) {
+    const ch = Math.max(1, Math.min(16, parseInt(channel, 10) || 1));
+    const prog = Math.max(0, Math.min(127, Math.round(Number(program) || 0)));
+    return [0xC0 | ((ch - 1) & 0x0F), prog];
+  }
+
+  /**
    * Classifies an audio device label and deviceId into categories and icons.
    */
   function classifyAudioDevice(label = "", deviceId = "") {
@@ -2828,17 +2837,72 @@
       measures.push(measureItems);
     }
 
-    // Cross-step tie detection
-    for (let sIdx = 1; sIdx < steps.length; sIdx++) {
-      const prev = steps[sIdx - 1];
-      const cur = steps[sIdx];
-      const prevTied = (prev.dyad && prev.dyad.tied) || (prev.rh && prev.rh.tied) || (prev.lh && prev.lh.tied);
-      if (prevTied && prev.expectedPitches && cur.expectedPitches) {
-        const hasOverlap = cur.expectedPitches.some(p => prev.expectedPitches.includes(p));
-        if (hasOverlap) {
-          cur.tiedFromPrev = true;
+    // Per-voice cross-step tie detection & cumulative tied beat duration
+    for (let sIdx = 0; sIdx < steps.length; sIdx++) {
+      const s = steps[sIdx];
+      s.tiedPitches = [];
+      s.tiedFromPrev = false;
+      s.newExpectedPitches = [...(s.expectedPitches || [])];
+    }
+
+    const matchesPitch = (a, b) => a === b || areEnharmonicEquivalent(a, b);
+
+    ["rh", "lh", "dyad"].forEach(voiceKey => {
+      let lastEvent = null;
+      let chainHead = null;
+
+      for (let sIdx = 0; sIdx < steps.length; sIdx++) {
+        const step = steps[sIdx];
+        const ev = step[voiceKey];
+        if (!ev) continue;
+
+        if (!ev.pitch || ev.pitch === "-") {
+          lastEvent = null;
+          chainHead = null;
+          continue;
         }
+
+        ev.isTiedContinuation = false;
+        ev.tiedTotalBeats = ev.beats || 1;
+
+        const evPitches = ev.pitch.split("+").filter(p => p && p !== "-");
+        if (lastEvent && lastEvent.tied && lastEvent.pitch && lastEvent.pitch !== "-") {
+          const prevPitches = lastEvent.pitch.split("+").filter(p => p && p !== "-");
+          const matchedFromPrev = evPitches.filter(ep => prevPitches.some(pp => matchesPitch(ep, pp)));
+
+          if (matchedFromPrev.length > 0) {
+            matchedFromPrev.forEach(mp => {
+              const canonicalExpected = (step.expectedPitches || []).find(xp => matchesPitch(xp, mp)) || mp;
+              if (!step.tiedPitches.includes(canonicalExpected)) {
+                step.tiedPitches.push(canonicalExpected);
+              }
+            });
+
+            if (matchedFromPrev.length === evPitches.length && evPitches.length > 0) {
+              ev.isTiedContinuation = true;
+              if (chainHead) {
+                chainHead.tiedTotalBeats = (chainHead.tiedTotalBeats || chainHead.beats || 1) + (ev.beats || 0);
+              }
+            } else {
+              chainHead = ev;
+            }
+          } else {
+            chainHead = ev;
+          }
+        } else {
+          chainHead = ev;
+        }
+
+        lastEvent = ev;
       }
+    });
+
+    for (let sIdx = 0; sIdx < steps.length; sIdx++) {
+      const step = steps[sIdx];
+      step.tiedFromPrev = step.tiedPitches.length > 0;
+      step.newExpectedPitches = (step.expectedPitches || []).filter(
+        p => !step.tiedPitches.some(tp => matchesPitch(p, tp))
+      );
     }
 
     return { measures, steps };
@@ -3431,6 +3495,7 @@
   const INSTRUMENT_PRESETS = {
     grand_piano: {
       id: "grand_piano",
+      gmProgram: 0,
       name: "Acoustic Grand Piano",
       shortName: "Grand Piano",
       icon: "🎹",
@@ -3446,6 +3511,7 @@
     },
     electric_piano: {
       id: "electric_piano",
+      gmProgram: 4,
       name: "Electric Piano (Rhodes)",
       shortName: "Electric Piano",
       icon: "⚡",
@@ -3461,6 +3527,7 @@
     },
     harpsichord: {
       id: "harpsichord",
+      gmProgram: 6,
       name: "Baroque Harpsichord",
       shortName: "Harpsichord",
       icon: "🎼",
@@ -3476,6 +3543,7 @@
     },
     church_organ: {
       id: "church_organ",
+      gmProgram: 19,
       name: "Church Pipe Organ",
       shortName: "Pipe Organ",
       icon: "⛪",
@@ -3491,6 +3559,7 @@
     },
     rock_organ: {
       id: "rock_organ",
+      gmProgram: 18,
       name: "Vintage Drawbar Organ",
       shortName: "Drawbar Organ",
       icon: "🎸",
@@ -3506,6 +3575,7 @@
     },
     celesta: {
       id: "celesta",
+      gmProgram: 8,
       name: "Celesta & Music Box",
       shortName: "Celesta",
       icon: "✨",
@@ -3521,6 +3591,7 @@
     },
     acoustic_guitar: {
       id: "acoustic_guitar",
+      gmProgram: 24,
       name: "Acoustic Folk Guitar",
       shortName: "Acoustic Guitar",
       icon: "🪕",
@@ -3536,6 +3607,7 @@
     },
     chiptune: {
       id: "chiptune",
+      gmProgram: 80,
       name: "8-Bit Chiptune Lead",
       shortName: "8-Bit Retro",
       icon: "👾",
@@ -3551,6 +3623,7 @@
     },
     strings_synth: {
       id: "strings_synth",
+      gmProgram: 48,
       name: "Orchestral Strings Synth",
       shortName: "Strings",
       icon: "🎻",
@@ -3566,6 +3639,7 @@
     },
     vibraphone: {
       id: "vibraphone",
+      gmProgram: 11,
       name: "Jazz Vibraphone",
       shortName: "Vibraphone",
       icon: "🎷",
@@ -3581,6 +3655,7 @@
     },
     honky_tonk: {
       id: "honky_tonk",
+      gmProgram: 3,
       name: "Ragtime Honky-Tonk Piano",
       shortName: "Honky-Tonk",
       icon: "🍺",
@@ -3859,6 +3934,175 @@
     };
   }
 
+  // ============================================================================
+  // PRECISION KEY-PRESS GATING, HOLD DURATION & TEMPO FLOW TIMING (MILESTONE 43)
+  // ============================================================================
+
+  /**
+   * Evaluates how accurately a held key duration matched the note's rhythmic beat value.
+   */
+  function evaluateNoteHoldDuration(durationMs, bpm = 100, targetBeats = 1.0) {
+    const safeBpm = Math.max(30, Math.min(220, Number(bpm) || 100));
+    const safeTarget = Math.max(0.125, Number(targetBeats) || 1.0);
+    const heldBeats = (Math.max(0, Number(durationMs) || 0) / 1000) * (safeBpm / 60);
+    const holdRatio = heldBeats / safeTarget;
+
+    let category = "good";
+    let label = "Good duration!";
+    if (holdRatio < 0.45) {
+      category = "staccato";
+      label = "Staccato tap — hold longer for full beat value!";
+    } else if (holdRatio >= 0.75 && holdRatio <= 1.35) {
+      category = "flawless";
+      label = "🎯 Flawless rhythmic hold!";
+    } else if (holdRatio > 1.5) {
+      category = "tenuto";
+      label = "Held longer than value (tenuto)";
+    }
+
+    return {
+      heldBeats,
+      targetBeats: safeTarget,
+      holdRatio,
+      category,
+      label
+    };
+  }
+
+  /**
+   * Enforces repeated-note anti-skip gating: rejects held keys without release and sub-threshold bounce.
+   */
+  function evaluateRepeatedNoteAttackGate({ isCurrentlyHeld, nowMs, lastReleaseMs, debounceMs = 30 } = {}) {
+    if (isCurrentlyHeld) {
+      return { allowed: false, reason: "already_held" };
+    }
+    if (typeof lastReleaseMs === "number" && lastReleaseMs > 0 && (Number(nowMs) - lastReleaseMs) < debounceMs) {
+      return { allowed: false, reason: "switch_bounce" };
+    }
+    return { allowed: true, reason: "fresh_attack" };
+  }
+
+  /**
+   * Evaluates a live hit against scheduled Tempo Flow onset timestamps with lookahead and late grace.
+   */
+  function evaluateTempoFlowHit({
+    hitTimeMs,
+    steps,
+    stepOnsetTimes,
+    currentStepIndex,
+    playedPitch,
+    stepFulfilledSets,
+    bpm = 100,
+    maxEarlyWindowMs = 220,
+    maxLateGraceMs = 140
+  } = {}) {
+    const missResult = {
+      matched: false,
+      stepIndex: currentStepIndex,
+      matchedPitch: null,
+      offsetMs: null,
+      absOffsetMs: null,
+      grade: "WRONG",
+      points: 0
+    };
+
+    if (!Array.isArray(steps) || steps.length === 0 || !Array.isArray(stepOnsetTimes)) {
+      return missResult;
+    }
+
+    const fulfilledMap = stepFulfilledSets instanceof Map ? stepFulfilledSets : new Map();
+
+    const matchesUnfulfilled = (idx) => {
+      if (idx < 0 || idx >= steps.length) return null;
+      const step = steps[idx];
+      if (!step || !Array.isArray(step.expectedPitches) || step.expectedPitches.length === 0) return null;
+      const fulfilled = fulfilledMap.get(idx);
+      return step.expectedPitches.find(p => {
+        if (fulfilled && fulfilled.has(p)) return false;
+        return p === playedPitch || areEnharmonicEquivalent(p, playedPitch);
+      }) || null;
+    };
+
+    const isStepDone = (idx) => {
+      if (idx < 0 || idx >= steps.length) return true;
+      const step = steps[idx];
+      if (!step || !Array.isArray(step.expectedPitches) || step.expectedPitches.length === 0) return true;
+      const fulfilled = fulfilledMap.get(idx);
+      return Boolean(fulfilled && fulfilled.size >= step.expectedPitches.length);
+    };
+
+    let chosenIdx = -1;
+    let matchedPitch = null;
+
+    const curMatch = matchesUnfulfilled(currentStepIndex);
+    const nextIdx = currentStepIndex + 1;
+    const nextMatch = (nextIdx < steps.length) ? matchesUnfulfilled(nextIdx) : null;
+    const curOnset = typeof stepOnsetTimes[currentStepIndex] === "number" ? stepOnsetTimes[currentStepIndex] : null;
+    const nextOnset = typeof stepOnsetTimes[nextIdx] === "number" ? stepOnsetTimes[nextIdx] : null;
+    const curStepDurMs = ((steps[currentStepIndex]?.beats || 1) * 60000) / Math.max(30, Number(bpm) || 100);
+    const effectiveEarlyWindow = Math.min(maxEarlyWindowMs, Math.max(110, curStepDurMs * 0.45));
+
+    const preferNextEarly = Boolean(
+      nextMatch &&
+      nextOnset !== null &&
+      (nextOnset - hitTimeMs) >= 0 &&
+      (nextOnset - hitTimeMs) <= effectiveEarlyWindow &&
+      (curOnset === null || (curMatch ? ((hitTimeMs - curOnset) > (nextOnset - hitTimeMs)) : true))
+    );
+
+    if (curMatch && !preferNextEarly) {
+      chosenIdx = currentStepIndex;
+      matchedPitch = curMatch;
+    } else if (nextMatch && nextOnset !== null && (nextOnset - hitTimeMs) >= 0 && (nextOnset - hitTimeMs) <= effectiveEarlyWindow) {
+      chosenIdx = nextIdx;
+      matchedPitch = nextMatch;
+    } else if (curMatch) {
+      chosenIdx = currentStepIndex;
+      matchedPitch = curMatch;
+    }
+
+    if (chosenIdx < 0 && currentStepIndex > 0 && typeof stepOnsetTimes[currentStepIndex - 1] === "number") {
+      const prevIdx = currentStepIndex - 1;
+      const activeOnset = curOnset !== null ? curOnset : hitTimeMs;
+      if ((hitTimeMs - activeOnset) <= maxLateGraceMs && !isStepDone(prevIdx)) {
+        const prevMatch = matchesUnfulfilled(prevIdx);
+        if (prevMatch) {
+          chosenIdx = prevIdx;
+          matchedPitch = prevMatch;
+        }
+      }
+    }
+
+    if (chosenIdx < 0 || !matchedPitch || typeof stepOnsetTimes[chosenIdx] !== "number") {
+      return missResult;
+    }
+
+    const offsetMs = hitTimeMs - stepOnsetTimes[chosenIdx];
+    const absOffsetMs = Math.abs(offsetMs);
+    let grade = "LATE";
+    let points = 40;
+    if (absOffsetMs <= 45) {
+      grade = "PERFECT";
+      points = 100;
+    } else if (absOffsetMs <= 95) {
+      grade = "GOOD";
+      points = 75;
+    } else if (offsetMs < 0) {
+      grade = "EARLY";
+      points = 40;
+    }
+
+    return {
+      matched: true,
+      stepIndex: chosenIdx,
+      matchedPitch,
+      offsetMs,
+      absOffsetMs,
+      grade,
+      points
+    };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -3931,6 +4175,7 @@
     createMidiNoteOn,
     createMidiNoteOff,
     createMidiCC,
+    createMidiProgramChange,
     filterAudioOutputDevices,
     classifyAudioDevice,
     AUDIO_OUTPUT_CHANNEL_MODES,
@@ -3948,7 +4193,10 @@
     resolveLoopStepBounds,
     computeTempoFromSpeedPercent,
     findStepAtBeat,
-    formatPlaybackClock
+    formatPlaybackClock,
+    evaluateNoteHoldDuration,
+    evaluateRepeatedNoteAttackGate,
+    evaluateTempoFlowHit
   };
 });
 
