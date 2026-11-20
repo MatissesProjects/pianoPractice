@@ -295,7 +295,7 @@ console.log("=== Running Piano Education Suite Tests ===");
   // 14.1 UMD Song Database Export Verification
   const songsFromUmd = require("../songs.js");
   assert.ok(Array.isArray(songsFromUmd), "songs.js must export an Array via UMD module.exports");
-  assert.strictEqual(songsFromUmd.length, 56, "songs.js must contain 56 songs");
+  assert.strictEqual(songsFromUmd.length, 80, "songs.js must contain 80 songs");
 
   // 14.2 Score Engine Exports on MusicTheory
   assert.strictEqual(typeof MusicTheory.parseToken, "function", "parseToken must be exported on MusicTheory");
@@ -816,7 +816,107 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 20: 🎹 Milestone 43 GM Program Change, Per-Voice Ties, Attack Gate & Tempo Flow Precision passed");
 }
 
-console.log("=== ALL 20 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// ==========================================
+// TEST 21: 🎼 Milestone 44 Song Encoding Validator, Repertoire Expansion (80 Songs) & Bootcamp Link Integrity
+// ==========================================
+{
+  const songDatabase = require("../songs.js");
+  assert.strictEqual(typeof MusicTheory.validateSongEncoding, "function", "validateSongEncoding must be exported on MusicTheory");
+  assert.strictEqual(songDatabase.length, 80, "Repertoire must contain 80 songs");
+
+  // 21.1 Validate every song in songs.js with strict musical & encoding checks
+  songDatabase.forEach((song, idx) => {
+    const res = MusicTheory.validateSongEncoding(song);
+    assert.strictEqual(res.valid, true, `Song [${idx + 1}] '${song.id}' failed validateSongEncoding: ${res.errors.join("; ")}`);
+    assert.strictEqual(res.errors.length, 0);
+  });
+
+  // 21.2 Negative validation tests on validateSongEncoding
+  const baseValidSong = {
+    id: "test-valid",
+    title: "Test Song",
+    category: "C 5-Finger",
+    instrument: "grand_piano",
+    tempo: 100,
+    timeSig: "4/4",
+    rh: "C4:2 D4:2 | E4:4",
+    rhF: "1 2 | 3",
+    lh: "C3:4 | C3:4",
+    lhF: "5 | 5",
+    dyads: "C4+E4:2 G3+D4:2 | C4+E4:4",
+    dyadsF: "1+3 1+2 | 1+3",
+    tip: "Validation unit test song."
+  };
+  assert.strictEqual(MusicTheory.validateSongEncoding(baseValidSong).valid, true, "Clean song passes validator");
+
+  // Broken tie into different pitch
+  const brokenTie = { ...baseValidSong, rh: "E4:2~ D4:2 | C4:4" };
+  const brokenTieRes = MusicTheory.validateSongEncoding(brokenTie);
+  assert.strictEqual(brokenTieRes.valid, false);
+  assert.ok(brokenTieRes.errors.some(e => e.includes("broken tie")), "Broken tie must be rejected");
+
+  // Non-standard duration (:2.5)
+  const oddDur = { ...baseValidSong, rh: "C4:1.5 D4:2.5 | E4:4" };
+  const oddDurRes = MusicTheory.validateSongEncoding(oddDur);
+  assert.strictEqual(oddDurRes.valid, false);
+  assert.ok(oddDurRes.errors.some(e => e.includes("non-standard duration 2.5")), "Non-standard 2.5 duration must be rejected");
+
+  // Measure beat sum mismatch
+  const badBeats = { ...baseValidSong, rh: "C4:2 D4:2 | E4:3" };
+  assert.strictEqual(MusicTheory.validateSongEncoding(badBeats).valid, false, "Wrong measure beat sum must be rejected");
+
+  // Finger count mismatch
+  const badFingers = { ...baseValidSong, rhF: "1 | 3" };
+  assert.strictEqual(MusicTheory.validateSongEncoding(badFingers).valid, false, "Token/finger count mismatch must be rejected");
+
+  // Out-of-49-key-range pitch (A1 < C2 or D6 > C6)
+  const outRange = { ...baseValidSong, rh: "C4:2 D6:2 | E4:4", lh: "A1:4 | C3:4" };
+  const outRangeRes = MusicTheory.validateSongEncoding(outRange);
+  assert.strictEqual(outRangeRes.valid, false);
+  assert.ok(outRangeRes.errors.some(e => e.includes("49-key range")), "Out-of-range pitch must be rejected");
+
+  // Tied rest
+  const tiedRest = { ...baseValidSong, rh: "-:2~ D4:2 | E4:4", rhF: "- 2 | 3" };
+  assert.strictEqual(MusicTheory.validateSongEncoding(tiedRest).valid, false, "Rest with tie '~' must be rejected");
+
+  // Monophonic dyads track without '+'
+  const monoDyads = { ...baseValidSong, dyads: "C4:2 D4:2 | E4:4", dyadsF: "1 2 | 3" };
+  assert.strictEqual(MusicTheory.validateSongEncoding(monoDyads).valid, false, "Dyads track without '+' chord must be rejected");
+
+  // Invalid pickup > expBeats / 2
+  const badPickup = { ...baseValidSong, rh: "C4:1 D4:2 | E4:4", lh: "C3:3 | C3:4", dyads: "C4+E4:1 G3+D4:2 | C4+E4:4" };
+  assert.strictEqual(MusicTheory.validateSongEncoding(badPickup).valid, false, "Oversized 3-beat pickup in 4/4 must be rejected");
+
+  // Minor-2nd simultaneous clash inside chord
+  const clashChord = { ...baseValidSong, dyads: "E4+F4:2 G3+D4:2 | C4+E4:4" };
+  assert.strictEqual(MusicTheory.validateSongEncoding(clashChord).valid, false, "Minor-2nd chord clash must be rejected");
+
+  // 21.3 All Beginner Bootcamp recommendedSongs resolve to existing song IDs
+  const idSet = new Set(songDatabase.map(s => s.id));
+  MusicTheory.BEGINNER_BOOTCAMP_MODULES.forEach(mod => {
+    mod.recommendedSongs.forEach(recId => {
+      assert.ok(idSet.has(recId), `Bootcamp Module ${mod.number} recommended song '${recId}' must exist in songs.js`);
+    });
+  });
+
+  // 21.4 Key Signature & Song Theory DNA Accuracy on Fixed & New Pieces
+  const checkKey = (id, expectedKey) => {
+    const s = songDatabase.find(x => x.id === id);
+    assert.ok(s, `Song '${id}' must exist`);
+    const dna = MusicTheory.analyzeSongTheoryDNA(s);
+    assert.strictEqual(dna.keySignature, expectedKey, `${id} DNA keySignature must be '${expectedKey}'`);
+  };
+  checkKey("gymnopedie-1", "D Major");
+  checkKey("moonlight-sonata-mvt1", "C# Minor");
+  checkKey("house-of-the-rising-sun", "A Minor");
+  checkKey("nocturne-op9-no2", "Eb Major");
+  checkKey("c-minor-blues-riff", "C Minor");
+  checkKey("amazing-grace", "G Major");
+
+  console.log("✔ Test 21: 🎼 Milestone 44 Song Encoding Validator, Repertoire Expansion (80 Songs) & Bootcamp Link Integrity passed");
+}
+
+console.log("=== ALL 21 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
 
 
 

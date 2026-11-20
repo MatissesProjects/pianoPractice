@@ -48,7 +48,7 @@ const {
       }
     });
   });
-  console.log("✔ Test 1: Left-hand solo mode across all 56 songs passed");
+  console.log("✔ Test 1: Left-hand solo mode across all 80 songs passed");
 }
 
 // 2. Test Grand Staff Mode (Level 5: 2-Hand Coordination) onset synchronization
@@ -1216,7 +1216,7 @@ const {
     if (song.category && song.category.includes("C 5-Finger")) tonic = "C";
     else if (song.id === "canon-in-d") tonic = "D";
     else if (song.id === "bach-minuet-g" || (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5"))) tonic = "G";
-    else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-no-1")) tonic = "D";
+    else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-1" || song.id === "gymnopedie-no-1")) tonic = "D";
     else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves"))) tonic = "A";
     else if (song.id && song.id.includes("amazing-grace-f")) tonic = "F";
     else {
@@ -1675,7 +1675,7 @@ const {
   assert.strictEqual(leanModel.measures[1][0].lh.beats, 4, "Lean on Me measure 2 LH note F2 is 4 beats");
   assert.strictEqual(leanModel.measures[1][0].lh.pitch, "F2", "Lean on Me measure 2 LH note is F2");
 
-  // 20.4 Full Repertoire Duration Audit (All 56 Songs)
+  // 20.4 Full Repertoire Duration Audit (All 80 Songs)
   function getExpBeats(timeSig) {
     if (!timeSig) return 4;
     const parts = timeSig.split('/').map(Number);
@@ -1714,7 +1714,7 @@ const {
     }
   });
 
-  assert.strictEqual(durationDiscrepancies, 0, "All 56 songs in songDatabase must have 0 measure duration discrepancies");
+  assert.strictEqual(durationDiscrepancies, 0, "All 80 songs in songDatabase must have 0 measure duration discrepancies");
 
   console.log("✔ Test 20: 🎼 SVG Vector Rest Rendering, Lean on Me Durations & Full Repertoire Rhythm Audit passed");
 }
@@ -2113,7 +2113,7 @@ const {
     assert.strictEqual(comp.fitsExact, true, `${song.title} must fit exact on standard 49-key range`);
   });
 
-  // 88 Keys (Full Grand) fits all 56 songs exact
+  // 88 Keys (Full Grand) fits all 80 songs exact
   const kb88 = { startMidi: 21, keyCount: 88 };
   songDatabase.forEach(song => {
     const comp = MusicTheory.evaluateSongKeyboardCompatibility(song, kb88);
@@ -3237,8 +3237,8 @@ const {
   const songDatabase = require("../songs.js");
   const MusicTheory = window.MusicTheory;
 
-  // 38.1 All 56 Repertoire Songs Tagged with Valid Instruments
-  assert.strictEqual(songDatabase.length, 56, "Repertoire must contain 56 songs");
+  // 38.1 All 80 Repertoire Songs Tagged with Valid Instruments
+  assert.strictEqual(songDatabase.length, 80, "Repertoire must contain 80 songs");
   const validPresetIds = new Set(Object.keys(MusicTheory.INSTRUMENT_PRESETS));
 
   songDatabase.forEach((song, idx) => {
@@ -3485,6 +3485,76 @@ const {
   assertDomIdIntegrity();
 
   console.log("✔ Test 41: 🎯 Milestone 43 Auto Song Instrument Selection, Key-Press Timing, Held-Note Gating & Score Cleanup passed");
+}
+
+// ==========================================
+// TEST 42: 🎼 Milestone 44 Full 80-Song Encoding, LF Formatting, Category Balance & Score-Model Integrity Audit
+// ==========================================
+{
+  const fs = require("fs");
+  const path = require("path");
+  const songDatabase = require("../songs.js");
+  const songsPath = path.join(__dirname, "../songs.js");
+  const songsRaw = fs.readFileSync(songsPath, "utf8");
+
+  // 42.1 Strict LF Line Endings & Repertoire Size
+  assert.strictEqual(songsRaw.includes("\r"), false, "songs.js must use uniform LF line endings with zero CR characters");
+  assert.strictEqual(songDatabase.length, 80, "Repertoire must contain exactly 80 songs");
+
+  // 42.2 Unique IDs & Category Balance
+  const ids = new Set();
+  const categoryCounts = {};
+  songDatabase.forEach(song => {
+    assert.ok(!ids.has(song.id), `Duplicate song ID detected: ${song.id}`);
+    ids.add(song.id);
+    categoryCounts[song.category] = (categoryCounts[song.category] || 0) + 1;
+  });
+
+  const expectedCategories = [
+    "C 5-Finger",
+    "Harmonic / Dyads",
+    "Extended Scale",
+    "Minor / Modal",
+    "Classical Mastery"
+  ];
+  expectedCategories.forEach(cat => {
+    assert.ok((categoryCounts[cat] || 0) >= 10, `Category '${cat}' must contain at least 10 songs (found ${categoryCounts[cat] || 0})`);
+  });
+
+  // 42.3 Every Song Passes Strict Encoding Validator & Builds Cleanly Across All 4 Hand Modes
+  const handModes = [
+    { label: "RH Solo", opts: [true, false, false] },
+    { label: "LH Solo", opts: [false, true, false] },
+    { label: "Two-Hand Grand Staff", opts: [true, true, false] },
+    { label: "Dyads + LH", opts: [false, true, true] }
+  ];
+
+  songDatabase.forEach((song, idx) => {
+    const val = MusicTheory.validateSongEncoding(song);
+    assert.strictEqual(val.valid, true, `Song [${idx + 1}] '${song.id}' encoding failed: ${val.errors.join("; ")}`);
+
+    handModes.forEach(mode => {
+      const model = buildScoreModel(song, mode.opts[0], mode.opts[1], mode.opts[2]);
+      assert.ok(model && Array.isArray(model.measures) && model.measures.length >= 2, `${song.id} (${mode.label}) must produce >= 2 measures`);
+      assert.ok(Array.isArray(model.steps) && model.steps.length > 0, `${song.id} (${mode.label}) must produce non-empty steps`);
+      model.steps.forEach((st, sIdx) => {
+        assert.ok(typeof st.beats === "number" && isFinite(st.beats) && st.beats > 0, `${song.id} (${mode.label}) step ${sIdx} must have finite positive beats`);
+      });
+    });
+  });
+
+  // 42.4 Beginner Bootcamp Recommended Songs All Resolve cleanly
+  MusicTheory.BEGINNER_BOOTCAMP_MODULES.forEach(mod => {
+    mod.recommendedSongs.forEach(recId => {
+      assert.ok(ids.has(recId), `Bootcamp Module ${mod.number} link '${recId}' must resolve inside songs.js`);
+    });
+  });
+
+  // 42.5 Syntax & DOM Integrity Validation
+  assertValidProjectScripts("Test 42");
+  assertDomIdIntegrity();
+
+  console.log("✔ Test 42: 🎼 Milestone 44 Full 80-Song Encoding, LF Formatting, Category Balance & Score-Model Integrity Audit passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");

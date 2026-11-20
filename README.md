@@ -4,7 +4,7 @@
 [![Web Audio API](https://img.shields.io/badge/Web%20Audio-2.0-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 [![Web MIDI API](https://img.shields.io/badge/Web%20MIDI-16--Channel-purple.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-emerald.svg)](#technical-architecture)
-[![Test Suite](https://img.shields.io/badge/Automated%20Tests-61%20Passing-brightgreen.svg)](#testing--verification)
+[![Test Suite](https://img.shields.io/badge/Automated%20Tests-63%20Passing-brightgreen.svg)](#testing--verification)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A modern, comprehensive, zero-dependency browser-based piano learning and practice workstation. Built with vanilla modern JavaScript, SVG score rendering, physical Web Audio synthesis, and real-time Web MIDI hardware telemetry, **Piano Practice Lab** guides players from their very first Middle C note to advanced classical repertoire, ear training mastery, and harmonic voice leading.
@@ -47,7 +47,7 @@ Learning to play the piano requires synchronizing four distinct cognitive facult
 - **Zero Build Steps & Zero Dependencies**: Completely self-contained in clean HTML5, CSS3, and ES6+ JavaScript. Just open `index.html` in any modern web browser.
 - **Hardware-Ready**: Connect any standard USB/Bluetooth MIDI keyboard for instant low-latency tactile practice, velocity sensitivity, and sustain pedal support.
 - **Multi-Device Output**: Route audio directly to headphones, studio monitors, or USB DAC interfaces using native OS device pickers.
-- **Pedagogical Integrity**: 56 progressively arranged pieces with conservatory-standard 12-key fingerings, harmonic Roman numeral analysis, and SMuFL classical engraving.
+- **Pedagogical Integrity**: 80 progressively arranged pieces with conservatory-standard 12-key fingerings, harmonic Roman numeral analysis, and SMuFL classical engraving.
 
 ---
 
@@ -180,7 +180,7 @@ Interactive reference drawer:
   - **32 Keys** (Mini Synth: $F2 - C5$)
   - **25 Keys** (Compact Mini: $C3 - C5$)
   - **Custom Key Count**: User-defined count and starting note with semitone/octave shift controls.
-- **Keyboard Range Allowance Filtering**: Automatically filters the 56 repertoire pieces to display only songs that fit within the currently selected keyboard size, featuring 1-click **Auto-Fit Keyboard** and range badges.
+- **Keyboard Range Allowance Filtering**: Automatically filters the 80 repertoire pieces to display only songs that fit within the currently selected keyboard size, featuring 1-click **Auto-Fit Keyboard** and range badges.
 
 ### Real-Time Chord & Inversion Recognizer
 The `#activeChordPill` displays polyphonic chord identification in real-time without clobbering single notes:
@@ -264,18 +264,18 @@ flowchart LR
 
 ## 🎼 Pedagogical Repertoire Catalog (`songs.js`)
 
-56 pieces organized across 8 progressive curriculum levels:
+80 pieces organized across 5 structured curriculum tracks (`C 5-Finger`: 21, `Harmonic / Dyads`: 14, `Extended Scale`: 20, `Minor / Modal`: 15, `Classical Mastery`: 10) spanning 8 progressive difficulty levels:
 
 | Level | Curriculum Focus | Representative Pieces |
 | :--- | :--- | :--- |
-| **Level 1** | Middle C Primer & Finger Isolation | *Middle C Warmup*, *Two Black Keys*, *Three Black Keys*, *Ode to Joy Primer* |
-| **Level 2** | C 5-Finger Pattern & Alternating Hands | *Mary Had a Little Lamb*, *Au Clair de la Lune*, *Lightly Row*, *Jingle Bells* |
-| **Level 3** | Harmonic Dyads & Left-Hand Accompaniment | *Heart and Soul Chords*, *Twinkle Twinkle Harmony*, *Brahms Lullaby Dyads* |
-| **Level 4** | Extended Scale Degrees & Finger Crossings | *Für Elise Motif*, *Canon in D Bass Line*, *The Entertainer Primer* |
-| **Level 5** | Minor Keys & Modal Expressions | *Scarborough Fair Primer*, *Greensleeves Primer*, *House of the Rising Sun* |
-| **Level 6** | Modern & Syncopated Rhythms | *Lean on Me (Complete 24 Measures)*, *Pink Panther*, *Hallelujah* |
-| **Level 7** | Two-Hand Independence & Grand Staff Harmony | *Amazing Grace (F Major)*, *Gymnopédie No. 1 (Erik Satie)*, *Bach Minuet in G* |
-| **Level 8** | Classical Mastery & Conservatory Repertoire | *Für Elise (Full Bagatelle in A Minor)*, *Pachelbel Canon in D*, *Hanon Ex. No. 1* |
+| **Level 1** | Middle C Primer & Finger Isolation | *C Major Scale & Thumb-Tuck Study*, *Hot Cross Buns*, *Jaws Theme*, *Ode to Joy* |
+| **Level 2** | C 5-Finger Pattern & Alternating Hands | *Mary Had a Little Lamb*, *Au Clair de la Lune*, *French Folk Song*, *Jingle Bells* |
+| **Level 3** | Harmonic Dyads & Left-Hand Accompaniment | *Heart and Soul*, *Imagine (Piano Intro)*, *Auld Lang Syne*, *Piano Man (Waltz Riff)* |
+| **Level 4** | Extended Scale Degrees & Finger Crossings | *Für Elise Motif*, *Over the Rainbow*, *The Entertainer*, *Maple Leaf Rag* |
+| **Level 5** | Minor Keys & Modal Expressions | *Scarborough Fair*, *Greensleeves*, *House of the Rising Sun*, *Autumn Leaves (Jazz ii–V–I)* |
+| **Level 6** | Modern & Syncopated Rhythms | *Lean on Me (Complete 24 Measures)*, *Pink Panther*, *Hallelujah*, *Midnight C Minor Blues* |
+| **Level 7** | Two-Hand Independence & Grand Staff Harmony | *Amazing Grace*, *Gymnopédie No. 1*, *In the Hall of the Mountain King*, *Imperial March* |
+| **Level 8** | Classical Mastery & Conservatory Repertoire | *Für Elise (3/8)*, *Bach Prelude in C*, *Moonlight Sonata*, *Turkish March*, *Clair de Lune*, *Nocturne Op. 9 No. 2*, *Swan Lake* |
 
 ---
 
@@ -285,8 +285,8 @@ flowchart LR
 pianoPractice/
 ├── index.html                 # Semantic UI shell & classic script loader (file:// compatible)
 ├── styles.css                 # Responsive dark/light theme styling, 3D piano & transport deck CSS
-├── theory.js                  # Unified music theory, timeline math & score engine (window.MusicTheory)
-├── songs.js                   # Universal UMD 56-piece pedagogical repertoire database
+├── theory.js                  # Unified music theory, encoding validator, timeline math & score engine (window.MusicTheory)
+├── songs.js                   # Universal UMD 80-piece pedagogical repertoire database
 ├── js/
 │   ├── state.js               # Shared application state, curriculum presets & theory bindings
 │   ├── audio-engine.js        # Multi-channel Web Audio router, 11-instrument synth & output sink bridge
@@ -299,12 +299,12 @@ pianoPractice/
 │   └── app.js                 # Deterministic module bootstrap sequence
 ├── pianoNotesCheatSheet.png   # Authentic pedagogical reference sheet for cheat visualizer
 ├── FIXES.MD                   # Engineering audit & upgrade verification checklist (100% complete)
-├── PLAN_TRACKING.md           # Master milestone tracking document (Milestones 1–43)
+├── PLAN_TRACKING.md           # Master milestone tracking document (Milestones 1–44)
 ├── README.md                  # Comprehensive documentation and architecture reference
 └── tests/
     ├── test_helpers.js        # Shared project loader, multi-module vm syntax & DOM ID integrity checks
-    ├── test_education.js      # 20 automated unit tests for theory, scales, synthesis & transport math
-    └── test_score_engine.js   # 41 automated integration tests for SVG rendering, audio, MIDI & transport
+    ├── test_education.js      # 21 automated unit tests for theory, encoding, synthesis & transport math
+    └── test_score_engine.js   # 42 automated integration tests for SVG rendering, audio, MIDI & repertoire
 ```
 
 - **`index.html` & `styles.css`**: Zero-framework, zero-build-step application shell and stylesheet loaded directly via standard `<link>` and classic `<script src="...">` tags so double-clicking `index.html` works immediately over `file://`.
@@ -350,10 +350,10 @@ Piano Practice Lab features an automated Node.js test harness covering the music
 To run the automated test suites:
 
 ```bash
-# Run the core music theory & educational engine tests (20 tests)
+# Run the core music theory & educational engine tests (21 tests)
 node tests/test_education.js
 
-# Run the score engine, SVG rendering & MIDI integration tests (41 tests)
+# Run the score engine, SVG rendering & MIDI integration tests (42 tests)
 node tests/test_score_engine.js
 
 # Run both suites sequentially (Windows PowerShell syntax)
@@ -362,7 +362,7 @@ node tests/test_education.js ; node tests/test_score_engine.js
 
 ### Test Coverage Highlights
 - ✅ **Enharmonic Spelling & Fingerings**: Validates conservatory fingerings across all 12 Major and Minor keys without staff collisions.
-- ✅ **Grand Staff Alignment**: Beat-synchronized two-hand alignment across all 56 repertoire pieces.
+- ✅ **Grand Staff Alignment & Strict Song Encoding**: Beat-synchronized two-hand alignment, LF normalization, fingering alignment, and musical integrity verified across all 80 repertoire pieces.
 - ✅ **SMuFL Rest Rendering**: SVG path geometry validation for quarter, half, whole, and eighth rests.
 - ✅ **Cross-Step Ties**: Verifies quadratic bezier tie arcs and practice holding fulfillment.
 - ✅ **Non-Bouncing Viewport**: Asserts container-isolated scroll math and absence of viewport bounce bugs.
@@ -381,7 +381,7 @@ All architectural phases, algorithmic fixes, and feature milestones are recorded
 - **Milestones 19–24**: SMuFL vector rests, full 24-measure *Lean on Me* transcription, SVG tie arcs, non-bouncing viewport auto-scroll, and keyboard size song allowance engine.
 - **Milestones 25–30**: Interactive Piano Notes Cheat Sheet, equal beat subdivision metronome, hardware audio output routing (`setSinkId`), and acoustic wood block synthesis.
 - **Milestones 31–36**: Codebase cleanup, 3D visual expansion, mechanical metronome pendulum, multi-level left-hand accompaniment engine, post-song performance review modal, full `FIXES.MD` audit & deduplication, and **Deep Music Theory & Beginner Conservatory Learning Studio** (7-Module Interactive Bootcamp, Song Theory DNA Bar, Chord & Interval Builder Lab, Solfège & Thumb-Tuck Coach, Engraved Key Signature SVGs, and Famous Song Interval Mnemonics).
-- **Milestones 37–43**: Beginner bass root simplification, Live BPM Proximity & Timing Stability Graph, Multi-Channel Audio & MIDI Output Routing, 11-Instrument Multi-Timbre Synthesizer, **Zero-Build Modularization (`styles.css` + `js/*.js`)**, **Upgraded Playback Transport** (Pause/Resume, live seek scrubber, clickable measures, real A-B Loop in Auto-Play & Tempo Flow, speed `%` presets, count-in), and **Auto Song Instrument Selection & Precision Key-Press Timing** (GM Program Change, MIDI loopback protection, anti-bounce repeated-note gating, per-voice tie tracking, and drift-free playback/Tempo Flow synchronization).
+- **Milestones 37–44**: Beginner bass root simplification, Live BPM Proximity & Timing Stability Graph, Multi-Channel Audio & MIDI Output Routing, 11-Instrument Multi-Timbre Synthesizer, **Zero-Build Modularization (`styles.css` + `js/*.js`)**, **Upgraded Playback Transport**, **Auto Song Instrument Selection & Precision Key-Press Timing**, and **Full 80-Song Musical Audit, Strict Encoding Validator (`validateSongEncoding`) & Classical Mastery Expansion**.
 
 ---
 

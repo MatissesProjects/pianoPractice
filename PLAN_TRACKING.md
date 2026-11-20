@@ -588,6 +588,18 @@
   - [x] **Automated Test Suite (`tests/test_education.js` Test 20 & `tests/test_score_engine.js` Test 41)**:
     - [x] Added Test 20 in `tests/test_education.js` and Test 41 in `tests/test_score_engine.js` — all 61/61 automated tests passing.
 
+- [x] **Milestone 44: Full Repertoire Musical Audit, Strict Encoding Validator & 80-Song Student Library Expansion**
+  - [x] **Strict Song Encoding Validator & Theory Alignment (`theory.js`)**:
+    - [x] Implemented and exported `validateSongEncoding(song)` enforcing required fields, valid `INSTRUMENT_PRESETS`, bounded tempo, valid standard durations (`0.25, 0.33, 0.34, 0.5, 0.75, 1, 1.5, 2, 3, 4`), synchronized 6-track measure counts, matching token/fingering counts, 49-key range (`36..84`), zero minor-2nd chord clashes or duplicate chord pitches, strict tie pitch continuity, valid pickup bounds, cross-voice beat parity, and genuine harmonic `+` dyads.
+    - [x] Fixed `gymnopedie-1` key recognition alongside `gymnopedie-no-1` in `getRomanNumeralAnalysis()` and `analyzeSongTheoryDNA()`, fixed Beginner Bootcamp Module 4 (`minuet-in-g` -> `bach-minuet-g`), added accurate key signatures for all newly added classical/minor/jazz songs plus `amazing-grace` (`G Major`) and `c-minor-blues-riff` (`C Minor`), and extended `getSongDefaultInstrument()` keyword heuristics.
+  - [x] **Repertoire Musical Fixes & LF Normalization (`songs.js`)**:
+    - [x] Normalized all line endings in `songs.js` to uniform LF (`0` CR characters).
+    - [x] Audited all 56 existing pieces and repaired musical/encoding defects: fixed `lean-on-me` M24 broken tie while preserving M1–M23, fixed `the-entertainer` invalid `:2.5` duration and syncopation, fixed `rain-rain-go-away` broken 3-beat M1, fixed `brahms-lullaby` anacrusis & `happy-birthday` pickup barlines, re-encoded `pop-goes-the-weasel` and `hallelujah` in `6/8` and `fur-elise` in authentic `3/8` with interlocking LH arpeggios, fixed `smoke-on-the-water` parallel 4ths & syncopation, fixed `clocks` Mixolydian `B♭3`, fixed `gymnopedie-1` Dmaj7 `C♯4`, extended `jingle-bells`, `lightly-row`, `amazing-grace-f`, `bach-minuet-g`, `canon-in-d`, `korobeiniki-tetris`, and corrected melodies/harmonies across *Love Me Tender*, *William Tell Overture*, *The Can-Can*, *Chariots of Fire*, *Old MacDonald*, *Stand by Me*, *Let It Be*, *Scarborough Fair*, *Greensleeves*, *Bella Ciao*, and *Star Wars* triplets.
+  - [x] **Student Library Expansion (56 → 80 Curated Pieces)**:
+    - [x] Added 24 pedagogically curated songs balanced across all 5 categories (`C 5-Finger`: 21, `Harmonic / Dyads`: 14, `Extended Scale`: 20, `Minor / Modal`: 15, `Classical Mastery`: 10): *Jaws Theme*, *C Major Scale & Thumb-Tuck Study*, *French Folk Song*, *Good King Wenceslas*, *Imagine (Piano Intro)*, *Auld Lang Syne*, *Country Roads*, *Piano Man (Waltz Riff)*, *Over the Rainbow*, *My Bonnie Lies Over the Ocean*, *Danny Boy*, *Maple Leaf Rag*, *House of the Rising Sun*, *In the Hall of the Mountain King*, *The Imperial March*, *Autumn Leaves (Jazz ii–V–I)*, *Midnight C Minor Blues*, *Prelude in C Major (BWV 846)*, *Moonlight Sonata (Mvt. 1 Theme)*, *Turkish March (Rondo Alla Turca)*, *Clair de Lune*, *Spring (Vivaldi)*, *Nocturne Op. 9 No. 2*, and *Swan Lake*, resolving 100% of Beginner Bootcamp links.
+  - [x] **Automated Test Suite (`tests/test_education.js` Test 21 & `tests/test_score_engine.js` Test 42)**:
+    - [x] Added Test 21 in `tests/test_education.js` and Test 42 in `tests/test_score_engine.js` verifying all 80 songs pass strict encoding, LF formatting, category balance, 49-key compatibility, Bootcamp links, and 4-mode `buildScoreModel` execution — all **63/63 automated tests passing**.
+
 
 
 
