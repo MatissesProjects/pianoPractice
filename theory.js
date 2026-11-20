@@ -3682,6 +3682,183 @@
     return INSTRUMENT_PRESETS[cleanId] || INSTRUMENT_PRESETS.grand_piano;
   }
 
+  // ============================================================================
+  // PLAYBACK TRANSPORT TIMELINE & LOOP BOUNDS ENGINE (MILESTONE 42)
+  // ============================================================================
+
+  /**
+   * Builds a cumulative beat timeline and measure index maps from parsed score steps.
+   */
+  function buildPlaybackTimeline(steps, timeSigStr = "4/4") {
+    const ts = parseTimeSignature(timeSigStr);
+    const beatsPerMeasure = (ts && ts.numerator && ts.denominator)
+      ? ts.numerator * (4 / ts.denominator)
+      : 4;
+
+    if (!Array.isArray(steps) || steps.length === 0) {
+      return {
+        stepTimings: [],
+        totalBeats: 0,
+        totalMeasures: 0,
+        measureStartSteps: {},
+        measureStartBeats: {},
+        beatsPerMeasure
+      };
+    }
+
+    const stepTimings = [];
+    const measureStartSteps = {};
+    const measureStartBeats = {};
+    let totalBeats = 0;
+    let totalMeasures = 0;
+
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i] || {};
+      const stepIndex = typeof step.stepIndex === "number" ? step.stepIndex : i;
+      const measure = (typeof step.measure === "number" && step.measure >= 1) ? Math.floor(step.measure) : 1;
+      const beats = (typeof step.beats === "number" && step.beats > 0) ? step.beats : 1;
+
+      if (measureStartSteps[measure] === undefined) {
+        measureStartSteps[measure] = i;
+        measureStartBeats[measure] = totalBeats;
+      }
+
+      stepTimings.push({
+        stepIndex,
+        arrayIndex: i,
+        measure,
+        startBeat: totalBeats,
+        endBeat: totalBeats + beats,
+        beats
+      });
+
+      totalBeats += beats;
+      if (measure > totalMeasures) totalMeasures = measure;
+    }
+
+    return {
+      stepTimings,
+      totalBeats,
+      totalMeasures,
+      measureStartSteps,
+      measureStartBeats,
+      beatsPerMeasure
+    };
+  }
+
+  /**
+   * Resolves clamped A-B loop measure bounds and exact start/end step indices.
+   */
+  function resolveLoopStepBounds(steps, isLoopEnabled, startMeasure, endMeasure) {
+    if (!Array.isArray(steps) || steps.length === 0) {
+      return {
+        active: false,
+        startStepIndex: 0,
+        endStepIndex: 0,
+        startMeasure: 1,
+        endMeasure: 1,
+        totalMeasures: 0
+      };
+    }
+
+    let totalMeasures = 1;
+    for (let i = 0; i < steps.length; i++) {
+      const m = (steps[i] && typeof steps[i].measure === "number") ? Math.floor(steps[i].measure) : 1;
+      if (m > totalMeasures) totalMeasures = m;
+    }
+
+    const rawStart = parseInt(startMeasure, 10);
+    const rawEnd = parseInt(endMeasure, 10);
+    let clampedStart = Math.max(1, Math.min(totalMeasures, isNaN(rawStart) ? 1 : rawStart));
+    let clampedEnd = Math.max(1, Math.min(totalMeasures, isNaN(rawEnd) ? totalMeasures : rawEnd));
+
+    if (clampedStart > clampedEnd) {
+      const tmp = clampedStart;
+      clampedStart = clampedEnd;
+      clampedEnd = tmp;
+    }
+
+    let startStepIndex = steps.findIndex(s => ((s && s.measure) || 1) >= clampedStart);
+    if (startStepIndex < 0) startStepIndex = 0;
+
+    let endStepIndex = steps.length - 1;
+    for (let i = steps.length - 1; i >= 0; i--) {
+      if (((steps[i] && steps[i].measure) || 1) <= clampedEnd) {
+        endStepIndex = i;
+        break;
+      }
+    }
+    if (endStepIndex < startStepIndex) {
+      endStepIndex = startStepIndex;
+    }
+
+    return {
+      active: Boolean(isLoopEnabled && steps.length > 0),
+      startStepIndex,
+      endStepIndex,
+      startMeasure: clampedStart,
+      endMeasure: clampedEnd,
+      totalMeasures
+    };
+  }
+
+  /**
+   * Computes a clamped BPM value from a base tempo and relative speed percentage.
+   */
+  function computeTempoFromSpeedPercent(baseBpm, percent, minBpm = 30, maxBpm = 220) {
+    const safeBase = (typeof baseBpm === "number" && !isNaN(baseBpm) && baseBpm > 0) ? baseBpm : 96;
+    const safePct = (typeof percent === "number" && !isNaN(percent) && percent > 0) ? percent : 100;
+    const raw = Math.round(safeBase * (safePct / 100));
+    return Math.max(minBpm, Math.min(maxBpm, raw));
+  }
+
+  /**
+   * Maps a cumulative beat position back to the containing step index in a playback timeline.
+   */
+  function findStepAtBeat(timeline, targetBeat) {
+    if (!timeline || !Array.isArray(timeline.stepTimings) || timeline.stepTimings.length === 0) {
+      return 0;
+    }
+    const timings = timeline.stepTimings;
+    const beat = Math.max(0, Number(targetBeat) || 0);
+    if (beat >= timeline.totalBeats) {
+      return timings.length - 1;
+    }
+    for (let i = 0; i < timings.length; i++) {
+      if (beat < timings[i].endBeat) {
+        return i;
+      }
+    }
+    return timings.length - 1;
+  }
+
+  /**
+   * Formats elapsed and total song durations in M:SS / M:SS for a given BPM.
+   */
+  function formatPlaybackClock(currentBeat, totalBeats, bpm) {
+    const safeBpm = (typeof bpm === "number" && !isNaN(bpm) && bpm > 0) ? bpm : 96;
+    const secPerBeat = 60 / safeBpm;
+    const elapsedSec = Math.max(0, Math.round((Number(currentBeat) || 0) * secPerBeat));
+    const totalSec = Math.max(0, Math.round((Number(totalBeats) || 0) * secPerBeat));
+
+    const formatSec = (s) => {
+      const mins = Math.floor(s / 60);
+      const secs = s % 60;
+      return `${mins}:${String(secs).padStart(2, "0")}`;
+    };
+
+    const elapsedText = formatSec(elapsedSec);
+    const totalText = formatSec(totalSec);
+
+    return {
+      elapsedSec,
+      totalSec,
+      elapsedText,
+      totalText,
+      formatted: `${elapsedText} / ${totalText}`
+    };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -3766,7 +3943,12 @@
     analyzeRhythmTapHistory,
     INSTRUMENT_PRESETS,
     getSongDefaultInstrument,
-    getInstrumentParameters
+    getInstrumentParameters,
+    buildPlaybackTimeline,
+    resolveLoopStepBounds,
+    computeTempoFromSpeedPercent,
+    findStepAtBeat,
+    formatPlaybackClock
   };
 });
 
