@@ -119,6 +119,44 @@ function setMidiOutputDevice(deviceId) {
   }
 
   selectedMidiOutput = midiAccess.outputs.get(selectedMidiOutputId) || null;
+  if (selectedMidiOutput && typeof getActiveSynthInstrument === "function") {
+    sendMidiOutputProgramChange(getActiveSynthInstrument());
+  }
+}
+
+function sendMidiOutputProgramChange(instrumentId) {
+  if (!selectedMidiOutput) return;
+  const instParams = (window.MusicTheory && window.MusicTheory.getInstrumentParameters)
+    ? window.MusicTheory.getInstrumentParameters(instrumentId)
+    : { gmProgram: 0 };
+  const prog = (instParams && typeof instParams.gmProgram === "number") ? instParams.gmProgram : 0;
+
+  const chSelect = document.getElementById("midiChannelSelect");
+  const setting = (chSelect && chSelect.value) ? chSelect.value : "all";
+  const channels = (setting === "split")
+    ? [1, 2, 3]
+    : getActiveMidiOutputChannels("rh");
+
+  channels.forEach(ch => {
+    try {
+      const msg = (window.MusicTheory && window.MusicTheory.createMidiProgramChange)
+        ? window.MusicTheory.createMidiProgramChange(prog, ch)
+        : [0xC0 | ((ch - 1) & 0x0F), prog];
+      selectedMidiOutput.send(msg);
+    } catch (err) {
+      console.warn("sendMidiOutputProgramChange failed on Ch", ch, err);
+    }
+  });
+}
+
+function isMidiEchoLoopback() {
+  if (!selectedMidiInput || !selectedMidiOutput) return false;
+  if (selectedMidiInput.id && selectedMidiOutput.id && selectedMidiInput.id === selectedMidiOutput.id) {
+    return true;
+  }
+  const inName = (selectedMidiInput.name || "").trim();
+  const outName = (selectedMidiOutput.name || "").trim();
+  return Boolean(inName && outName && inName === outName);
 }
 
 function getActiveMidiOutputChannels(voiceRole = "rh") {
@@ -623,11 +661,15 @@ function updateMidiDeviceList() {
 
 function attachMidiListener(deviceId) {
   if (selectedMidiInput) selectedMidiInput.onmidimessage = null;
-  // Reset channel activity when switching to another MIDI port or device
+  // Reset channel activity & held MIDI inputs when switching to another MIDI port or device
+  if (typeof clearHeldMidiInputs === "function") {
+    clearHeldMidiInputs();
+  }
   resetMidiChannelActivity();
 
   if (!midiAccess || !deviceId) {
     document.getElementById("midiStatusText").textContent = "No MIDI device selected";
+    selectedMidiInput = null;
     return;
   }
 
@@ -665,6 +707,9 @@ function handleIncomingMIDIMessage(event) {
         if (!activeHeldMidiNotes.has(num)) stopLiveTone(num, true);
       });
       pedaledNotes.clear();
+      if (typeof handleTiedReleaseCheck === "function") {
+        handleTiedReleaseCheck(null);
+      }
     }
     updateSustainPedalUI();
     updateActiveChordRecognizer();
@@ -672,28 +717,29 @@ function handleIncomingMIDIMessage(event) {
   }
 
   const pitchName = midiNumberToPitch(noteNumber);
+  const skipMidiOut = isMidiEchoLoopback();
 
   // Note On Event
   if (cmd === 9 && velocity > 0) {
     const keyEl = document.querySelector(`.piano-key[data-note="${pitchName}"]`);
     if (keyEl) keyEl.classList.add("active-live");
 
-    startLiveTone(noteNumber, velocity, noteNumber < 60 ? "lh" : "rh");
+    startLiveTone(noteNumber, velocity, noteNumber < 60 ? "lh" : "rh", null, skipMidiOut);
 
     createSustainLane(noteNumber, pitchName);
 
     // PRACTICE & EDUCATIONAL NOTE INPUT
-    handleNoteDown(pitchName, "midi", { noteNumber, velocity });
+    handleNoteDown(pitchName, "midi", { noteNumber, velocity, channel });
   } 
   // Note Off Event
   else if (cmd === 8 || (cmd === 9 && velocity === 0)) {
     const keyEl = document.querySelector(`.piano-key[data-note="${pitchName}"]`);
     if (keyEl) keyEl.classList.remove("active-live");
 
-    stopLiveTone(noteNumber);
+    stopLiveTone(noteNumber, false, skipMidiOut);
 
     removeSustainLane(noteNumber);
 
-    handleNoteUp(pitchName, { noteNumber });
+    handleNoteUp(pitchName, { noteNumber, channel });
   }
 }

@@ -15,18 +15,18 @@ function handleEducationalNoteInput(pitchName) {
     } else if (isScalePracticeActive) {
       verifyScalePracticeInput(pitchName);
     } else {
-      checkAndPlayNote(pitchName);
+      if (typeof highlightPlaybackKey === "function") highlightPlaybackKey(pitchName, "rh", 250);
     }
   } else if (activeEducationalMode === "theory") {
     if (typeof isBootcampTaskActive !== "undefined" && isBootcampTaskActive) {
       verifyBootcampNoteInput(pitchName);
     } else {
-      checkAndPlayNote(pitchName);
+      if (typeof highlightPlaybackKey === "function") highlightPlaybackKey(pitchName, "rh", 250);
     }
   } else if (activeEducationalMode === "rhythm") {
     registerRhythmTap();
   } else {
-    checkAndPlayNote(pitchName);
+    if (typeof highlightPlaybackKey === "function") highlightPlaybackKey(pitchName, "rh", 250);
   }
 }
 

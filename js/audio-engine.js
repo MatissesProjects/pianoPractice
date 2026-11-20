@@ -1284,6 +1284,9 @@ function initSustainPedalControl() {
         if (!activeHeldMidiNotes.has(num)) stopLiveTone(num, true);
       });
       pedaledNotes.clear();
+      if (typeof handleTiedReleaseCheck === "function") {
+        handleTiedReleaseCheck(null);
+      }
     }
     updateSustainPedalUI();
     updateActiveChordRecognizer();
@@ -1294,8 +1297,9 @@ function initSustainPedalControl() {
 function startLiveTone(noteNumber, velocity = 100) {
   const voiceRole = arguments.length > 2 && arguments[2] ? arguments[2] : (noteNumber < 60 ? "lh" : "rh");
   const instOverride = arguments.length > 3 ? arguments[3] : null;
+  const skipMidiOut = arguments.length > 4 ? Boolean(arguments[4]) : false;
 
-  if (typeof sendMidiOutputNoteOn === "function") {
+  if (!skipMidiOut && typeof sendMidiOutputNoteOn === "function") {
     sendMidiOutputNoteOn(noteNumber, velocity, voiceRole);
   }
   if (!isSynthAudioEnabled()) return;
@@ -1311,9 +1315,10 @@ function startLiveTone(noteNumber, velocity = 100) {
 }
 
 function stopLiveTone(noteNumber, forceImmediate = false) {
+  const skipMidiOut = arguments.length > 2 ? Boolean(arguments[2]) : false;
   const existingVoice = liveOscillators.get(noteNumber);
   const voiceRole = existingVoice && existingVoice.voiceRole ? existingVoice.voiceRole : (noteNumber < 60 ? "lh" : "rh");
-  if (typeof sendMidiOutputNoteOff === "function") {
+  if (!skipMidiOut && typeof sendMidiOutputNoteOff === "function") {
     sendMidiOutputNoteOff(noteNumber, voiceRole);
   }
   if (isSustainPedalDown && !forceImmediate) {

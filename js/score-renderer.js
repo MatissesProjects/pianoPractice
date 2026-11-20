@@ -288,10 +288,10 @@ function renderSheetMusicScore() {
               }
             });
             const actualPitches = pitches.filter(p => p !== "-");
+            const startYCheat = trebleBottomY + 38;
+            const lineSpacing = 13.5;
+            const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
             if (showCheat && actualPitches.length > 0) {
-              const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
-              const startYCheat = trebleBottomY + 38;
-              const lineSpacing = 13.5;
               sorted.forEach((p, pIdx) => {
                 const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 label.setAttribute("x", cx);
@@ -304,14 +304,14 @@ function renderSheetMusicScore() {
                 label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                 noteGroup.appendChild(label);
               });
-              if (showFingers && item.dyadF && item.dyadF !== "-") {
-                const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                fLabel.setAttribute("x", cx);
-                fLabel.setAttribute("y", startYCheat + sorted.length * lineSpacing + 2);
-                fLabel.setAttribute("class", "cheat-finger-label");
-                fLabel.textContent = item.dyadF;
-                noteGroup.appendChild(fLabel);
-              }
+            }
+            if (showFingers && item.dyadF && item.dyadF !== "-") {
+              const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+              fLabel.setAttribute("x", cx);
+              fLabel.setAttribute("y", showCheat ? (startYCheat + sorted.length * lineSpacing + 2) : (trebleBottomY + 32));
+              fLabel.setAttribute("class", "cheat-finger-label");
+              fLabel.textContent = item.dyadF;
+              noteGroup.appendChild(fLabel);
             }
           }
         } else if (showRH && item.rh) {
@@ -342,10 +342,10 @@ function renderSheetMusicScore() {
               }
             });
             const actualPitches = pitches.filter(p => p !== "-");
+            const startYCheat = trebleBottomY + 38;
+            const lineSpacing = 13.5;
+            const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
             if (showCheat && actualPitches.length > 0) {
-              const sorted = [...actualPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
-              const startYCheat = trebleBottomY + 38;
-              const lineSpacing = 13.5;
               sorted.forEach((p, pIdx) => {
                 const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 label.setAttribute("x", cx);
@@ -358,15 +358,15 @@ function renderSheetMusicScore() {
                 label.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                 noteGroup.appendChild(label);
               });
-              const fNum = item.rh.f || item.rhF;
-              if (showFingers && fNum && fNum !== "-") {
-                const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                fLabel.setAttribute("x", cx);
-                fLabel.setAttribute("y", startYCheat + sorted.length * lineSpacing + 2);
-                fLabel.setAttribute("class", "cheat-finger-label");
-                fLabel.textContent = fNum;
-                noteGroup.appendChild(fLabel);
-              }
+            }
+            const fNum = item.rh.f || item.rhF;
+            if (showFingers && fNum && fNum !== "-") {
+              const fLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+              fLabel.setAttribute("x", cx);
+              fLabel.setAttribute("y", showCheat ? (startYCheat + sorted.length * lineSpacing + 2) : (trebleBottomY + 32));
+              fLabel.setAttribute("class", "cheat-finger-label");
+              fLabel.textContent = fNum;
+              noteGroup.appendChild(fLabel);
             }
           }
         }
@@ -401,11 +401,10 @@ function renderSheetMusicScore() {
             });
 
             const actualLHPitches = lhPitches.filter(p => p !== "-");
+            const startYBCheat = bassBottomY + 38;
+            const lineSpacing = 13.5;
+            const sortedB = [...actualLHPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
             if (showCheat && actualLHPitches.length > 0) {
-              const sortedB = [...actualLHPitches].sort((a, b) => (getDiatonicStep(b) || 0) - (getDiatonicStep(a) || 0));
-              const startYBCheat = bassBottomY + 38;
-              const lineSpacing = 13.5;
-
               sortedB.forEach((p, pIdx) => {
                 const labelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 labelB.setAttribute("x", cx);
@@ -418,16 +417,15 @@ function renderSheetMusicScore() {
                 labelB.textContent = p.replace(/[0-9]/g, "").replace("#", "♯").replace("b", "♭");
                 noteGroup.appendChild(labelB);
               });
-
-              const fNumB = item.lh.f || item.lhF;
-              if (showFingers && fNumB && fNumB !== "-") {
-                const fLabelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                fLabelB.setAttribute("x", cx);
-                fLabelB.setAttribute("y", startYBCheat + sortedB.length * lineSpacing + 2);
-                fLabelB.setAttribute("class", "cheat-finger-label");
-                fLabelB.textContent = fNumB;
-                noteGroup.appendChild(fLabelB);
-              }
+            }
+            const fNumB = item.lh.f || item.lhF;
+            if (showFingers && fNumB && fNumB !== "-") {
+              const fLabelB = document.createElementNS("http://www.w3.org/2000/svg", "text");
+              fLabelB.setAttribute("x", cx);
+              fLabelB.setAttribute("y", showCheat ? (startYBCheat + sortedB.length * lineSpacing + 2) : (bassBottomY + 32));
+              fLabelB.setAttribute("class", "cheat-finger-label");
+              fLabelB.textContent = fNumB;
+              noteGroup.appendChild(fLabelB);
             }
           }
         }
@@ -711,15 +709,7 @@ function renderNoteheadOnly(group, pitchStr, beats, cx, bottomStaffY, refDiatoni
     stem.setAttribute("class", "notestem");
     group.appendChild(stem);
 
-    if (beats === 0.5) {
-      const flag = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      if (stemUp) flag.setAttribute("d", `M ${cx + 5.2} ${cy - 28} Q ${cx + 12} ${cy - 22} ${cx + 12} ${cy - 14}`);
-      else flag.setAttribute("d", `M ${cx - 5.2} ${cy + 28} Q ${cx + 2} ${cy + 22} ${cx + 2} ${cy + 14}`);
-      flag.setAttribute("fill", "none");
-      flag.setAttribute("stroke", "currentColor");
-      flag.setAttribute("stroke-width", "1.6");
-      group.appendChild(flag);
-    } else if (beats === 0.25) {
+    if (beats <= 0.28) {
       const flag1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
       const flag2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
       if (stemUp) {
@@ -737,10 +727,27 @@ function renderNoteheadOnly(group, pitchStr, beats, cx, bottomStaffY, refDiatoni
       flag2.setAttribute("stroke-width", "1.6");
       group.appendChild(flag1);
       group.appendChild(flag2);
+    } else if (beats > 0.28 && beats <= 0.78) {
+      const flag = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      if (stemUp) flag.setAttribute("d", `M ${cx + 5.2} ${cy - 28} Q ${cx + 12} ${cy - 22} ${cx + 12} ${cy - 14}`);
+      else flag.setAttribute("d", `M ${cx - 5.2} ${cy + 28} Q ${cx + 2} ${cy + 22} ${cx + 2} ${cy + 14}`);
+      flag.setAttribute("fill", "none");
+      flag.setAttribute("stroke", "currentColor");
+      flag.setAttribute("stroke-width", "1.6");
+      group.appendChild(flag);
+
+      if (beats >= 0.30 && beats <= 0.36) {
+        const tri = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        tri.setAttribute("x", stemUp ? (cx + 5) : (cx - 5));
+        tri.setAttribute("y", stemUp ? (cy - 31) : (cy + 37));
+        tri.setAttribute("class", "triplet-marker");
+        tri.textContent = "3";
+        group.appendChild(tri);
+      }
     }
   }
 
-  if (beats === 1.5 || beats === 3 || beats === 0.75) {
+  if (Math.abs(beats - 0.75) < 0.05 || Math.abs(beats - 1.5) < 0.05 || Math.abs(beats - 3.0) < 0.05) {
     const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     dot.setAttribute("cx", cx + 9);
     dot.setAttribute("cy", cy - 1);
@@ -806,6 +813,7 @@ function autoScrollScoreToNote(targetEl, smooth = true) {
 }
 
 function highlightActiveScoreNote(stepIdx, autoScroll = true) {
+  if (typeof clearWaitPracticeTimer === "function") clearWaitPracticeTimer();
   stepFulfilledPitches.clear();
   document.querySelectorAll(".note-group").forEach(g => g.classList.remove("active-target", "error-target"));
   const targetEl = document.getElementById(`staff_note_${stepIdx}`);
@@ -824,32 +832,47 @@ function highlightActiveScoreNote(stepIdx, autoScroll = true) {
   const progressText = document.getElementById("hudProgressText");
 
   if (step) {
-    if (step.tiedFromPrev && isWaitPracticeMode && step.expectedPitches && step.expectedPitches.length > 0) {
-      const prevStep = songNoteSteps[stepIdx - 1];
-      if (prevStep && prevStep.expectedPitches) {
-        step.expectedPitches.forEach(p => {
-          const wasTiedInPrev = prevStep.expectedPitches.includes(p) && (
-            (prevStep.dyad && prevStep.dyad.tied) ||
-            (prevStep.rh && prevStep.rh.tied) ||
-            (prevStep.lh && prevStep.lh.tied)
-          );
-          if (wasTiedInPrev) {
-            const midiNum = (typeof getPitchMidiNumber === "function") ? getPitchMidiNumber(p) : null;
-            const isHeld = (typeof activeHeldKeyAttacks !== "undefined" && activeHeldKeyAttacks.has(p)) ||
-                           (typeof isSustainPedalDown !== "undefined" && isSustainPedalDown && midiNum && typeof pedaledNotes !== "undefined" && pedaledNotes.has(midiNum));
-            if (isHeld) {
-              stepFulfilledPitches.add(p);
-            }
-          }
-        });
-      }
+    // Only carry over pitches that are genuinely tied in their voice from the prior step
+    if (step.tiedFromPrev && isWaitPracticeMode && Array.isArray(step.tiedPitches) && step.tiedPitches.length > 0) {
+      step.tiedPitches.forEach(p => {
+        const isHeld = (typeof isPitchActivelySustained === "function")
+          ? isPitchActivelySustained(p)
+          : (typeof activeHeldKeyAttacks !== "undefined" && activeHeldKeyAttacks.has(getCanonicalMidiNumber ? getCanonicalMidiNumber(p) : p));
+        if (isHeld) {
+          stepFulfilledPitches.add(p);
+        }
+      });
     }
 
     updateTargetBadgeDisplay(step, stepFulfilledPitches);
+    if (typeof updateKeyboardTargetHighlights === "function") {
+      updateKeyboardTargetHighlights(step, stepFulfilledPitches);
+    }
     progressText.textContent = `Note: ${stepIdx + 1} / ${songNoteSteps.length} (Meas ${step.measure})`;
     if (typeof transportState !== "undefined" && transportState.status === "stopped") {
       transportState.currentStepIndex = Math.max(0, Math.min(Math.max(0, songNoteSteps.length - 1), stepIdx));
       if (typeof updateTransportUI === "function") updateTransportUI();
+    }
+
+    // If next non-tied repeated pitch is still physically held down, coach student to lift & re-press
+    if (isWaitPracticeMode && !isSongFinished && stepIdx > 0 && Array.isArray(step.expectedPitches) && step.expectedPitches.length > 0) {
+      const heldRepressPitches = step.expectedPitches.filter(p =>
+        !stepFulfilledPitches.has(p) &&
+        typeof isPitchActivelyHeld === "function" &&
+        isPitchActivelyHeld(p)
+      );
+      if (heldRepressPitches.length > 0) {
+        const feedbackText = document.getElementById("hudFeedbackText");
+        if (feedbackText) {
+          const repressNote = `🔁 Lift & re-press ${heldRepressPitches.join(" + ")}`;
+          if (feedbackText.dataset.baseText) {
+            feedbackText.textContent = `${feedbackText.dataset.baseText} • ${repressNote}`;
+          } else {
+            feedbackText.style.color = "#fbbf24";
+            feedbackText.textContent = `${repressNote}!`;
+          }
+        }
+      }
     }
 
     if (step.tiedFromPrev && isWaitPracticeMode && step.expectedPitches && step.expectedPitches.length > 0) {
@@ -858,13 +881,22 @@ function highlightActiveScoreNote(stepIdx, autoScroll = true) {
         const feedbackText = document.getElementById("hudFeedbackText");
         if (feedbackText) {
           feedbackText.style.color = "#34d399";
-          feedbackText.textContent = `🔗 Tied note held! (${step.expectedPitches.join(" + ")})`;
+          const tieMsg = `🔗 Tied note — hold ${step.expectedPitches.join(" + ")} (${step.beats || 1}b)...`;
+          feedbackText.dataset.baseText = tieMsg;
+          feedbackText.textContent = tieMsg;
         }
-        const tempo = currentSong ? (currentSong.tempo || 90) : 90;
-        const tieHoldDurationMs = Math.max(300, (step.beats || 1) * (60000 / tempo));
-        setTimeout(() => {
-          if (currentPracticeStep === stepIdx && isWaitPracticeMode) {
-            advancePracticeStep();
+        const tempo = (typeof getCurrentTempoBpm === "function") ? getCurrentTempoBpm() : (currentSong ? (currentSong.tempo || 90) : 90);
+        const tieHoldDurationMs = Math.max(250, (step.beats || 1) * (60000 / tempo));
+        const tiedCheckList = Array.isArray(step.tiedPitches) ? [...step.tiedPitches] : [...step.expectedPitches];
+        waitPracticeStepTimerId = setTimeout(() => {
+          waitPracticeStepTimerId = null;
+          if (currentPracticeStep === stepIdx && isWaitPracticeMode && !isSongFinished) {
+            const stillSustained = tiedCheckList.every(p =>
+              typeof isPitchActivelySustained === "function" ? isPitchActivelySustained(p) : true
+            );
+            if (stillSustained) {
+              advancePracticeStep();
+            }
           }
         }, tieHoldDurationMs);
         return;
@@ -884,6 +916,7 @@ function highlightActiveScoreNote(stepIdx, autoScroll = true) {
         if (feedbackText) {
           feedbackText.style.color = "#f59e0b";
           feedbackText.textContent = `𝄽 Count in: play ${nextLabel} to begin!`;
+          delete feedbackText.dataset.baseText;
         }
         return;
       }
@@ -891,12 +924,14 @@ function highlightActiveScoreNote(stepIdx, autoScroll = true) {
       if (feedbackText) {
         feedbackText.style.color = "#f59e0b";
         feedbackText.textContent = `𝄽 Rest: pause for ${step.beats || 1} beat${(step.beats || 1) === 1 ? '' : 's'}...`;
+        delete feedbackText.dataset.baseText;
       }
 
-      const tempo = currentSong ? (currentSong.tempo || 90) : 90;
-      const restDurationMs = Math.max(300, (step.beats || 1) * (60000 / tempo));
-      setTimeout(() => {
-        if (currentPracticeStep === stepIdx && isWaitPracticeMode) {
+      const tempo = (typeof getCurrentTempoBpm === "function") ? getCurrentTempoBpm() : (currentSong ? (currentSong.tempo || 90) : 90);
+      const restDurationMs = Math.max(250, (step.beats || 1) * (60000 / tempo));
+      waitPracticeStepTimerId = setTimeout(() => {
+        waitPracticeStepTimerId = null;
+        if (currentPracticeStep === stepIdx && isWaitPracticeMode && !isSongFinished) {
           advancePracticeStep();
         }
       }, restDurationMs);
@@ -905,6 +940,9 @@ function highlightActiveScoreNote(stepIdx, autoScroll = true) {
     const targetBadge = document.getElementById("hudTargetBadge");
     if (targetBadge) targetBadge.textContent = "DONE! 🎉";
     document.getElementById("hudFeedbackText").textContent = "Magnificent! Piece completed!";
+    if (typeof updateKeyboardTargetHighlights === "function") {
+      updateKeyboardTargetHighlights(null);
+    }
   }
 }
 
@@ -1001,7 +1039,7 @@ function completeSongPerformance(accuracy, mode = "wait", flowStats = null) {
     totalNotes: songNoteSteps ? songNoteSteps.filter(s => s.expectedPitches && s.expectedPitches.length > 0).length : totalAttempts,
     peakStreak: Math.max(sessionBestStreak, sessionCurrentStreak),
     durationSec,
-    bpm: currentSong ? currentSong.tempo : 96,
+    bpm: (typeof getCurrentTempoBpm === "function") ? getCurrentTempoBpm() : (currentSong ? currentSong.tempo : 96),
     prevBestAcc,
     mode,
     flowStats,

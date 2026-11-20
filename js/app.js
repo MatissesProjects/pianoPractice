@@ -7,6 +7,7 @@ initSustainPedalControl();
 initReviewModalControls();
 initCatalogAndLayerControls();
 initPracticeAndTransportControls();
+initRepertoireMetronome();
 renderFilterPills();
 populateDropdown(songDatabase);
 loadSong(songDatabase[0]);
@@ -17,7 +18,6 @@ initWebMIDI();
 initAudioOutputRouting();
 initMidiOutputRouting();
 initMasterVolume();
-initRepertoireMetronome();
 
 // Initialize educational modules
 initModeNavigation();

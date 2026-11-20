@@ -53,20 +53,29 @@ function buildPianoKeyboard() {
   }
 
   function bindKeyListeners(keyEl, noteId) {
+    const resolveMidi = () => (window.MusicTheory && window.MusicTheory.pitchToMidi)
+      ? window.MusicTheory.pitchToMidi(noteId)
+      : getPitchMidiNumber(noteId);
+
     const onDown = (e) => {
       if (e.cancelable && e.type === "touchstart") e.preventDefault();
       e.stopPropagation();
+      const midiNum = resolveMidi();
+      if (midiNum === null || midiNum === undefined) return;
+      if (activeMouseKeys.has(midiNum)) return;
+      activeMouseKeys.add(midiNum);
       keyEl.classList.add("active-live");
-      const midiNum = (window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(noteId) : getPitchMidiNumber(noteId);
       if (isSynthAudioEnabled() || (typeof selectedMidiOutput !== "undefined" && selectedMidiOutput)) {
         startLiveTone(midiNum, 90);
       }
       handleNoteDown(noteId, "mouse", { noteNumber: midiNum });
     };
-    const onUp = (e) => {
-      e.stopPropagation();
+    const onUp = () => {
+      const midiNum = resolveMidi();
+      if (midiNum === null || midiNum === undefined) return;
+      if (!activeMouseKeys.has(midiNum)) return;
+      activeMouseKeys.delete(midiNum);
       keyEl.classList.remove("active-live");
-      const midiNum = (window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(noteId) : getPitchMidiNumber(noteId);
       stopLiveTone(midiNum);
       handleNoteUp(noteId, { noteNumber: midiNum });
     };
@@ -144,6 +153,51 @@ function buildPianoKeyboard() {
 
     keyboard.appendChild(whiteKey);
   }
+
+  if (typeof updateKeyboardTargetHighlights === "function" && typeof songNoteSteps !== "undefined") {
+    updateKeyboardTargetHighlights(songNoteSteps[currentPracticeStep], stepFulfilledPitches);
+  }
+}
+
+function releaseAllMouseKeys() {
+  if (typeof activeMouseKeys === "undefined" || activeMouseKeys.size === 0) return;
+  for (const midiNum of Array.from(activeMouseKeys)) {
+    activeMouseKeys.delete(midiNum);
+    const attack = (typeof activeHeldKeyAttacks !== "undefined") ? activeHeldKeyAttacks.get(midiNum) : null;
+    const pitchId = (attack && attack.pitch) ? attack.pitch : midiNumberToPitch(midiNum);
+    const keyEl = findPianoKeyElement(pitchId);
+    if (keyEl) keyEl.classList.remove("active-live");
+    if (typeof stopLiveTone === "function") stopLiveTone(midiNum);
+    if (typeof handleNoteUp === "function") handleNoteUp(pitchId, { noteNumber: midiNum });
+  }
+}
+
+function updateKeyboardTargetHighlights(step, fulfilledSet = null) {
+  document.querySelectorAll(".piano-key").forEach(k => {
+    k.classList.remove("target-guide", "target-repress", "target-tie-hold");
+  });
+
+  if (typeof activeEducationalMode === "undefined" || activeEducationalMode !== "repertoire") return;
+  if (typeof isWaitPracticeMode === "undefined" || !isWaitPracticeMode || (typeof isSongFinished !== "undefined" && isSongFinished)) return;
+  if (typeof transportState !== "undefined" && transportState.status !== "stopped") return;
+  if (!step || !Array.isArray(step.expectedPitches) || step.expectedPitches.length === 0) return;
+
+  const fulfilled = fulfilledSet || (typeof stepFulfilledPitches !== "undefined" ? stepFulfilledPitches : new Set());
+  const tiedList = Array.isArray(step.tiedPitches) ? step.tiedPitches : [];
+
+  step.expectedPitches.forEach(p => {
+    const keyEl = findPianoKeyElement(p);
+    if (!keyEl) return;
+    if (fulfilled.has(p)) {
+      if (tiedList.includes(p)) {
+        keyEl.classList.add("target-tie-hold");
+      }
+    } else if (typeof isPitchActivelyHeld === "function" && isPitchActivelyHeld(p)) {
+      keyEl.classList.add("target-repress");
+    } else {
+      keyEl.classList.add("target-guide");
+    }
+  });
 }
 
 function onKeyboardLayoutChanged() {
@@ -309,6 +363,18 @@ function initKeyboardControls() {
   // Auto-center Middle C on initial load if keyboard is wide
   if (currentKeyCount > 37) {
     setTimeout(() => centerMiddleCView(false), 100);
+  }
+
+  // Ensure mouseups outside the keyboard or window blur never leave held keys stuck
+  if (!window._pianoInputSafetyListenersWired) {
+    window._pianoInputSafetyListenersWired = true;
+    window.addEventListener("mouseup", releaseAllMouseKeys);
+    window.addEventListener("blur", () => {
+      releaseAllMouseKeys();
+      if (typeof resetHeldInputState === "function") {
+        resetHeldInputState();
+      }
+    });
   }
 }
 

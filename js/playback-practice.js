@@ -35,6 +35,8 @@ function parseSongSteps() {
   }
 
   // Reset practice stats and session telemetry for newly loaded piece
+  clearWaitPracticeTimer();
+  lastPerfectStepIndex = -1;
   practiceStats = { correct: 0, attempts: 0, cleanLoop: true };
   sessionStartTime = 0;
   sessionEndTime = 0;
@@ -58,6 +60,28 @@ function parseSongSteps() {
   } catch (e) {}
 }
 
+function clearWaitPracticeTimer() {
+  if (typeof waitPracticeStepTimerId !== "undefined" && waitPracticeStepTimerId !== null) {
+    clearTimeout(waitPracticeStepTimerId);
+    waitPracticeStepTimerId = null;
+  }
+}
+
+function getVoiceBeatsForPitch(step, pitchStr) {
+  if (!step) return 1.0;
+  const matches = (a, b) => a === b || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(a, b));
+  const voiceCandidates = [step.dyad, step.rh, step.lh];
+  for (const v of voiceCandidates) {
+    if (v && v.pitch && v.pitch !== "-") {
+      const parts = v.pitch.split("+").filter(p => p && p !== "-");
+      if (parts.some(p => matches(p, pitchStr))) {
+        return v.tiedTotalBeats || v.beats || step.beats || 1.0;
+      }
+    }
+  }
+  return step.beats || 1.0;
+}
+
 function updateTargetBadgeDisplay(step, fulfilledSet) {
   const targetBadge = document.getElementById("hudTargetBadge");
   if (!targetBadge || !step) return;
@@ -68,11 +92,16 @@ function updateTargetBadgeDisplay(step, fulfilledSet) {
     return;
   }
 
+  const tiedList = Array.isArray(step.tiedPitches) ? step.tiedPitches : [];
   const partsHtml = step.expectedPitches.map(p => {
     const isDone = fulfilledSet && fulfilledSet.has(p);
     const label = p.replace(/#/g, "♯");
     if (isDone) {
-      return `<span style="color:#34d399; font-weight:900; text-shadow:0 0 8px rgba(52,211,153,0.5);">${label}✓</span>`;
+      const prefix = tiedList.includes(p) ? "🔗 " : "";
+      return `<span style="color:#34d399; font-weight:900; text-shadow:0 0 8px rgba(52,211,153,0.5);">${prefix}${label}✓</span>`;
+    }
+    if (typeof isPitchActivelyHeld === "function" && isPitchActivelyHeld(p)) {
+      return `<span style="color:#fbbf24; font-weight:900;" title="Release key and re-press for this note">🔁 ${label}</span>`;
     }
     return `<span style="color:#f59e0b; font-weight:900;">${label}</span>`;
   });
@@ -81,27 +110,49 @@ function updateTargetBadgeDisplay(step, fulfilledSet) {
 
 function handleNoteDown(pitchName, source = "input", meta = {}) {
   const now = performance.now();
-  const existing = activeHeldKeyAttacks.get(pitchName);
+  const midiNum = (typeof getCanonicalMidiNumber === "function")
+    ? getCanonicalMidiNumber(meta.noteNumber !== undefined ? meta.noteNumber : pitchName)
+    : getPitchMidiNumber(pitchName);
+  if (midiNum === null || midiNum === undefined) return;
 
-  // Prevent continuous holding without release from triggering duplicate note-on attacks
-  if (existing && existing.isDown) {
+  const existing = activeHeldKeyAttacks.get(midiNum);
+  const isCurrentlyHeld = Boolean(existing && existing.isDown);
+  const lastReleaseMs = (typeof lastNoteUpPerfMs !== "undefined") ? (lastNoteUpPerfMs.get(midiNum) || 0) : 0;
+  const debounceMs = (source === "midi" || source === "mouse") ? 30 : 0;
+
+  if (isCurrentlyHeld && source === "midi" && meta.channel && existing.heldChannels) {
+    existing.heldChannels.add(meta.channel);
+  }
+
+  const gate = (window.MusicTheory && window.MusicTheory.evaluateRepeatedNoteAttackGate)
+    ? window.MusicTheory.evaluateRepeatedNoteAttackGate({
+        isCurrentlyHeld,
+        nowMs: now,
+        lastReleaseMs,
+        debounceMs
+      })
+    : { allowed: !isCurrentlyHeld };
+
+  if (!gate.allowed) {
     return;
   }
 
   const noteAttack = {
     pitch: pitchName,
+    noteNumber: midiNum,
     downTime: now,
     attackId: ++attackCounter,
     isDown: true,
     consumedStepIndex: null,
+    expectedVoiceBeats: null,
     source: source,
+    heldChannels: new Set(meta.channel ? [meta.channel] : []),
     ...meta
   };
-  activeHeldKeyAttacks.set(pitchName, noteAttack);
+  activeHeldKeyAttacks.set(midiNum, noteAttack);
   updateActiveChordRecognizer();
 
   // Connect interactive playing to Live Sustain stage
-  const midiNum = meta.noteNumber ?? ((window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(pitchName) : getPitchMidiNumber(pitchName));
   if (midiNum && source !== "direct") {
     createSustainLane(midiNum, pitchName);
   }
@@ -119,24 +170,73 @@ function handleNoteDown(pitchName, source = "input", meta = {}) {
 
 function handleNoteUp(pitchName, meta = {}) {
   const now = performance.now();
-  const noteAttack = activeHeldKeyAttacks.get(pitchName);
+  const midiNum = (typeof getCanonicalMidiNumber === "function")
+    ? getCanonicalMidiNumber(meta.noteNumber !== undefined ? meta.noteNumber : pitchName)
+    : getPitchMidiNumber(pitchName);
+  if (midiNum === null || midiNum === undefined) return;
 
-  const midiNum = meta.noteNumber ?? ((window.MusicTheory && window.MusicTheory.pitchToMidi) ? window.MusicTheory.pitchToMidi(pitchName) : getPitchMidiNumber(pitchName));
-  if (midiNum) {
-    removeSustainLane(midiNum);
+  const noteAttack = activeHeldKeyAttacks.get(midiNum);
+  if (noteAttack && meta.channel && noteAttack.heldChannels && noteAttack.heldChannels.size > 1) {
+    noteAttack.heldChannels.delete(meta.channel);
+    if (noteAttack.heldChannels.size > 0) return;
+  }
+
+  removeSustainLane(midiNum);
+  if (typeof lastNoteUpPerfMs !== "undefined") {
+    lastNoteUpPerfMs.set(midiNum, now);
   }
 
   if (noteAttack) {
     noteAttack.isDown = false;
     const durationMs = now - noteAttack.downTime;
-    const bpm = parseInt(document.getElementById("tempoSlider")?.value, 10) || 100;
+    const bpm = (typeof getCurrentTempoBpm === "function")
+      ? getCurrentTempoBpm()
+      : (parseInt(document.getElementById("tempoSlider")?.value, 10) || 100);
     const heldBeats = (durationMs / 1000) * (bpm / 60);
 
+    activeHeldKeyAttacks.delete(midiNum);
+
     if (activeEducationalMode === "repertoire" && isWaitPracticeMode) {
-      checkAndPlayNoteOff(pitchName, heldBeats, durationMs);
+      handleTiedReleaseCheck(midiNum);
+      checkAndPlayNoteOff(pitchName, heldBeats, durationMs, noteAttack);
     }
-    activeHeldKeyAttacks.delete(pitchName);
+    if (typeof updateKeyboardTargetHighlights === "function" && typeof songNoteSteps !== "undefined") {
+      updateKeyboardTargetHighlights(songNoteSteps[currentPracticeStep], stepFulfilledPitches);
+    }
+    if (typeof songNoteSteps !== "undefined" && songNoteSteps[currentPracticeStep]) {
+      updateTargetBadgeDisplay(songNoteSteps[currentPracticeStep], stepFulfilledPitches);
+    }
     updateActiveChordRecognizer();
+  }
+}
+
+function handleTiedReleaseCheck(releasedMidiNum = null) {
+  if (activeEducationalMode !== "repertoire" || !isWaitPracticeMode || isSongFinished) return;
+  const step = songNoteSteps[currentPracticeStep];
+  if (!step || !Array.isArray(step.tiedPitches) || step.tiedPitches.length === 0) return;
+
+  let anyReleasedEarly = false;
+  let releasedLabel = "";
+  step.tiedPitches.forEach(p => {
+    if (stepFulfilledPitches.has(p) && !isPitchActivelySustained(p)) {
+      stepFulfilledPitches.delete(p);
+      anyReleasedEarly = true;
+      releasedLabel = p;
+    }
+  });
+
+  if (anyReleasedEarly) {
+    clearWaitPracticeTimer();
+    updateTargetBadgeDisplay(step, stepFulfilledPitches);
+    if (typeof updateKeyboardTargetHighlights === "function") {
+      updateKeyboardTargetHighlights(step, stepFulfilledPitches);
+    }
+    const feedbackText = document.getElementById("hudFeedbackText");
+    if (feedbackText) {
+      feedbackText.style.color = "#f59e0b";
+      feedbackText.textContent = `🔗 Released tie early — press ${releasedLabel || step.tiedPitches.join(" + ")} to continue`;
+      delete feedbackText.dataset.baseText;
+    }
   }
 }
 
@@ -147,6 +247,7 @@ function checkAndPlayNote(playedPitch) {
 
 function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
   const isFromMidi = noteAttack && noteAttack.source === "midi";
+  if (noteAttack && noteAttack.consumedStepIndex !== null) return;
 
   if (!isWaitPracticeMode || isSongFinished) {
     playSingleNoteAudit(playedPitch, "rh", !isFromMidi);
@@ -163,13 +264,13 @@ function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
 
   // Handle Rest Step Transition
   if (!currentStep.expectedPitches || currentStep.expectedPitches.length === 0) {
-    // Current step is a rest! If user strikes the next playable note, advance through the rest cleanly
     const nextStep = songNoteSteps[currentPracticeStep + 1];
     if (nextStep && nextStep.expectedPitches && nextStep.expectedPitches.length > 0) {
       const matchesNext = nextStep.expectedPitches.some(p =>
         p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch))
       );
       if (matchesNext) {
+        clearWaitPracticeTimer();
         isPracticeSessionStarted = true;
         advancePracticeStep();
         checkAndPlayNoteOn(playedPitch, noteAttack);
@@ -184,6 +285,34 @@ function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
   const targetBadge = document.getElementById("hudTargetBadge");
   const feedbackText = document.getElementById("hudFeedbackText");
 
+  // Guard pre-rest / tie hold timer if current step is already completely fulfilled
+  if (waitPracticeStepTimerId !== null && stepFulfilledPitches.size >= expected.length) {
+    const matchesCurrentTied = currentStep.tiedFromPrev && Array.isArray(currentStep.tiedPitches) && currentStep.tiedPitches.some(p =>
+      p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch))
+    );
+    if (matchesCurrentTied) {
+      clearWaitPracticeTimer();
+      if (noteAttack) noteAttack.consumedStepIndex = currentPracticeStep;
+      playSingleNoteAudit(playedPitch, "rh", !isFromMidi);
+      advancePracticeStep();
+      return;
+    }
+    const nextStep = songNoteSteps[currentPracticeStep + 1];
+    const stepAfterRest = songNoteSteps[currentPracticeStep + 2];
+    const nextIsRest = nextStep && (!nextStep.expectedPitches || nextStep.expectedPitches.length === 0);
+    if (nextIsRest && stepAfterRest && stepAfterRest.expectedPitches && stepAfterRest.expectedPitches.some(p =>
+      p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch))
+    )) {
+      clearWaitPracticeTimer();
+      stepFulfilledPitches.clear();
+      currentPracticeStep = currentPracticeStep + 2;
+      highlightActiveScoreNote(currentPracticeStep);
+      checkAndPlayNoteOn(playedPitch, noteAttack);
+      return;
+    }
+    return;
+  }
+
   // Verify if this strike matches an unfulfilled expected note of the current step
   const matchedPitch = expected.find(p => {
     if (stepFulfilledPitches.has(p)) return false;
@@ -193,9 +322,11 @@ function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
   practiceStats.attempts++;
 
   if (matchedPitch) {
-    // Satisfy this note in the current step
     stepFulfilledPitches.add(matchedPitch);
-    if (noteAttack) noteAttack.consumedStepIndex = currentPracticeStep;
+    if (noteAttack) {
+      noteAttack.consumedStepIndex = currentPracticeStep;
+      noteAttack.expectedVoiceBeats = getVoiceBeatsForPitch(currentStep, matchedPitch);
+    }
 
     practiceStats.correct++;
     sessionCurrentStreak++;
@@ -203,56 +334,68 @@ function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
       sessionBestStreak = sessionCurrentStreak;
     }
 
-    // If note was played via MIDI, startLiveTone already handles synthesis; only audit sound for non-MIDI if synth audio is enabled
     playSingleNoteAudit(playedPitch, "rh", !isFromMidi);
     targetBadge.classList.remove("error-flash");
 
-    const isFullyFulfilled = (stepFulfilledPitches.size >= expected.length);
+    const remaining = expected.filter(p => !stepFulfilledPitches.has(p));
 
-    if (!isFullyFulfilled) {
-      // Multi-hand or chord step: first hand landed, waiting for concurrent note(s)
-      const remaining = expected.filter(p => !stepFulfilledPitches.has(p));
+    if (remaining.length > 0) {
       feedbackText.style.color = "#38bdf8";
       feedbackText.textContent = `🎵 ${playedPitch} locked (${stepFulfilledPitches.size}/${expected.length}) — now play ${remaining.join(" + ")}!`;
+      delete feedbackText.dataset.baseText;
       updateTargetBadgeDisplay(currentStep, stepFulfilledPitches);
+      if (typeof updateKeyboardTargetHighlights === "function") {
+        updateKeyboardTargetHighlights(currentStep, stepFulfilledPitches);
+      }
       return;
     }
 
     // ALL notes of this step are fulfilled!
+    lastPerfectStepIndex = currentPracticeStep;
+    const baseOkMsg = `✅ Perfect! ${expected.join(" + ")}`;
     feedbackText.style.color = "#34d399";
-    feedbackText.textContent = `✅ Perfect! ${expected.join(" + ")}`;
+    feedbackText.dataset.baseText = baseOkMsg;
+    feedbackText.textContent = baseOkMsg;
 
-    // If the next step is a rest, hold the current note visually fulfilled for its remaining musical duration
+    // If the next step is a rest, hold the current note visually fulfilled for its live tempo duration
     const nextStep = songNoteSteps[currentPracticeStep + 1];
     const isNextStepRest = nextStep && (!nextStep.expectedPitches || nextStep.expectedPitches.length === 0);
 
     if (isNextStepRest) {
-      const tempo = currentSong ? (currentSong.tempo || 90) : 90;
+      const tempo = getCurrentTempoBpm();
       const noteDurationMs = Math.max(250, (currentStep.beats || 1) * (60000 / tempo));
       if (currentStep.beats && currentStep.beats > 1) {
-        feedbackText.textContent += ` • hold ${currentStep.beats}b`;
+        const holdMsg = `${baseOkMsg} • hold ${currentStep.beats}b`;
+        feedbackText.dataset.baseText = holdMsg;
+        feedbackText.textContent = holdMsg;
       }
+      clearWaitPracticeTimer();
       const stepHolding = currentPracticeStep;
-      setTimeout(() => {
-        if (currentPracticeStep === stepHolding && isWaitPracticeMode) {
+      waitPracticeStepTimerId = setTimeout(() => {
+        waitPracticeStepTimerId = null;
+        if (currentPracticeStep === stepHolding && isWaitPracticeMode && !isSongFinished) {
           advancePracticeStep();
         }
       }, noteDurationMs);
       return;
     }
 
-    // Advance to next step
     advancePracticeStep();
   } else {
-    // Did user restrike an already fulfilled note of this step while waiting for the other hand?
-    if (expected.some(p => p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch)))) {
-      const remaining = expected.filter(p => !stepFulfilledPitches.has(p));
+    const remaining = expected.filter(p => !stepFulfilledPitches.has(p));
+    const matchesAlreadyFulfilled = expected.some(p =>
+      stepFulfilledPitches.has(p) &&
+      (p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch)))
+    );
+    if (matchesAlreadyFulfilled && remaining.length > 0) {
       feedbackText.style.color = "#fbbf24";
       feedbackText.textContent = `⚠️ Already locked ${playedPitch} — still waiting for ${remaining.join(" + ")}!`;
+      delete feedbackText.dataset.baseText;
       return;
     }
 
     // Genuine wrong note
+    lastPerfectStepIndex = -1;
     practiceStats.cleanLoop = false;
     sessionCurrentStreak = 0;
     sessionMistakeMeasures.add(currentStep.measure);
@@ -263,7 +406,7 @@ function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
       expected: expected
     });
 
-    if (isSynthAudioEnabled()) {
+    if (!isFromMidi && isSynthAudioEnabled()) {
       playTone(getNoteFreq(playedPitch), 0.2);
     }
     targetBadge.classList.remove("error-flash");
@@ -274,36 +417,32 @@ function checkAndPlayNoteOn(playedPitch, noteAttack = null) {
     if (targetEl) targetEl.classList.add("error-target");
 
     feedbackText.style.color = "#f87171";
-    const remaining = expected.filter(p => !stepFulfilledPitches.has(p));
+    delete feedbackText.dataset.baseText;
     feedbackText.textContent = `❌ You played ${playedPitch} — try ${remaining.join(" + ")}!`;
   }
 }
 
-function checkAndPlayNoteOff(pitchName, heldBeats, durationMs) {
-  if (!isWaitPracticeMode) return;
-  const targetStep = songNoteSteps[currentPracticeStep > 0 ? currentPracticeStep - 1 : 0] || songNoteSteps[0];
-  const targetBeats = targetStep ? (targetStep.beats || 1.0) : 1.0;
+function checkAndPlayNoteOff(pitchName, heldBeats, durationMs, noteAttack = null) {
+  if (!isWaitPracticeMode || !noteAttack || noteAttack.consumedStepIndex === null) return;
+  const step = songNoteSteps[noteAttack.consumedStepIndex];
+  const targetBeats = noteAttack.expectedVoiceBeats || (step ? (step.beats || 1.0) : 1.0);
+  const bpm = getCurrentTempoBpm();
+  const evalRes = (window.MusicTheory && window.MusicTheory.evaluateNoteHoldDuration)
+    ? window.MusicTheory.evaluateNoteHoldDuration(durationMs, bpm, targetBeats)
+    : { heldBeats, targetBeats, category: "good", label: "Good duration!" };
+
+  if (evalRes.category === "staccato") sessionRhythmCounts.shortTap++;
+  else if (evalRes.category === "flawless") sessionRhythmCounts.flawless++;
+  else sessionRhythmCounts.other++;
 
   const feedbackText = document.getElementById("hudFeedbackText");
-  if (feedbackText && feedbackText.style.color === "rgb(52, 211, 153)") { // Green "Perfect" state
-    const holdRatio = heldBeats / targetBeats;
-    let durationDesc = "Good duration!";
-    if (holdRatio < 0.45) {
-      durationDesc = "Staccato tap — hold longer for full beat value!";
-      sessionRhythmCounts.shortTap++;
-    } else if (holdRatio >= 0.75 && holdRatio <= 1.35) {
-      durationDesc = "🎯 Flawless rhythmic hold!";
-      sessionRhythmCounts.flawless++;
-    } else {
-      if (holdRatio > 1.5) durationDesc = "Held longer than value (tenuto)";
-      sessionRhythmCounts.other++;
-    }
-
-    feedbackText.textContent += ` • Held ${heldBeats.toFixed(2)}b / ${targetBeats}b (${durationDesc})`;
+  if (feedbackText && noteAttack.consumedStepIndex === lastPerfectStepIndex && feedbackText.dataset.baseText) {
+    feedbackText.textContent = `${feedbackText.dataset.baseText} • Held ${evalRes.heldBeats.toFixed(2)}b / ${evalRes.targetBeats}b (${evalRes.label})`;
   }
 }
 
 function advancePracticeStep() {
+  clearWaitPracticeTimer();
   stepFulfilledPitches.clear();
   const isLoop = document.getElementById("toggleLoopSection")?.checked;
   const startM = parseInt(document.getElementById("loopStartMeasure")?.value, 10) || 1;
@@ -408,10 +547,20 @@ function updatePlaybackChordPill() {
 
 function triggerTransportVoicePlayback(voiceKey, voiceData, defaultOct, bpm) {
   if (!voiceData || !voiceData.pitch || voiceData.pitch === "-") return;
+
+  // Seamless tie continuation: keep already ringing note & highlight without re-striking
+  if (voiceData.isTiedContinuation && transportState.activeVoiceNotes.has(voiceKey)) {
+    const curNotes = transportState.activeVoiceNotes.get(voiceKey) || [];
+    const nextMidis = voiceData.pitch.split("+").filter(p => p && p !== "-").map(p => getCanonicalMidiNumber(p));
+    const curMidis = curNotes.map(n => n.num);
+    const allMatch = nextMidis.length > 0 && nextMidis.length === curMidis.length && nextMidis.every(m => curMidis.includes(m));
+    if (allMatch) return;
+  }
+
   const beatMs = (60 / bpm) * 1000;
-  const voiceBeats = voiceData.beats || 1.0;
-  const voiceDurationMs = voiceBeats * beatMs;
-  const voiceSoundDuration = (voiceBeats * (60 / bpm)) * 0.95;
+  const playBeats = voiceData.tied ? (voiceData.tiedTotalBeats || voiceData.beats || 1.0) : (voiceData.beats || 1.0);
+  const voiceDurationMs = playBeats * beatMs;
+  const voiceSoundDuration = (playBeats * (60 / bpm)) * 0.95;
   const activeClass = voiceKey === "dyad" ? "active-dyad" : (voiceKey === "lh" ? "active-lh" : "active-rh");
 
   document.querySelectorAll(`.piano-key.${activeClass}`).forEach(k => k.classList.remove(activeClass));
@@ -692,10 +841,18 @@ function schedulePlaybackStep(stepIndex) {
   const showLH = !!document.getElementById("toggleLH")?.checked;
   const showDyads = !!document.getElementById("toggleDyads")?.checked;
 
+  const nowPerf = performance.now();
+  const expectedNow = (typeof transportState.nextStepTargetPerfMs === "number" && transportState.nextStepTargetPerfMs > 0)
+    ? transportState.nextStepTargetPerfMs
+    : nowPerf;
+  const stepAnchorPerfMs = (Math.abs(nowPerf - expectedNow) > 300) ? nowPerf : expectedNow;
+
   transportState.currentStepIndex = stepIndex;
-  transportState.stepStartPerfMs = performance.now();
+  transportState.stepStartPerfMs = stepAnchorPerfMs;
   transportState.currentStepBeats = stepBeats;
   transportState.lastStepBpm = bpm;
+  transportState.nextStepTargetPerfMs = stepAnchorPerfMs + stepDurationMs;
+  const waitDelayMs = Math.max(4, transportState.nextStepTargetPerfMs - performance.now());
   currentPracticeStep = stepIndex;
 
   document.querySelectorAll(".note-group").forEach(g => g.classList.remove("active-target"));
@@ -758,6 +915,7 @@ function schedulePlaybackStep(stepIndex) {
           feedbackEl.textContent = `⚡ Loop pass #${transportState.loopPassCount}! Tempo ramped to ${nextBpm} BPM!`;
         }
       }
+      transportState.nextStepTargetPerfMs = performance.now();
       schedulePlaybackStep(loop.startStepIndex);
       return;
     }
@@ -772,16 +930,18 @@ function schedulePlaybackStep(stepIndex) {
         }
       }, tailWait);
     }
-  }, stepDurationMs);
+  }, waitDelayMs);
 }
 
 function stopPlayback(resetToStart = true) {
+  clearWaitPracticeTimer();
   clearTransportTimersAndVoices();
   if (typeof stopRepertoireMetronomeClock === "function") {
     stopRepertoireMetronomeClock();
   }
   transportState.status = "stopped";
   transportState.loopPassCount = 0;
+  transportState.nextStepTargetPerfMs = 0;
 
   if (resetToStart) {
     const loop = getActiveLoopBounds();
@@ -791,7 +951,11 @@ function stopPlayback(resetToStart = true) {
     document.querySelectorAll(".note-group").forEach(g => g.classList.remove("active-target"));
     if (isWaitPracticeMode && songNoteSteps && songNoteSteps.length > 0) {
       highlightActiveScoreNote(targetStart, false);
+    } else if (typeof updateKeyboardTargetHighlights === "function") {
+      updateKeyboardTargetHighlights(null);
     }
+  } else if (typeof updateKeyboardTargetHighlights === "function") {
+    updateKeyboardTargetHighlights(null);
   }
   updateTransportUI();
 }
@@ -835,6 +999,8 @@ function startPlayback(options = {}) {
   const beginPlaying = () => {
     if (transportState.status === "stopped" || transportState.status === "paused") return;
     transportState.status = "playing";
+    transportState.nextStepTargetPerfMs = performance.now();
+    if (typeof updateKeyboardTargetHighlights === "function") updateKeyboardTargetHighlights(null);
     updateTransportUI();
     if (typeof isRepertoireMetroActive !== "undefined" && isRepertoireMetroActive) {
       startRepertoireMetronomeClock();
@@ -861,6 +1027,7 @@ function pausePlayback() {
     stopRepertoireMetronomeClock();
   }
   transportState.status = "paused";
+  transportState.nextStepTargetPerfMs = 0;
   transportState.currentStepIndex = pausedStep;
   currentPracticeStep = pausedStep;
 
@@ -894,12 +1061,14 @@ function togglePlayPause() {
 
 function seekPlaybackToStep(stepIndex, options = {}) {
   if (!songNoteSteps || songNoteSteps.length === 0) return;
+  clearWaitPracticeTimer();
   const clampedIdx = Math.max(0, Math.min(songNoteSteps.length - 1, Math.floor(stepIndex)));
 
   if (transportState.status === "playing") {
     clearTransportTimersAndVoices();
     transportState.status = "playing";
     transportState.currentStepIndex = clampedIdx;
+    transportState.nextStepTargetPerfMs = performance.now();
     currentPracticeStep = clampedIdx;
     startTransportScrubberLoop();
     schedulePlaybackStep(clampedIdx);
@@ -966,6 +1135,7 @@ function applyLiveTempoChange(newBpm) {
 
     clearTimeout(transportState.stepTimerId);
     transportState.lastStepBpm = clamped;
+    transportState.nextStepTargetPerfMs = performance.now() + remainingNewMs;
     transportState.stepTimerId = setTimeout(() => {
       if (transportState.status !== "playing") return;
       const loop = getActiveLoopBounds();
@@ -975,6 +1145,7 @@ function applyLiveTempoChange(newBpm) {
           const bumped = Math.min(200, getCurrentTempoBpm() + 5);
           applyLiveTempoChange(bumped);
         }
+        transportState.nextStepTargetPerfMs = performance.now();
         schedulePlaybackStep(loop.startStepIndex);
         return;
       }
@@ -1007,8 +1178,14 @@ function setRelativeSpeedPercent(pct) {
 // 🥁 TEMPO FLOW MODE (METRONOME-SYNCED PLAYHEAD & TIMING EVALUATION)
 function stopTempoFlow() {
   isTempoFlowActive = false;
+  if (tempoFlowRunRafId) {
+    cancelAnimationFrame(tempoFlowRunRafId);
+    tempoFlowRunRafId = null;
+  }
   tempoFlowTimeouts.forEach(t => clearTimeout(t));
   tempoFlowTimeouts = [];
+  tempoFlowFulfilledSets.clear();
+  tempoFlowStepOnsetTimes = [];
   const tfToggle = document.getElementById("tempoFlowToggle");
   if (tfToggle) {
     tfToggle.classList.remove("active-practice");
@@ -1033,8 +1210,14 @@ function startTempoFlow() {
   stopPlayback(false);
 
   isTempoFlowActive = true;
+  if (tempoFlowRunRafId) {
+    cancelAnimationFrame(tempoFlowRunRafId);
+    tempoFlowRunRafId = null;
+  }
   tempoFlowTimeouts.forEach(t => clearTimeout(t));
   tempoFlowTimeouts = [];
+  tempoFlowFulfilledSets.clear();
+  tempoFlowStepOnsetTimes = [];
   tempoFlowStats = { total: 0, perfect: 0, good: 0, lateOrEarly: 0, missed: 0 };
 
   const tfToggle = document.getElementById("tempoFlowToggle");
@@ -1107,11 +1290,55 @@ function runTempoFlowSequence(startIdx = 0) {
     return;
   }
 
+  tempoFlowFulfilledSets.clear();
+  tempoFlowStepOnsetTimes = new Array(songNoteSteps.length);
+  songNoteSteps.forEach(s => {
+    if (s) {
+      s._flowCounted = false;
+      s._flowScored = false;
+      s._flowMissed = false;
+    }
+  });
+
   let flowLoopMisses = 0;
   let flowMetroTimerId = null;
   let flowMetroTick = 0;
+  tempoFlowClockAnchorPerfMs = performance.now();
+  let flowMetroStartPerfMs = tempoFlowClockAnchorPerfMs;
+  let flowMetroTickCount = 0;
+  let flowMetroLastBpm = getCurrentTempoBpm();
+  let nextStepTargetPerfMs = tempoFlowClockAnchorPerfMs;
 
-  // Isochronous Metronome Clicks synchronized with live BPM
+  const scheduleStepOnsetLookahead = (fromIdx, fromPerfMs, bpmVal) => {
+    const beatMs = (60 / bpmVal) * 1000;
+    let cursorMs = fromPerfMs;
+    for (let k = fromIdx; k < songNoteSteps.length; k++) {
+      tempoFlowStepOnsetTimes[k] = cursorMs;
+      cursorMs += (songNoteSteps[k]?.beats || 1.0) * beatMs;
+    }
+  };
+
+  const startFlowScrubberRaf = () => {
+    if (tempoFlowRunRafId) cancelAnimationFrame(tempoFlowRunRafId);
+    const tickRaf = () => {
+      if (!isTempoFlowActive) {
+        tempoFlowRunRafId = null;
+        return;
+      }
+      const timeline = currentPlaybackTimeline;
+      const stepTiming = timeline && timeline.stepTimings ? timeline.stepTimings[currentPracticeStep] : null;
+      if (stepTiming) {
+        const bpm = getCurrentTempoBpm();
+        const elapsedBeats = ((performance.now() - tempoFlowStepStartTime) / 1000) * (bpm / 60);
+        const clampedBeat = stepTiming.startBeat + Math.min(stepTiming.beats, Math.max(0, elapsedBeats));
+        updateTransportUI(clampedBeat);
+      }
+      tempoFlowRunRafId = requestAnimationFrame(tickRaf);
+    };
+    tempoFlowRunRafId = requestAnimationFrame(tickRaf);
+  };
+
+  // Isochronous Metronome Clicks synchronized with live BPM & anchored to wall clock
   function scheduleFlowMetro() {
     if (!isTempoFlowActive) return;
     const bpm = getCurrentTempoBpm();
@@ -1119,6 +1346,12 @@ function runTempoFlowSequence(startIdx = 0) {
     const metroCalc = (window.MusicTheory && window.MusicTheory.calculateMetronomeIntervals)
       ? window.MusicTheory.calculateMetronomeIntervals(bpm, timeSigStr, 1)
       : { tickIntervalMs: (60 / bpm) * 1000, ticksPerMeasure: 4 };
+
+    if (bpm !== flowMetroLastBpm) {
+      flowMetroStartPerfMs = performance.now();
+      flowMetroTickCount = 0;
+      flowMetroLastBpm = bpm;
+    }
 
     const profile = (window.MusicTheory && window.MusicTheory.getMetronomeTickProfile)
       ? window.MusicTheory.getMetronomeTickProfile(flowMetroTick, metroCalc.ticksPerMeasure, timeSigStr, 1)
@@ -1130,19 +1363,30 @@ function runTempoFlowSequence(startIdx = 0) {
       playTone(profile.freq, 0.04);
     }
     flowMetroTick = (flowMetroTick + 1) % metroCalc.ticksPerMeasure;
-    flowMetroTimerId = setTimeout(scheduleFlowMetro, metroCalc.tickIntervalMs);
+    flowMetroTickCount++;
+    const targetNextMs = flowMetroStartPerfMs + (flowMetroTickCount * metroCalc.tickIntervalMs);
+    const waitMs = Math.max(4, targetNextMs - performance.now());
+    flowMetroTimerId = setTimeout(scheduleFlowMetro, waitMs);
     tempoFlowTimeouts.push(flowMetroTimerId);
+  }
+
+  function finalizeCompletedStepCheck(stepIdxToCheck) {
+    const checkedStep = songNoteSteps[stepIdxToCheck];
+    if (!checkedStep || !checkedStep.expectedPitches || checkedStep.expectedPitches.length === 0) return;
+    const fulfilled = tempoFlowFulfilledSets.get(stepIdxToCheck);
+    const isDone = Boolean(fulfilled && fulfilled.size >= checkedStep.expectedPitches.length);
+    if (!isDone && !checkedStep._flowMissed && !checkedStep._flowScored) {
+      checkedStep._flowMissed = true;
+      tempoFlowStats.missed++;
+      flowLoopMisses++;
+    }
   }
 
   function advanceFlowStep(stepIdx, isFirstInRun = false) {
     if (!isTempoFlowActive) return;
 
-    if (!isFirstInRun && !tempoFlowStepFulfilled) {
-      const prevStep = songNoteSteps[currentPracticeStep];
-      if (prevStep && prevStep.expectedPitches && prevStep.expectedPitches.length > 0) {
-        tempoFlowStats.missed++;
-        flowLoopMisses++;
-      }
+    if (!isFirstInRun) {
+      finalizeCompletedStepCheck(currentPracticeStep);
     }
 
     const step = songNoteSteps[stepIdx];
@@ -1155,32 +1399,61 @@ function runTempoFlowSequence(startIdx = 0) {
     const beatMs = (60 / bpm) * 1000;
     const stepBeats = step.beats || 1.0;
     const stepDurationMs = stepBeats * beatMs;
+    const nowPerf = performance.now();
+    const scheduledOnset = isFirstInRun ? nowPerf : nextStepTargetPerfMs;
+    nextStepTargetPerfMs = scheduledOnset + stepDurationMs;
+    scheduleStepOnsetLookahead(stepIdx, scheduledOnset, bpm);
 
     currentPracticeStep = stepIdx;
     transportState.currentStepIndex = stepIdx;
-    tempoFlowStepFulfilled = false;
-    tempoFlowStepStartTime = performance.now();
-    tempoFlowStats.total++;
+    tempoFlowStepStartTime = scheduledOnset;
+
+    let fulfilledSet = tempoFlowFulfilledSets.get(stepIdx);
+    if (!fulfilledSet) {
+      fulfilledSet = new Set();
+      tempoFlowFulfilledSets.set(stepIdx, fulfilledSet);
+    }
+
+    if (step.tiedFromPrev && Array.isArray(step.tiedPitches) && step.tiedPitches.length > 0) {
+      step.tiedPitches.forEach(p => {
+        if (typeof isPitchActivelySustained === "function" && isPitchActivelySustained(p)) {
+          fulfilledSet.add(p);
+        }
+      });
+    }
+
+    const hasPlayableNotes = Array.isArray(step.expectedPitches) && step.expectedPitches.length > 0;
+    if (hasPlayableNotes && !step._flowCounted) {
+      step._flowCounted = true;
+      tempoFlowStats.total++;
+    }
+    tempoFlowStepFulfilled = hasPlayableNotes ? (fulfilledSet.size >= step.expectedPitches.length) : true;
 
     highlightActiveScoreNote(stepIdx);
-    updateTargetBadgeDisplay(step, null);
+    updateTargetBadgeDisplay(step, fulfilledSet);
     document.getElementById("hudProgressText").textContent = `Step: ${stepIdx + 1} / ${songNoteSteps.length}`;
     updateTransportUI();
 
+    const waitMs = Math.max(4, nextStepTargetPerfMs - performance.now());
     const stepTimer = setTimeout(() => {
       if (!isTempoFlowActive) return;
       const loop = getActiveLoopBounds();
       if (loop.active && stepIdx >= loop.endStepIndex) {
-        if (!tempoFlowStepFulfilled && step.expectedPitches && step.expectedPitches.length > 0) {
-          tempoFlowStats.missed++;
-          flowLoopMisses++;
-        }
+        finalizeCompletedStepCheck(stepIdx);
         if (flowLoopMisses === 0 && document.getElementById("toggleTempoRamp")?.checked) {
           const nextBpm = Math.min(200, getCurrentTempoBpm() + 5);
           applyLiveTempoChange(nextBpm);
         }
         flowLoopMisses = 0;
-        tempoFlowStepFulfilled = true;
+        for (let j = loop.startStepIndex; j <= loop.endStepIndex; j++) {
+          tempoFlowFulfilledSets.delete(j);
+          if (songNoteSteps[j]) {
+            songNoteSteps[j]._flowCounted = false;
+            songNoteSteps[j]._flowScored = false;
+            songNoteSteps[j]._flowMissed = false;
+          }
+        }
+        nextStepTargetPerfMs = performance.now();
         advanceFlowStep(loop.startStepIndex, true);
         return;
       }
@@ -1188,50 +1461,104 @@ function runTempoFlowSequence(startIdx = 0) {
       if (stepIdx + 1 < songNoteSteps.length) {
         advanceFlowStep(stepIdx + 1, false);
       } else {
-        if (!tempoFlowStepFulfilled && step.expectedPitches && step.expectedPitches.length > 0) {
-          tempoFlowStats.missed++;
-        }
+        finalizeCompletedStepCheck(stepIdx);
         finishTempoFlow();
       }
-    }, stepDurationMs);
+    }, waitMs);
 
     tempoFlowTimeouts.push(stepTimer);
   }
 
   scheduleFlowMetro();
+  startFlowScrubberRaf();
   advanceFlowStep(startIdx, true);
 }
 
 function verifyTempoFlowInput(playedPitch, noteAttack = null) {
   if (!isTempoFlowActive) return;
-  const step = songNoteSteps[currentPracticeStep];
-  if (!step || !step.expectedPitches || step.expectedPitches.length === 0) return;
+  if (noteAttack && noteAttack.consumedStepIndex !== null) return;
 
-  const isMatch = step.expectedPitches.some(p => p === playedPitch || (window.MusicTheory && window.MusicTheory.areEnharmonicEquivalent(p, playedPitch)));
   const isFromMidi = noteAttack && noteAttack.source === "midi";
   playSingleNoteAudit(playedPitch, "rh", !isFromMidi);
 
-  if (isMatch) {
-    const now = performance.now();
-    const diffMs = Math.abs(now - tempoFlowStepStartTime);
-    const feedbackText = document.getElementById("hudFeedbackText");
+  const hitTimeMs = performance.now();
+  const bpm = getCurrentTempoBpm();
+  const evalRes = (window.MusicTheory && window.MusicTheory.evaluateTempoFlowHit)
+    ? window.MusicTheory.evaluateTempoFlowHit({
+        hitTimeMs,
+        steps: songNoteSteps,
+        stepOnsetTimes: tempoFlowStepOnsetTimes,
+        currentStepIndex: currentPracticeStep,
+        playedPitch,
+        stepFulfilledSets: tempoFlowFulfilledSets,
+        bpm
+      })
+    : { matched: false };
 
+  const feedbackText = document.getElementById("hudFeedbackText");
+  if (!evalRes.matched) return;
+
+  const targetStep = songNoteSteps[evalRes.stepIndex];
+  if (!targetStep) return;
+
+  if (noteAttack) noteAttack.consumedStepIndex = evalRes.stepIndex;
+
+  let fulfilledSet = tempoFlowFulfilledSets.get(evalRes.stepIndex);
+  if (!fulfilledSet) {
+    fulfilledSet = new Set();
+    tempoFlowFulfilledSets.set(evalRes.stepIndex, fulfilledSet);
+  }
+  fulfilledSet.add(evalRes.matchedPitch);
+
+  if (evalRes.stepIndex === currentPracticeStep) {
+    updateTargetBadgeDisplay(targetStep, fulfilledSet);
+  }
+
+  const allDone = fulfilledSet.size >= (targetStep.expectedPitches ? targetStep.expectedPitches.length : 1);
+  if (!allDone) {
+    if (feedbackText) {
+      feedbackText.style.color = "#38bdf8";
+      feedbackText.textContent = `🎵 ${playedPitch} locked (${fulfilledSet.size}/${targetStep.expectedPitches.length})`;
+    }
+    return;
+  }
+
+  if (targetStep._flowMissed) {
+    targetStep._flowMissed = false;
+    tempoFlowStats.missed = Math.max(0, tempoFlowStats.missed - 1);
+  }
+
+  if (!targetStep._flowScored) {
+    targetStep._flowScored = true;
+    if (evalRes.grade === "PERFECT") tempoFlowStats.perfect++;
+    else if (evalRes.grade === "GOOD") tempoFlowStats.good++;
+    else tempoFlowStats.lateOrEarly++;
+  }
+
+  if (evalRes.stepIndex === currentPracticeStep) {
     tempoFlowStepFulfilled = true;
-    if (diffMs <= 45) {
-      tempoFlowStats.perfect++;
-      feedbackText.innerHTML = `<span class="timing-badge-perfect">🔥 PERFECT TIMING! (±${Math.round(diffMs)}ms)</span>`;
-    } else if (diffMs <= 95) {
-      tempoFlowStats.good++;
-      feedbackText.innerHTML = `<span class="timing-badge-good">✨ GOOD! (±${Math.round(diffMs)}ms)</span>`;
+  }
+
+  const roundedSigned = Math.round(evalRes.offsetMs || 0);
+  const signedLabel = `${roundedSigned >= 0 ? "+" : ""}${roundedSigned}ms`;
+  if (feedbackText) {
+    if (evalRes.grade === "PERFECT") {
+      feedbackText.innerHTML = `<span class="timing-badge-perfect">🔥 PERFECT TIMING! (${signedLabel})</span>`;
+    } else if (evalRes.grade === "GOOD") {
+      feedbackText.innerHTML = `<span class="timing-badge-good">✨ GOOD! (${signedLabel})</span>`;
+    } else if (evalRes.grade === "EARLY") {
+      feedbackText.innerHTML = `<span class="timing-badge-early">⚠️ EARLY (${signedLabel})</span>`;
     } else {
-      tempoFlowStats.lateOrEarly++;
-      const sign = (now > tempoFlowStepStartTime) ? "LATE" : "EARLY";
-      feedbackText.innerHTML = `<span class="timing-badge-early">⚠️ ${sign} (+${Math.round(diffMs)}ms)</span>`;
+      feedbackText.innerHTML = `<span class="timing-badge-early">⚠️ LATE (+${Math.round(evalRes.absOffsetMs || 0)}ms)</span>`;
     }
   }
 }
 
 function finishTempoFlow() {
+  if (tempoFlowRunRafId) {
+    cancelAnimationFrame(tempoFlowRunRafId);
+    tempoFlowRunRafId = null;
+  }
   const { perfect, good, lateOrEarly, missed, total } = tempoFlowStats;
   const maxPts = Math.max(1, total) * 100;
   const earned = perfect * 100 + good * 75 + lateOrEarly * 40;

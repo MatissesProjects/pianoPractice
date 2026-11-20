@@ -177,6 +177,7 @@ function populateDropdown(songsToUse = songDatabase) {
 }
 
 function loadSong(song) {
+  if (typeof clearWaitPracticeTimer === "function") clearWaitPracticeTimer();
   stopPlayback(false);
   currentSong = song;
   currentPracticeStep = 0;
@@ -203,7 +204,11 @@ function loadSong(song) {
   highlightActiveCard();
   updateKeyboardRangeWarning();
   renderSongTheoryDnaBar(song);
-  updateSongInstrumentUI();
+  if (typeof applyAutoSongInstrument === "function") {
+    applyAutoSongInstrument(song);
+  } else {
+    updateSongInstrumentUI();
+  }
   if (typeof updateTransportUI === "function") updateTransportUI();
 }
 
@@ -441,6 +446,15 @@ function applyCatalogFilters() {
 }
 
 function updateLayerToggleClasses() {
+  if (typeof clearWaitPracticeTimer === "function") clearWaitPracticeTimer();
+  if (typeof stopPlayback === "function") stopPlayback(false);
+  if (typeof isTempoFlowActive !== "undefined" && isTempoFlowActive && typeof stopTempoFlow === "function") {
+    stopTempoFlow();
+  }
+
+  const prevStepObj = (typeof songNoteSteps !== "undefined" && songNoteSteps[currentPracticeStep]) ? songNoteSteps[currentPracticeStep] : null;
+  const prevMeasure = prevStepObj ? (prevStepObj.measure || 1) : 1;
+
   document.getElementById("toggleLabelRH").classList.toggle("active-rh", document.getElementById("toggleRH").checked);
   document.getElementById("toggleLabelLH").classList.toggle("active-lh", document.getElementById("toggleLH").checked);
   document.getElementById("toggleLabelDyads").classList.toggle("active-dyad", document.getElementById("toggleDyads").checked);
@@ -458,7 +472,18 @@ function updateLayerToggleClasses() {
   }
 
   parseSongSteps();
+  if (typeof songNoteSteps !== "undefined" && songNoteSteps.length > 0) {
+    const matchedStep = songNoteSteps.find(s => (s.measure || 1) >= prevMeasure);
+    currentPracticeStep = matchedStep ? matchedStep.index : 0;
+  } else {
+    currentPracticeStep = 0;
+  }
+  if (typeof transportState !== "undefined") {
+    transportState.currentStepIndex = currentPracticeStep;
+  }
+
   renderSheetMusicScore();
+  if (typeof updateTransportUI === "function") updateTransportUI();
   if (currentSong) renderSongTheoryDnaBar(currentSong);
   if (typeof onKeyboardLayoutChanged === "function") {
     onKeyboardLayoutChanged();
@@ -600,8 +625,7 @@ function initCatalogAndLayerControls() {
     });
   });
   
-  // Paper Theme
-  let isDarkPaper = false;
+  // Paper Theme (uses shared global isDarkPaper from js/state.js)
   document.getElementById("paperThemeBtn").addEventListener("click", () => {
     isDarkPaper = !isDarkPaper;
     const sheetSec = document.getElementById("sheetMusicSection");
@@ -609,6 +633,18 @@ function initCatalogAndLayerControls() {
     document.getElementById("paperThemeBtn").textContent = isDarkPaper ? "🎨 Paper Theme: Studio Dark" : "🎨 Paper Theme: Vintage";
     renderSheetMusicScore();
   });
+
+  const instBadge = document.getElementById("currentSongInstrumentBadge");
+  if (instBadge) {
+    instBadge.addEventListener("click", () => {
+      if (typeof currentSynthInstrument !== "undefined" && currentSynthInstrument !== "auto") {
+        setSynthInstrument("auto", true);
+      } else {
+        if (typeof initAudio === "function") initAudio();
+        if (typeof playTone === "function") playTone(523.25, 0.45, 95, "rh");
+      }
+    });
+  }
   
   document.getElementById("songDropdown").addEventListener("change", (e) => {
     const found = songDatabase.find(s => s.id === e.target.value);

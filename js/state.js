@@ -160,13 +160,13 @@ function updateActiveChordRecognizer() {
     }
   }
 
-  // 3. Keys held via mouse / touch on on-screen interactive piano
+  // 3. Keys held via mouse / touch / input tracked in activeHeldKeyAttacks (canonical MIDI-number keyed)
   if (typeof activeHeldKeyAttacks !== "undefined") {
-    for (const [pitchName, attack] of activeHeldKeyAttacks) {
+    for (const [keyId, attack] of activeHeldKeyAttacks) {
       if (attack && attack.isDown) {
-        const num = attack.noteNumber ?? (NOTE_OFFSETS[pitchName.replace(/[0-9]/g, "")] + (parseInt(pitchName.slice(-1), 10) + 1) * 12);
-        if (!activeNotesMap.has(num)) {
-          activeNotesMap.set(num, { num, pitch: pitchName });
+        const num = (typeof attack.noteNumber === "number") ? attack.noteNumber : getCanonicalMidiNumber(keyId);
+        if (num !== null && !activeNotesMap.has(num)) {
+          activeNotesMap.set(num, { num, pitch: attack.pitch || midiNumberToPitch(num) });
         }
       }
     }
@@ -186,16 +186,15 @@ let currentSong = null;
 const liveOscillators = new Map();
 const activeHeldMidiNotes = new Map();
 
-// Synthesizer Timbre & Instrument State (Milestone 40)
+// Synthesizer Timbre & Instrument State (Milestone 40 & 43 Auto-Selection)
 let currentSynthInstrument = "auto";
-try {
-  const savedSynthInst = localStorage.getItem("piano_synth_instrument");
-  if (savedSynthInst) currentSynthInstrument = savedSynthInst;
-} catch (e) {}
 
 function getActiveSynthInstrument() {
   if (currentSynthInstrument && currentSynthInstrument !== "auto") {
     return currentSynthInstrument;
+  }
+  if (typeof activeEducationalMode !== "undefined" && activeEducationalMode !== "repertoire") {
+    return "grand_piano";
   }
   if (currentSong && typeof window.MusicTheory !== "undefined" && typeof window.MusicTheory.getSongDefaultInstrument === "function") {
     return window.MusicTheory.getSongDefaultInstrument(currentSong);
@@ -209,27 +208,40 @@ function updateSongInstrumentUI() {
     ? window.MusicTheory.getInstrumentParameters(effectiveId)
     : { name: "Acoustic Grand Piano", shortName: "Grand Piano", icon: "🎹" };
 
+  const defaultSongInst = (currentSong && window.MusicTheory && window.MusicTheory.getSongDefaultInstrument)
+    ? window.MusicTheory.getSongDefaultInstrument(currentSong)
+    : "grand_piano";
+  const defParams = (window.MusicTheory && window.MusicTheory.getInstrumentParameters)
+    ? window.MusicTheory.getInstrumentParameters(defaultSongInst)
+    : { shortName: "Grand Piano", icon: "🎹" };
+  const isAuto = (currentSynthInstrument === "auto");
+
   const badge = document.getElementById("currentSongInstrumentBadge");
   if (badge) {
-    badge.textContent = `${instParams.icon} ${instParams.name || instParams.shortName}`;
-    badge.title = `Active Synthesizer Instrument: ${instParams.name} (${currentSynthInstrument === "auto" ? "Song Default" : "Manual Override"})`;
+    badge.textContent = `${instParams.icon} ${instParams.name || instParams.shortName}${isAuto ? " • Auto" : " • Manual"}`;
+    badge.dataset.mode = isAuto ? "auto" : "manual";
+    badge.title = isAuto
+      ? `Auto-selected for "${currentSong ? currentSong.title : "Song"}": ${instParams.name}. Click to audition.`
+      : `Manual override: ${instParams.name}. Click to reset to Auto (${defParams.shortName}).`;
   }
 
   const sel = document.getElementById("synthInstrumentSelect");
   if (sel) {
     const autoOpt = sel.querySelector('option[value="auto"]');
     if (autoOpt) {
-      const defaultSongInst = (currentSong && window.MusicTheory && window.MusicTheory.getSongDefaultInstrument)
-        ? window.MusicTheory.getSongDefaultInstrument(currentSong)
-        : "grand_piano";
-      const defParams = (window.MusicTheory && window.MusicTheory.getInstrumentParameters)
-        ? window.MusicTheory.getInstrumentParameters(defaultSongInst)
-        : { shortName: "Grand Piano" };
-      autoOpt.textContent = `✨ Auto (${defParams.shortName || "Default"})`;
+      autoOpt.textContent = `✨ Auto: ${defParams.icon || "🎹"} ${defParams.shortName || "Grand Piano"}`;
     }
     if (sel.value !== currentSynthInstrument) {
       sel.value = currentSynthInstrument;
     }
+  }
+}
+
+function applyAutoSongInstrument(song) {
+  currentSynthInstrument = "auto";
+  updateSongInstrumentUI();
+  if (typeof sendMidiOutputProgramChange === "function") {
+    sendMidiOutputProgramChange(getActiveSynthInstrument());
   }
 }
 
@@ -240,6 +252,9 @@ function setSynthInstrument(instId, playPreview = false) {
   } catch (e) {}
 
   updateSongInstrumentUI();
+  if (typeof sendMidiOutputProgramChange === "function") {
+    sendMidiOutputProgramChange(getActiveSynthInstrument());
+  }
 
   if (playPreview && isSynthAudioEnabled()) {
     initAudio();
@@ -283,8 +298,77 @@ try {
   }
 } catch (e) {}
 let stepFulfilledPitches = new Set(); // Tracks satisfied pitches within current active practice step
-const activeHeldKeyAttacks = new Map(); // pitch -> { downTime, attackId, isDown, consumedStepIndex }
+const activeHeldKeyAttacks = new Map(); // canonical MIDI number -> { pitch, noteNumber, downTime, attackId, isDown, consumedStepIndex, expectedVoiceBeats, source, heldChannels }
+const lastNoteUpPerfMs = new Map(); // canonical MIDI number -> performance.now() of last Note Off (switch-bounce guard)
+const activeMouseKeys = new Set(); // canonical MIDI numbers currently held via mouse/touch on-screen keys
+let waitPracticeStepTimerId = null; // Single tracked cancellable timer for tie holds / pre-rest holds / rest pauses
+let lastPerfectStepIndex = -1; // Exact step index of most recent completed strike for Note-Off duration feedback
 let attackCounter = 0;
+
+function getCanonicalMidiNumber(pitchOrMidi) {
+  if (typeof pitchOrMidi === "number" && !isNaN(pitchOrMidi)) {
+    const n = Math.round(pitchOrMidi);
+    return (n >= 0 && n <= 127) ? n : null;
+  }
+  if (typeof pitchOrMidi === "string") {
+    const normalized = pitchOrMidi.trim().replace(/♯/g, "#").replace(/♭/g, "b");
+    return getPitchMidiNumber(normalized);
+  }
+  return null;
+}
+
+function getHeldKeyAttack(pitchOrMidi) {
+  const midiNum = getCanonicalMidiNumber(pitchOrMidi);
+  if (midiNum === null) return undefined;
+  return activeHeldKeyAttacks.get(midiNum);
+}
+
+function isPitchActivelyHeld(pitchOrMidi) {
+  const attack = getHeldKeyAttack(pitchOrMidi);
+  return Boolean(attack && attack.isDown);
+}
+
+function isPitchActivelySustained(pitchOrMidi) {
+  const midiNum = getCanonicalMidiNumber(pitchOrMidi);
+  if (midiNum === null) return false;
+  if (isPitchActivelyHeld(midiNum)) return true;
+  return Boolean(
+    typeof isSustainPedalDown !== "undefined" &&
+    isSustainPedalDown &&
+    typeof pedaledNotes !== "undefined" &&
+    pedaledNotes.has(midiNum)
+  );
+}
+
+function resetHeldInputState(filterSource = null) {
+  for (const [midiNum, attack] of Array.from(activeHeldKeyAttacks.entries())) {
+    if (filterSource && attack && attack.source !== filterSource) continue;
+    activeHeldKeyAttacks.delete(midiNum);
+    activeMouseKeys.delete(midiNum);
+    lastNoteUpPerfMs.set(midiNum, performance.now());
+    if (typeof removeSustainLane === "function") {
+      removeSustainLane(midiNum);
+    }
+    if (typeof stopLiveTone === "function") {
+      stopLiveTone(midiNum, true);
+    }
+    const pitchStr = (attack && attack.pitch) ? attack.pitch : midiNumberToPitch(midiNum);
+    const keyEl = findPianoKeyElement(pitchStr);
+    if (keyEl) keyEl.classList.remove("active-live");
+  }
+  if (!filterSource) {
+    activeMouseKeys.clear();
+    document.querySelectorAll(".piano-key.active-live").forEach(k => k.classList.remove("active-live"));
+  }
+  updateActiveChordRecognizer();
+  if (typeof updateKeyboardTargetHighlights === "function" && typeof songNoteSteps !== "undefined") {
+    updateKeyboardTargetHighlights(songNoteSteps[currentPracticeStep], stepFulfilledPitches);
+  }
+}
+
+function clearHeldMidiInputs() {
+  resetHeldInputState("midi");
+}
 
 function isSynthAudioEnabled() {
   const toggle = document.getElementById("midiSoundToggle");
@@ -371,6 +455,10 @@ let isTempoFlowActive = false;
 let tempoFlowTimeouts = [];
 let tempoFlowStepStartTime = 0;
 let tempoFlowStepFulfilled = false;
+const tempoFlowFulfilledSets = new Map();
+let tempoFlowStepOnsetTimes = [];
+let tempoFlowClockAnchorPerfMs = 0;
+let tempoFlowRunRafId = null;
 let tempoFlowStats = { total: 0, perfect: 0, good: 0, lateOrEarly: 0, missed: 0 };
 let isRepertoireMetroActive = false;
 let repMetroTimerId = null;
