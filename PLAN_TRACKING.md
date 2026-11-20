@@ -519,6 +519,39 @@
   - [x] **Automated Test Suite (`tests/test_education.js` Test 16 & `tests/test_score_engine.js` Test 36)**:
     - [x] Added Test 16 in `tests/test_education.js` and Test 36 in `tests/test_score_engine.js` — all 52/52 automated tests passing.
 
+- [x] **Milestone 39: Hardware Audio Output Sink Bridge, Multi-Channel Audio Router & Multi-Channel Web MIDI Output**
+  - [x] **Multi-Channel Audio Routing Engine (`theory.js`)**:
+    - [x] Defined `AUDIO_OUTPUT_CHANNEL_MODES` (`stereo`, `ch1`, `ch2`, `split_hands`, `mono`, `ch3_4`–`ch7_8`, `ch3`–`ch8`, `all_multi`) and `getAudioChannelRoutingOptions(maxChannelCount)` (expanding dynamically for up to 32 hardware channels).
+    - [x] Added `computeAudioChannelGains(channelMode, hardwareChannelCount, voiceRole)` to build per-channel gain vectors and Left/Right bus feed matrices.
+    - [x] Added `resolveMidiOutputChannels(channelSetting, voiceRole)` supporting channels `1..16`, `"split"` (RH→Ch 1, LH→Ch 2, Dyads→Ch 3), and `"omni_out"` (16-channel broadcast).
+  - [x] **Web Audio Channel Router, MediaStream Sink Bridge & MIDI Out Controls (`index.html`)**:
+    - [x] Built `setupWebAudioChannelRouter()`, `applyAudioChannelGainsMatrix()`, `getVoiceAudioDestination()`, `setAudioOutputChannelMode()`, and `#audioOutputChannelSelect` / `#audioOutputRouteBadge` with `localStorage` persistence (`piano_audio_output_channel`).
+    - [x] Added `routeAudioViaMediaStreamBridge()` fallback when `audioCtx.setSinkId` is unavailable, plus `playTestAudioChime()` and `playTestMidiOutputChime()`.
+    - [x] Wired multi-channel MIDI output (`getActiveMidiOutputChannels`, `#chOpt_split`, `#chOpt_omni_out`) with `localStorage` persistence (`piano_midi_channel`).
+  - [x] **Automated Test Suite (`tests/test_education.js` Test 17 & `tests/test_score_engine.js` Test 37)**:
+    - [x] Added Test 17 in `tests/test_education.js` and Test 37 in `tests/test_score_engine.js` — all 54/54 automated tests passing.
+
+- [x] **Milestone 40: Authentic Multi-Instrument Song Synthesis Engine, Timbre Library & Song Instrument Presets**
+  - [x] **Phase 1: Timbre Library & Song Instrument Assignment Engine (`theory.js`)**:
+    - [x] Defined `INSTRUMENT_PRESETS` with 11 authentic instrument sound models: `grand_piano`, `electric_piano`, `harpsichord`, `church_organ`, `rock_organ`, `celesta`, `acoustic_guitar`, `chiptune`, `strings_synth`, `vibraphone`, `honky_tonk`.
+    - [x] Implemented `getSongDefaultInstrument(song)` with intelligent genre/title/category heuristic resolution and `INSTRUMENT_PRESETS` verification.
+    - [x] Exported `INSTRUMENT_PRESETS`, `getSongDefaultInstrument`, and `getInstrumentParameters` in `MusicTheory` object.
+  - [x] **Phase 2: Song Database Repertoire Instrument Metadata (`songs.js`)**:
+    - [x] Tagged all 56 songs in `songs.js` with their curated authentic `"instrument"` attribute.
+    - [x] Updated fallback song database in `index.html` with instrument tags.
+  - [x] **Phase 3: Web Audio Multi-Timbre Physical Synthesizer Engine & UI (`index.html`)**:
+    - [x] Implemented physical acoustic Web Audio synthesis profiles for all 11 instrument types in `playTone`, `startLiveTone`, and `stopLiveTone` (multi-oscillators, dynamic biquad filters, harmonic hammer envelopes, LFO motor tremolo, pulse chirps).
+    - [x] Added `#synthInstrumentSelect` dropdown control in Repertoire transport controls and `#currentSongInstrumentBadge` indicator with LocalStorage persistence (`piano_synth_instrument`, default `"auto"`).
+    - [x] Added instrument preview chime on selection change.
+    - [x] Displayed instrument badge (`✨ Celesta`, `👾 Chiptune`, `⛪ Organ`, etc.) on song catalog cards.
+    - [x] Wired CC 64 Damper Sustain Pedal, live MIDI note-ons/offs, and auto play preview through the active instrument timbre.
+  - [x] **Phase 4: Automated Verification Test Suite & Documentation**:
+    - [x] Added Test 18 in `tests/test_education.js` verifying instrument presets, resolving defaults, and synthesis attributes.
+    - [x] Added Test 38 in `tests/test_score_engine.js` verifying song instrument tags across all 56 songs, DOM elements, audio synthesis routing, and full inline script syntax validation.
+    - [x] Suggested clean git commit chunks.
+
+
+
 
 
 

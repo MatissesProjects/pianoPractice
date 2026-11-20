@@ -491,7 +491,141 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 16: 📈 Milestone 38 Live BPM Proximity & Rhythm Stability Graph Engine passed");
 }
 
-console.log("=== ALL 16 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// 17. Test Milestone 39 Hardware Audio Output Discovery, Multi-Channel Audio Routing & Multi-Channel MIDI Output Engine
+{
+  assert.strictEqual(typeof MusicTheory.filterAudioOutputDevices, "function", "filterAudioOutputDevices must be exported");
+  assert.ok(MusicTheory.AUDIO_OUTPUT_CHANNEL_MODES && typeof MusicTheory.AUDIO_OUTPUT_CHANNEL_MODES === "object", "AUDIO_OUTPUT_CHANNEL_MODES must be exported");
+  assert.strictEqual(typeof MusicTheory.getAudioChannelRoutingOptions, "function", "getAudioChannelRoutingOptions must be exported");
+  assert.strictEqual(typeof MusicTheory.computeAudioChannelGains, "function", "computeAudioChannelGains must be exported");
+  assert.strictEqual(typeof MusicTheory.resolveMidiOutputChannels, "function", "resolveMidiOutputChannels must be exported");
+
+  // 17.1 Audio Output Device Normalization (empty pre-permission deviceId & authorized devices merge)
+  const rawDevices = [
+    { kind: "audiooutput", deviceId: "", label: "" },
+    { kind: "audiooutput", deviceId: "communications", label: "Communications Headphones" },
+    { kind: "audioinput", deviceId: "mic-1", label: "USB Microphone" }
+  ];
+  const authorizedExtra = [
+    { kind: "audiooutput", deviceId: "usb-dac-99", label: "Focusrite Scarlett 4i4 USB" }
+  ];
+  const filtered = MusicTheory.filterAudioOutputDevices(rawDevices, authorizedExtra);
+  assert.strictEqual(filtered.length, 3, "Must include normalized default, communications, and authorized USB DAC");
+  assert.strictEqual(filtered[0].deviceId, "default", "Empty pre-permission deviceId must normalize to 'default'");
+  assert.ok(filtered.some(d => d.deviceId === "usb-dac-99" && d.label === "Focusrite Scarlett 4i4 USB"), "Authorized device from selectAudioOutput must be merged");
+
+  // 17.2 Audio Channel Routing Options by Hardware Channel Count
+  const stereoOpts = MusicTheory.getAudioChannelRoutingOptions(2);
+  const primaryOpts = stereoOpts.filter(o => o.group === "primary");
+  assert.strictEqual(primaryOpts.length, 5, "Primary group must expose 5 stereo/channel routing modes");
+  assert.deepStrictEqual(primaryOpts.map(o => o.id), ["stereo", "ch1", "ch2", "split_hands", "mono"]);
+
+  const multi8Opts = MusicTheory.getAudioChannelRoutingOptions(8);
+  assert.ok(multi8Opts.some(o => o.id === "ch3_4" && o.isHardwareNative), "8-channel interface must expose native Ch 3+4 stereo pair");
+  assert.ok(multi8Opts.some(o => o.id === "ch5_6" && o.isHardwareNative), "8-channel interface must expose native Ch 5+6 stereo pair");
+  assert.ok(multi8Opts.some(o => o.id === "ch7_8" && o.isHardwareNative), "8-channel interface must expose native Ch 7+8 stereo pair");
+  assert.ok(multi8Opts.some(o => o.id === "ch3") && multi8Opts.some(o => o.id === "ch8"), "8-channel interface must expose discrete Ch 3..8 outputs");
+  assert.ok(multi8Opts.some(o => o.id === "all_multi"), "Multi-channel interface must expose all_multi broadcast mode");
+
+  // 17.3 Audio Channel Gain Matrix Computation (Stereo, Ch 1 Left Only, Ch 2 Right Only, Split Hands LH/RH, Multi-Channel)
+  const stereoGains = MusicTheory.computeAudioChannelGains("stereo", 2, "center");
+  assert.deepStrictEqual(stereoGains.gains, [1, 1], "Stereo mode routes full gain to Ch 1 and Ch 2");
+  assert.deepStrictEqual(stereoGains.leftBusGains, [1, 0], "Stereo mode routes Left bus to Ch 1");
+  assert.deepStrictEqual(stereoGains.rightBusGains, [0, 1], "Stereo mode routes Right bus to Ch 2");
+
+  const ch1Gains = MusicTheory.computeAudioChannelGains("ch1", 2, "center");
+  assert.deepStrictEqual(ch1Gains.gains, [1, 0], "Ch 1 mode routes exclusively to Ch 1 (Left) and mutes Ch 2");
+
+  const ch2Gains = MusicTheory.computeAudioChannelGains("ch2", 2, "center");
+  assert.deepStrictEqual(ch2Gains.gains, [0, 1], "Ch 2 mode routes exclusively to Ch 2 (Right) and mutes Ch 1");
+
+  const splitLh = MusicTheory.computeAudioChannelGains("split_hands", 2, "lh");
+  const splitRh = MusicTheory.computeAudioChannelGains("split_hands", 2, "rh");
+  assert.deepStrictEqual(splitLh.gains, [1, 0], "Split Hands routes LH strictly to Ch 1 (Left)");
+  assert.deepStrictEqual(splitRh.gains, [0, 1], "Split Hands routes RH strictly to Ch 2 (Right)");
+  assert.deepStrictEqual(splitLh.leftBusGains, [1, 0], "Split Hands maps Left/LH bus to Ch 1");
+  assert.deepStrictEqual(splitRh.rightBusGains, [0, 1], "Split Hands maps Right/RH bus to Ch 2");
+
+  const ch34Gains = MusicTheory.computeAudioChannelGains("ch3_4", 4, "center");
+  assert.deepStrictEqual(ch34Gains.gains, [0, 0, 1, 1], "Ch 3+4 mode mutes Ch 1-2 and activates Ch 3-4");
+
+  const ch5Gains = MusicTheory.computeAudioChannelGains("ch5", 8, "center");
+  assert.deepStrictEqual(ch5Gains.gains, [0, 0, 0, 0, 1, 0, 0, 0], "Discrete Ch 5 mode activates only hardware index 4");
+
+  const allMultiGains = MusicTheory.computeAudioChannelGains("all_multi", 6, "center");
+  assert.deepStrictEqual(allMultiGains.gains, [1, 1, 1, 1, 1, 1], "all_multi activates all 6 hardware channels");
+
+  // 17.4 Multi-Channel MIDI Output Resolution (Individual Ch 1..16, Split Hands, Omni Broadcast)
+  assert.deepStrictEqual(MusicTheory.resolveMidiOutputChannels("1", "rh"), [1], "Channel 1 resolves to channel [1]");
+  assert.deepStrictEqual(MusicTheory.resolveMidiOutputChannels("10", "rh"), [10], "Channel 10 resolves to channel [10]");
+  assert.deepStrictEqual(MusicTheory.resolveMidiOutputChannels("16", "lh"), [16], "Channel 16 resolves to channel [16]");
+  assert.deepStrictEqual(MusicTheory.resolveMidiOutputChannels("split", "rh"), [1], "Split Hands MIDI routes RH to Ch 1");
+  assert.deepStrictEqual(MusicTheory.resolveMidiOutputChannels("split", "lh"), [2], "Split Hands MIDI routes LH to Ch 2");
+  assert.deepStrictEqual(MusicTheory.resolveMidiOutputChannels("split", "dyad"), [3], "Split Hands MIDI routes Dyads to Ch 3");
+  const omniChannels = MusicTheory.resolveMidiOutputChannels("omni_out", "rh");
+  assert.strictEqual(omniChannels.length, 16, "omni_out broadcasts across all 16 MIDI channels");
+  assert.strictEqual(omniChannels[0], 1);
+  assert.strictEqual(omniChannels[15], 16);
+
+  console.log("✔ Test 17: 🔊 Milestone 39 Hardware Audio Output Discovery, Multi-Channel Audio Routing & Multi-Channel MIDI Output Engine passed");
+}
+
+// ==========================================
+// TEST 18: Milestone 40 Multi-Instrument Song Synthesis Engine, Timbre Library & Song Instrument Presets
+// ==========================================
+{
+  // 18.1 INSTRUMENT_PRESETS Definition & Verification
+  assert.ok(MusicTheory.INSTRUMENT_PRESETS, "MusicTheory must export INSTRUMENT_PRESETS");
+  const expectedInstruments = [
+    "grand_piano", "electric_piano", "harpsichord", "church_organ",
+    "rock_organ", "celesta", "acoustic_guitar", "chiptune",
+    "strings_synth", "vibraphone", "honky_tonk"
+  ];
+  assert.strictEqual(Object.keys(MusicTheory.INSTRUMENT_PRESETS).length, 11, "Must contain exactly 11 authentic instrument models");
+  expectedInstruments.forEach(id => {
+    const inst = MusicTheory.INSTRUMENT_PRESETS[id];
+    assert.ok(inst, `Instrument ${id} must exist in INSTRUMENT_PRESETS`);
+    assert.strictEqual(inst.id, id, `Instrument ${id} must have matching id`);
+    assert.ok(inst.name && inst.name.length > 0, `Instrument ${id} must have display name`);
+    assert.ok(inst.shortName && inst.shortName.length > 0, `Instrument ${id} must have shortName`);
+    assert.ok(inst.icon && inst.icon.length > 0, `Instrument ${id} must have an icon`);
+    assert.ok(inst.category, `Instrument ${id} must have a category`);
+    assert.ok(typeof inst.attackSec === "number" && inst.attackSec >= 0, `Instrument ${id} must define attackSec`);
+    assert.ok(typeof inst.decaySec === "number", `Instrument ${id} must define decaySec`);
+    assert.ok(typeof inst.sustainLevel === "number" && inst.sustainLevel >= 0 && inst.sustainLevel <= 1.0, `Instrument ${id} must define sustainLevel between 0 and 1`);
+    assert.ok(typeof inst.releaseSec === "number" && inst.releaseSec > 0, `Instrument ${id} must define releaseSec`);
+    assert.ok(typeof inst.velocitySensitivity === "number", `Instrument ${id} must define velocitySensitivity`);
+  });
+
+  // 18.2 Harpsichord Velocity Invariance & Organ Continuous Sustain
+  assert.strictEqual(MusicTheory.INSTRUMENT_PRESETS.harpsichord.velocitySensitivity, 0.0, "Harpsichord must be velocity invariant (velocitySensitivity = 0)");
+  assert.strictEqual(MusicTheory.INSTRUMENT_PRESETS.church_organ.sustainLevel, 1.0, "Church Organ must have 100% continuous sustain while held");
+  assert.strictEqual(MusicTheory.INSTRUMENT_PRESETS.chiptune.icon, "👾", "Chiptune must have retro gaming icon");
+
+  // 18.3 getSongDefaultInstrument Heuristic & Song Attribute Resolution
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "custom", instrument: "vibraphone" }), "vibraphone", "Explicit song.instrument takes highest priority");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "korobeiniki-tetris", title: "Tetris" }), "chiptune", "Tetris resolves to chiptune");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "hedwigs-theme", title: "Hedwig's Theme" }), "celesta", "Hedwig's Theme resolves to celesta");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "pink-panther", title: "The Pink Panther" }), "vibraphone", "Pink Panther resolves to vibraphone");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "the-entertainer", title: "The Entertainer" }), "honky_tonk", "The Entertainer resolves to honky_tonk");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "bach-minuet-g", title: "Minuet in G" }), "harpsichord", "Bach Minuet resolves to harpsichord");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "smoke-on-the-water", title: "Smoke on the Water" }), "rock_organ", "Smoke on the Water resolves to rock_organ");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "amazing-grace", title: "Amazing Grace" }), "church_organ", "Amazing Grace resolves to church_organ");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "lean-on-me", title: "Lean on Me" }), "electric_piano", "Lean on Me resolves to electric_piano");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "scarborough-fair", title: "Scarborough Fair" }), "acoustic_guitar", "Scarborough Fair resolves to acoustic_guitar");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument({ id: "fur-elise", title: "Für Elise" }), "grand_piano", "Für Elise resolves to grand_piano");
+  assert.strictEqual(MusicTheory.getSongDefaultInstrument(null), "grand_piano", "Null song gracefully falls back to grand_piano");
+
+  // 18.4 getInstrumentParameters Retrieval & Fallback
+  const ep = MusicTheory.getInstrumentParameters("electric_piano");
+  assert.strictEqual(ep.id, "electric_piano");
+  assert.strictEqual(ep.shortName, "Electric Piano");
+  const fallback = MusicTheory.getInstrumentParameters("non_existent_preset");
+  assert.strictEqual(fallback.id, "grand_piano", "Non-existent preset falls back to grand_piano");
+
+  console.log("✔ Test 18: 🎹 Milestone 40 Multi-Instrument Song Synthesis Engine & Timbre Library passed");
+}
+
+console.log("=== ALL 18 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
 
 
 

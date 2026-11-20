@@ -3261,6 +3261,129 @@ const {
   console.log("✔ Test 36: 📈 Milestone 38 Rhythm & Metronome Live BPM Graph & Clear Data UI passed");
 }
 
+// ============================================================================
+// TEST 37: 🔊 Milestone 39 Hardware Audio Output Sink Bridge, Multi-Channel Audio Router & Multi-Channel MIDI Output
+// ============================================================================
+{
+  const fs = require("fs");
+  const vm = require("vm");
+  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+
+  // 37.1 Hardware Audio Output Channel Selector & Route Badge DOM Elements
+  assert.ok(html.includes('id="audioOutputSelect"'), "index.html must include #audioOutputSelect");
+  assert.ok(html.includes('id="audioOutputChannelSelect"'), "index.html must include #audioOutputChannelSelect for hardware channel routing");
+  assert.ok(html.includes('id="audioOutputRouteBadge"'), "index.html must include #audioOutputRouteBadge live telemetry pill");
+  assert.ok(html.includes('value="stereo"'), "#audioOutputChannelSelect must include stereo option");
+  assert.ok(html.includes('value="ch1"'), "#audioOutputChannelSelect must include ch1 (Left / Out 1) option");
+  assert.ok(html.includes('value="ch2"'), "#audioOutputChannelSelect must include ch2 (Right / Out 2) option");
+  assert.ok(html.includes('value="split_hands"'), "#audioOutputChannelSelect must include split_hands (LH→Ch1 / RH→Ch2) option");
+  assert.ok(html.includes('value="mono"'), "#audioOutputChannelSelect must include mono option");
+
+  // 37.2 Web Audio Multi-Channel Router & MediaStream Sink Bridge Functions
+  assert.ok(html.includes("function setupWebAudioChannelRouter()"), "index.html must define setupWebAudioChannelRouter()");
+  assert.ok(html.includes("function applyAudioChannelGainsMatrix()"), "index.html must define applyAudioChannelGainsMatrix()");
+  assert.ok(html.includes("function getVoiceAudioDestination(voiceRole"), "index.html must define getVoiceAudioDestination(voiceRole)");
+  assert.ok(html.includes("function setAudioOutputChannelMode(channelMode"), "index.html must define setAudioOutputChannelMode(channelMode)");
+  assert.ok(html.includes("function applyAudioOutputSink(deviceId)"), "index.html must define applyAudioOutputSink(deviceId)");
+  assert.ok(html.includes("function routeAudioViaMediaStreamBridge(sinkVal)"), "index.html must define routeAudioViaMediaStreamBridge(sinkVal) fallback");
+  assert.ok(html.includes("createMediaStreamDestination"), "MediaStream fallback bridge must use audioCtx.createMediaStreamDestination()");
+  assert.ok(html.includes("createChannelSplitter"), "Multi-channel router must use audioCtx.createChannelSplitter");
+  assert.ok(html.includes("createChannelMerger"), "Multi-channel router must use audioCtx.createChannelMerger");
+
+  // 37.3 Multi-Channel Web MIDI Output Controls, Split Hands & 16-Channel Broadcast
+  assert.ok(html.includes('id="testMidiOutputBtn"'), "MIDI Out control must include #testMidiOutputBtn chime button");
+  assert.ok(html.includes('id="chOpt_split"'), "MIDI Channel menu must include #chOpt_split (Split Hands RH→Ch1 / LH→Ch2)");
+  assert.ok(html.includes('id="chOpt_omni_out"'), "MIDI Channel menu must include #chOpt_omni_out (Broadcast All 16 Channels)");
+  assert.ok(html.includes("function getActiveMidiOutputChannels(voiceRole"), "index.html must define getActiveMidiOutputChannels(voiceRole)");
+  assert.ok(html.includes("function playTestMidiOutputChime()"), "index.html must define playTestMidiOutputChime()");
+  assert.ok(html.includes("piano_midi_channel"), "index.html must persist selected MIDI channel in localStorage (piano_midi_channel)");
+  assert.ok(html.includes("piano_audio_output_channel"), "index.html must persist selected audio channel mode in localStorage (piano_audio_output_channel)");
+
+  // 37.4 Full Inline Script Syntax & DOM ID Audit
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid after Milestone 39 upgrades");
+
+  const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
+  const queriedStaticIds = [...scriptContent.matchAll(/document\.getElementById\("([^"$]+)"\)/g)].map(m => m[1]);
+  const missingIds = [...new Set(queriedStaticIds.filter(id => !htmlIds.has(id)))];
+  assert.deepStrictEqual(missingIds, [], `All static document.getElementById() calls must match existing HTML IDs (missing: ${missingIds.join(", ")})`);
+
+  console.log("✔ Test 37: 🔊 Milestone 39 Hardware Audio Output Sink Bridge, Multi-Channel Audio Router & Multi-Channel MIDI Output passed");
+}
+
+// ==========================================
+// TEST 38: Milestone 40 Multi-Instrument Song Synthesis Engine & Repertoire Timbre Library
+// ==========================================
+{
+  const fs = require("fs");
+  const path = require("path");
+  const vm = require("vm");
+  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const songDatabase = require("../songs.js");
+  const MusicTheory = window.MusicTheory;
+
+  // 38.1 All 56 Repertoire Songs Tagged with Valid Instruments
+  assert.strictEqual(songDatabase.length, 56, "Repertoire must contain 56 songs");
+  const validPresetIds = new Set(Object.keys(MusicTheory.INSTRUMENT_PRESETS));
+
+  songDatabase.forEach((song, idx) => {
+    assert.ok(song.instrument, `Song [${idx + 1}] '${song.id}' must declare an explicit instrument`);
+    assert.ok(validPresetIds.has(song.instrument), `Song '${song.id}' instrument '${song.instrument}' must exist in INSTRUMENT_PRESETS`);
+  });
+
+  // Verify genre-specific curate assignments
+  const songMap = Object.fromEntries(songDatabase.map(s => [s.id, s]));
+  assert.strictEqual(songMap["lean-on-me"].instrument, "electric_piano", "Lean on Me must be Electric Piano");
+  assert.strictEqual(songMap["ode-to-joy"].instrument, "grand_piano", "Ode to Joy must be Grand Piano");
+  assert.strictEqual(songMap["korobeiniki-tetris"].instrument, "chiptune", "Tetris must be Chiptune");
+  assert.strictEqual(songMap["hedwigs-theme"].instrument, "celesta", "Hedwig's Theme must be Celesta");
+  assert.strictEqual(songMap["pink-panther"].instrument, "vibraphone", "Pink Panther must be Vibraphone");
+  assert.strictEqual(songMap["the-entertainer"].instrument, "honky_tonk", "The Entertainer must be Honky-Tonk");
+  assert.strictEqual(songMap["bach-minuet-g"].instrument, "harpsichord", "Bach Minuet must be Harpsichord");
+  assert.strictEqual(songMap["smoke-on-the-water"].instrument, "rock_organ", "Smoke on the Water must be Rock Organ");
+  assert.strictEqual(songMap["amazing-grace"].instrument, "church_organ", "Amazing Grace must be Church Organ");
+  assert.strictEqual(songMap["scarborough-fair"].instrument, "acoustic_guitar", "Scarborough Fair must be Acoustic Guitar");
+  assert.strictEqual(songMap["star-wars-theme"].instrument, "strings_synth", "Star Wars must be Strings Synth");
+
+  // 38.2 DOM Elements & CSS in index.html
+  assert.ok(html.includes('id="synthInstrumentSelect"'), "index.html must include #synthInstrumentSelect in controls bar");
+  assert.ok(html.includes('id="currentSongInstrumentBadge"'), "index.html must include #currentSongInstrumentBadge in sheet music header");
+  assert.ok(html.includes('.current-instrument-badge'), "index.html must style .current-instrument-badge");
+  assert.ok(html.includes('.card-inst-badge'), "index.html must style .card-inst-badge");
+
+  // Verify all 11 instrument options in #synthInstrumentSelect
+  validPresetIds.forEach(presetId => {
+    assert.ok(html.includes(`value="${presetId}"`), `synthInstrumentSelect must include option for '${presetId}'`);
+  });
+  assert.ok(html.includes('value="auto"'), "synthInstrumentSelect must include option for 'auto'");
+
+  // 38.3 Synthesizer Timbre Engine & LocalStorage Persistence
+  assert.ok(html.includes("function getActiveSynthInstrument()"), "index.html must define getActiveSynthInstrument()");
+  assert.ok(html.includes("function setSynthInstrument("), "index.html must define setSynthInstrument()");
+  assert.ok(html.includes("function updateSongInstrumentUI()"), "index.html must define updateSongInstrumentUI()");
+  assert.ok(html.includes("function synthesizeTimbre("), "index.html must define synthesizeTimbre()");
+  assert.ok(html.includes("piano_synth_instrument"), "index.html must persist selected instrument in localStorage (piano_synth_instrument)");
+
+  // 38.4 Full Inline Script Syntax & DOM ID Integrity Audit
+  const scriptStart = html.indexOf("<script>");
+  const scriptEnd = html.lastIndexOf("</script>");
+  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  assert.doesNotThrow(() => {
+    new vm.Script(scriptContent);
+  }, "index.html inline script must be syntactically valid after Milestone 40 upgrades");
+
+  const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
+  const queriedStaticIds = [...scriptContent.matchAll(/document\.getElementById\("([^"$]+)"\)/g)].map(m => m[1]);
+  const missingIds = [...new Set(queriedStaticIds.filter(id => !htmlIds.has(id)))];
+  assert.deepStrictEqual(missingIds, [], `All static document.getElementById() calls must match existing HTML IDs (missing: ${missingIds.join(", ")})`);
+
+  console.log("✔ Test 38: 🎹 Milestone 40 Multi-Instrument Song Synthesis Engine & Repertoire Timbre Library passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 
