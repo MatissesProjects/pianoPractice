@@ -550,6 +550,32 @@
     - [x] Added Test 38 in `tests/test_score_engine.js` verifying song instrument tags across all 56 songs, DOM elements, audio synthesis routing, and full inline script syntax validation.
     - [x] Suggested clean git commit chunks.
 
+- [x] **Milestone 41: Codebase Modularization (`styles.css` + `js/*.js`), Deep Deduplication & Test Harness Modernization**
+  - [x] **Zero-Build External CSS & Classic JS Architecture (`styles.css`, `js/*.js`, `index.html`)**:
+    - [x] Extracted 3,194 lines of CSS from `index.html` into [`styles.css`](styles.css) with balanced braces (`0`).
+    - [x] Split the 9,076-line inline `<script>` in `index.html` into 9 focused classic script modules (`file://`-compatible, zero bundler/CORS errors): [`js/state.js`](js/state.js), [`js/audio-engine.js`](js/audio-engine.js), [`js/midi-router.js`](js/midi-router.js), [`js/keyboard-sustain.js`](js/keyboard-sustain.js), [`js/score-renderer.js`](js/score-renderer.js), [`js/playback-practice.js`](js/playback-practice.js), [`js/catalog.js`](js/catalog.js), [`js/edu-modes.js`](js/edu-modes.js), and [`js/app.js`](js/app.js), reducing `index.html` from 13,659 lines to clean semantic HTML.
+  - [x] **Deep Deduplication & Bug Fixes**:
+    - [x] Fixed first-note silent-drop bug in `synthesizeTimbre()` by calling `initAudio()` before checking `!audioCtx`.
+    - [x] Eliminated ~400 lines of duplicated synthesis logic in `playTone()` by delegating Web Audio timbre synthesis cleanly to `synthesizeTimbre()`, and added `activePreviewVoices` tracking + `stopAllPreviewVoices()` for crisp cutoff on Pause/Stop/Seek.
+    - [x] Extracted shared `triggerMetronomeClickAudio()` helper used by both `scheduleMetroClick()` and `scheduleRepertoireMetroClick()`.
+    - [x] Removed dead `getActiveMidiOutputChannel()`, wired `#centerMidCBtn` to `centerMiddleCView(true)`, replaced manual `NOTE_OFFSETS` calculation in score click handler with `getPitchMidiNumber()`, and tracked `activeCurriculumLevel` accurately on curriculum tier selection.
+  - [x] **Modernized Multi-File Test Harness (`tests/test_helpers.js` & `tests/test_score_engine.js`)**:
+    - [x] Created `tests/test_helpers.js` (`loadProjectSources`, `assertValidProjectScripts`, `assertDomIdIntegrity`) and refactored Tests 22–38 to validate all modules individually and combined via `vm.Script`.
+    - [x] Added Test 39 in `tests/test_score_engine.js` (57/57 automated tests passing).
+
+- [x] **Milestone 42: Upgraded Playback Transport, Live Seek Scrubber, Real A-B Loop & Configurable Count-In**
+  - [x] **Pure Playback Timeline & Loop Bounds Engine (`theory.js`)**:
+    - [x] Added and exported `buildPlaybackTimeline(steps, timeSigStr)`, `resolveLoopStepBounds(steps, isLoopEnabled, startMeasure, endMeasure)`, `computeTempoFromSpeedPercent(baseBpm, percent, minBpm, maxBpm)`, `findStepAtBeat(timeline, targetBeat)`, and `formatPlaybackClock(currentBeat, totalBeats, bpm)`.
+  - [x] **Transport Deck UI & Score Loop Visuals (`index.html`, `styles.css`, `js/score-renderer.js`)**:
+    - [x] Added `#playbackTransportDeck` (`#transportPrevMeasureBtn`, `#transportPauseBtn`, `#transportStopBtn`, `#transportNextMeasureBtn`, `#transportScrubber`, `#transportLoopOverlay`, `#transportMeasureBadge`, `#transportTimeDisplay`, `#transportStatusPill`).
+    - [x] Added relative speed percentage presets (`50%`, `75%`, `100%`, `125%`), configurable `#countInSelect` (`Off`, `1 Bar`, `2 Bars`, persisted in `piano_count_in_bars`), and 1-click `#setLoopABtn` / `#setLoopBBtn` measure stampers.
+    - [x] Made score measure numbers clickable (`seekPlaybackToMeasure`) and added `.measure-loop-band` SVG region overlays (`updateScoreLoopHighlights()`).
+  - [x] **Dynamic Step-Chained Playback Engine & Tempo Flow Integration (`js/playback-practice.js`, `js/state.js`, `js/catalog.js`)**:
+    - [x] Replaced static pre-scheduled timeout loops with step-chained `schedulePlaybackStep`, enabling true Pause/Resume (`pausePlayback`, `resumePlayback`, `togglePlayPause`), instant Scrub/Step/Measure seeking (`seekPlaybackToStep`, `seekPlaybackToMeasure`, `jumpPlaybackMeasure`), live BPM changes mid-playback (`applyLiveTempoChange`), and real A-B Measure Looping + `+5 BPM` Tempo Ramp in both Auto-Play Preview and Tempo Flow Mode.
+    - [x] Added Repertoire-scoped keyboard shortcuts (`Space`, `Esc`, `←/→`, `Shift+←/→`, `Home`, `L`) guarded so Sight-Reading, Ear Training, and Rhythm shortcuts are never affected.
+  - [x] **Automated Test Suite (`tests/test_education.js` Test 19 & `tests/test_score_engine.js` Test 40)**:
+    - [x] Added Test 19 in `tests/test_education.js` and Test 40 in `tests/test_score_engine.js` — all 59/59 automated tests passing.
+
 
 
 

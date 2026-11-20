@@ -4,7 +4,7 @@
 [![Web Audio API](https://img.shields.io/badge/Web%20Audio-2.0-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 [![Web MIDI API](https://img.shields.io/badge/Web%20MIDI-16--Channel-purple.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-emerald.svg)](#technical-architecture)
-[![Test Suite](https://img.shields.io/badge/Automated%20Tests-45%20Passing-brightgreen.svg)](#testing--verification)
+[![Test Suite](https://img.shields.io/badge/Automated%20Tests-59%20Passing-brightgreen.svg)](#testing--verification)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A modern, comprehensive, zero-dependency browser-based piano learning and practice workstation. Built with vanilla modern JavaScript, SVG score rendering, physical Web Audio synthesis, and real-time Web MIDI hardware telemetry, **Piano Practice Lab** guides players from their very first Middle C note to advanced classical repertoire, ear training mastery, and harmonic voice leading.
@@ -91,8 +91,11 @@ The primary performance stage featuring dynamic SVG Grand Staff rendering:
   - ✨ **Good Timing**: $\le \pm 95\text{ms}$
   - ⚠️ **Early / Late**: $> 95\text{ms}$
   - ❌ **Missed**: Step unfulfilled
-- **Polyphonic Auto Play Preview**: Realistic independent voice playback where held bass whole notes sustain naturally while right-hand melodic figures move independently.
-- **A-B Measure Looping & Tempo Ramp**: Isolate difficult measures and configure progressive tempo ramps ($+5\text{ BPM}$ per repetition).
+- **Polyphonic Auto Play Preview & Upgraded Playback Transport**:
+  - **Dynamic Step-Chained Playback**: Realistic independent voice sustaining with full **Pause / Resume**, **Stop**, **Measure Step (`⏮` / `⏭`)**, and a live **`requestAnimationFrame` Progress Scrubber (`#playbackTransportDeck`)** showing measure/step telemetry and live `M:SS / M:SS` clock.
+  - **Click-to-Seek Score & Measures**: Click any measure number or notehead on the SVG Grand Staff to jump the playhead immediately (even while actively playing).
+  - **Real A-B Measure Looping & Tempo Ramp**: Works across **Wait-for-Me Practice**, **Auto Play Preview**, and **Tempo Flow Mode** with 1-click **Set A / Set B** measure stamps, shaded loop overlay on the scrubber, dashed visual loop bands on the sheet music, and automatic $+5\text{ BPM}$ progressive tempo ramps.
+  - **Relative Speed Presets & Configurable Count-In**: Instant **`50%` / `75%` / `100%` / `125%`** relative speed buttons, live mid-song tempo slider updates without restarting, configurable **Off / 1-Bar / 2-Bar** count-in (`#countInSelect`), and Repertoire keyboard shortcuts (`Space` Play/Pause, `Esc` Stop, `←/→` Step Seek, `Shift+←/→` Measure Jump, `Home` Rewind, `L` Toggle Loop).
 - **Harmonic Roman Numeral Analysis**: Functional harmonic analysis overlay on Beat 0 of each measure (e.g., $\text{I}$, $\text{IV}$, $\text{V}^7$, $\text{vi}$).
 - **Non-Bouncing Viewport Auto-Scroll**: Container-isolated auto-scroll algorithm with an ergonomic reading comfort zone, eliminating Chromium SVG viewport bounce bugs.
 - **🏆 Post-Song Performance Review, Score Inspection & Anti-Reset Engine**:
@@ -279,21 +282,34 @@ flowchart LR
 
 ```
 pianoPractice/
-├── index.html                 # Complete UI application, SVG score renderer & Web Audio/MIDI engine
-├── theory.js                  # Unified music theory & score engine (scales, chords, voice leading, SRS, buildScoreModel)
+├── index.html                 # Semantic UI shell & classic script loader (file:// compatible)
+├── styles.css                 # Responsive dark/light theme styling, 3D piano & transport deck CSS
+├── theory.js                  # Unified music theory, timeline math & score engine (window.MusicTheory)
 ├── songs.js                   # Universal UMD 56-piece pedagogical repertoire database
+├── js/
+│   ├── state.js               # Shared application state, curriculum presets & theory bindings
+│   ├── audio-engine.js        # Multi-channel Web Audio router, 11-instrument synth & output sink bridge
+│   ├── midi-router.js         # Web MIDI In/Out routing, split channels & 16-channel activity monitor
+│   ├── keyboard-sustain.js    # 3D shiftable piano keyboard, Guitar-Hero sustain stage & cheat sheet modal
+│   ├── score-renderer.js      # Multi-system SVG Grand Staff engraving, loop bands & performance review
+│   ├── playback-practice.js   # Step-chained transport, Wait-for-Me, Tempo Flow & repertoire metronome
+│   ├── catalog.js             # Song catalog filtering, keyboard range guard & Song Theory DNA bar
+│   ├── edu-modes.js           # Sight-Reading, Ear Training, Scales/Chord Lab, Rhythm & Bootcamp modes
+│   └── app.js                 # Deterministic module bootstrap sequence
 ├── pianoNotesCheatSheet.png   # Authentic pedagogical reference sheet for cheat visualizer
 ├── FIXES.MD                   # Engineering audit & upgrade verification checklist (100% complete)
-├── PLAN_TRACKING.md           # Master milestone tracking document (Milestones 1–36)
+├── PLAN_TRACKING.md           # Master milestone tracking document (Milestones 1–42)
 ├── README.md                  # Comprehensive documentation and architecture reference
 └── tests/
-    ├── test_education.js      # 15 automated unit tests for theory, scales, chords, bootcamp, and SRS
-    └── test_score_engine.js   # 35 automated integration tests for SVG rendering, audio & MIDI
+    ├── test_helpers.js        # Shared project loader, multi-module vm syntax & DOM ID integrity checks
+    ├── test_education.js      # 19 automated unit tests for theory, scales, synthesis & transport math
+    └── test_score_engine.js   # 40 automated integration tests for SVG rendering, audio, MIDI & transport
 ```
 
-- **`index.html`**: Zero-framework application layer containing responsive dark/light theme CSS, accessible DOM components, SVG score generation (`renderSheetMusicScore`), practice evaluation loops, Web Audio routing, and Web MIDI message dispatchers.
-- **`theory.js`**: Universal UMD module (exports to Node.js `module.exports` and browser `window.MusicTheory`) handling pitch conversions, diatonic scale spelling, conservatory fingerings, chord recognition, voice-leading optimization, `buildScoreModel`, SRS stats, and acoustic click synthesis.
-- **`songs.js`**: Canonical UMD song database exported as `window.songDatabase` and `module.exports` containing time signatures, tempo, measure tokens, voice partings (`rh`, `lh`, `dyad`), fingerings, and tie annotations (`~`).
+- **`index.html` & `styles.css`**: Zero-framework, zero-build-step application shell and stylesheet loaded directly via standard `<link>` and classic `<script src="...">` tags so double-clicking `index.html` works immediately over `file://`.
+- **`js/*.js` Modules**: Cleanly separated feature modules sharing global state via `js/state.js` and coordinated deterministically by `js/app.js`.
+- **`theory.js`**: Universal UMD module (exports to Node.js `module.exports` and browser `window.MusicTheory`) handling pitch conversions, diatonic scale spelling, conservatory fingerings, chord recognition, voice-leading optimization, `buildScoreModel`, SRS stats, acoustic click synthesis, multi-instrument timbre presets, and playback timeline/loop math.
+- **`songs.js`**: Canonical UMD song database exported as `window.songDatabase` and `module.exports` containing time signatures, tempo, instrument presets, measure tokens, voice partings (`rh`, `lh`, `dyad`), fingerings, and tie annotations (`~`).
 
 ---
 
@@ -333,10 +349,10 @@ Piano Practice Lab features an automated Node.js test harness covering the music
 To run the automated test suites:
 
 ```bash
-# Run the core music theory & educational engine tests (15 tests)
+# Run the core music theory & educational engine tests (19 tests)
 node tests/test_education.js
 
-# Run the score engine, SVG rendering & MIDI integration tests (35 tests)
+# Run the score engine, SVG rendering & MIDI integration tests (40 tests)
 node tests/test_score_engine.js
 
 # Run both suites sequentially (Windows PowerShell syntax)
@@ -364,6 +380,7 @@ All architectural phases, algorithmic fixes, and feature milestones are recorded
 - **Milestones 19–24**: SMuFL vector rests, full 24-measure *Lean on Me* transcription, SVG tie arcs, non-bouncing viewport auto-scroll, and keyboard size song allowance engine.
 - **Milestones 25–30**: Interactive Piano Notes Cheat Sheet, equal beat subdivision metronome, hardware audio output routing (`setSinkId`), and acoustic wood block synthesis.
 - **Milestones 31–36**: Codebase cleanup, 3D visual expansion, mechanical metronome pendulum, multi-level left-hand accompaniment engine, post-song performance review modal, full `FIXES.MD` audit & deduplication, and **Deep Music Theory & Beginner Conservatory Learning Studio** (7-Module Interactive Bootcamp, Song Theory DNA Bar, Chord & Interval Builder Lab, Solfège & Thumb-Tuck Coach, Engraved Key Signature SVGs, and Famous Song Interval Mnemonics).
+- **Milestones 37–42**: Beginner bass root simplification, Live BPM Proximity & Timing Stability Graph, Multi-Channel Audio & MIDI Output Routing, 11-Instrument Multi-Timbre Synthesizer, **Zero-Build Modularization (`styles.css` + `js/*.js`) & Test Harness Modernization**, and **Upgraded Playback Transport** (Pause/Resume, live seek scrubber, clickable measures, real A-B Loop in Auto-Play & Tempo Flow, relative speed presets, and configurable count-in).
 
 ---
 

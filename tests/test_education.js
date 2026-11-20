@@ -625,7 +625,98 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 18: 🎹 Milestone 40 Multi-Instrument Song Synthesis Engine & Timbre Library passed");
 }
 
-console.log("=== ALL 18 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// ==========================================
+// TEST 19: 🎛️ Milestone 42 Playback Transport Timeline, Loop Bounds, Speed % & Clock Formatting
+// ==========================================
+{
+  const sampleSteps = [
+    { stepIndex: 0, measure: 1, beats: 2 },
+    { stepIndex: 1, measure: 1, beats: 2 },
+    { stepIndex: 2, measure: 2, beats: 1 },
+    { stepIndex: 3, measure: 2, beats: 3 },
+    { stepIndex: 4, measure: 3, beats: 4 },
+    { stepIndex: 5, measure: 4, beats: 2 }
+  ];
+
+  // 19.1 buildPlaybackTimeline
+  const tl44 = MusicTheory.buildPlaybackTimeline(sampleSteps, "4/4");
+  assert.strictEqual(tl44.totalBeats, 14, "Total beats across sample steps must equal 14");
+  assert.strictEqual(tl44.totalMeasures, 4, "Total measures must equal 4");
+  assert.strictEqual(tl44.beatsPerMeasure, 4, "4/4 beatsPerMeasure must equal 4");
+  assert.strictEqual(tl44.stepTimings.length, 6);
+  assert.strictEqual(tl44.stepTimings[0].startBeat, 0);
+  assert.strictEqual(tl44.stepTimings[0].endBeat, 2);
+  assert.strictEqual(tl44.stepTimings[2].startBeat, 4);
+  assert.strictEqual(tl44.stepTimings[5].startBeat, 12);
+  assert.strictEqual(tl44.stepTimings[5].endBeat, 14);
+  assert.strictEqual(tl44.measureStartSteps[1], 0);
+  assert.strictEqual(tl44.measureStartSteps[2], 2);
+  assert.strictEqual(tl44.measureStartSteps[3], 4);
+  assert.strictEqual(tl44.measureStartSteps[4], 5);
+  assert.strictEqual(tl44.measureStartBeats[3], 8);
+
+  const tl34 = MusicTheory.buildPlaybackTimeline([], "3/4");
+  assert.strictEqual(tl34.totalBeats, 0, "Empty timeline has 0 beats");
+  assert.strictEqual(tl34.totalMeasures, 0, "Empty timeline has 0 measures");
+  assert.strictEqual(tl34.beatsPerMeasure, 3, "3/4 beatsPerMeasure must equal 3");
+
+  // 19.2 resolveLoopStepBounds
+  const loopOff = MusicTheory.resolveLoopStepBounds(sampleSteps, false, 2, 3);
+  assert.strictEqual(loopOff.active, false, "Disabled loop reports active: false");
+
+  const loopNormal = MusicTheory.resolveLoopStepBounds(sampleSteps, true, 2, 3);
+  assert.strictEqual(loopNormal.active, true);
+  assert.strictEqual(loopNormal.startMeasure, 2);
+  assert.strictEqual(loopNormal.endMeasure, 3);
+  assert.strictEqual(loopNormal.startStepIndex, 2);
+  assert.strictEqual(loopNormal.endStepIndex, 4);
+
+  const loopSwapped = MusicTheory.resolveLoopStepBounds(sampleSteps, true, 4, 2);
+  assert.strictEqual(loopSwapped.startMeasure, 2, "Reversed bounds auto-swap startMeasure");
+  assert.strictEqual(loopSwapped.endMeasure, 4, "Reversed bounds auto-swap endMeasure");
+  assert.strictEqual(loopSwapped.startStepIndex, 2);
+  assert.strictEqual(loopSwapped.endStepIndex, 5);
+
+  const loopClamped = MusicTheory.resolveLoopStepBounds(sampleSteps, true, -5, 99);
+  assert.strictEqual(loopClamped.startMeasure, 1, "Out-of-range start clamps to 1");
+  assert.strictEqual(loopClamped.endMeasure, 4, "Out-of-range end clamps to totalMeasures (4)");
+
+  const loopEmpty = MusicTheory.resolveLoopStepBounds([], true, 1, 4);
+  assert.strictEqual(loopEmpty.active, false);
+  assert.strictEqual(loopEmpty.totalMeasures, 0);
+
+  // 19.3 computeTempoFromSpeedPercent
+  assert.strictEqual(MusicTheory.computeTempoFromSpeedPercent(120, 50), 60, "50% of 120 BPM = 60");
+  assert.strictEqual(MusicTheory.computeTempoFromSpeedPercent(100, 75), 75, "75% of 100 BPM = 75");
+  assert.strictEqual(MusicTheory.computeTempoFromSpeedPercent(96, 100), 96, "100% of 96 BPM = 96");
+  assert.strictEqual(MusicTheory.computeTempoFromSpeedPercent(96, 125), 120, "125% of 96 BPM = 120");
+  assert.strictEqual(MusicTheory.computeTempoFromSpeedPercent(50, 50, 30, 220), 30, "Clamps to minBpm 30");
+  assert.strictEqual(MusicTheory.computeTempoFromSpeedPercent(200, 125, 30, 220), 220, "Clamps to maxBpm 220");
+
+  // 19.4 findStepAtBeat
+  assert.strictEqual(MusicTheory.findStepAtBeat(tl44, 0), 0, "Beat 0 maps to step 0");
+  assert.strictEqual(MusicTheory.findStepAtBeat(tl44, 1.5), 0, "Beat 1.5 falls inside step 0 [0..2)");
+  assert.strictEqual(MusicTheory.findStepAtBeat(tl44, 2.0), 1, "Beat 2.0 lands cleanly on step 1");
+  assert.strictEqual(MusicTheory.findStepAtBeat(tl44, 6.5), 3, "Beat 6.5 falls inside step 3 [5..8)");
+  assert.strictEqual(MusicTheory.findStepAtBeat(tl44, 999), 5, "Overshoot clamps to final step");
+  assert.strictEqual(MusicTheory.findStepAtBeat(tl44, -4), 0, "Negative beat clamps to step 0");
+  assert.strictEqual(MusicTheory.findStepAtBeat(tl34, 2), 0, "Empty timeline safely returns 0");
+
+  // 19.5 formatPlaybackClock
+  const clkZero = MusicTheory.formatPlaybackClock(0, 48, 96);
+  assert.strictEqual(clkZero.elapsedSec, 0);
+  assert.strictEqual(clkZero.totalSec, 30);
+  assert.strictEqual(clkZero.formatted, "0:00 / 0:30");
+
+  const clkRollover = MusicTheory.formatPlaybackClock(96, 120, 96);
+  assert.strictEqual(clkRollover.elapsedSec, 60);
+  assert.strictEqual(clkRollover.totalSec, 75);
+  assert.strictEqual(clkRollover.formatted, "1:00 / 1:15");
+
+  console.log("✔ Test 19: 🎛️ Milestone 42 Playback Transport Timeline, Loop Bounds, Speed % & Clock Formatting passed");
+}
+
+console.log("=== ALL 19 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
 
 
 

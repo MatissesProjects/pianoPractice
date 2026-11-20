@@ -3,9 +3,12 @@
  */
 
 const assert = require('assert');
+const { loadProjectSources, assertValidProjectScripts, assertDomIdIntegrity } = require('./test_helpers.js');
 global.window = global;
 require('../theory.js');
 require('../songs.js');
+
+const projectSources = loadProjectSources();
 
 console.log("=== Running Score Engine & Bass Clef Alignment Tests ===");
 
@@ -1790,8 +1793,7 @@ const {
 
 // 22. Sheet Music Viewport Auto-Scroll Stabilization & Anti-Bounce Engine
 {
-  const fs = require("fs");
-  const htmlContent = fs.readFileSync("index.html", "utf-8");
+  const htmlContent = projectSources.allSource;
 
   // 22.1 Verify CSS scroll-behavior: smooth is removed from .sheet-music-container
   const sheetMusicCssMatch = htmlContent.match(/\.sheet-music-container\s*\{[^}]*\}/);
@@ -1931,12 +1933,11 @@ const {
   assert.deepStrictEqual(renderedM1S0[0], { hand: "treble", type: "rest", beats: 1 }, "Treble staff renders 1-beat rest");
   assert.deepStrictEqual(renderedM1S0[1], { hand: "bass", type: "note", pitch: "C3" }, "Bass staff renders note C3");
 
-  // 23.4 Verify index.html contains rest dispatch logic for all 3 modes
-  const fs = require("fs");
-  const normHtml = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
-  assert.ok(normHtml.includes('if (item.dyad.pitch === "-") {\n                renderNoteheadOnly(noteGroup, "-", item.dyad.beats, cx, trebleBottomY, 2);'), "Dyads mode must render rests when pitch is '-'");
-  assert.ok(normHtml.includes('if (item.rh.pitch === "-") {\n                renderNoteheadOnly(noteGroup, "-", item.rh.beats, cx, trebleBottomY, 2);'), "RH mode must render rests when pitch is '-'");
-  assert.ok(normHtml.includes('if (item.lh.pitch === "-") {\n                renderNoteheadOnly(noteGroup, "-", item.lh.beats, cx, bassBottomY, -10);'), "LH mode must render rests when pitch is '-'");
+  // 23.4 Verify score renderer contains rest dispatch logic for all 3 modes
+  const normScript = projectSources.combinedScript;
+  assert.ok(/if\s*\(item\.dyad\.pitch === "-"\)\s*\{\s*renderNoteheadOnly\(noteGroup, "-", item\.dyad\.beats, cx, trebleBottomY, 2\);/.test(normScript), "Dyads mode must render rests when pitch is '-'");
+  assert.ok(/if\s*\(item\.rh\.pitch === "-"\)\s*\{\s*renderNoteheadOnly\(noteGroup, "-", item\.rh\.beats, cx, trebleBottomY, 2\);/.test(normScript), "RH mode must render rests when pitch is '-'");
+  assert.ok(/if\s*\(item\.lh\.pitch === "-"\)\s*\{\s*renderNoteheadOnly\(noteGroup, "-", item\.lh\.beats, cx, bassBottomY, -10\);/.test(normScript), "LH mode must render rests when pitch is '-'");
 
   // 23.5 Verify Lean on Me Measure 9 eighth rest
   const lean = songDatabase.find(s => s.id === "lean-on-me");
@@ -1953,8 +1954,7 @@ const {
 // TEST 24: 𝄽 Classical Rest Glyphs, Collision-Free Spacing & Rest Timing Engine
 // ============================================================================
 {
-  const fs = require("fs");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
 
   // 24.1 Classical SMuFL Quarter Rest Vector Outline
   // Ensure the old tadpole blob/loop was removed and replaced with classical SMuFL restQuarter path
@@ -2045,8 +2045,7 @@ const {
 // TEST 25: 🎹 Keyboard Size Song Allowance & Range Filtering Engine
 // ============================================================================
 {
-  const fs = require("fs");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
 
   // 25.1 Verify Theory Module Exports
   assert.ok(Array.isArray(MusicTheory.STANDARD_KEYBOARD_PRESETS), "Must export STANDARD_KEYBOARD_PRESETS");
@@ -2154,8 +2153,7 @@ const {
 // Test 26: 🎼 Interactive Piano Notes Cheat Sheet, Keyboard Colorization & Live Sustain Integration
 // ==========================================
 {
-  const fs = require("fs");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
 
   // 26.1 Music Theory Cheat Sheet Exports & Color Mappings
   const colors = MusicTheory.CHEAT_SHEET_NOTE_COLORS;
@@ -2237,14 +2235,8 @@ const {
   assert.ok(html.includes('function closeCheatSheetModal'), "Must define closeCheatSheetModal");
   assert.ok(html.includes('function selectCheatSheetNote'), "Must define selectCheatSheetNote");
 
-  // 26.6 Complete Inline Script Syntax & Balance Validation
-  const vm = require("vm");
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid and free of unclosed braces or tokens");
+  // 26.6 Complete Script Syntax & Balance Validation
+  assertValidProjectScripts("Test 26");
 
   console.log("✔ Test 26: 🎼 Interactive Piano Notes Cheat Sheet, Keyboard Colorization & Live Sustain Integration passed");
 }
@@ -2253,8 +2245,7 @@ const {
 // TEST 27: ⏱️ Metronome Engine Architecture — Equal Divisions, Proper Time Signatures, Beat Subdivisions & Repertoire Synchronization
 // ==========================================
 {
-  const fs = require("fs");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
   const theory = window.MusicTheory;
   assert.ok(theory, "window.MusicTheory must be available");
   assert.ok(typeof theory.parseTimeSignature === "function", "theory.parseTimeSignature must be exported");
@@ -2436,13 +2427,7 @@ const {
   assert.ok(html.includes('calculateMetronomeIntervals(bpm, timeSigStr, 1)'), "Tempo Flow mode must schedule isochronous equal-division clicks");
 
   // 27.7 Complete Script Syntax Validation
-  const vm = require("vm");
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid and free of unclosed tokens or syntax errors");
+  assertValidProjectScripts("Test 27");
 
   console.log("✔ Test 27: ⏱️ Metronome Engine Architecture — Equal Divisions, Proper Time Signatures, Beat Subdivisions & Repertoire Synchronization passed");
 }
@@ -2451,8 +2436,7 @@ const {
 // TEST 28: 🔊 Hardware Output Device Selection (Web Audio setSinkId & Web MIDI Outputs)
 // ==========================================
 {
-  const fs = require("fs");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
   const theory = window.MusicTheory;
   assert.ok(theory, "window.MusicTheory must be available");
 
@@ -2556,13 +2540,7 @@ const {
   assert.ok(html.includes('initMidiOutputRouting();'), "index.html boot up must invoke initMidiOutputRouting");
 
   // 28.6 Complete Script Syntax Validation
-  const vm = require("vm");
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid and free of unclosed tokens or syntax errors");
+  assertValidProjectScripts("Test 28");
 
   console.log("✔ Test 28: 🔊 Hardware Output Device Selection (Web Audio setSinkId & Web MIDI Outputs) passed");
 }
@@ -2571,8 +2549,7 @@ const {
 // TEST 29: 🔊 Universal Multi-Device Audio Output Enumeration, Discovery & Native Picker Engine
 // ==========================================
 {
-  const fs = require("fs");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
   const theory = window.MusicTheory;
   assert.ok(theory, "window.MusicTheory must be available");
 
@@ -2654,13 +2631,7 @@ const {
   assert.ok(html.includes('audioCtx.setSinkId'), "index.html must route Web Audio via audioCtx.setSinkId");
 
   // 29.5 Script Syntax Validation via Node vm
-  const vm = require("vm");
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html script must remain fully syntactically valid with multi-device discovery");
+  assertValidProjectScripts("Test 29");
 
   console.log("✔ Test 29: 🔊 Universal Multi-Device Audio Output Enumeration, Discovery & Native Picker Engine passed");
 }
@@ -2669,8 +2640,7 @@ const {
 // TEST 30: 🪵 Multi-Timbre Metronome Engine & Acoustic Wood Block Synthesis
 // ==========================================
 {
-  const fs = require("fs");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
   const theory = window.MusicTheory;
   assert.ok(theory, "window.MusicTheory must be available");
 
@@ -2810,13 +2780,7 @@ const {
   assert.ok(html.includes('synthesizeMetronomeClick(audioCtx, masterGainNode || audioCtx.destination, time, profile.accentType, currentMetroSound, effectiveVol)'), "scheduleRepertoireMetroClick must route clicks through synthesizeMetronomeClick");
 
   // 30.6 Complete Script Syntax Validation via Node vm
-  const vm = require("vm");
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid with multi-sound metronome engine");
+  assertValidProjectScripts("Test 30");
 
   console.log("✔ Test 30: 🪵 Multi-Timbre Metronome Engine & Acoustic Wood Block Synthesis passed");
 }
@@ -2827,7 +2791,7 @@ const {
 {
   const fs = require("fs");
   const path = require("path");
-  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const html = projectSources.allSource;
   const readmePath = path.join(__dirname, "../README.md");
 
   // 31.1 README.md Existence & Comprehensive Content
@@ -2873,24 +2837,17 @@ const {
   assert.ok(html.includes('.sr-timer-progress.urgent'), "index.html must include .sr-timer-progress.urgent styling");
 
   // 31.6 CSS Brace Balance & Cleanup Validation
-  const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/i);
-  assert.ok(styleMatch, "index.html must contain <style> tag");
-  const styleContent = styleMatch[1];
+  const styleContent = projectSources.css;
+  assert.ok(styleContent && styleContent.length > 0, "External styles.css must be non-empty");
   let openBraceCount = 0;
   for (let i = 0; i < styleContent.length; i++) {
     if (styleContent[i] === '{') openBraceCount++;
     if (styleContent[i] === '}') openBraceCount--;
   }
-  assert.strictEqual(openBraceCount, 0, "<style> block must have perfectly balanced curly braces (0 unclosed)");
+  assert.strictEqual(openBraceCount, 0, "styles.css must have perfectly balanced curly braces (0 unclosed)");
 
   // 31.7 Complete Script Syntax Validation via Node vm
-  const vm = require("vm");
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid with visual expansion & pendulum engine");
+  assertValidProjectScripts("Test 31");
 
   console.log("✔ Test 31: 🎨 Visual Expansion, 3D Realism, Metronome Pendulum & UI Cleanliness passed");
 }
@@ -2900,9 +2857,7 @@ const {
 // ==========================================
 {
   const theory = require("../theory.js");
-  const fs = require("fs");
-  const path = require("path");
-  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const html = projectSources.allSource;
 
   // 32.1 Exports & Style Presets in theory.js
   assert.ok(theory.LH_ACCOMPANIMENT_STYLES, "theory must export LH_ACCOMPANIMENT_STYLES");
@@ -2991,13 +2946,7 @@ const {
   assert.ok(html.includes('.lh-style-select-wrap.active-lh-style'), "index.html CSS must include .lh-style-select-wrap.active-lh-style");
 
   // 32.7 Complete Script Syntax Validation via Node vm
-  const vm = require("vm");
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid with Left Hand Accompaniment Engine");
+  assertValidProjectScripts("Test 32");
 
   console.log("✔ Test 32: 𝄢 Left-Hand Accompaniment Engine & Multi-Level Left-Hand Style Selector passed");
 }
@@ -3006,11 +2955,7 @@ const {
 // TEST 33: 🏆 Post-Song Comprehensive Performance Review, Score Inspection & Anti-Reset Engine
 // ==========================================
 {
-  const fs = require("fs");
-  const path = require("path");
-  const vm = require("vm");
-  const htmlPath = path.join(__dirname, "..", "index.html");
-  const html = fs.readFileSync(htmlPath, "utf8");
+  const html = projectSources.allSource;
 
   // 33.1 DOM Elements: Modal, Hero Grade, 4 Metric Cards, Problem Measure Diagnostic & Actions
   const requiredElements = [
@@ -3114,9 +3059,7 @@ const {
   assert.strictEqual(calculateProblemMeasureLoop([]), null, "Empty mistake array returns null");
 
   // 33.6 Persistent Review & Replay Functions in Script
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
+  const scriptContent = projectSources.combinedScript;
 
   assert.ok(scriptContent.includes("function completeSongPerformance("), "Script must define completeSongPerformance");
   assert.ok(scriptContent.includes("function showSongReviewModal("), "Script must define showSongReviewModal");
@@ -3129,9 +3072,7 @@ const {
   assert.ok(scriptContent.includes("function playVictoryFanfare("), "Script must define playVictoryFanfare");
 
   // 33.7 Script Syntax Validation via Node vm
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid with Performance Review & Anti-Reset Suite");
+  assertValidProjectScripts("Test 33");
 
   console.log("✔ Test 33: 🏆 Post-Song Comprehensive Performance Review, Score Inspection & Anti-Reset Engine passed");
 }
@@ -3140,45 +3081,41 @@ const {
 // TEST 34: 🛠️ FIXES.MD Complete Audit & Codebase Deduplication Verification
 // ============================================================================
 {
-  const fs = require("fs");
-  const vm = require("vm");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
 
   // 34.1 Global MIDI Deck Un-Nested Above #panelRepertoire
-  const midiDeckIdx = html.indexOf('id="globalMidiDeck"');
-  const panelRepIdx = html.indexOf('id="panelRepertoire"');
+  const midiDeckIdx = projectSources.html.indexOf('id="globalMidiDeck"');
+  const panelRepIdx = projectSources.html.indexOf('id="panelRepertoire"');
   assert.ok(midiDeckIdx > 0, "globalMidiDeck must exist in index.html");
   assert.ok(panelRepIdx > 0, "panelRepertoire must exist in index.html");
   assert.ok(midiDeckIdx < panelRepIdx, "globalMidiDeck must be placed BEFORE #panelRepertoire so it persists across all 6 educational tabs");
 
   // 34.2 Unified Score Engine Destructured from window.MusicTheory (No Duplicate Inline Definitions)
-  assert.ok(html.includes("parseToken,\n      getRomanNumeralAnalysis,\n      buildScoreModel,"), "index.html must destructure parseToken, getRomanNumeralAnalysis, and buildScoreModel from MusicTheory");
-  assert.ok(!html.includes("function buildScoreModel(song, showRH"), "index.html must not contain duplicate inline function buildScoreModel definition");
+  assert.ok(/parseToken,\s*getRomanNumeralAnalysis,\s*buildScoreModel,/.test(projectSources.combinedScript), "js/state.js must destructure parseToken, getRomanNumeralAnalysis, and buildScoreModel from MusicTheory");
+  assert.ok(!projectSources.combinedScript.includes("function buildScoreModel(song, showRH"), "App scripts must not contain duplicate inline function buildScoreModel definition");
 
-  // 34.3 Velocity-Sensitive Multi-Oscillator playTone() + Sustain Pedal UI Badge
-  const playToneMatch = html.match(/function playTone\(freq, duration = 0\.35, velocity = 90\)[\s\S]*?osc2\.stop\(now \+ duration \+ 0\.02\);\s*\}/);
-  assert.ok(playToneMatch, "playTone must accept velocity and use dual oscillators (osc1 + osc2) with lowpass filter");
-  assert.ok(playToneMatch[0].includes('osc1.type = "triangle"'), "playTone fundamental oscillator must be triangle");
-  assert.ok(playToneMatch[0].includes('osc2.type = "sine"'), "playTone 2nd harmonic oscillator must be sine");
-  assert.ok(playToneMatch[0].includes('filter.type = "lowpass"'), "playTone must include dynamic lowpass BiquadFilter");
+  // 34.3 Velocity-Sensitive Multi-Oscillator synthesizeTimbre() + Delegated playTone() + Sustain Pedal UI Badge
+  const playToneMatch = projectSources.combinedScript.match(/function playTone\(freq, duration = 0\.35, velocity = 90\)[\s\S]*?\n\}/);
+  assert.ok(playToneMatch, "playTone must exist");
+  assert.ok(playToneMatch[0].includes("synthesizeTimbre("), "playTone must delegate Web Audio synthesis directly to synthesizeTimbre()");
+  const synthMatch = projectSources.combinedScript.match(/function synthesizeTimbre\([\s\S]*?\n\}/);
+  assert.ok(synthMatch, "synthesizeTimbre must exist");
+  assert.ok(synthMatch[0].includes('osc1.type = "triangle"'), "synthesizeTimbre must use triangle oscillator");
+  assert.ok(synthMatch[0].includes('osc2.type = "sine"'), "synthesizeTimbre must use sine harmonic oscillator");
+  assert.ok(synthMatch[0].includes('filter.type = "lowpass"'), "synthesizeTimbre must include dynamic lowpass BiquadFilter");
 
   assert.ok(html.includes('id="sustainPedalBadge"'), "index.html must include #sustainPedalBadge in the sustain header");
-  assert.ok(html.includes("function updateSustainPedalUI()"), "index.html must define updateSustainPedalUI()");
+  assert.ok(html.includes("function updateSustainPedalUI()"), "App scripts must define updateSustainPedalUI()");
 
   // 34.4 Adaptive SRS Integration in Ear Training UI
   assert.ok(html.includes('id="earSrsPill"'), "Ear Training header must include #earSrsPill");
   assert.ok(html.includes('id="earSrsStatsDisplay"'), "Ear Training header must include #earSrsStatsDisplay");
-  assert.ok(html.includes("function updateEarSRSHudDisplay("), "index.html must define updateEarSRSHudDisplay");
+  assert.ok(html.includes("function updateEarSRSHudDisplay("), "App scripts must define updateEarSRSHudDisplay");
   assert.ok(html.includes('window.MusicTheory.generateEarTrainingChallenge(earSubmode, true)'), "loadEarChallenge must request SRS-weighted challenges");
   assert.ok(html.includes("window.MusicTheory.recordSRSAttempt(earCurrentChallenge.srsKey"), "Ear Training verification must record SRS attempts with response time");
 
-  // 34.5 Full Inline Script Syntax Check
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid");
+  // 34.5 Full Modular Script Syntax Check
+  assertValidProjectScripts("Test 34");
 
   console.log("✔ Test 34: 🛠️ FIXES.MD Complete Audit & Codebase Deduplication Verification passed");
 }
@@ -3187,9 +3124,7 @@ const {
 // TEST 35: 🎓 Milestone 36 Beginner Pedagogy, Bootcamp, Chord Lab & Theory DNA UI
 // ============================================================================
 {
-  const fs = require("fs");
-  const vm = require("vm");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
 
   // 35.1 Repertoire Song Theory DNA & Warmup Bar
   assert.ok(html.includes('id="songTheoryDnaBar"'), "index.html must include #songTheoryDnaBar in Repertoire panel");
@@ -3225,18 +3160,9 @@ const {
   assert.ok(html.includes("function verifyBootcampNoteInput("), "index.html must define verifyBootcampNoteInput");
   assert.ok(html.includes("function initInteractiveTheoryCards("), "index.html must define initInteractiveTheoryCards");
 
-  // 35.5 Full Inline Script Syntax Check & Static DOM ID Integrity Audit
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid after Milestone 36 upgrades");
-
-  const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
-  const queriedStaticIds = [...scriptContent.matchAll(/document\.getElementById\("([^"$]+)"\)/g)].map(m => m[1]);
-  const missingIds = [...new Set(queriedStaticIds.filter(id => !htmlIds.has(id)))];
-  assert.deepStrictEqual(missingIds, [], `All static document.getElementById() calls must match existing HTML IDs (missing: ${missingIds.join(", ")})`);
+  // 35.5 Full Script Syntax Check & Static DOM ID Integrity Audit
+  assertValidProjectScripts("Test 35");
+  assertDomIdIntegrity();
 
   console.log("✔ Test 35: 🎓 Milestone 36 Beginner Pedagogy, Bootcamp, Chord Lab & Theory DNA UI passed");
 }
@@ -3245,8 +3171,7 @@ const {
 // TEST 36: 📈 Milestone 38 Rhythm & Metronome Live BPM Graph & Clear Data UI
 // ============================================================================
 {
-  const fs = require("fs");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
 
   assert.ok(html.includes('id="rhythmClearDataBtn"'), "Rhythm panel must include Clear Data button #rhythmClearDataBtn");
   assert.ok(html.includes('id="rhythmBpmGraphSvg"'), "Rhythm panel must include Live BPM Proximity Graph SVG #rhythmBpmGraphSvg");
@@ -3265,9 +3190,7 @@ const {
 // TEST 37: 🔊 Milestone 39 Hardware Audio Output Sink Bridge, Multi-Channel Audio Router & Multi-Channel MIDI Output
 // ============================================================================
 {
-  const fs = require("fs");
-  const vm = require("vm");
-  const html = fs.readFileSync("index.html", "utf-8").replace(/\r\n/g, "\n");
+  const html = projectSources.allSource;
 
   // 37.1 Hardware Audio Output Channel Selector & Route Badge DOM Elements
   assert.ok(html.includes('id="audioOutputSelect"'), "index.html must include #audioOutputSelect");
@@ -3299,18 +3222,9 @@ const {
   assert.ok(html.includes("piano_midi_channel"), "index.html must persist selected MIDI channel in localStorage (piano_midi_channel)");
   assert.ok(html.includes("piano_audio_output_channel"), "index.html must persist selected audio channel mode in localStorage (piano_audio_output_channel)");
 
-  // 37.4 Full Inline Script Syntax & DOM ID Audit
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid after Milestone 39 upgrades");
-
-  const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
-  const queriedStaticIds = [...scriptContent.matchAll(/document\.getElementById\("([^"$]+)"\)/g)].map(m => m[1]);
-  const missingIds = [...new Set(queriedStaticIds.filter(id => !htmlIds.has(id)))];
-  assert.deepStrictEqual(missingIds, [], `All static document.getElementById() calls must match existing HTML IDs (missing: ${missingIds.join(", ")})`);
+  // 37.4 Full Script Syntax & DOM ID Audit
+  assertValidProjectScripts("Test 37");
+  assertDomIdIntegrity();
 
   console.log("✔ Test 37: 🔊 Milestone 39 Hardware Audio Output Sink Bridge, Multi-Channel Audio Router & Multi-Channel MIDI Output passed");
 }
@@ -3319,10 +3233,7 @@ const {
 // TEST 38: Milestone 40 Multi-Instrument Song Synthesis Engine & Repertoire Timbre Library
 // ==========================================
 {
-  const fs = require("fs");
-  const path = require("path");
-  const vm = require("vm");
-  const html = fs.readFileSync(path.join(__dirname, "../index.html"), "utf8");
+  const html = projectSources.allSource;
   const songDatabase = require("../songs.js");
   const MusicTheory = window.MusicTheory;
 
@@ -3368,20 +3279,166 @@ const {
   assert.ok(html.includes("function synthesizeTimbre("), "index.html must define synthesizeTimbre()");
   assert.ok(html.includes("piano_synth_instrument"), "index.html must persist selected instrument in localStorage (piano_synth_instrument)");
 
-  // 38.4 Full Inline Script Syntax & DOM ID Integrity Audit
-  const scriptStart = html.indexOf("<script>");
-  const scriptEnd = html.lastIndexOf("</script>");
-  const scriptContent = html.slice(scriptStart + "<script>".length, scriptEnd);
-  assert.doesNotThrow(() => {
-    new vm.Script(scriptContent);
-  }, "index.html inline script must be syntactically valid after Milestone 40 upgrades");
-
-  const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
-  const queriedStaticIds = [...scriptContent.matchAll(/document\.getElementById\("([^"$]+)"\)/g)].map(m => m[1]);
-  const missingIds = [...new Set(queriedStaticIds.filter(id => !htmlIds.has(id)))];
-  assert.deepStrictEqual(missingIds, [], `All static document.getElementById() calls must match existing HTML IDs (missing: ${missingIds.join(", ")})`);
+  // 38.4 Full Script Syntax & DOM ID Integrity Audit
+  assertValidProjectScripts("Test 38");
+  assertDomIdIntegrity();
 
   console.log("✔ Test 38: 🎹 Milestone 40 Multi-Instrument Song Synthesis Engine & Repertoire Timbre Library passed");
+}
+
+// ==========================================
+// TEST 39: 🧹 Milestone 41 Modularization & Deep Codebase Cleanup Verification
+// ==========================================
+{
+  const { html, css, scriptPaths, combinedScript } = projectSources;
+
+  // 39.1 External CSS + Classic Script Architecture (file:// compatible, zero build step)
+  assert.ok(html.includes('<link rel="stylesheet" href="styles.css">'), "index.html must link external styles.css");
+  assert.ok(!/<style[\s>]/i.test(html), "index.html must not contain inline <style> block");
+  assert.ok(!/<script\s*>/i.test(html), "index.html must not contain large inline <script> block");
+  assert.ok(!/type=["']module["']/i.test(html), "Scripts must remain classic <script src='...'> tags for file:// compatibility");
+
+  const expectedScripts = [
+    "js/state.js",
+    "js/audio-engine.js",
+    "js/midi-router.js",
+    "js/keyboard-sustain.js",
+    "js/score-renderer.js",
+    "js/playback-practice.js",
+    "js/catalog.js",
+    "js/edu-modes.js",
+    "js/app.js"
+  ];
+  assert.deepStrictEqual(scriptPaths, expectedScripts, "index.html must load all 9 js/*.js modules in exact dependency order");
+
+  // 39.2 Synthesizer Deduplication & First-Note Init Fix
+  const synthHeaderMatch = combinedScript.match(/function synthesizeTimbre\([\s\S]{0,400}/);
+  assert.ok(synthHeaderMatch, "synthesizeTimbre must exist");
+  const initPos = synthHeaderMatch[0].indexOf("initAudio()");
+  const ctxCheckPos = synthHeaderMatch[0].indexOf("!audioCtx");
+  assert.ok(initPos > -1 && ctxCheckPos > initPos, "synthesizeTimbre must call initAudio() BEFORE checking !audioCtx so first note never drops");
+
+  const playToneFn = combinedScript.match(/function playTone\([\s\S]*?\n\}/);
+  assert.ok(playToneFn, "playTone must exist");
+  assert.ok(playToneFn[0].includes("synthesizeTimbre("), "playTone must delegate synthesis to synthesizeTimbre()");
+  assert.ok(playToneFn[0].split("\n").length < 35, "playTone must remain concise (< 35 lines) with zero synth copy-paste");
+
+  // 39.3 Shared Helpers & Dead Code Removal
+  assert.ok(combinedScript.includes("function stopAllPreviewVoices()"), "audio-engine.js must define stopAllPreviewVoices()");
+  assert.ok(combinedScript.includes("function triggerMetronomeClickAudio("), "audio-engine.js must define shared triggerMetronomeClickAudio()");
+  assert.ok(!combinedScript.includes("function getActiveMidiOutputChannel("), "Dead duplicate function getActiveMidiOutputChannel() must be removed");
+  assert.ok(combinedScript.includes("function getActiveMidiOutputChannels("), "Active getActiveMidiOutputChannels() must be preserved");
+  assert.ok(combinedScript.includes('document.getElementById("centerMidCBtn")'), "#centerMidCBtn must be wired to centerMiddleCView()");
+
+  // 39.4 CSS Hygiene: Brace Balance & Zero Duplicate Root Selectors
+  let cssDepth = 0;
+  const rootSelectors = new Set();
+  const duplicateRootSelectors = [];
+  css.split("\n").forEach(line => {
+    const t = line.trim();
+    if (cssDepth === 0 && t.endsWith("{") && !t.startsWith("@")) {
+      const sel = t.slice(0, -1).trim();
+      if (rootSelectors.has(sel)) duplicateRootSelectors.push(sel);
+      rootSelectors.add(sel);
+    }
+    for (const ch of line) {
+      if (ch === "{") cssDepth++;
+      else if (ch === "}") cssDepth--;
+    }
+  });
+  assert.strictEqual(cssDepth, 0, "styles.css must have balanced curly braces");
+  assert.deepStrictEqual(duplicateRootSelectors, [], `styles.css must have zero duplicate root selectors (found: ${duplicateRootSelectors.join(", ")})`);
+
+  // 39.5 Combined Syntax & DOM ID Integrity
+  assertValidProjectScripts("Test 39");
+  assertDomIdIntegrity();
+
+  console.log("✔ Test 39: 🧹 Milestone 41 Modularization & Deep Codebase Cleanup passed");
+}
+
+// ==========================================
+// TEST 40: 🎛️ Milestone 42 Upgraded Playback Transport, Seek Scrubber, A-B Loop & Count-In
+// ==========================================
+{
+  const { html, css, combinedScript } = projectSources;
+
+  // 40.1 Transport Deck, Count-In, Speed % & Loop Stamp DOM Elements
+  const requiredIds = [
+    'id="playbackTransportDeck"',
+    'id="transportPrevMeasureBtn"',
+    'id="transportPauseBtn"',
+    'id="transportStopBtn"',
+    'id="transportNextMeasureBtn"',
+    'id="transportScrubberWrap"',
+    'id="transportLoopOverlay"',
+    'id="transportScrubber"',
+    'id="transportMeasureBadge"',
+    'id="transportTimeDisplay"',
+    'id="transportStatusPill"',
+    'id="countInSelect"',
+    'id="setLoopABtn"',
+    'id="setLoopBBtn"'
+  ];
+  requiredIds.forEach(attr => {
+    assert.ok(html.includes(attr), `index.html must include ${attr}`);
+  });
+
+  ["50", "75", "100", "125"].forEach(pct => {
+    assert.ok(html.includes(`data-pct="${pct}"`), `index.html must include .speed-pct-btn with data-pct="${pct}"`);
+  });
+
+  // 40.2 Transport & Score Loop Highlighting CSS Rules
+  const requiredCss = [
+    ".playback-transport-deck",
+    ".transport-loop-overlay",
+    ".transport-status-pill.is-playing",
+    ".transport-status-pill.is-paused",
+    ".speed-pct-btn.active",
+    ".loop-stamp-btn",
+    ".measure-number.is-clickable",
+    ".measure-loop-band.is-looped"
+  ];
+  requiredCss.forEach(sel => {
+    assert.ok(css.includes(sel), `styles.css must include ${sel}`);
+  });
+
+  // 40.3 Dynamic Step-Chained Transport Functions & Persistence
+  const requiredFunctions = [
+    "function getCurrentTempoBpm(",
+    "function getActiveLoopBounds(",
+    "function clearTransportTimersAndVoices(",
+    "function updateTransportUI(",
+    "function runPlaybackCountIn(",
+    "function schedulePlaybackStep(",
+    "function pausePlayback(",
+    "function resumePlayback(",
+    "function togglePlayPause(",
+    "function seekPlaybackToStep(",
+    "function seekPlaybackToMeasure(",
+    "function stepPlaybackBy(",
+    "function jumpPlaybackMeasure(",
+    "function applyLiveTempoChange(",
+    "function setRelativeSpeedPercent(",
+    "function initTransportKeyboardShortcuts(",
+    "function updateScoreLoopHighlights("
+  ];
+  requiredFunctions.forEach(fn => {
+    assert.ok(combinedScript.includes(fn), `App scripts must define ${fn}`);
+  });
+  assert.ok(combinedScript.includes("piano_count_in_bars"), "Count-in bars must persist in localStorage (piano_count_in_bars)");
+
+  // 40.4 Real A-B Loop Wiring in Auto-Play & Tempo Flow + Clickable Score Measures
+  const startPlaybackMatch = combinedScript.match(/function startPlayback\([\s\S]*?\n\}/);
+  const runFlowMatch = combinedScript.match(/function runTempoFlowSequence\([\s\S]*?\n\}/);
+  assert.ok(startPlaybackMatch && startPlaybackMatch[0].includes("getActiveLoopBounds()"), "startPlayback must respect getActiveLoopBounds()");
+  assert.ok(runFlowMatch && runFlowMatch[0].includes("getActiveLoopBounds()"), "runTempoFlowSequence must respect getActiveLoopBounds()");
+  assert.ok(combinedScript.includes("seekPlaybackToMeasure(globalMeasureNum)"), "renderSheetMusicScore must wire clickable measure numbers to seekPlaybackToMeasure()");
+
+  // 40.5 Syntax & DOM Integrity Validation
+  assertValidProjectScripts("Test 40");
+  assertDomIdIntegrity();
+
+  console.log("✔ Test 40: 🎛️ Milestone 42 Upgraded Playback Transport, Seek Scrubber, A-B Loop & Count-In passed");
 }
 
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
