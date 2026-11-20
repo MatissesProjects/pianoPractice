@@ -576,6 +576,18 @@
   - [x] **Automated Test Suite (`tests/test_education.js` Test 19 & `tests/test_score_engine.js` Test 40)**:
     - [x] Added Test 19 in `tests/test_education.js` and Test 40 in `tests/test_score_engine.js` — all 59/59 automated tests passing.
 
+- [x] **Milestone 43: Automatic Song Instrument Selection, Precision Key-Press Gating & Score Delivery Cleanup**
+  - [x] **Automatic Per-Song Instrument & MIDI Program Change (`theory.js`, `js/state.js`, `js/midi-router.js`, `js/catalog.js`, `js/app.js`)**:
+    - [x] Added `applyAutoSongInstrument(song)` called on every `loadSong()` so each piece loads with its curated `instrument` (e.g., *Lean on Me* -> Electric Piano, *Tetris* -> Chiptune, *Bach Minuet* -> Harpsichord) without stale manual overrides hijacking new songs, and scoped non-repertoire educational tabs to `grand_piano`.
+    - [x] Added GM `gmProgram` (`0..127`) to all 11 `INSTRUMENT_PRESETS`, `createMidiProgramChange()`, `sendMidiOutputProgramChange()` on song load/instrument change, interactive `#currentSongInstrumentBadge` click-to-audition/reset, and `isMidiEchoLoopback()` guard.
+  - [x] **Precision Repeated-Note Gating & Key Input Cleanup (`js/keyboard-sustain.js`, `js/playback-practice.js`, `js/score-renderer.js`, `js/edu-modes.js`)**:
+    - [x] Canonicalized `activeHeldKeyAttacks` by integer MIDI number (`getCanonicalMidiNumber`), added 30ms switch-bounce guard (`evaluateRepeatedNoteAttackGate`), multi-channel MIDI hold refcounting, and per-voice tie tracking (`tiedPitches`, `isTiedContinuation`, `tiedTotalBeats`) so an untied held note can NEVER be consumed as the next repeated note, while genuine ties require continuous sustain (`handleTiedReleaseCheck`).
+    - [x] Fixed `mouseleave` phantom Note-Off bug (`activeMouseKeys` guard), added `window.blur` / global `mouseup` stuck-key cleanup, removed premature `checkAndPlayNote()` `handleNoteUp` in non-repertoire modes, and added live `.target-guide`, `.target-repress` (lift & re-press prompt), and `.target-tie-hold` keyboard highlights.
+  - [x] **Drift-Free Delivery & Score Engraving Polish (`js/playback-practice.js`, `js/score-renderer.js`, `styles.css`)**:
+    - [x] Anchored Auto-Play Preview (`transportState.nextStepTargetPerfMs`) and Tempo Flow (`tempoFlowClockAnchorPerfMs`) to absolute wall-clock timestamps, added seamless tied-note synthesis (`isTiedContinuation`) + early-hit anticipation lookahead & late grace (`evaluateTempoFlowHit`), un-nested finger numbers from Cheat Sheet labels, and added 8th/16th/triplet (`"3"`) engraving.
+  - [x] **Automated Test Suite (`tests/test_education.js` Test 20 & `tests/test_score_engine.js` Test 41)**:
+    - [x] Added Test 20 in `tests/test_education.js` and Test 41 in `tests/test_score_engine.js` — all 61/61 automated tests passing.
+
 
 
 

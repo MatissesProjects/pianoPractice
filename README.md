@@ -4,7 +4,7 @@
 [![Web Audio API](https://img.shields.io/badge/Web%20Audio-2.0-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 [![Web MIDI API](https://img.shields.io/badge/Web%20MIDI-16--Channel-purple.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-emerald.svg)](#technical-architecture)
-[![Test Suite](https://img.shields.io/badge/Automated%20Tests-59%20Passing-brightgreen.svg)](#testing--verification)
+[![Test Suite](https://img.shields.io/badge/Automated%20Tests-61%20Passing-brightgreen.svg)](#testing--verification)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A modern, comprehensive, zero-dependency browser-based piano learning and practice workstation. Built with vanilla modern JavaScript, SVG score rendering, physical Web Audio synthesis, and real-time Web MIDI hardware telemetry, **Piano Practice Lab** guides players from their very first Middle C note to advanced classical repertoire, ear training mastery, and harmonic voice leading.
@@ -85,12 +85,13 @@ flowchart TD
 
 ### 1. Repertoire Practice Lab
 The primary performance stage featuring dynamic SVG Grand Staff rendering:
-- **Wait-for-Me Practice Mode**: The playhead advances only when the correct pitch is played. Supports two-hand fulfillment, consecutive identical notes without skipping, cross-step tie curves, and classical rest holding.
-- **🥁 Tempo Flow Mode**: Auto-advancing metronome-synced playhead that evaluates key strike timing with precision grading:
+- **Wait-for-Me Practice Mode**: The playhead advances only when the correct pitch is played. Features canonical MIDI held-key & switch-bounce gating so held keys are never falsely consumed as repeated notes (with live `🔁 Lift & re-press` prompts), voice-exact cross-step tie tracking & release checks, independent finger number engraving, and classical rest holding.
+- **🥁 Tempo Flow Mode**: Drift-free, metronome-synced auto-advancing playhead with live scrubber tracking, anticipated hit lookahead & late grace, and precision strike timing grading:
   - 🔥 **Perfect Timing**: $\le \pm 45\text{ms}$
   - ✨ **Good Timing**: $\le \pm 95\text{ms}$
   - ⚠️ **Early / Late**: $> 95\text{ms}$
   - ❌ **Missed**: Step unfulfilled
+- **Automatic Song Instrument Selection & Multi-Timbre Audio**: Automatically switches the active 11-instrument synthesizer preset (and sends GM MIDI Program Changes to external hardware) to match every loaded piece (Electric Piano, Harpsichord, Chiptune, Pipe Organ, Acoustic Guitar, Celesta, etc.) while allowing instant manual overrides.
 - **Polyphonic Auto Play Preview & Upgraded Playback Transport**:
   - **Dynamic Step-Chained Playback**: Realistic independent voice sustaining with full **Pause / Resume**, **Stop**, **Measure Step (`⏮` / `⏭`)**, and a live **`requestAnimationFrame` Progress Scrubber (`#playbackTransportDeck`)** showing measure/step telemetry and live `M:SS / M:SS` clock.
   - **Click-to-Seek Score & Measures**: Click any measure number or notehead on the SVG Grand Staff to jump the playhead immediately (even while actively playing).
@@ -298,12 +299,12 @@ pianoPractice/
 │   └── app.js                 # Deterministic module bootstrap sequence
 ├── pianoNotesCheatSheet.png   # Authentic pedagogical reference sheet for cheat visualizer
 ├── FIXES.MD                   # Engineering audit & upgrade verification checklist (100% complete)
-├── PLAN_TRACKING.md           # Master milestone tracking document (Milestones 1–42)
+├── PLAN_TRACKING.md           # Master milestone tracking document (Milestones 1–43)
 ├── README.md                  # Comprehensive documentation and architecture reference
 └── tests/
     ├── test_helpers.js        # Shared project loader, multi-module vm syntax & DOM ID integrity checks
-    ├── test_education.js      # 19 automated unit tests for theory, scales, synthesis & transport math
-    └── test_score_engine.js   # 40 automated integration tests for SVG rendering, audio, MIDI & transport
+    ├── test_education.js      # 20 automated unit tests for theory, scales, synthesis & transport math
+    └── test_score_engine.js   # 41 automated integration tests for SVG rendering, audio, MIDI & transport
 ```
 
 - **`index.html` & `styles.css`**: Zero-framework, zero-build-step application shell and stylesheet loaded directly via standard `<link>` and classic `<script src="...">` tags so double-clicking `index.html` works immediately over `file://`.
@@ -349,10 +350,10 @@ Piano Practice Lab features an automated Node.js test harness covering the music
 To run the automated test suites:
 
 ```bash
-# Run the core music theory & educational engine tests (19 tests)
+# Run the core music theory & educational engine tests (20 tests)
 node tests/test_education.js
 
-# Run the score engine, SVG rendering & MIDI integration tests (40 tests)
+# Run the score engine, SVG rendering & MIDI integration tests (41 tests)
 node tests/test_score_engine.js
 
 # Run both suites sequentially (Windows PowerShell syntax)
@@ -380,7 +381,7 @@ All architectural phases, algorithmic fixes, and feature milestones are recorded
 - **Milestones 19–24**: SMuFL vector rests, full 24-measure *Lean on Me* transcription, SVG tie arcs, non-bouncing viewport auto-scroll, and keyboard size song allowance engine.
 - **Milestones 25–30**: Interactive Piano Notes Cheat Sheet, equal beat subdivision metronome, hardware audio output routing (`setSinkId`), and acoustic wood block synthesis.
 - **Milestones 31–36**: Codebase cleanup, 3D visual expansion, mechanical metronome pendulum, multi-level left-hand accompaniment engine, post-song performance review modal, full `FIXES.MD` audit & deduplication, and **Deep Music Theory & Beginner Conservatory Learning Studio** (7-Module Interactive Bootcamp, Song Theory DNA Bar, Chord & Interval Builder Lab, Solfège & Thumb-Tuck Coach, Engraved Key Signature SVGs, and Famous Song Interval Mnemonics).
-- **Milestones 37–42**: Beginner bass root simplification, Live BPM Proximity & Timing Stability Graph, Multi-Channel Audio & MIDI Output Routing, 11-Instrument Multi-Timbre Synthesizer, **Zero-Build Modularization (`styles.css` + `js/*.js`) & Test Harness Modernization**, and **Upgraded Playback Transport** (Pause/Resume, live seek scrubber, clickable measures, real A-B Loop in Auto-Play & Tempo Flow, relative speed presets, and configurable count-in).
+- **Milestones 37–43**: Beginner bass root simplification, Live BPM Proximity & Timing Stability Graph, Multi-Channel Audio & MIDI Output Routing, 11-Instrument Multi-Timbre Synthesizer, **Zero-Build Modularization (`styles.css` + `js/*.js`)**, **Upgraded Playback Transport** (Pause/Resume, live seek scrubber, clickable measures, real A-B Loop in Auto-Play & Tempo Flow, speed `%` presets, count-in), and **Auto Song Instrument Selection & Precision Key-Press Timing** (GM Program Change, MIDI loopback protection, anti-bounce repeated-note gating, per-voice tie tracking, and drift-free playback/Tempo Flow synchronization).
 
 ---
 

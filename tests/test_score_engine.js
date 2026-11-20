@@ -3441,6 +3441,52 @@ const {
   console.log("✔ Test 40: 🎛️ Milestone 42 Upgraded Playback Transport, Seek Scrubber, A-B Loop & Count-In passed");
 }
 
+// ==========================================
+// TEST 41: 🎯 Milestone 43 Auto Song Instrument Selection, Key-Press Timing, Held-Note Gating & Score Cleanup
+// ==========================================
+{
+  const { css, combinedScript } = projectSources;
+
+  // 41.1 Auto Song Instrument Selection & MIDI Program Change Wiring
+  assert.ok(combinedScript.includes("function applyAutoSongInstrument("), "js/state.js must define applyAutoSongInstrument()");
+  assert.ok(!combinedScript.includes('localStorage.getItem("piano_synth_instrument")'), "Boot must not let stale manual localStorage override hijack song auto-instrument selection");
+  const loadSongMatch = combinedScript.match(/function loadSong\([\s\S]*?\n\}/);
+  assert.ok(loadSongMatch && loadSongMatch[0].includes("applyAutoSongInstrument(song)"), "loadSong() must automatically select song instrument");
+  assert.ok(combinedScript.includes("function sendMidiOutputProgramChange("), "js/midi-router.js must define sendMidiOutputProgramChange()");
+  assert.ok(combinedScript.includes("function isMidiEchoLoopback("), "js/midi-router.js must guard against hardware MIDI echo loopback");
+
+  // 41.2 On-Screen Keyboard Phantom-Release Fix & Target Guides
+  assert.ok(combinedScript.includes("const activeMouseKeys = new Set()"), "js/state.js must track activeMouseKeys");
+  assert.ok(combinedScript.includes("if (!activeMouseKeys.has(midiNum)) return;"), "Mouse hover/leave without mousedown must never release MIDI held keys");
+  assert.ok(combinedScript.includes("function releaseAllMouseKeys("), "js/keyboard-sustain.js must define releaseAllMouseKeys()");
+  assert.ok(combinedScript.includes("function updateKeyboardTargetHighlights("), "js/keyboard-sustain.js must define updateKeyboardTargetHighlights()");
+  assert.ok(css.includes(".piano-key.white.target-repress"), "styles.css must define .target-repress key indicator");
+  assert.ok(css.includes(".piano-key.white.target-tie-hold"), "styles.css must define .target-tie-hold key indicator");
+
+  // 41.3 Canonical MIDI Keyed Anti-Skip Gating, Tie Release Guard & Tempo Flow Lookahead
+  assert.ok(combinedScript.includes("function getCanonicalMidiNumber("), "js/state.js must define getCanonicalMidiNumber()");
+  assert.ok(combinedScript.includes("evaluateRepeatedNoteAttackGate("), "handleNoteDown must invoke MusicTheory.evaluateRepeatedNoteAttackGate()");
+  assert.ok(combinedScript.includes("function clearWaitPracticeTimer("), "js/playback-practice.js must track/cancel Wait-for-Me timers");
+  assert.ok(combinedScript.includes("function handleTiedReleaseCheck("), "js/playback-practice.js must cancel tie auto-advance when key/pedal releases early");
+  assert.ok(combinedScript.includes("evaluateNoteHoldDuration("), "checkAndPlayNoteOff must use MusicTheory.evaluateNoteHoldDuration()");
+  assert.ok(combinedScript.includes("evaluateTempoFlowHit("), "verifyTempoFlowInput must use MusicTheory.evaluateTempoFlowHit()");
+  assert.ok(combinedScript.includes("voiceData.isTiedContinuation"), "Auto-Play Preview must seamlessly sustain tied continuations without re-striking");
+  assert.ok(combinedScript.includes("transportState.nextStepTargetPerfMs"), "Auto-Play Preview must schedule steps against absolute performance.now() clock");
+
+  // 41.4 Score Engraving Cleanup (Independent Finger Numbers & Triplets)
+  const scoreFnMatch = combinedScript.match(/function renderSheetMusicScore\([\s\S]*?\n\}/);
+  assert.ok(scoreFnMatch, "renderSheetMusicScore must exist");
+  assert.ok(scoreFnMatch[0].includes("showCheat ? (startYCheat + sorted.length * lineSpacing + 2) : (trebleBottomY + 32)"), "Finger numbers must render below staff even when Cheat Sheet is unchecked");
+  assert.ok(combinedScript.includes('showFingers && fNum && fNum !== "-"'), "RH finger numbers must render independently of showCheat");
+  assert.ok(css.includes(".triplet-marker"), "styles.css must define .triplet-marker for rhythmic tuplets");
+
+  // 41.5 Syntax & DOM Integrity Validation
+  assertValidProjectScripts("Test 41");
+  assertDomIdIntegrity();
+
+  console.log("✔ Test 41: 🎯 Milestone 43 Auto Song Instrument Selection, Key-Press Timing, Held-Note Gating & Score Cleanup passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 
