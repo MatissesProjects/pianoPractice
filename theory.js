@@ -2526,12 +2526,20 @@
   function getRomanNumeralAnalysis(chordInfo, song) {
     if (!chordInfo || !chordInfo.name || !song) return null;
     let tonic = "C";
-    if (song.category && song.category.includes("C 5-Finger")) tonic = "C";
-    else if (song.id === "canon-in-d") tonic = "D";
-    else if (song.id === "bach-minuet-g" || (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5"))) tonic = "G";
-    else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-no-1")) tonic = "D";
-    else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves"))) tonic = "A";
-    else if (song.id && song.id.includes("amazing-grace-f")) tonic = "F";
+    if (song.id === "canon-in-d") tonic = "D";
+    else if (song.id === "bach-minuet-g" || song.id === "amazing-grace") tonic = "G";
+    else if (song.id === "moonlight-sonata-mvt1") tonic = "C#";
+    else if (song.id === "nocturne-op9-no2") tonic = "Eb";
+    else if (song.id === "clair-de-lune-debussy") tonic = "Db";
+    else if (song.id === "spring-vivaldi") tonic = "E";
+    else if (song.id === "imperial-march") tonic = "G";
+    else if (song.id === "c-minor-blues-riff") tonic = "C";
+    else if (song.id === "hedwigs-theme" || song.id === "pink-panther") tonic = "E";
+    else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-1" || song.id === "gymnopedie-no-1")) tonic = "D";
+    else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves") || song.id === "house-of-the-rising-sun" || song.id === "turkish-march-mozart" || song.id === "hall-of-the-mountain-king" || song.id === "swan-lake-theme" || song.id === "autumn-leaves-jazz")) tonic = "A";
+    else if (song.id && (song.id.includes("amazing-grace-f") || song.id === "love-me-tender")) tonic = "F";
+    else if (song.category && song.category.includes("C 5-Finger")) tonic = "C";
+    else if (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5") && !song.rh.includes("G#4")) tonic = "G";
     else {
       const firstBass = song.lh ? song.lh.match(/([A-G][#b]?)/) : null;
       if (firstBass) tonic = firstBass[1];
@@ -3135,7 +3143,7 @@
         { pitches: ["B4"], label: "B4 (RH Finger 4)", hint: "Degree 7 (Ti) — Whole step" },
         { pitches: ["C5"], label: "C5 (RH Finger 5 - Pinky)", hint: "Degree 8 (High Do) — Half step!" }
       ],
-      recommendedSongs: ["joy-to-the-world", "scales-warmup-c", "minuet-in-g"]
+      recommendedSongs: ["joy-to-the-world", "scales-warmup-c", "bach-minuet-g"]
     },
     {
       id: "module-5-intervals",
@@ -3221,20 +3229,40 @@
     let isMinor = false;
     const keyAccs = detectKeyAccidentals(song);
 
-    if (song.category && song.category.includes("C 5-Finger")) {
-      tonic = "C";
-    } else if (song.id === "canon-in-d") {
+    if (song.id === "canon-in-d") {
       tonic = "D";
-    } else if (song.id === "bach-minuet-g" || (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5"))) {
+    } else if (song.id === "bach-minuet-g" || song.id === "amazing-grace") {
       tonic = "G";
-    } else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-no-1")) {
+    } else if (song.id === "moonlight-sonata-mvt1") {
+      tonic = "C#";
+      isMinor = true;
+    } else if (song.id === "nocturne-op9-no2") {
+      tonic = "Eb";
+    } else if (song.id === "clair-de-lune-debussy") {
+      tonic = "Db";
+    } else if (song.id === "spring-vivaldi") {
+      tonic = "E";
+    } else if (song.id === "imperial-march") {
+      tonic = "G";
+      isMinor = true;
+    } else if (song.id === "c-minor-blues-riff") {
+      tonic = "C";
+      isMinor = true;
+    } else if (song.id === "hedwigs-theme" || song.id === "pink-panther") {
+      tonic = "E";
+      isMinor = true;
+    } else if (song.id && (song.id.includes("scarborough-fair") || song.id === "gymnopedie-1" || song.id === "gymnopedie-no-1")) {
       tonic = "D";
       isMinor = song.id.includes("scarborough");
-    } else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves") || song.id.includes("house-of-the-rising-sun"))) {
+    } else if (song.id && (song.id.includes("fur-elise") || song.id.includes("greensleeves") || song.id.includes("house-of-the-rising-sun") || song.id === "turkish-march-mozart" || song.id === "hall-of-the-mountain-king" || song.id === "swan-lake-theme" || song.id === "autumn-leaves-jazz")) {
       tonic = "A";
       isMinor = true;
-    } else if (song.id && song.id.includes("amazing-grace-f")) {
+    } else if (song.id && (song.id.includes("amazing-grace-f") || song.id === "love-me-tender")) {
       tonic = "F";
+    } else if (song.category && song.category.includes("C 5-Finger")) {
+      tonic = "C";
+    } else if (song.rh && song.rh.includes("F#4") && !song.rh.includes("C#5") && !song.rh.includes("G#4")) {
+      tonic = "G";
     } else {
       if (keyAccs["B"] === "b" && !keyAccs["E"]) tonic = "F";
       else if (keyAccs["F"] === "#" && !keyAccs["C"]) tonic = "G";
@@ -3701,17 +3729,17 @@
         id.includes("au-clair") || id.includes("alouette") || id.includes("pop-goes") ||
         id.includes("frere-jacques") || id.includes("this-old-man") || id.includes("london-bridge") ||
         id.includes("row-row") || id.includes("lavender") || id.includes("hot-cross") ||
-        id.includes("rain-rain") || id.includes("happy-birthday")) {
+        id.includes("rain-rain") || id.includes("happy-birthday") || id.includes("french-folk")) {
       return "celesta";
     }
 
     // 4. Jazz Vibraphone
-    if (id.includes("pink-panther") || id.includes("take-five")) {
+    if (id.includes("pink-panther") || id.includes("take-five") || id.includes("autumn-leaves")) {
       return "vibraphone";
     }
 
     // 5. Ragtime Honky-Tonk Piano
-    if (id.includes("entertainer") || id.includes("can-can") || id.includes("heart-and-soul") || id.includes("maple-leaf")) {
+    if (id.includes("entertainer") || id.includes("can-can") || id.includes("heart-and-soul") || id.includes("maple-leaf") || id.includes("piano-man")) {
       return "honky_tonk";
     }
 
@@ -3721,7 +3749,7 @@
     }
 
     // 7. Church Pipe Organ
-    if (id.includes("amazing-grace") || id.includes("joy-to-the-world") || id.includes("interstellar") || id.includes("toccata") || id.includes("hymn")) {
+    if (id.includes("amazing-grace") || id.includes("joy-to-the-world") || id.includes("interstellar") || id.includes("toccata") || id.includes("hymn") || id.includes("wenceslas")) {
       return "church_organ";
     }
 
@@ -3731,17 +3759,17 @@
     }
 
     // 9. Electric Piano / Rhodes
-    if (id.includes("lean-on-me") || id.includes("let-it-be") || id.includes("stand-by-me") || id.includes("hallelujah") || id.includes("love-me-tender") || id.includes("clocks")) {
+    if (id.includes("lean-on-me") || id.includes("let-it-be") || id.includes("stand-by-me") || id.includes("hallelujah") || id.includes("love-me-tender") || id.includes("clocks") || id.includes("blues") || id.includes("over-the-rainbow")) {
       return "electric_piano";
     }
 
     // 10. Acoustic Folk Guitar
-    if (id.includes("scarborough") || id.includes("bella-ciao") || id.includes("sunshine") || id.includes("macdonald") || id.includes("yankee") || id.includes("aunt-rhody")) {
+    if (id.includes("scarborough") || id.includes("bella-ciao") || id.includes("sunshine") || id.includes("macdonald") || id.includes("yankee") || id.includes("aunt-rhody") || id.includes("house-of-the-rising-sun") || id.includes("country-roads") || id.includes("my-bonnie")) {
       return "acoustic_guitar";
     }
 
     // 11. Orchestral Strings Synth
-    if (id.includes("star-wars") || id.includes("chariots-of-fire") || id.includes("going-home")) {
+    if (id.includes("star-wars") || id.includes("chariots-of-fire") || id.includes("going-home") || id.includes("jaws") || id.includes("mountain-king") || id.includes("imperial-march") || id.includes("swan-lake")) {
       return "strings_synth";
     }
 
@@ -4103,6 +4131,191 @@
     };
   }
 
+  /**
+   * Validates structural, rhythmic, pitch-range, tie, and fingering integrity for a song object.
+   */
+  function validateSongEncoding(song) {
+    const errors = [];
+    const songId = song && typeof song.id === "string" ? song.id : null;
+    if (!song || typeof song !== "object") {
+      return { valid: false, errors: ["Song must be a non-null object"], songId, measureCount: 0 };
+    }
+
+    const VALID_DURATIONS = new Set([0.25, 0.33, 0.34, 0.5, 0.75, 1, 1.5, 2, 3, 4]);
+    const requiredFields = ["id", "title", "category", "instrument", "timeSig", "rh", "rhF", "lh", "lhF", "dyads", "dyadsF", "tip"];
+    requiredFields.forEach(field => {
+      if (typeof song[field] !== "string" || song[field].trim().length === 0) {
+        errors.push(`Missing or empty required string field '${field}'`);
+      }
+    });
+
+    if (typeof song.instrument === "string" && song.instrument.trim() && !INSTRUMENT_PRESETS[song.instrument]) {
+      errors.push(`Unknown instrument preset '${song.instrument}'`);
+    }
+
+    if (typeof song.tempo !== "number" || !isFinite(song.tempo) || song.tempo < 30 || song.tempo > 240) {
+      errors.push(`Tempo must be a finite number between 30 and 240 (got ${song.tempo})`);
+    }
+
+    const tsValid = typeof song.timeSig === "string" && /^\d+\/\d+$/.test(song.timeSig.trim());
+    const ts = parseTimeSignature(song.timeSig);
+    if (!tsValid || !ts || !ts.numerator || !ts.denominator) {
+      errors.push(`Invalid time signature '${song.timeSig}'`);
+    }
+    const expBeats = (ts && ts.numerator && ts.denominator) ? ts.numerator * (4 / ts.denominator) : 4;
+
+    if (typeof song.dyads === "string" && !song.dyads.includes("+")) {
+      errors.push("dyads track must contain at least one harmonic multi-note chord ('+')");
+    }
+
+    const splitMeasures = (raw) => (typeof raw === "string" ? raw : "")
+      .split("|")
+      .map(m => m.trim().split(/\s+/).filter(Boolean));
+
+    const trackMap = {
+      rh: splitMeasures(song.rh),
+      rhF: splitMeasures(song.rhF),
+      lh: splitMeasures(song.lh),
+      lhF: splitMeasures(song.lhF),
+      dyads: splitMeasures(song.dyads),
+      dyadsF: splitMeasures(song.dyadsF)
+    };
+
+    const measureCounts = Object.values(trackMap).map(arr => arr.length);
+    const measureCount = trackMap.rh.length;
+    if (measureCount < 2) {
+      errors.push(`Song must contain at least 2 measures (found ${measureCount})`);
+    }
+    if (new Set(measureCounts).size !== 1) {
+      errors.push(`Measure count mismatch across tracks (rh=${trackMap.rh.length}, rhF=${trackMap.rhF.length}, lh=${trackMap.lh.length}, lhF=${trackMap.lhF.length}, dyads=${trackMap.dyads.length}, dyadsF=${trackMap.dyadsF.length})`);
+      return { valid: false, errors, songId, measureCount };
+    }
+
+    const beatSums = { rh: [], lh: [], dyads: [] };
+    const voicePairs = [
+      ["rh", "rhF"],
+      ["lh", "lhF"],
+      ["dyads", "dyadsF"]
+    ];
+
+    voicePairs.forEach(([noteKey, fingerKey]) => {
+      const noteMeasures = trackMap[noteKey];
+      const fingerMeasures = trackMap[fingerKey];
+      let prevTiedPitches = null;
+
+      for (let m = 0; m < measureCount; m++) {
+        const tokens = noteMeasures[m];
+        const fingers = fingerMeasures[m];
+
+        if (tokens.length === 0) {
+          errors.push(`${noteKey} M${m + 1}: empty measure`);
+        }
+        if (tokens.length !== fingers.length) {
+          errors.push(`${noteKey}/${fingerKey} M${m + 1}: token count (${tokens.length}) does not match finger count (${fingers.length})`);
+        }
+
+        let barBeats = 0;
+        for (let i = 0; i < tokens.length; i++) {
+          const tok = tokens[i];
+          const fin = fingers[i] || "";
+          const parsed = parseToken(tok);
+          barBeats += parsed.beats;
+
+          if (!VALID_DURATIONS.has(parsed.beats)) {
+            errors.push(`${noteKey} M${m + 1} token '${tok}': non-standard duration ${parsed.beats}`);
+          }
+
+          if (parsed.pitch === "-") {
+            if (fin !== "-") {
+              errors.push(`${fingerKey} M${m + 1} token '${tok}': rest finger must be '-' (got '${fin}')`);
+            }
+            if (parsed.tied) {
+              errors.push(`${noteKey} M${m + 1} token '${tok}': rests cannot carry a tie ('~')`);
+            }
+            if (prevTiedPitches) {
+              errors.push(`${noteKey} M${m + 1} token '${tok}': broken tie from [${prevTiedPitches.join("+")}] into rest`);
+            }
+            prevTiedPitches = null;
+          } else {
+            const pitches = parsed.pitch.split("+");
+            const midiList = [];
+
+            pitches.forEach(pt => {
+              if (!/^[A-G][#b]?[1-7]$/.test(pt)) {
+                errors.push(`${noteKey} M${m + 1} token '${tok}': invalid pitch syntax '${pt}'`);
+                return;
+              }
+              const midi = pitchToMidi(pt);
+              if (midi === null || midi < 36 || midi > 84) {
+                errors.push(`${noteKey} M${m + 1} token '${tok}': pitch '${pt}' (MIDI ${midi}) outside 49-key range [36..84]`);
+              } else {
+                midiList.push(midi);
+              }
+            });
+
+            if (midiList.length === pitches.length && pitches.length > 1) {
+              const sortedMidis = [...midiList].sort((a, b) => a - b);
+              for (let k = 1; k < sortedMidis.length; k++) {
+                const diff = sortedMidis[k] - sortedMidis[k - 1];
+                if (diff === 0) {
+                  errors.push(`${noteKey} M${m + 1} token '${tok}': duplicate pitch in chord`);
+                } else if (diff === 1) {
+                  errors.push(`${noteKey} M${m + 1} token '${tok}': minor-2nd clash inside simultaneous chord`);
+                }
+              }
+            }
+
+            if (!/^[1-5](\+[1-5])*$/.test(fin) || fin.split("+").length !== pitches.length) {
+              errors.push(`${fingerKey} M${m + 1} token '${tok}': invalid fingering '${fin}' for ${pitches.length} note(s)`);
+            }
+
+            if (prevTiedPitches) {
+              const continuesTie = pitches.some(ep =>
+                prevTiedPitches.some(pp => ep === pp || areEnharmonicEquivalent(ep, pp))
+              );
+              if (!continuesTie) {
+                errors.push(`${noteKey} M${m + 1} token '${tok}': broken tie from [${prevTiedPitches.join("+")}] to '${parsed.pitch}'`);
+              }
+            }
+
+            prevTiedPitches = parsed.tied ? pitches : null;
+          }
+        }
+
+        beatSums[noteKey].push(barBeats);
+        if (m > 0 && Math.abs(barBeats - expBeats) > 0.01) {
+          errors.push(`${noteKey} M${m + 1}: beat sum ${barBeats} != expected ${expBeats}`);
+        } else if (m === 0) {
+          const isFullBar = Math.abs(barBeats - expBeats) <= 0.01;
+          const isValidPickup = barBeats > 0 && barBeats <= (expBeats / 2) + 0.01;
+          if (!isFullBar && !isValidPickup) {
+            errors.push(`${noteKey} M1: invalid measure/pickup beat sum ${barBeats} for ${song.timeSig} (expected ${expBeats} or pickup <= ${expBeats / 2})`);
+          }
+        }
+      }
+
+      if (prevTiedPitches) {
+        errors.push(`${noteKey}: dangling tie '~' on final note of piece`);
+      }
+    });
+
+    for (let m = 0; m < measureCount; m++) {
+      const rhB = beatSums.rh[m] || 0;
+      const lhB = beatSums.lh[m] || 0;
+      const dyB = beatSums.dyads[m] || 0;
+      if (Math.abs(rhB - lhB) > 0.01 || Math.abs(rhB - dyB) > 0.01) {
+        errors.push(`M${m + 1}: cross-voice beat mismatch (rh=${rhB}, lh=${lhB}, dyads=${dyB})`);
+      }
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+      songId,
+      measureCount
+    };
+  }
+
   return {
     NOTE_NAMES_SHARP,
     NOTE_NAMES_FLAT,
@@ -4196,7 +4409,8 @@
     formatPlaybackClock,
     evaluateNoteHoldDuration,
     evaluateRepeatedNoteAttackGate,
-    evaluateTempoFlowHit
+    evaluateTempoFlowHit,
+    validateSongEncoding
   };
 });
 
