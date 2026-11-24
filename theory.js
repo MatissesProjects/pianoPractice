@@ -2573,6 +2573,17 @@
   }
 
   /**
+   * Formats a raw lyric token for score engraving.
+   * "_" and "-" represent blank/silent lyric slots; internal "_" becomes a space.
+   */
+  function formatLyricToken(raw) {
+    if (typeof raw !== "string") return "";
+    const trimmed = raw.trim();
+    if (!trimmed || trimmed === "_" || trimmed === "-") return "";
+    return trimmed.replace(/_/g, " ");
+  }
+
+  /**
    * Builds a synchronized multi-measure score model & step timeline from a song definition.
    */
   function buildScoreModel(song, showRH, showLH, showDyads, harmonyType = "song", lhStyle = "song") {
@@ -2602,6 +2613,9 @@
     const rhFM = (song.rhF || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
     const lhFM = (lhFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
     const dyadFM = (dyadFSource || "").split("|").map(m => m.trim().split(/\s+/).filter(Boolean));
+    const lyricsM = (typeof song.lyrics === "string" && song.lyrics.trim())
+      ? song.lyrics.split("|").map(m => m.trim().split(/\s+/).filter(Boolean))
+      : [];
 
     let expMeasureBeats = 4;
     if (song.timeSig) {
@@ -2623,6 +2637,25 @@
       const mRHF = rhFM[m] || [];
       const mLHF = lhFM[m] || [];
       const mDyadF = dyadFM[m] || [];
+      const mLyrics = lyricsM[m] || [];
+
+      // Map each RH token's startBeat in this measure to its formatted lyric syllable
+      const lyricByBeat = [];
+      if (mLyrics.length > 0 && mRH.length > 0) {
+        let lBeat = 0;
+        for (let k = 0; k < mRH.length; k++) {
+          const p = parseToken(mRH[k]);
+          const txt = formatLyricToken(mLyrics[k] || "");
+          if (txt) {
+            lyricByBeat.push({ beat: lBeat, text: txt });
+          }
+          lBeat += p.beats;
+        }
+      }
+      const getLyricAtBeat = (b) => {
+        const hit = lyricByBeat.find(entry => Math.abs(entry.beat - b) < 0.001);
+        return hit ? hit.text : "";
+      };
 
       const measureItems = [];
 
@@ -2841,6 +2874,11 @@
           stepGlobalIdx++;
         });
       }
+
+      // Attach beat-aligned lyrics to every item in this measure
+      measureItems.forEach(it => {
+        it.lyric = getLyricAtBeat(it.startBeat || 0);
+      });
 
       measures.push(measureItems);
     }
@@ -4308,6 +4346,19 @@
       }
     }
 
+    if (typeof song.lyrics === "string" && song.lyrics.trim().length > 0) {
+      const lyricsMeasures = splitMeasures(song.lyrics);
+      if (lyricsMeasures.length !== measureCount) {
+        errors.push(`lyrics: measure count (${lyricsMeasures.length}) does not match rh (${measureCount})`);
+      } else {
+        for (let m = 0; m < measureCount; m++) {
+          if (lyricsMeasures[m].length !== trackMap.rh[m].length) {
+            errors.push(`lyrics M${m + 1}: token count (${lyricsMeasures[m].length}) does not match rh (${trackMap.rh[m].length})`);
+          }
+        }
+      }
+    }
+
     return {
       valid: errors.length === 0,
       errors,
@@ -4360,6 +4411,7 @@
     transformLeftHandToken,
     generateLeftHandAccompaniment,
     parseToken,
+    formatLyricToken,
     getRomanNumeralAnalysis,
     buildScoreModel,
     recordSRSAttempt,

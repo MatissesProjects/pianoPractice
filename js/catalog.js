@@ -460,6 +460,11 @@ function updateLayerToggleClasses() {
   document.getElementById("toggleLabelDyads").classList.toggle("active-dyad", document.getElementById("toggleDyads").checked);
   document.getElementById("toggleLabelCheat").classList.toggle("active-cheat", document.getElementById("toggleCheat").checked);
   document.getElementById("toggleLabelFingers").classList.toggle("active-fingers", document.getElementById("toggleFingers").checked);
+  const toggleLyricsEl = document.getElementById("toggleLyrics");
+  const toggleLabelLyricsEl = document.getElementById("toggleLabelLyrics");
+  if (toggleLyricsEl && toggleLabelLyricsEl) {
+    toggleLabelLyricsEl.classList.toggle("active-lyrics", toggleLyricsEl.checked);
+  }
 
   const lhWrap = document.getElementById("lhStyleSelectWrap");
   if (lhWrap) {
@@ -497,8 +502,31 @@ function initCatalogAndLayerControls() {
   const toggleDyads = document.getElementById("toggleDyads");
   const toggleCheat = document.getElementById("toggleCheat");
   const toggleFingers = document.getElementById("toggleFingers");
+  const toggleLyrics = document.getElementById("toggleLyrics");
+  const toggleLabelLyrics = document.getElementById("toggleLabelLyrics");
   const harmonyTypeSelect = document.getElementById("harmonyTypeSelect");
   const lhStyleSelect = document.getElementById("lhStyleSelect");
+
+  if (toggleLyrics) {
+    try {
+      const savedLyrics = localStorage.getItem("piano_show_lyrics");
+      if (savedLyrics !== null) {
+        toggleLyrics.checked = (savedLyrics === "true");
+      }
+    } catch (err) {}
+    if (toggleLabelLyrics) {
+      toggleLabelLyrics.classList.toggle("active-lyrics", toggleLyrics.checked);
+    }
+    toggleLyrics.addEventListener("change", () => {
+      try {
+        localStorage.setItem("piano_show_lyrics", toggleLyrics.checked.toString());
+      } catch (err) {}
+      if (toggleLabelLyrics) {
+        toggleLabelLyrics.classList.toggle("active-lyrics", toggleLyrics.checked);
+      }
+      renderSheetMusicScore();
+    });
+  }
 
   if (searchInput) {
     searchInput.addEventListener("input", applyCatalogFilters);

@@ -13,6 +13,8 @@ function renderSheetMusicScore() {
   const showDyads = document.getElementById("toggleDyads").checked;
   const showCheat = document.getElementById("toggleCheat").checked;
   const showFingers = document.getElementById("toggleFingers").checked;
+  const lyricsEl = document.getElementById("toggleLyrics");
+  const showLyrics = Boolean(lyricsEl && lyricsEl.checked);
 
   document.getElementById("sheetPieceTitle").textContent = currentSong.title;
 
@@ -31,7 +33,7 @@ function renderSheetMusicScore() {
 
   const staffLineSpacing = 10;
   const isGrandStaff = ((showRH || showDyads) && showLH);
-  const systemHeight = isGrandStaff ? 275 : 160;
+  const systemHeight = isGrandStaff ? (showLyrics ? 305 : 275) : (showLyrics ? 190 : 160);
 
   const numSystems = Math.ceil(measures.length / measuresPerSystem);
   const totalSvgHeight = numSystems * systemHeight + 60;
@@ -44,7 +46,7 @@ function renderSheetMusicScore() {
     const systemTopY = 30 + s * systemHeight;
     const trebleTopY = (showRH || showDyads) ? (systemTopY + 12) : 0;
     const trebleBottomY = trebleTopY + 4 * staffLineSpacing; // y = trebleTopY + 40
-    const bassTopY = isGrandStaff ? (trebleBottomY + 80) : (showLH ? (systemTopY + 12) : 0);
+    const bassTopY = isGrandStaff ? (trebleBottomY + (showLyrics ? 104 : 80)) : (showLH ? (systemTopY + 12) : 0);
     const bassBottomY = bassTopY + 4 * staffLineSpacing;
 
     // Draw Staff Lines for this system
@@ -428,6 +430,40 @@ function renderSheetMusicScore() {
               noteGroup.appendChild(fLabelB);
             }
           }
+        }
+
+        // 3. Render Synchronized Song Lyrics / Phrase Markers
+        if (showLyrics && item.lyric) {
+          let lyricY;
+          if (showRH || showDyads) {
+            if (showCheat && showFingers) {
+              lyricY = trebleBottomY + (showDyads ? 82 : 69);
+            } else if (showCheat) {
+              lyricY = trebleBottomY + (showDyads ? 69 : 55);
+            } else if (showFingers) {
+              lyricY = trebleBottomY + 48;
+            } else {
+              lyricY = trebleBottomY + 34;
+            }
+          } else {
+            // LH-only solo mode: place lyrics cleanly beneath bass labels
+            if (showCheat && showFingers) {
+              lyricY = bassBottomY + 72;
+            } else if (showCheat) {
+              lyricY = bassBottomY + 56;
+            } else if (showFingers) {
+              lyricY = bassBottomY + 48;
+            } else {
+              lyricY = bassBottomY + 34;
+            }
+          }
+          const isSectionMarker = item.lyric.startsWith("[") && item.lyric.endsWith("]");
+          const lyricLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          lyricLabel.setAttribute("x", cx);
+          lyricLabel.setAttribute("y", lyricY);
+          lyricLabel.setAttribute("class", `lyric-text${isSectionMarker ? " lyric-section-marker" : ""}`);
+          lyricLabel.textContent = item.lyric;
+          noteGroup.appendChild(lyricLabel);
         }
 
         svg.appendChild(noteGroup);
