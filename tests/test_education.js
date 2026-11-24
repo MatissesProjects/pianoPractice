@@ -916,7 +916,48 @@ console.log("=== Running Piano Education Suite Tests ===");
   console.log("✔ Test 21: 🎼 Milestone 44 Song Encoding Validator, Repertoire Expansion (80 Songs) & Bootcamp Link Integrity passed");
 }
 
-console.log("=== ALL 21 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
+// ==========================================
+// TEST 22: 🎤 Milestone 45 Synchronized Lyrics Engine, Validator & 80-Song Coverage
+// ==========================================
+{
+  const songDatabase = require("../songs.js");
+
+  // 22.1 formatLyricToken formatting rules
+  assert.strictEqual(typeof MusicTheory.formatLyricToken, "function", "formatLyricToken must be exported");
+  assert.strictEqual(MusicTheory.formatLyricToken("_"), "", "Underscore represents blank lyric slot");
+  assert.strictEqual(MusicTheory.formatLyricToken("-"), "", "Single hyphen represents blank lyric slot");
+  assert.strictEqual(MusicTheory.formatLyricToken("Twin-"), "Twin-", "Syllable hyphen preserved");
+  assert.strictEqual(MusicTheory.formatLyricToken("[Theme_A]"), "[Theme A]", "Internal underscores convert to spaces");
+  assert.strictEqual(MusicTheory.formatLyricToken("do_ya?"), "do ya?", "Multi-word lyric token converts underscore to space");
+
+  // 22.2 validateSongEncoding rejects mismatched lyric measures & token counts
+  const sample = songDatabase.find(s => s.id === "ode-to-joy");
+  assert.ok(sample && sample.lyrics, "Ode to Joy must have lyrics");
+  const badMeasureCount = { ...sample, lyrics: "Joy- ful | we" };
+  assert.strictEqual(MusicTheory.validateSongEncoding(badMeasureCount).valid, false, "Mismatched lyric measure count must fail validation");
+  const badTokenCount = { ...sample, lyrics: sample.lyrics.replace("Joy- ful, joy- ful,", "Joy- ful,") };
+  assert.strictEqual(MusicTheory.validateSongEncoding(badTokenCount).valid, false, "Mismatched lyric token count must fail validation");
+
+  // 22.3 buildScoreModel attaches beat-aligned lyrics across RH, Grand Staff, and Dyads
+  const rhModel = MusicTheory.buildScoreModel(sample, true, false, false);
+  assert.strictEqual(rhModel.steps[0].lyric, "Joy-", "RH step 0 lyric must be 'Joy-'");
+  assert.strictEqual(rhModel.steps[1].lyric, "ful,", "RH step 1 lyric must be 'ful,'");
+  const grandModel = MusicTheory.buildScoreModel(sample, true, true, false);
+  assert.strictEqual(grandModel.steps[0].lyric, "Joy-", "Grand Staff step 0 lyric must be 'Joy-'");
+  const dyadModel = MusicTheory.buildScoreModel(sample, false, true, true);
+  assert.strictEqual(dyadModel.steps[0].lyric, "Joy-", "Dyads + LH step 0 lyric must be 'Joy-'");
+
+  // 22.4 All 80 songs carry valid synchronized lyrics
+  songDatabase.forEach(song => {
+    assert.ok(typeof song.lyrics === "string" && song.lyrics.trim().length > 0, `${song.id} must define a lyrics track`);
+    const v = MusicTheory.validateSongEncoding(song);
+    assert.strictEqual(v.valid, true, `${song.id} failed encoding/lyrics validation: ${v.errors.join("; ")}`);
+  });
+
+  console.log("✔ Test 22: 🎤 Milestone 45 Synchronized Lyrics Engine, Validator & 80-Song Coverage passed");
+}
+
+console.log("=== ALL 22 EDUCATION SUITE TESTS PASSED SUCCESSFULLY! ===");
 
 
 

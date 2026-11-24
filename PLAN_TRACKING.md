@@ -600,6 +600,19 @@
   - [x] **Automated Test Suite (`tests/test_education.js` Test 21 & `tests/test_score_engine.js` Test 42)**:
     - [x] Added Test 21 in `tests/test_education.js` and Test 42 in `tests/test_score_engine.js` verifying all 80 songs pass strict encoding, LF formatting, category balance, 49-key compatibility, Bootcamp links, and 4-mode `buildScoreModel` execution — all **63/63 automated tests passing**.
 
+- [x] **Milestone 45: Full 80-Song Sheet Music Accuracy Repairs & Synchronized Lyrics Toggle**
+  - [x] **Musical Accuracy Repairs Across 19 Repertoire Pieces (`songs.js`)**:
+    - [x] Repaired melodies, rhythms, barlines, bass lines, and dyad harmonies in *Pop Goes the Weasel*, *Heart and Soul*, *Stand by Me*, *Let It Be*, *Smoke on the Water*, *Hallelujah*, *Amazing Grace (Key of F)*, *Down by the Riverside*, *Joy to the World*, *Für Elise (Hook Motif)*, *Bella Ciao*, *Imagine (Piano Intro)*, *Take Me Home, Country Roads*, *My Bonnie Lies Over the Ocean*, *Danny Boy*, *House of the Rising Sun*, *Autumn Leaves (Jazz ii–V–I)*, *Clair de Lune*, and *Swan Lake (Main Theme)*.
+  - [x] **Syllable-Aligned Lyrics & Phrase Markers Across All 80 Songs (`songs.js`, `theory.js`)**:
+    - [x] Added 1-to-1 measure-and-note aligned `lyrics` tracks to all 80 songs (authentic vocal lyrics for all vocal/folk/pop/hymn pieces and concise musical section/phrase markers for instrumental/classical pieces).
+    - [x] Added `formatLyricToken()` and beat-aligned `item.lyric` attachment inside `buildScoreModel()` across all hand modes, plus strict lyric measure/token parity validation in `validateSongEncoding()`.
+  - [x] **Interactive `🎤 Lyrics` Toggle & Collision-Free SVG Engraving (`index.html`, `styles.css`, `js/catalog.js`, `js/score-renderer.js`)**:
+    - [x] Added `#toggleLyrics` / `#toggleLabelLyrics` toggle in `.layer-toggles-bar` with `localStorage` (`piano_show_lyrics`) persistence and live non-interrupting re-render.
+    - [x] Expanded system & grand-staff vertical spacing dynamically when lyrics are enabled so syllables never collide with noteheads, cheat letters, finger numbers, or bass staves.
+    - [x] Styled `.lyric-text`, `.lyric-section-marker`, dark-paper theme variants, and `.note-group.active-target .lyric-text` active-step highlighting so the current syllable glows as you play.
+  - [x] **Automated Test Suite (`tests/test_education.js` Test 22 & `tests/test_score_engine.js` Test 43)**:
+    - [x] Added Test 22 in `tests/test_education.js` and Test 43 in `tests/test_score_engine.js` — all **65/65 automated tests passing**.
+
 
 
 

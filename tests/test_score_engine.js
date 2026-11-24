@@ -3557,6 +3557,43 @@ const {
   console.log("✔ Test 42: 🎼 Milestone 44 Full 80-Song Encoding, LF Formatting, Category Balance & Score-Model Integrity Audit passed");
 }
 
+// ==========================================
+// TEST 43: 🎤 Milestone 45 Sheet Music Musical Repairs & Interactive Lyrics Toggle UI/Renderer
+// ==========================================
+{
+  const songDatabase = require("../songs.js");
+  const byId = Object.fromEntries(songDatabase.map(s => [s.id, s]));
+
+  // 43.1 Spot-check repaired melodies & rhythms
+  assert.ok(byId["pop-goes-the-weasel"].rh.startsWith("C4:1 C4:0.5 D4:1 D4:0.5"), "Pop Goes the Weasel starts with authentic C-C-D-D motif");
+  assert.ok(byId["stand-by-me"].rh.includes("G4:0.5 A4:1 C5:1"), "Stand by Me includes authentic 'When the night' G-A-C5 motif");
+  assert.ok(byId["let-it-be"].rh.includes("A5:1 G5:1 E5:1"), "Let It Be includes authentic chorus peak");
+  assert.ok(byId["smoke-on-the-water"].rh.includes("D4:0.5~ | D4:0.5 F4:1 G#4:0.5 G4:2"), "Smoke on the Water uses authentic tied barline anticipation");
+  assert.ok(byId["hallelujah"].rh.startsWith("E4:0.5 | G4:1 G4:0.5 G4:1 G4:0.5"), "Hallelujah uses authentic 6/8 pickup & 1+0.5 lilt");
+  assert.ok(byId["amazing-grace-f"].rh.includes("F4:2 C4:1 | D4:2 F4:0.5 D4:0.5"), "Amazing Grace (F) includes authentic 'was lost, but now am found' bridge");
+  assert.ok(byId["imagine-motif"].rh.includes("E4:0.5 E4:0.5 G4:0.5 G4:0.5 B4:1 B4:1"), "Imagine includes authentic vocal melody");
+  assert.ok(byId["swan-lake-theme"].rh.includes("| C5:2 A4:2 |"), "Swan Lake M4 resolves cleanly to C5-A4");
+  assert.ok(byId["clair-de-lune-debussy"].rh.includes("Bb4:1.5 Db5:0.5 Bb4:0.5 Ab4:0.5~"), "Clair de Lune includes authentic Db5 upper-neighbor turn");
+  assert.ok(byId["autumn-leaves-jazz"].rh.includes("E3:1 G#3:1 B3:1 | C4:4"), "Autumn Leaves ends on authentic 'of red and gold' cadence");
+
+  // 43.2 DOM, CSS, Catalog Persistence & Score Renderer Integration
+  const sources = loadProjectSources();
+  assert.ok(sources.html.includes('id="toggleLyrics"'), "index.html must include #toggleLyrics checkbox");
+  assert.ok(sources.html.includes('id="toggleLabelLyrics"'), "index.html must include #toggleLabelLyrics label");
+  assert.ok(sources.css.includes(".layer-toggle.active-lyrics"), "styles.css must style active lyrics toggle");
+  assert.ok(sources.css.includes(".lyric-text"), "styles.css must style SVG .lyric-text");
+  assert.ok(sources.css.includes(".note-group.active-target .lyric-text"), "styles.css must highlight active note lyric");
+  assert.ok(sources.scripts["js/catalog.js"].includes("piano_show_lyrics"), "js/catalog.js must persist lyrics toggle in localStorage");
+  assert.ok(sources.scripts["js/score-renderer.js"].includes('document.getElementById("toggleLyrics")'), "js/score-renderer.js must read #toggleLyrics");
+  assert.ok(sources.scripts["js/score-renderer.js"].includes("item.lyric"), "js/score-renderer.js must render item.lyric onto SVG score");
+
+  // 43.3 Full syntax & DOM ID integrity check
+  assertValidProjectScripts("Test 43");
+  assertDomIdIntegrity();
+
+  console.log("✔ Test 43: 🎤 Milestone 45 Sheet Music Musical Repairs & Interactive Lyrics Toggle UI/Renderer passed");
+}
+
 console.log("=== ALL SCORE ENGINE & BASS CLEF ALIGNMENT TESTS PASSED! ===");
 
 
