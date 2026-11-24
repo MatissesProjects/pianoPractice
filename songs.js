@@ -23,7 +23,8 @@
     "lhF": "1 | 5 | 1 | 4 | 1 | 5 | 1 4 | 1 | 1 | 5 | 1 | 4 | 1 | 5 | 1 | 4 1 | 1 | 5 1 | 4 1 | 4 1 | 1 | 5 1 | 4 1 | 4 1",
     "dyads": "C4+E4:2 C4+E4:0.5 D4+F4:0.5 E4+G4:0.5 F4+A4:0.5~ | F4+A4:2 F4+A4:0.5 E4+G4:0.5 D4+F4:0.5 C4+E4:0.5~ | C4+E4:2 C4+E4:0.5 D4+F4:0.5 E4+G4:0.5 E4+G4:0.5~ | E4+G4:1.5 D4+F4:0.5~ D4+F4:2 | C4+E4:2 C4+E4:0.5 D4+F4:0.5 E4+G4:0.5 F4+A4:0.5~ | F4+A4:2 F4+A4:0.5 E4+G4:0.5 D4+F4:0.5 C4+E4:0.5~ | C4+E4:2 C4+E4:0.5 D4+F4:0.5 E4+G4:0.5 D4+F4:0.5~ | D4+F4:1.5 C4+E4:0.5~ C4+E4:0.5 C5+E5:0.5 B4+D5:0.5 A4+C5:0.5~ | A4+C5:1.5 -:0.5 C5+E5:0.5 C5+E5:0.5 C5+E5:0.5 D5+F5:0.5~ | D5+F5:1 -:0.5 D5+F5:0.5 D5+F5:0.5 C5+E5:0.5 B4+D5:0.5 A4+C5:0.5~ | A4+C5:2 A4+C5:0.5 B4+D5:0.5 C5+E5:0.5 C5+E5:0.5~ | C5+E5:1 B4+D5:0.5 B4+D5:0.5~ B4+D5:2 | A4+C5:1 -:0.5 A4+C5:0.5 A4+C5:0.5 B4+D5:0.5 C5+E5:0.5 D5+F5:0.5~ | D5+F5:2 D5+F5:0.5 C5+E5:0.5 B4+D5:0.5 A4+C5:0.5~ | A4+C5:1.5 E4+G4:0.5 D4+F4:0.5 C4+E4:0.5 B3+D4:0.5 -:0.5 | C4+E4:1.5 B3+D4:0.5~ B3+D4:1 B3+D4:0.25 C4+E4:0.75 | E4+G4:1 E4+G4:0.75 F4+A4:0.25 E4+G4:0.5 C4+E4:0.5 -:0.5 E4+G4:0.5 | A3+C4:0.5 B3+D4:0.5 C4+E4:0.5 D4+F4:0.5 -:1 D4+F4:0.25 E4+G4:0.75 | E4+G4:1 F4+A4:0.5 E4+G4:0.5 C4+E4:1 -:0.5 B3+D4:0.5 | C4+E4:1.5 B3+D4:0.5~ B3+D4:1 B3+D4:0.25 C4+E4:0.75 | E4+G4:1 E4+G4:0.75 F4+A4:0.25 E4+G4:0.5 C4+E4:0.5 -:0.5 E4+G4:0.5 | A3+C4:0.5 B3+D4:0.5 C4+E4:0.5 D4+F4:0.5 -:1 D4+F4:0.25 E4+G4:0.75 | E4+G4:1 F4+A4:0.5 E4+G4:0.5 C4+E4:1 -:0.5 B3+D4:0.5 | C4+E4:1 E4+G4:0.5 B3+D4:0.5 C4+E4:2",
     "dyadsF": "1+3 1+3 2+4 3+5 1+4 | 1+4 1+4 3+5 2+4 1+3 | 1+3 1+3 2+4 3+5 3+5 | 3+5 2+4 2+4 | 1+3 1+3 2+4 3+5 1+4 | 1+4 1+4 3+5 2+4 1+3 | 1+3 1+3 2+4 3+5 2+4 | 2+4 1+3 1+3 3+5 2+4 1+3 | 1+3 - 3+5 3+5 3+5 2+4 | 2+4 - 2+4 2+4 3+5 2+4 1+3 | 1+3 1+3 2+4 3+5 3+5 | 3+5 2+4 2+4 2+4 | 1+3 - 1+3 1+3 2+4 3+5 2+4 | 2+4 2+4 3+5 2+4 1+3 | 1+3 3+5 2+4 1+3 1+3 - | 1+3 1+3 1+3 1+3 1+3 | 3+5 3+5 2+4 3+5 1+3 - 3+5 | 1+3 1+3 1+3 2+4 - 2+4 3+5 | 3+5 2+4 3+5 1+3 - 1+3 | 1+3 1+3 1+3 1+3 1+3 | 3+5 3+5 2+4 3+5 1+3 - 3+5 | 1+3 1+3 1+3 2+4 - 2+4 3+5 | 3+5 2+4 3+5 1+3 - 1+3 | 1+3 3+5 1+2 1+3",
-    "tip": "Bill Withers' gospel classic: Features steady bass root anchors (C3, F2, G2) in basic mode—use the LH Style menu to expand into Open 5ths, Octaves, or Full Triads!"
+    "tip": "Bill Withers' gospel classic: Features steady bass root anchors (C3, F2, G2) in basic mode—use the LH Style menu to expand into Open 5ths, Octaves, or Full Triads!",
+    "lyrics": "Some- times in our lives, | _ we all have pain, | _ we all have sor- | _ row. _ | But if we are wise, | _ we know that there's | _ al- ways to- mor- | _ row. _ Lean on me, | _ _ when you're not strong, | _ _ and I'll be your friend, | _ I'll help you car- | _ ry on. _ | For _ it won't be long, _ | _ 'til I'm gon- na | need some- bo- dy to _ | lean on. _ Just call | on me bro- ther when _ you | need a hand. _ _ We all | need some- bo- dy _ to | lean on. _ I just | might have a prob- lem _ that | you'd un- der- stand. _ We all | need some- bo- dy _ to | lean on me. _"
   },
   {
     "id": "ode-to-joy",
@@ -38,7 +39,8 @@
     "lhF": "5 5 | 1 1 | 5 1 | 5 1 | 5 5 | 1 1 | 5 1 | 1 5",
     "dyads": "C4+E4:1 C4+E4:1 D4+F4:1 E4+G4:1 | E4+G4:1 D4+F4:1 C4+E4:1 G3+D4:1 | C4+E4:1 C4+E4:1 G3+D4:1 C4+E4:1 | C4+E4:1.5 G3+D4:0.5 G3+D4:2 | C4+E4:1 C4+E4:1 D4+F4:1 E4+G4:1 | E4+G4:1 D4+F4:1 C4+E4:1 G3+D4:1 | C4+E4:1 C4+E4:1 G3+D4:1 C4+E4:1 | G3+D4:1.5 C4+E4:0.5 C4+E4:2",
     "dyadsF": "1+3 1+3 2+4 3+5 | 3+5 2+4 1+3 1+2 | 1+3 1+3 1+2 1+3 | 1+3 1+2 1+2 | 1+3 1+3 2+4 3+5 | 3+5 2+4 1+3 1+2 | 1+3 1+3 1+2 1+3 | 1+2 1+3 1+3",
-    "tip": "Beethoven's 9th Symphony theme: Keep both hands level and drop arm weight evenly into downbeats."
+    "tip": "Beethoven's 9th Symphony theme: Keep both hands level and drop arm weight evenly into downbeats.",
+    "lyrics": "Joy- ful, joy- ful, | we a- dore Thee, | God of glo- ry, | Lord of love! | Hearts un- fold like | flow'rs be- fore Thee, | O- p'ning to the | sun a- bove."
   },
   {
     "id": "mary-had-a-little-lamb",
@@ -53,7 +55,8 @@
     "lhF": "5 | 5 | 1 | 5 | 5 | 5 | 1 | 5",
     "dyads": "C4+E4:1 G3+D4:1 C4+E4:1 G3+D4:1 | C4+E4:1 C4+E4:1 C4+E4:2 | G3+D4:1 G3+D4:1 G3+D4:2 | C4+E4:1 C4+G4:1 C4+G4:2 | C4+E4:1 G3+D4:1 C4+E4:1 G3+D4:1 | C4+E4:1 C4+E4:1 C4+E4:1 C4+E4:1 | G3+D4:1 G3+D4:1 C4+E4:1 G3+D4:1 | C4+E4:4",
     "dyadsF": "1+3 1+2 1+3 1+2 | 1+3 1+3 1+3 | 1+2 1+2 1+2 | 1+3 1+5 1+5 | 1+3 1+2 1+3 1+2 | 1+3 1+3 1+3 1+3 | 1+2 1+2 1+3 1+2 | 1+3",
-    "tip": "Bedrock exercise for finger independence between fingers 1, 2, and 3."
+    "tip": "Bedrock exercise for finger independence between fingers 1, 2, and 3.",
+    "lyrics": "Ma- ry had a | lit- tle lamb, | lit- tle lamb, | lit- tle lamb. | Ma- ry had a | lit- tle lamb, its | fleece was white as | snow."
   },
   {
     "id": "jingle-bells",
@@ -68,7 +71,8 @@
     "lhF": "5 | 5 | 5 | 5 | 2 | 5 | 1 | 1 | 5 | 5 | 5 | 5 | 2 | 5 | 1 | 5",
     "dyads": "C4+E4:1 C4+E4:1 C4+E4:2 | C4+E4:1 C4+E4:1 C4+E4:2 | C4+E4:1 C4+G4:1 C4+E4:1.5 G3+D4:0.5 | C4+E4:4 | C4+F4:1 C4+F4:1 C4+F4:1.5 C4+F4:0.5 | C4+F4:1 C4+E4:1 C4+E4:1 C4+E4:0.5 C4+E4:0.5 | C4+E4:1 G3+D4:1 G3+D4:1 C4+E4:1 | G3+D4:2 G3+G4:2 | C4+E4:1 C4+E4:1 C4+E4:2 | C4+E4:1 C4+E4:1 C4+E4:2 | C4+E4:1 C4+G4:1 C4+E4:1.5 G3+D4:0.5 | C4+E4:4 | C4+F4:1 C4+F4:1 C4+F4:1.5 C4+F4:0.5 | C4+F4:1 C4+E4:1 C4+E4:1 C4+E4:0.5 C4+E4:0.5 | C4+G4:1 C4+G4:1 G3+F4:1 G3+D4:1 | C4+E4:4",
     "dyadsF": "1+3 1+3 1+3 | 1+3 1+3 1+3 | 1+3 1+5 1+3 1+2 | 1+3 | 1+4 1+4 1+4 1+4 | 1+4 1+3 1+3 1+3 1+3 | 1+3 1+2 1+2 1+3 | 1+2 1+5 | 1+3 1+3 1+3 | 1+3 1+3 1+3 | 1+3 1+5 1+3 1+2 | 1+3 | 1+4 1+4 1+4 1+4 | 1+4 1+3 1+3 1+3 1+3 | 1+5 1+5 1+4 1+2 | 1+3",
-    "tip": "Complete 16-bar holiday chorus: Keep eighth notes bouncy and resolve firmly to C on measure 16."
+    "tip": "Complete 16-bar holiday chorus: Keep eighth notes bouncy and resolve firmly to C on measure 16.",
+    "lyrics": "Jin- gle bells, | jin- gle bells, | jin- gle all the | way! | Oh, what fun it | is to ride in a | one- horse o- pen | sleigh, hey! | Jin- gle bells, | jin- gle bells, | jin- gle all the | way! | Oh, what fun it | is to ride in a | one- horse o- pen | sleigh!"
   },
   {
     "id": "when-the-saints",
@@ -83,7 +87,8 @@
     "lhF": "5 | 5 | 5 | 5 | 5 | 5 | 5 1 | 1 | 5 | 5 | 5 | 1 | 5 1 | 5 1 | 1 1 | 5",
     "dyads": "-:1 C4+E4:1 C4+G4:1 C4+A4:1 | C4+G4:4 | -:1 C4+E4:1 C4+G4:1 C4+A4:1 | C4+G4:4 | -:1 C4+E4:1 C4+G4:1 C4+A4:1 | C4+G4:2 C4+E4:2 | C4:2 C4+E4:2 | G3+D4:4 | -:1 C4+E4:1 C4+E4:1 G3+D4:1 | C4:4 | -:1 C4:1 C4+E4:1 C4+G4:1 | C4+G4:1 F4+A4:3 | C4+E4:2 F4+A4:2 | C4+G4:2 C4+E4:2 | C4+E4:2 G3+D4:2 | C4+E4:4",
     "dyadsF": "- 1+3 1+4 1+5 | 1+5 | - 1+3 1+4 1+5 | 1+5 | - 1+3 1+4 1+5 | 1+5 1+3 | 1 1+3 | 1+2 | - 1+3 1+3 1+2 | 1 | - 1 1+3 1+5 | 1+5 3+5 | 1+3 3+5 | 1+5 1+3 | 1+3 1+2 | 1+3",
-    "tip": "Notice the swinging upbeat pickup notes leading into accented root downbeats."
+    "tip": "Notice the swinging upbeat pickup notes leading into accented root downbeats.",
+    "lyrics": "_ Oh, when the | saints | _ go march- ing | in, | _ Oh, when the | saints go | march- ing | in, | _ Oh, Lord, I | want | _ to be in | that num- | ber, when | the saints | go march- | in!"
   },
   {
     "id": "lightly-row",
@@ -98,7 +103,8 @@
     "lhF": "5 | 1 | 5 | 5 | 5 | 1 | 5 | 5 | 1 | 1 | 5 | 5 | 5 | 1 | 5 1 | 5",
     "dyads": "C4+G4:2 C4+E4:1 C4+E4:1 | G3+F4:2 G3+D4:1 G3+D4:1 | C4:1 C4+D4:1 C4+E4:1 C4+F4:1 | C4+G4:1 C4+G4:1 C4+G4:2 | C4+G4:2 C4+E4:1 C4+E4:1 | G3+F4:2 G3+D4:1 G3+D4:1 | C4:1 C4+E4:1 C4+G4:1 C4+G4:1 | C4+E4:4 | G3+D4:1 G3+D4:1 G3+D4:1 G3+D4:1 | G3+D4:1 C4+E4:1 G3+F4:2 | C4+E4:1 C4+E4:1 C4+E4:1 C4+E4:1 | C4+E4:1 C4+F4:1 C4+G4:2 | C4+G4:2 C4+E4:1 C4+E4:1 | G3+F4:2 G3+D4:1 G3+D4:1 | C4:1 C4+E4:1 C4+G4:1 C4+G4:1 | C4+E4:4",
     "dyadsF": "1+5 1+3 1+3 | 1+4 1+2 1+2 | 1 1+2 1+3 1+4 | 1+5 1+5 1+5 | 1+5 1+3 1+3 | 1+4 1+2 1+2 | 1 1+3 1+5 1+5 | 1+3 | 1+2 1+2 1+2 1+2 | 1+2 1+3 1+4 | 1+3 1+3 1+3 1+3 | 1+3 1+4 1+5 | 1+5 1+3 1+3 | 1+4 1+2 1+2 | 1 1+3 1+5 1+5 | 1+3",
-    "tip": "Complete 16-bar A-B-A' German folk song: Master smooth repeated notes in the middle section."
+    "tip": "Complete 16-bar A-B-A' German folk song: Master smooth repeated notes in the middle section.",
+    "lyrics": "Light- ly row, | light- ly row, | O'er the glass- y | waves we go. | Smooth- ly glide, | smooth- ly glide, | On the si- lent | tide. | Let the winds and | wa- ters be | Min- gled with our | me- lo- dy. | Sing and float, | sing and float, | In our lit- tle | boat."
   },
   {
     "id": "love-me-tender",
@@ -113,7 +119,8 @@
     "lhF": "2 | 1 5 | 1 5 | 2 | 2 | 1 5 | 5 | 2",
     "dyads": "C4:1 C4+F4:1 C4+E4:1 C4+F4:1 | D4+G4:1 Bb3+D4:1 C4+G4:2 | D4+F4:1 C4+E4:1 Bb3+D4:1 C4+E4:1 | C4+F4:4 | C4:1 C4+F4:1 C4+E4:1 C4+F4:1 | D4+G4:1 Bb3+D4:1 C4+G4:2 | D4+F4:1 C4+E4:1 C4+D4:1 C4+E4:1 | C4+F4:4",
     "dyadsF": "1 1+4 1+3 1+4 | 2+5 1+3 1+5 | 2+4 1+3 1+3 1+3 | 1+4 | 1 1+4 1+3 1+4 | 2+5 1+3 1+5 | 2+4 1+3 1+2 1+3 | 1+4",
-    "tip": "Authentic 'Aura Lee' ballad in F: Right hand stays comfortably within C4–G4 while training the 1-to-4 fourth leap."
+    "tip": "Authentic 'Aura Lee' ballad in F: Right hand stays comfortably within C4–G4 while training the 1-to-4 fourth leap.",
+    "lyrics": "Love me ten- der, | love me sweet, | Ne- ver let me | go. | You have made my | life com- plete, | And I love you | so."
   },
   {
     "id": "going-home",
@@ -128,7 +135,8 @@
     "lhF": "5 | 5 | 1 | 1 | 5 | 5 | 1 | 5",
     "dyads": "C4+E4:1.5 C4+G4:0.5 C4+G4:2 | C4+E4:1.5 G3+D4:0.5 C4:2 | G3+D4:1 C4+E4:1 C4+G4:1 C4+E4:1 | G3+D4:4 | C4+E4:1.5 C4+G4:0.5 C4+G4:2 | C4+E4:1.5 G3+D4:0.5 C4:2 | G3+D4:1 C4+E4:1 G3+D4:1 C4:1 | C4+E4:4",
     "dyadsF": "1+3 1+5 1+5 | 1+3 1+2 1 | 1+2 1+3 1+5 1+3 | 1+2 | 1+3 1+5 1+5 | 1+3 1+2 1 | 1+2 1+3 1+2 1 | 1+3",
-    "tip": "Dvorak's English horn theme: Practice pure legato tone and sustained phrasing."
+    "tip": "Dvorak's English horn theme: Practice pure legato tone and sustained phrasing.",
+    "lyrics": "Go- ing home, | go- ing home, | I'm a- go- ing | home. | Qui- et like, | some still day, | I'm just go- ing | home."
   },
   {
     "id": "morning-mood",
@@ -143,7 +151,8 @@
     "lhF": "5 | 5 | 5 2 | 1 5 | 5 | 5 | 5 2 | 1 5",
     "dyads": "C4+G4:0.5 C4+E4:0.5 G3+D4:0.5 C4:0.5 G3+D4:0.5 C4+E4:0.5 | C4+G4:0.5 C4+E4:0.5 G3+D4:0.5 C4:0.5 G3+D4:0.5 C4+E4:0.5 | C4+G4:0.5 C4+E4:0.5 C4+G4:0.5 C4+A4:0.5 C4+E4:0.5 C4+A4:0.5 | C4+G4:0.5 C4+E4:0.5 G3+D4:0.5 C4+E4:1.5 | C4+G4:0.5 C4+E4:0.5 G3+D4:0.5 C4:0.5 G3+D4:0.5 C4+E4:0.5 | C4+G4:0.5 C4+E4:0.5 G3+D4:0.5 C4:0.5 G3+D4:0.5 C4+E4:0.5 | C4+G4:0.5 C4+E4:0.5 C4+G4:0.5 C4+A4:0.5 C4+E4:0.5 C4+A4:0.5 | B3+G4:1 G3+D4:0.5 C4+E4:1.5",
     "dyadsF": "1+5 1+3 1+2 1 1+2 1+3 | 1+5 1+3 1+2 1 1+2 1+3 | 1+5 1+3 1+5 1+5 1+3 1+5 | 1+5 1+3 1+2 1+3 | 1+5 1+3 1+2 1 1+2 1+3 | 1+5 1+3 1+2 1 1+2 1+3 | 1+5 1+3 1+5 1+5 1+3 1+5 | 1+5 1+2 1+3",
-    "tip": "Grieg's rolling pastoral flute theme: Reach gently with pinky 5 for the bright A4 sunrise peak."
+    "tip": "Grieg's rolling pastoral flute theme: Reach gently with pinky 5 for the bright A4 sunrise peak.",
+    "lyrics": "[Dawn_A] _ _ _ _ _ | [Echo] _ _ _ _ _ | [Sunrise_Peak] _ _ _ _ _ | [Cadence] _ _ _ | [Dawn_A'] _ _ _ _ _ | [Echo] _ _ _ _ _ | [Bright_Peak] _ _ _ _ _ | [Resolve] _ _"
   },
   {
     "id": "au-clair-de-la-lune",
@@ -158,7 +167,8 @@
     "lhF": "5 | 1 | 5 1 | 5 | 1 | 2 | 1 2 | 1 | 5 | 1 | 5 1 | 5",
     "dyads": "C4+E4:1 C4+E4:1 C4+E4:1 G3+D4:1 | C4+E4:2 G3+D4:2 | C4+E4:1 C4+E4:1 G3+D4:1 G3+D4:1 | C4+E4:4 | G3+D4:1 G3+D4:1 G3+D4:1 G3+D4:1 | F#3+A3:2 F#3+A3:2 | F#3+D4:1 F#3+C4:1 G3+B3:1 F#3+A3:1 | D3+G3:4 | C4+E4:1 C4+E4:1 C4+E4:1 G3+D4:1 | C4+E4:2 G3+D4:2 | C4+E4:1 C4+E4:1 G3+D4:1 G3+D4:1 | C4+E4:4",
     "dyadsF": "1+3 1+3 1+3 1+2 | 1+3 1+2 | 1+3 1+3 1+2 1+2 | 1+3 | 1+4 1+4 1+4 1+4 | 1+3 1+3 | 1+5 1+4 1+3 1+3 | 1+4 | 1+3 1+3 1+3 1+2 | 1+3 1+2 | 1+3 1+3 1+2 1+2 | 1+3",
-    "tip": "Authentic French A-B-A folk song: Listen to the gentle shift down to G major in the middle bridge."
+    "tip": "Authentic French A-B-A folk song: Listen to the gentle shift down to G major in the middle bridge.",
+    "lyrics": "Au clair de la | lu- ne, | Mon a- mi Pier- | rot, | Prê- te- moi ta | plu- me | Pour é- crire un | mot. | Ma chan- delle est | mor- te, | Je n'ai plus de | feu."
   },
   {
     "id": "alouette",
@@ -173,7 +183,8 @@
     "lhF": "5 | 1 5 | 5 | 1 5 | 5 | 1 | 5 | 1 5",
     "dyads": "C4+E4:1.5 C4+F4:0.5 C4+G4:1 C4+G4:1 | G3+D4:0.5 C4:0.5 G3+D4:0.5 C4+E4:0.5 C4+E4:1 G3+B3:1 | C4+E4:1.5 C4+F4:0.5 C4+G4:1 C4+G4:1 | G3+D4:0.5 C4:0.5 G3+D4:0.5 C4+E4:0.5 C4+E4:2 | C4:0.5 C4:0.5 C4:0.5 G3+D4:0.5 C4+E4:1 C4:1 | B3+G4:1 B3+G4:1 D4+G4:2 | C4+E4:1.5 C4+F4:0.5 C4+G4:1 C4+G4:1 | G3+D4:0.5 C4:0.5 G3+D4:0.5 C4+E4:0.5 C4+E4:2",
     "dyadsF": "1+3 1+4 1+5 1+5 | 1+4 1 1+4 1+3 1+3 1+2 | 1+3 1+4 1+5 1+5 | 1+4 1 1+4 1+3 1+3 | 1 1 1 1+2 1+3 1 | 1+5 1+5 2+5 | 1+3 1+4 1+5 1+5 | 1+4 1 1+4 1+3 1+3",
-    "tip": "Trains the classic dotted-quarter lilting bounce cleanly onto repeated third-finger notes."
+    "tip": "Trains the classic dotted-quarter lilting bounce cleanly onto repeated third-finger notes.",
+    "lyrics": "A- lou- et- te, | gen- tille A- lou- et- te, | A- lou- et- te, | je te plu- me- rai. | Je te plu- me- rai la | tête, la tête! | A- lou- et- te, | je te plu- me- rai."
   },
   {
     "id": "pop-goes-the-weasel",
@@ -182,13 +193,14 @@
     "category": "C 5-Finger",
     "tempo": 110,
     "timeSig": "6/8",
-    "rh": "C4:1 D4:0.5 E4:1 F4:0.5 | G4:0.5 E4:0.5 C4:1.5 G3:0.5 | C4:1 D4:0.5 E4:0.5 C4:0.5 G3:0.5 | E4:1.5 C4:1.5 | C4:1 D4:0.5 E4:1 F4:0.5 | G4:0.5 E4:0.5 C4:1.5 G3:0.5 | A4:1.5 D4:1 F4:0.5 | E4:1.5 C4:1.5",
-    "rhF": "1 2 3 4 | 5 3 1 1 | 1 2 3 1 1 | 3 1 | 1 2 3 4 | 5 3 1 1 | 5 1 3 | 2 1",
-    "lh": "C3:3 | C3:3 | C3:1.5 G2:1.5 | C3:3 | C3:3 | C3:3 | F2:1.5 G2:1.5 | C3:3",
-    "lhF": "5 | 5 | 5 1 | 5 | 5 | 5 | 2 1 | 5",
-    "dyads": "C4+E4:1 D4+F4:0.5 C4+E4:1 D4+F4:0.5 | E4+G4:0.5 C4+E4:0.5 C4:1.5 G3:0.5 | C4+E4:1 G3+D4:0.5 C4+E4:0.5 C4:0.5 G3:0.5 | C4+E4:1.5 C4+E4:1.5 | C4+E4:1 D4+F4:0.5 C4+E4:1 D4+F4:0.5 | E4+G4:0.5 C4+E4:0.5 C4:1.5 G3:0.5 | F4+A4:1.5 B3+D4:1 D4+F4:0.5 | C4+E4:1.5 C4+E4:1.5",
-    "dyadsF": "1+3 2+4 1+3 2+4 | 3+5 1+3 1 1 | 1+3 1+2 1+3 1 1 | 1+3 1+3 | 1+3 2+4 1+3 2+4 | 3+5 1+3 1 1 | 2+5 1+2 2+4 | 1+3 1+3",
-    "tip": "Sprightly 6/8 jig feel! Accent the high A4 on 'Pop!' before snapping cleanly down to D4."
+    "rh": "C4:1 C4:0.5 D4:1 D4:0.5 | E4:0.5 G4:0.5 E4:0.5 C4:1 G3:0.5 | C4:1 C4:0.5 D4:1 F4:0.5 | E4:1.5 C4:1 G3:0.5 | C4:1 C4:0.5 D4:1 D4:0.5 | E4:0.5 G4:0.5 E4:0.5 C4:1.5 | A4:1.5 D4:1 F4:0.5 | E4:1.5 C4:1.5",
+    "rhF": "2 2 3 3 | 3 5 3 2 1 | 2 2 3 4 | 3 2 1 | 2 2 3 3 | 3 5 3 2 | 5 1 3 | 2 1",
+    "lh": "C3:1.5 G2:1.5 | C3:3 | C3:1.5 G2:1.5 | C3:3 | C3:1.5 G2:1.5 | C3:3 | F2:1.5 G2:1.5 | C3:3",
+    "lhF": "5 1 | 5 | 5 1 | 5 | 5 1 | 5 | 2 1 | 5",
+    "dyads": "C4+E4:1 C4+E4:0.5 B3+D4:1 B3+D4:0.5 | C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 G3+C4:1 G3:0.5 | C4+E4:1 C4+E4:0.5 B3+D4:1 D4+F4:0.5 | C4+E4:1.5 G3+C4:1 G3:0.5 | C4+E4:1 C4+E4:0.5 B3+D4:1 B3+D4:0.5 | C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 G3+C4:1.5 | F4+A4:1.5 B3+D4:1 D4+F4:0.5 | C4+E4:1.5 G3+C4:1.5",
+    "dyadsF": "1+3 1+3 1+3 1+3 | 1+3 3+5 1+3 1+3 1 | 1+3 1+3 1+3 2+4 | 1+3 1+3 1 | 1+3 1+3 1+3 1+3 | 1+3 3+5 1+3 1+3 | 2+5 1+3 2+4 | 1+3 1+4",
+    "tip": "Sprightly 6/8 jig feel! Accent the high A4 on 'Pop!' before snapping cleanly down to D4.",
+    "lyrics": "All a- round the | mul- ber- ry bush, The | mon- key chased the | wea- sel. The | mon- key thought 'twas | all in _ fun, | Pop! goes the | wea- sel!"
   },
   {
     "id": "heart-and-soul",
@@ -197,13 +209,14 @@
     "category": "Harmonic / Dyads",
     "tempo": 108,
     "timeSig": "4/4",
-    "rh": "C4:1 C4:1 C4:2 | C4:1 B3:0.5 A3:0.5 B3:0.5 C4:0.5 D4:1 | E4:1 E4:1 E4:2 | E4:1 D4:0.5 C4:0.5 D4:0.5 E4:0.5 F4:1 | G4:2 C4:2 | A4:1 G4:0.5 F4:0.5 E4:1 D4:1 | C4:1 B3:1 A3:1 G3:1 | F3:1 G3:1 C4:2",
-    "rhF": "1 1 1 | 2 1 1 1 2 3 | 3 3 3 | 4 3 2 3 4 5 | 5 1 | 5 4 3 2 1 | 4 3 2 1 | 1 2 4",
-    "lh": "C3:2 A2:2 | F2:2 G2:2 | C3:2 A2:2 | F2:2 G2:2 | C3:2 A2:2 | F2:2 G2:2 | C3:2 G2:2 | G2:2 C3:2",
-    "lhF": "1 3 | 5 4 | 1 3 | 5 4 | 1 3 | 5 4 | 1 4 | 4 1",
-    "dyads": "C4+E4:1 C4+E4:1 C4+E4:2 | C4+E4:1 G3+B3:0.5 F3+A3:0.5 G3+B3:0.5 A3+C4:0.5 B3+D4:1 | C4+E4:1 C4+E4:1 C4+E4:2 | C4+E4:1 B3+D4:0.5 A3+C4:0.5 B3+D4:0.5 C4+E4:0.5 D4+F4:1 | E4+G4:2 G3+C4:2 | F4+A4:1 E4+G4:0.5 D4+F4:0.5 C4+E4:1 B3+D4:1 | A3+C4:1 G3+B3:1 F3+A3:1 E3+G3:1 | D3+F3:1 D3+G3:1 C4+E4:2",
-    "dyadsF": "1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3 1+4 | 1+3 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+4 1+3",
-    "tip": "Hoagy Carmichael's beloved duet: Left hand drives the I–vi–IV–V doo-wop cycle while the melody sings on top."
+    "rh": "C4:1 C4:1 C4:2 | C4:1 B3:0.5 A3:0.5 B3:0.5 C4:0.5 D4:1 | E4:1 E4:1 E4:2 | E4:1 D4:0.5 C4:0.5 D4:0.5 E4:0.5 F4:1 | G4:2 C4:2 | A4:1 G4:0.5 F4:0.5 E4:1 D4:1 | C4:1 B3:0.5 A3:0.5 G3:1 A3:0.5 B3:0.5 | C4:4",
+    "rhF": "2 2 2 | 3 2 1 2 3 4 | 3 3 3 | 4 3 2 3 4 5 | 5 1 | 5 4 3 2 1 | 4 3 2 1 2 3 | 4",
+    "lh": "C3:2 A2:2 | F2:2 G2:2 | C3:2 A2:2 | F2:2 G2:2 | C3:2 A2:2 | F2:2 G2:2 | C3:2 G2:2 | C3:4",
+    "lhF": "1 3 | 5 4 | 1 3 | 5 4 | 1 3 | 5 4 | 1 4 | 1",
+    "dyads": "C4+E4:1 C4+E4:1 C4+E4:2 | C4+E4:1 G3+B3:0.5 F3+A3:0.5 G3+B3:0.5 A3+C4:0.5 B3+D4:1 | C4+E4:1 C4+E4:1 C4+E4:2 | C4+E4:1 B3+D4:0.5 A3+C4:0.5 B3+D4:0.5 C4+E4:0.5 D4+F4:1 | E4+G4:2 G3+C4:2 | F4+A4:1 E4+G4:0.5 D4+F4:0.5 C4+E4:1 B3+D4:1 | A3+C4:1 G3+B3:0.5 F3+A3:0.5 E3+G3:1 F3+A3:0.5 G3+B3:0.5 | C4+E4:4",
+    "dyadsF": "1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3 1+4 | 1+3 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3",
+    "tip": "Hoagy Carmichael's beloved duet: Left hand drives the I–vi–IV–V doo-wop cycle while the melody sings on top.",
+    "lyrics": "Heart and soul, | I fell in love with you, | Heart and soul, | The way a fool would do, | Mad- ly, | Be- cause you held me | And stole a kiss in the | night!"
   },
   {
     "id": "stand-by-me",
@@ -212,13 +225,14 @@
     "category": "Harmonic / Dyads",
     "tempo": 116,
     "timeSig": "4/4",
-    "rh": "-:1.5 G4:0.5 A4:1 G4:0.5 E4:0.5~ | E4:1 D4:0.5 C4:1 -:1.5 | -:1.5 G4:0.5 A4:1 G4:0.5 E4:0.5~ | E4:1 -:3 | -:1 A4:0.5 C5:0.5 C5:1 A4:0.5 G4:0.5~ | G4:1 F4:0.5 E4:0.5 D4:1 E4:0.5 D4:0.5~ | D4:1 C4:1 E4:1 D4:1 | C4:4",
-    "rhF": "- 2 3 2 1 | 1 2 1 - | - 2 3 2 1 | 1 - | - 2 4 4 3 2 | 2 2 1 1 2 1 | 2 1 3 2 | 1",
+    "rh": "-:1.5 G4:0.5 A4:1 C5:1 | -:1.5 A4:0.5 C5:1.5 -:0.5 | -:1.5 E4:0.5 G4:0.5 A4:0.5 G4:0.5 E4:0.5 | E4:1 -:3 | -:1 F4:0.5 G4:0.5 A4:1 A4:0.5 G4:0.5 | G4:1 F4:0.5 E4:0.5 D4:1 E4:0.5 D4:0.5~ | D4:1 C4:1 E4:1 D4:1 | C4:4",
+    "rhF": "- 2 3 5 | - 3 5 - | - 1 2 3 2 1 | 1 - | - 2 3 4 4 3 | 3 2 1 1 2 1 | 2 1 3 2 | 1",
     "lh": "C3:1.5 C3:1.5 G2:0.5 B2:0.5 | C3:1.5 C3:1.5 C3:0.5 B2:0.5 | A2:1.5 A2:1.5 A2:0.5 G2:0.5 | A2:1.5 A2:1.5 G2:0.5 E2:0.5 | F2:1.5 F2:1.5 F2:1 | G2:1.5 G2:1.5 G2:1 | C3:1.5 C3:1.5 G2:0.5 B2:0.5 | C3:4",
     "lhF": "1 1 4 2 | 1 1 1 2 | 3 3 3 4 | 3 3 4 5 | 4 4 4 | 3 3 3 | 1 1 4 2 | 1",
-    "dyads": "-:1.5 E4+G4:0.5 F4+A4:1 E4+G4:0.5 C4+E4:0.5~ | C4+E4:1 B3+D4:0.5 G3+C4:1 -:1.5 | -:1.5 E4+G4:0.5 F4+A4:1 E4+G4:0.5 C4+E4:0.5~ | C4+E4:1 -:3 | -:1 F4+A4:0.5 A4+C5:0.5 A4+C5:1 F4+A4:0.5 D4+G4:0.5~ | D4+G4:1 D4+F4:0.5 C4+E4:0.5 B3+D4:1 C4+E4:0.5 B3+D4:0.5~ | B3+D4:1 G3+C4:1 C4+E4:1 G3+D4:1 | C4+E4:4",
-    "dyadsF": "- 1+3 2+4 1+3 1+3 | 1+3 1+3 1+4 - | - 1+3 2+4 1+3 1+3 | 1+3 - | - 1+3 2+5 2+5 1+3 1+4 | 1+4 1+3 1+3 1+3 1+3 1+3 | 1+3 1+4 1+3 1+4 | 1+3",
-    "tip": "Ben E. King's unmistakable bass hook (1.5 + 1.5 + 0.5 + 0.5 beats) paired with the soulful vocal line."
+    "dyads": "-:1.5 E4+G4:0.5 F4+A4:1 G4+C5:1 | -:1.5 F4+A4:0.5 G4+C5:1.5 -:0.5 | -:1.5 C4+E4:0.5 E4+G4:0.5 E4+A4:0.5 E4+G4:0.5 C4+E4:0.5 | C4+E4:1 -:3 | -:1 C4+F4:0.5 D4+G4:0.5 F4+A4:1 F4+A4:0.5 D4+G4:0.5 | D4+G4:1 D4+F4:0.5 C4+E4:0.5 B3+D4:1 C4+E4:0.5 B3+D4:0.5~ | B3+D4:1 G3+C4:1 C4+E4:1 G3+D4:1 | C4+E4:4",
+    "dyadsF": "- 1+3 2+4 2+5 | - 2+4 2+5 - | - 1+3 1+3 1+4 1+3 1+3 | 1+3 - | - 1+4 1+4 2+4 2+4 1+4 | 1+4 1+3 1+3 1+3 1+3 1+3 | 1+3 1+4 1+3 1+4 | 1+3",
+    "tip": "Ben E. King's unmistakable bass hook (1.5 + 1.5 + 0.5 + 0.5 beats) paired with the soulful vocal line.",
+    "lyrics": "_ When the night | _ has come, _ | _ And the land is _ | dark, _ | _ And the moon is the | on- ly light we'll see, _ | _ So stand by | me."
   },
   {
     "id": "let-it-be",
@@ -227,13 +241,14 @@
     "category": "Harmonic / Dyads",
     "tempo": 80,
     "timeSig": "4/4",
-    "rh": "G4:0.5 G4:0.5 G4:0.5 A4:0.5 E4:1 G4:0.5 G4:0.5~ | G4:0.5 C5:1 D5:0.5 E5:1 E5:0.5 D5:0.5~ | D5:0.5 C5:1 C5:2 -:0.5 | E5:0.5 E5:0.5 F5:0.5 E5:0.5 E5:0.5 D5:0.5 D5:0.5 C5:0.5 | E5:0.5 D5:0.5 C5:1 -:1 A4:0.5 G4:0.5 | E5:1 D5:1 C5:1 D5:1 | E5:1 E5:1 F5:0.5 E5:0.5 D5:0.5 C5:0.5 | C5:4",
-    "rhF": "2 2 2 3 1 2 2 | 1 3 4 5 5 4 | 4 3 3 - | 3 3 4 3 3 2 2 1 | 5 4 3 - 2 1 | 5 4 3 4 | 3 3 4 3 2 1 | 1",
+    "rh": "G4:0.5 G4:0.5 G4:0.5 G4:0.5 A4:0.5 E4:0.5 G4:0.5 G4:0.5 | C5:0.5 D5:0.5 E5:1 E5:0.5 E5:0.5 D5:0.5 D5:0.5 | C5:1.5 -:0.5 E5:0.5 E5:0.5 F5:0.5 E5:0.5 | E5:0.5 D5:0.5 -:0.5 E5:0.5 D5:0.5 C5:1.5 | -:0.5 E5:0.5 D5:0.5 C5:0.5 C5:1 E5:0.5 G5:0.5 | A5:1 G5:1 E5:1 D5:0.5 C5:0.5 | E5:1 -:1 E5:0.5 E5:0.5 F5:0.5 E5:0.5 | E5:0.5 D5:0.5 -:0.5 E5:0.5 D5:0.5 C5:1.5",
+    "rhF": "2 2 2 2 3 1 2 2 | 1 2 3 3 3 2 2 | 1 - 3 3 4 3 | 3 2 - 3 2 1 | - 3 2 1 1 3 4 | 5 4 3 2 1 | 3 - 3 3 4 3 | 3 2 - 3 2 1",
     "lh": "C3:2 G2:2 | A2:2 F2:2 | C3:2 G2:2 | F2:1 E2:0.5 D2:0.5 C2:2 | A2:2 G2:2 | F2:2 C3:2 | C3:2 G2:2 | F2:1 E2:0.5 D2:0.5 C2:2",
     "lhF": "1 4 | 3 5 | 1 4 | 2 3 4 5 | 3 4 | 5 1 | 1 4 | 2 3 4 5",
-    "dyads": "E4+G4:0.5 E4+G4:0.5 E4+G4:0.5 F4+A4:0.5 C4+E4:1 D4+G4:0.5 D4+G4:0.5~ | D4+G4:0.5 E4+C5:1 F4+D5:0.5 C5+E5:1 C5+E5:0.5 B4+D5:0.5~ | B4+D5:0.5 E4+C5:1 E4+C5:2 -:0.5 | A4+E5:0.5 A4+E5:0.5 A4+F5:0.5 G4+E5:0.5 G4+E5:0.5 F4+D5:0.5 F4+D5:0.5 E4+C5:0.5 | C5+E5:0.5 B4+D5:0.5 E4+C5:1 -:1 C4+A4:0.5 B3+G4:0.5 | A4+E5:1 G4+D5:1 E4+C5:1 G4+D5:1 | G4+E5:1 G4+E5:1 A4+F5:0.5 G4+E5:0.5 F4+D5:0.5 E4+C5:0.5 | E4+C5:4",
-    "dyadsF": "1+3 1+3 1+3 1+3 1+3 1+4 1+4 | 1+4 1+5 1+5 1+3 1+3 1+3 | 1+3 1+5 1+5 - | 1+5 1+5 1+5 1+5 1+5 1+5 1+5 1+5 | 1+3 1+3 1+5 - 1+5 1+5 | 1+5 1+5 1+5 1+5 | 1+5 1+5 1+5 1+5 1+5 1+5 | 1+5",
-    "tip": "McCartney's gospel piano ballad: Listen for the descending F–Em–Dm–C bass turnaround at phrase endings."
+    "dyads": "E4+G4:0.5 E4+G4:0.5 E4+G4:0.5 E4+G4:0.5 F4+A4:0.5 C4+E4:0.5 D4+G4:0.5 D4+G4:0.5 | A4+C5:0.5 B4+D5:0.5 C5+E5:1 C5+E5:0.5 C5+E5:0.5 A4+D5:0.5 A4+D5:0.5 | G4+C5:1.5 -:0.5 C5+E5:0.5 C5+E5:0.5 D5+F5:0.5 C5+E5:0.5 | C5+E5:0.5 B4+D5:0.5 -:0.5 C5+E5:0.5 B4+D5:0.5 G4+C5:1.5 | -:0.5 C5+E5:0.5 B4+D5:0.5 A4+C5:0.5 A4+C5:1 C5+E5:0.5 D5+G5:0.5 | F5+A5:1 E5+G5:1 C5+E5:1 B4+D5:0.5 G4+C5:0.5 | C5+E5:1 -:1 C5+E5:0.5 C5+E5:0.5 D5+F5:0.5 C5+E5:0.5 | C5+E5:0.5 B4+D5:0.5 -:0.5 C5+E5:0.5 B4+D5:0.5 G4+C5:1.5",
+    "dyadsF": "1+3 1+3 1+3 1+3 2+4 1+3 1+4 1+4 | 1+3 2+4 3+5 3+5 3+5 1+4 1+4 | 1+4 - 3+5 3+5 3+5 3+5 | 3+5 2+4 - 3+5 2+4 1+4 | - 3+5 2+4 1+3 1+3 2+4 2+5 | 3+5 2+4 1+3 1+3 1+4 | 3+5 - 3+5 3+5 3+5 3+5 | 3+5 2+4 - 3+5 2+4 1+4",
+    "tip": "McCartney's gospel piano ballad: Listen for the descending F–Em–Dm–C bass turnaround at phrase endings.",
+    "lyrics": "When I find my- self in times of | trou- ble, Mo- ther Ma- ry comes | me, _ Speak- ing words of | wis- dom, _ let it be. | _ Let it be, _ let it | be, let it be, let | be, _ Whis- per words of | wis- dom, _ let it be."
   },
   {
     "id": "pachelbel-canon",
@@ -248,7 +263,8 @@
     "lhF": "5 1 | 2 5 | 4 5 | 4 2 | 5 1 | 2 1 | 4 2 | 5",
     "dyads": "C4+E4:2 G3+D4:2 | A3+C4:2 E3+B3:2 | F3+A3:2 C3+G3:2 | F3+A3:2 G3+B3:2 | C4+E4:2 G3+D4:2 | A3+E4:2 G3+D4:2 | F3+C4:2 G3+D4:2 | C4+E4:4",
     "dyadsF": "1+3 1+2 | 1+3 1+2 | 1+3 1+2 | 1+3 1+2 | 1+3 1+2 | 1+3 1+2 | 1+3 1+2 | 1+3",
-    "tip": "Descending harmonic sequence: Every chord drops by a fourth then steps up by a second."
+    "tip": "Descending harmonic sequence: Every chord drops by a fourth then steps up by a second.",
+    "lyrics": "[Canon_1] _ | [Descend] _ | [Low_Turn] _ | [Rise] _ | [Var_1] _ | [Peak] _ | [Cadence] _ | [Resolve]"
   },
   {
     "id": "smoke-on-the-water",
@@ -257,13 +273,14 @@
     "category": "Harmonic / Dyads",
     "tempo": 112,
     "timeSig": "4/4",
-    "rh": "D4:1 F4:1 G4:1.5 D4:0.5 | -:0.5 F4:1 G#4:0.5 G4:2 | D4:1 F4:1 G4:1.5 F4:0.5 | -:0.5 D4:2~ D4:1.5",
-    "rhF": "1 3 4 1 | - 3 4 3 | 1 3 4 3 | - 1 1",
-    "lh": "D3:1 F3:1 G3:1.5 D3:0.5 | -:0.5 F3:1 G#3:0.5 G3:2 | D3:1 F3:1 G3:1.5 F3:0.5 | -:0.5 D3:2~ D3:1.5",
-    "lhF": "5 3 2 5 | - 3 2 3 | 5 3 2 3 | - 5 5",
-    "dyads": "A3+D4:1 C4+F4:1 D4+G4:1.5 A3+D4:0.5 | -:0.5 C4+F4:1 D#4+G#4:0.5 D4+G4:2 | A3+D4:1 C4+F4:1 D4+G4:1.5 C4+F4:0.5 | -:0.5 A3+D4:2~ A3+D4:1.5",
-    "dyadsF": "1+4 1+4 1+4 1+4 | - 1+4 1+4 1+4 | 1+4 1+4 1+4 1+4 | - 1+4 1+4",
-    "tip": "Played in parallel Perfect 4th intervals (A+D, C+F, D+G): Lock fingers 1 and 4 into a rock-solid shape."
+    "rh": "D4:1 F4:1 G4:1.5 D4:0.5~ | D4:0.5 F4:1 G#4:0.5 G4:2 | D4:1 F4:1 G4:1.5 F4:0.5~ | F4:0.5 D4:2~ D4:1.5",
+    "rhF": "1 3 4 1 | 1 3 4 3 | 1 3 4 3 | 3 1 1",
+    "lh": "D3:1 F3:1 G3:1.5 D3:0.5~ | D3:0.5 F3:1 G#3:0.5 G3:2 | D3:1 F3:1 G3:1.5 F3:0.5~ | F3:0.5 D3:2~ D3:1.5",
+    "lhF": "5 3 2 5 | 5 3 2 3 | 5 3 2 3 | 3 5 5",
+    "dyads": "A3+D4:1 C4+F4:1 D4+G4:1.5 A3+D4:0.5~ | A3+D4:0.5 C4+F4:1 D#4+G#4:0.5 D4+G4:2 | A3+D4:1 C4+F4:1 D4+G4:1.5 C4+F4:0.5~ | C4+F4:0.5 A3+D4:2~ A3+D4:1.5",
+    "dyadsF": "1+4 1+4 1+4 1+4 | 1+4 1+4 1+4 1+4 | 1+4 1+4 1+4 1+4 | 1+4 1+4 1+4",
+    "tip": "Played in parallel Perfect 4th intervals (A+D, C+F, D+G): Lock fingers 1 and 4 into a rock-solid shape.",
+    "lyrics": "[Riff_1] _ _ _ | _ [Tritone] _ _ | [Riff_2] _ _ _ | _ [Resolve] _"
   },
   {
     "id": "clocks",
@@ -278,7 +295,8 @@
     "lhF": "5 | 1 | 1 | 2",
     "dyads": "C4+E4:0.5 C4:0.5 G3:0.5 C4+E4:0.5 C4:0.5 G3:0.5 C4+E4:0.5 C4:0.5 | Bb3+D4:0.5 Bb3:0.5 G3:0.5 Bb3+D4:0.5 Bb3:0.5 G3:0.5 Bb3+D4:0.5 Bb3:0.5 | Bb3+D4:0.5 Bb3:0.5 G3:0.5 Bb3+D4:0.5 Bb3:0.5 G3:0.5 Bb3+D4:0.5 Bb3:0.5 | F3+C4:0.5 A3:0.5 F3:0.5 F3+C4:0.5 A3:0.5 F3:0.5 F3+C4:0.5 A3:0.5",
     "dyadsF": "3+5 3 1 3+5 3 1 3+5 3 | 3+5 3 1 3+5 3 1 3+5 3 | 3+5 3 1 3+5 3 1 3+5 3 | 1+5 3 1 1+5 3 1 1+5 3",
-    "tip": "Hypnotic Mixolydian arpeggios (C – Gm – Gm – F): Notice the soulful B♭3 giving the second chord its minor sweep."
+    "tip": "Hypnotic Mixolydian arpeggios (C – Gm – Gm – F): Notice the soulful B♭3 giving the second chord its minor sweep.",
+    "lyrics": "[C_Arp] _ _ _ _ _ _ _ | [Gm_Arp] _ _ _ _ _ _ _ | [Gm_Hold] _ _ _ _ _ _ _ | [F_Arp] _ _ _ _ _ _ _"
   },
   {
     "id": "hallelujah",
@@ -287,13 +305,14 @@
     "category": "Harmonic / Dyads",
     "tempo": 84,
     "timeSig": "6/8",
-    "rh": "E4:0.5 G4:1 G4:1 G4:0.5 | A4:0.5 A4:1 A4:1 -:0.5 | E4:0.5 G4:1 G4:1 G4:0.5 | A4:0.5 A4:1 A4:1.5 | G4:0.5 A4:1 A4:1 A4:0.5 | G4:0.5 G4:1 F4:1 G4:0.5 | E4:0.5 G4:1 A4:1.5 | G4:0.5 E4:1 C4:1.5",
-    "rhF": "1 3 3 3 | 4 4 4 - | 1 3 3 3 | 4 4 4 | 3 4 4 4 | 3 3 2 3 | 1 3 4 | 3 2 1",
-    "lh": "C3:3 | A2:3 | C3:3 | A2:3 | F2:3 | G2:1.5 E2:1.5 | F2:3 | C3:3",
-    "lhF": "5 | 1 | 5 | 1 | 2 | 1 5 | 2 | 5",
-    "dyads": "C4+E4:0.5 E4+G4:1 E4+G4:1 E4+G4:0.5 | C4+A4:0.5 C4+A4:1 C4+A4:1 -:0.5 | C4+E4:0.5 E4+G4:1 E4+G4:1 E4+G4:0.5 | C4+A4:0.5 C4+A4:1 C4+A4:1.5 | C4+G4:0.5 C4+A4:1 C4+A4:1 C4+A4:0.5 | B3+G4:0.5 B3+G4:1 B3+F4:1 B3+G4:0.5 | A3+E4:0.5 C4+G4:1 C4+A4:1.5 | C4+G4:0.5 C4+E4:1 G3+C4:1.5",
-    "dyadsF": "1+3 3+5 3+5 3+5 | 1+5 1+5 1+5 - | 1+3 3+5 3+5 3+5 | 1+5 1+5 1+5 | 1+5 1+5 1+5 1+5 | 1+5 1+5 1+4 1+5 | 1+4 1+5 1+5 | 1+5 1+3 1+4",
-    "tip": "Leonard Cohen's lilting 6/8 progression: Feel two gentle pulses per measure ('ONE-two-three FOUR-five-six')."
+    "rh": "E4:0.5 | G4:1 G4:0.5 G4:1 G4:0.5 | A4:1 A4:0.5 A4:1 E4:0.5 | G4:1 G4:0.5 G4:1 G4:0.5 | A4:1 A4:0.5 A4:1 G4:0.5 | A4:1 A4:0.5 A4:1 A4:0.5 | A4:1 G4:0.5 G4:1 F4:0.5 | G4:1.5 -:1 E4:0.5 | A4:1 A4:0.5 A4:1.5 | G4:1 E4:0.5 C4:1.5",
+    "rhF": "1 | 3 3 3 3 | 4 4 4 1 | 3 3 3 3 | 4 4 4 3 | 4 4 4 4 | 4 3 3 2 | 3 - 1 | 4 4 4 | 3 2 1",
+    "lh": "-:0.5 | C3:3 | A2:3 | C3:3 | A2:3 | F2:3 | G2:1.5 E2:1.5 | C3:3 | F2:3 | C3:3",
+    "lhF": "- | 5 | 1 | 5 | 1 | 2 | 1 5 | 5 | 2 | 5",
+    "dyads": "E4:0.5 | E4+G4:1 E4+G4:0.5 E4+G4:1 E4+G4:0.5 | C4+A4:1 C4+A4:0.5 C4+A4:1 C4+E4:0.5 | E4+G4:1 E4+G4:0.5 E4+G4:1 E4+G4:0.5 | C4+A4:1 C4+A4:0.5 C4+A4:1 C4+G4:0.5 | C4+A4:1 C4+A4:0.5 C4+A4:1 C4+A4:0.5 | B3+A4:1 B3+G4:0.5 B3+G4:1 B3+F4:0.5 | C4+G4:1.5 -:1 C4+E4:0.5 | C4+A4:1 C4+A4:0.5 C4+A4:1.5 | C4+G4:1 C4+E4:0.5 G3+C4:1.5",
+    "dyadsF": "1 | 3+5 3+5 3+5 3+5 | 1+5 1+5 1+5 1+3 | 3+5 3+5 3+5 3+5 | 1+5 1+5 1+5 1+4 | 1+5 1+5 1+5 1+5 | 1+5 1+4 1+4 1+3 | 1+5 - 1+3 | 1+5 1+5 1+5 | 1+5 1+3 1+4",
+    "tip": "Leonard Cohen's lilting 6/8 progression: Feel two gentle pulses per measure ('ONE-two-three FOUR-five-six').",
+    "lyrics": "I've | heard there was a | se- cret chord, That | Da- vid played and | pleased the Lord, But | you don't real- ly | care for mu- sic, | do_ya? _ Hal- | le- lu- jah, | Hal- le- lu-jah."
   },
   {
     "id": "you-are-my-sunshine",
@@ -308,7 +327,8 @@
     "lhF": "5 | 5 | 5 | 5 | 5 | 1 | 1 | 5",
     "dyads": "-:1 G3:1 G3+C4:1 B3+D4:1 | C4+E4:2 C4+E4:2 | -:1 C4+E4:1 G3+D4:1 C4+E4:1 | G3+C4:2 G3+C4:2 | -:1 G3+C4:1 B3+D4:1 C4+E4:1 | C4+F4:2 C4+A4:2 | -:1 C4+A4:1 B3+G4:1 B3+F4:1 | C4+E4:4",
     "dyadsF": "- 1 1+3 1+2 | 1+3 1+3 | - 1+3 1+2 1+3 | 1+4 1+4 | - 1+4 1+2 1+3 | 1+4 1+5 | - 1+5 1+5 1+4 | 1+3",
-    "tip": "Begins on the warm low G3 pickup note leading upward into the C major triad."
+    "tip": "Begins on the warm low G3 pickup note leading upward into the C major triad.",
+    "lyrics": "_ You are my | sun- shine, | _ my on- ly | sun- shine, | _ You make me | hap- py | _ when skies are | gray."
   },
   {
     "id": "amazing-grace-f",
@@ -317,13 +337,14 @@
     "category": "Harmonic / Dyads",
     "tempo": 75,
     "timeSig": "3/4",
-    "rh": "C4:1 | F4:2 A4:0.5 F4:0.5 | A4:2 G4:1 | F4:2 D4:1 | C4:2 C4:1 | F4:2 A4:0.5 F4:0.5 | A4:2 G4:1 | C5:3 | A4:2 C5:0.5 A4:0.5 | A4:2 G4:1 | F4:2 D4:1 | C4:2 C4:1 | F4:2 A4:0.5 F4:0.5 | A4:2 G4:1 | F4:3",
-    "rhF": "1 | 2 4 2 | 4 3 | 2 1 | 1 1 | 2 4 2 | 4 3 | 5 | 3 5 3 | 3 2 | 2 1 | 1 1 | 2 4 2 | 4 3 | 2",
+    "rh": "C4:1 | F4:2 A4:0.5 F4:0.5 | A4:2 G4:1 | F4:2 D4:1 | C4:2 C4:1 | F4:2 A4:0.5 F4:0.5 | A4:2 G4:1 | C5:3 | A4:2 C5:0.5 A4:0.5 | F4:2 C4:1 | D4:2 F4:0.5 D4:0.5 | C4:2 C4:1 | F4:2 A4:0.5 F4:0.5 | A4:2 G4:1 | F4:3",
+    "rhF": "1 | 2 4 2 | 4 3 | 2 1 | 1 1 | 2 4 2 | 4 3 | 5 | 3 5 3 | 2 1 | 2 4 2 | 1 1 | 2 4 2 | 4 3 | 2",
     "lh": "C3:1 | F2:3 | F2:3 | Bb2:3 | F2:3 | F2:3 | F2:3 | C3:3 | F2:3 | F2:3 | Bb2:3 | F2:3 | F2:3 | C3:3 | F2:3",
     "lhF": "5 | 2 | 2 | 1 | 2 | 2 | 2 | 5 | 2 | 2 | 1 | 2 | 2 | 5 | 2",
-    "dyads": "C4+E4:1 | F4+A4:2 A4+C5:0.5 F4+A4:0.5 | F4+A4:2 E4+G4:1 | D4+F4:2 Bb3+D4:1 | A3+C4:2 A3+C4:1 | F4+A4:2 A4+C5:0.5 F4+A4:0.5 | F4+A4:2 E4+G4:1 | E4+C5:3 | F4+A4:2 A4+C5:0.5 F4+A4:0.5 | F4+A4:2 E4+G4:1 | D4+F4:2 Bb3+D4:1 | A3+C4:2 A3+C4:1 | F4+A4:2 A4+C5:0.5 F4+A4:0.5 | E4+A4:2 E4+G4:1 | A3+F4:3",
-    "dyadsF": "1+3 | 2+4 3+5 2+4 | 2+4 1+3 | 1+3 1+3 | 1+3 1+3 | 2+4 3+5 2+4 | 2+4 1+3 | 1+5 | 2+4 3+5 2+4 | 2+4 1+3 | 1+3 1+3 | 1+3 1+3 | 2+4 3+5 2+4 | 1+4 1+3 | 1+4",
-    "tip": "Complete 15-bar traditional spiritual in F major (1 flat: B♭): Breathe naturally between four-bar phrases."
+    "dyads": "C4+E4:1 | F4+A4:2 A4+C5:0.5 F4+A4:0.5 | F4+A4:2 E4+G4:1 | D4+F4:2 Bb3+D4:1 | A3+C4:2 A3+C4:1 | F4+A4:2 A4+C5:0.5 F4+A4:0.5 | F4+A4:2 E4+G4:1 | E4+C5:3 | F4+A4:2 A4+C5:0.5 F4+A4:0.5 | C4+F4:2 A3+C4:1 | Bb3+D4:2 D4+F4:0.5 Bb3+D4:0.5 | A3+C4:2 A3+C4:1 | F4+A4:2 A4+C5:0.5 F4+A4:0.5 | E4+A4:2 E4+G4:1 | A3+F4:3",
+    "dyadsF": "1+3 | 2+4 3+5 2+4 | 2+4 1+3 | 1+3 1+3 | 1+3 1+3 | 2+4 3+5 2+4 | 2+4 1+3 | 1+5 | 2+4 3+5 2+4 | 1+4 1+3 | 1+3 2+4 1+3 | 1+3 1+3 | 2+4 3+5 2+4 | 1+4 1+3 | 1+4",
+    "tip": "Complete 15-bar traditional spiritual in F major (1 flat: B♭): Breathe naturally between four-bar phrases.",
+    "lyrics": "A- | ma- zing _ | grace, how | sweet the | sound, That | saved a _ | wretch like | me. | I once _ | was lost, | but now _ | found, Was | blind, but _ | now I | see."
   },
   {
     "id": "down-by-the-riverside",
@@ -332,13 +353,14 @@
     "category": "Harmonic / Dyads",
     "tempo": 116,
     "timeSig": "4/4",
-    "rh": "C4:1 D4:1 E4:1 G4:1 | G4:2 G4:2 | G4:1 A4:1 G4:1 E4:1 | G4:4 | C4:1 D4:1 E4:1 G4:1 | G4:2 G4:2 | A4:1 G4:1 F4:1 D4:1 | C4:4",
-    "rhF": "1 2 3 5 | 5 5 | 5 5 5 3 | 5 | 1 2 3 5 | 5 5 | 5 4 3 2 | 1",
-    "lh": "C3:4 | C3:4 | C3:4 | C3:4 | C3:4 | C3:4 | G2:4 | C3:4",
-    "lhF": "5 | 5 | 5 | 5 | 5 | 5 | 1 | 5",
-    "dyads": "C4:1 C4+D4:1 C4+E4:1 C4+G4:1 | C4+G4:2 C4+G4:2 | C4+G4:1 C4+A4:1 C4+G4:1 C4+E4:1 | C4+G4:4 | C4:1 C4+D4:1 C4+E4:1 C4+G4:1 | C4+G4:2 C4+G4:2 | C4+A4:1 C4+G4:1 G3+F4:1 G3+D4:1 | C4+E4:4",
-    "dyadsF": "1 1+2 1+3 1+5 | 1+5 1+5 | 1+5 1+5 1+5 1+3 | 1+5 | 1 1+2 1+3 1+5 | 1+5 1+5 | 1+5 1+4 1+3 1+2 | 1+3",
-    "tip": "Upbeat gospel stride rhythm: Alternate firmly between bass roots and dyads."
+    "rh": "G3:0.5 A3:0.5 C4:1 D4:1 E4:1 | E4:2 E4:2 | E4:1 D4:1 C4:1 A3:1 | G3:4 | G3:0.5 A3:0.5 C4:1 D4:1 E4:1 | E4:2 E4:2 | D4:1 D4:1 E4:1 D4:1 | C4:4",
+    "rhF": "1 2 3 4 5 | 5 5 | 5 4 3 2 | 1 | 1 2 3 4 5 | 5 5 | 4 4 5 4 | 3",
+    "lh": "C3:4 | C3:4 | C3:2 F2:2 | C3:4 | C3:4 | C3:4 | G2:4 | C3:4",
+    "lhF": "5 | 5 | 5 2 | 5 | 5 | 5 | 1 | 5",
+    "dyads": "G3:0.5 A3:0.5 G3+C4:1 B3+D4:1 C4+E4:1 | C4+E4:2 C4+E4:2 | C4+E4:1 B3+D4:1 A3+C4:1 F3+A3:1 | E3+G3:4 | G3:0.5 A3:0.5 G3+C4:1 B3+D4:1 C4+E4:1 | C4+E4:2 C4+E4:2 | B3+D4:1 B3+D4:1 C4+E4:1 B3+D4:1 | C4+E4:4",
+    "dyadsF": "1 2 1+4 1+3 1+3 | 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 | 1 2 1+4 1+3 1+3 | 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3",
+    "tip": "Upbeat gospel stride rhythm: Alternate firmly between bass roots and dyads.",
+    "lyrics": "Gon- na lay down my | bur- den, | Down by the ri- | side, | Gon- na lay down my | bur- den, | Down by the ri- | side!"
   },
   {
     "id": "twinkle-twinkle",
@@ -353,7 +375,8 @@
     "lhF": "5 5 | 2 5 | 2 5 | 1 5 | 5 2 | 5 1 | 5 2 | 5 1 | 5 5 | 2 5 | 2 5 | 1 5",
     "dyads": "C4+E4:1 C4+E4:1 C4+G4:1 C4+G4:1 | C4+A4:1 C4+A4:1 C4+G4:2 | D4+F4:1 D4+F4:1 C4+E4:1 C4+E4:1 | G3+D4:1 G3+D4:1 C4+E4:2 | C4+G4:1 C4+G4:1 D4+F4:1 D4+F4:1 | C4+E4:1 C4+E4:1 G3+D4:2 | C4+G4:1 C4+G4:1 D4+F4:1 D4+F4:1 | C4+E4:1 C4+E4:1 G3+D4:2 | C4+E4:1 C4+E4:1 C4+G4:1 C4+G4:1 | C4+A4:1 C4+A4:1 C4+G4:2 | D4+F4:1 D4+F4:1 C4+E4:1 C4+E4:1 | G3+D4:1 G3+D4:1 C4+E4:2",
     "dyadsF": "1+3 1+3 1+5 1+5 | 1+5 1+5 1+5 | 2+4 2+4 1+3 1+3 | 1+2 1+2 1+3 | 1+5 1+5 2+4 2+4 | 1+3 1+3 1+2 | 1+5 1+5 2+4 2+4 | 1+3 1+3 1+2 | 1+3 1+3 1+5 1+5 | 1+5 1+5 1+5 | 2+4 2+4 1+3 1+3 | 1+2 1+2 1+3",
-    "tip": "Complete 12-bar A-B-B-A nursery form: Extends finger 5 to A4 above the 5-finger cage."
+    "tip": "Complete 12-bar A-B-B-A nursery form: Extends finger 5 to A4 above the 5-finger cage.",
+    "lyrics": "Twin- kle, twin- kle, | lit- tle star, | How I won- der | what you are! | Up a- bove the | world so high, | Like a dia- mond | in the sky. | Twin- kle, twin- kle, | lit- tle star, | How I won- der | what you are!"
   },
   {
     "id": "joy-to-the-world",
@@ -362,13 +385,14 @@
     "category": "Extended Scale",
     "tempo": 100,
     "timeSig": "4/4",
-    "rh": "C5:2 B4:1.5 A4:0.5 | G4:3 F4:1 | E4:2 D4:2 | C4:4 | G4:2 A4:2 | A4:3 B4:1 | B4:3 C5:1 | C5:4",
-    "rhF": "5 4 3 | 2 1 | 3 2 | 1 | 1 2 | 2 3 | 3 4 | 5",
-    "lh": "C3:4 | C3:2 F2:2 | G2:2 G2:2 | C3:4 | C3:2 F2:2 | F2:2 G2:2 | G2:2 C3:2 | C3:4",
-    "lhF": "5 | 5 2 | 1 1 | 5 | 5 2 | 2 1 | 1 5 | 5",
-    "dyads": "C4+C5:2 B3+B4:1.5 A3+A4:0.5 | G3+G4:3 F3+F4:1 | E3+E4:2 D3+D4:2 | C3+C4:4 | C4+G4:2 F4+A4:2 | F4+A4:3 G4+B4:1 | G4+B4:3 C4+C5:1 | C4+C5:4",
-    "dyadsF": "1+5 1+4 1+3 | 1+2 1+2 | 1+3 1+2 | 1+5 | 1+5 2+4 | 2+4 3+5 | 3+5 1+5 | 1+5",
-    "tip": "The definitive 8-note descending scale: Notice the thumb tuck/cross over in step 4."
+    "rh": "C5:2 B4:1.5 A4:0.5 | G4:3 F4:1 | E4:2 D4:2 | C4:3 G4:1 | A4:3 A4:1 | B4:3 B4:1 | C5:3 C5:1 | C5:4",
+    "rhF": "5 4 3 | 2 1 | 3 2 | 1 2 | 3 3 | 4 4 | 5 5 | 5",
+    "lh": "C3:4 | C3:2 F2:2 | G2:2 G2:2 | C3:4 | F2:4 | G2:4 | C3:4 | C3:4",
+    "lhF": "5 | 5 2 | 1 1 | 5 | 2 | 1 | 5 | 5",
+    "dyads": "C4+C5:2 B3+B4:1.5 A3+A4:0.5 | G3+G4:3 F3+F4:1 | E3+E4:2 D3+D4:2 | C3+C4:3 C4+G4:1 | F4+A4:3 F4+A4:1 | G4+B4:3 G4+B4:1 | E4+C5:3 E4+C5:1 | E4+C5:4",
+    "dyadsF": "1+5 1+4 1+3 | 1+2 1+2 | 1+3 1+2 | 1+5 1+4 | 2+4 2+4 | 3+5 3+5 | 1+5 1+5 | 1+5",
+    "tip": "The definitive 8-note descending scale: Notice the thumb tuck/cross over in step 4.",
+    "lyrics": "Joy to the | world! The | Lord is | come! Let | earth re- | ceive her | King! Let | earth!"
   },
   {
     "id": "frere-jacques",
@@ -383,7 +407,8 @@
     "lhF": "5 | 5 | 5 | 5 | 5 | 5 | 5 5 | 5 5",
     "dyads": "C4+E4:1 C4+F4:1 C4+G4:1 C4+E4:1 | C4+E4:1 C4+F4:1 C4+G4:1 C4+E4:1 | C4+E4:1 D4+F4:1 E4+G4:2 | C4+E4:1 D4+F4:1 E4+G4:2 | E4+G4:0.5 F4+A4:0.5 E4+G4:0.5 D4+F4:0.5 C4+E4:1 C4:1 | E4+G4:0.5 F4+A4:0.5 E4+G4:0.5 D4+F4:0.5 C4+E4:1 C4:1 | C4:1 G3+D4:1 C4+E4:2 | C4:1 G3+D4:1 C4+E4:2",
     "dyadsF": "1+3 1+4 1+5 1+3 | 1+3 1+4 1+5 1+3 | 1+3 2+4 3+5 | 1+3 2+4 3+5 | 3+5 4+5 3+5 2+4 1+3 1 | 3+5 4+5 3+5 2+4 1+3 1 | 1 1+2 1+3 | 1 1+2 1+3",
-    "tip": "A perpetual round that trains alternating between finger 3 and finger 5."
+    "tip": "A perpetual round that trains alternating between finger 3 and finger 5.",
+    "lyrics": "Frè- re Jac- ques, | Frè- re Jac- ques, | Dor- mez- vous? | Dor- mez- vous? | Son- nez les ma- ti- nes, | Son- nez les ma- ti- nes, | Ding, dang, dong! | Ding, dang, dong!"
   },
   {
     "id": "this-old-man",
@@ -398,7 +423,8 @@
     "lhF": "5 | 5 | 2 | 1 | 5 | 5 | 1 | 5",
     "dyads": "C4+G4:1 C4+E4:1 C4+G4:2 | C4+G4:1 C4+E4:1 C4+G4:2 | C4+A4:1 C4+G4:1 D4+F4:1 C4+E4:1 | G3+D4:1 C4+E4:1 D4+F4:2 | C4+E4:1 D4+F4:1 E4+G4:1 C4:1 | C4:0.5 C4:0.5 C4:0.5 C4:0.5 C4:0.5 G3+D4:0.5 C4+E4:0.5 D4+F4:0.5 | C4+G4:1 G3+D4:1 G3+D4:1 D4+F4:1 | C4+E4:1 G3+D4:1 C4+E4:2",
     "dyadsF": "1+5 1+3 1+5 | 1+5 1+3 1+5 | 1+5 1+5 2+4 1+3 | 1+2 1+3 2+4 | 1+3 2+4 3+5 1 | 1 1 1 1 1 1+2 1+3 2+4 | 1+5 1+2 1+2 2+4 | 1+3 1+2 1+3",
-    "tip": "Authentic 'Knick-knack paddy-whack' scalar run up from C4 to F4 in measure 6."
+    "tip": "Authentic 'Knick-knack paddy-whack' scalar run up from C4 to F4 in measure 6.",
+    "lyrics": "This old man, | he played one, | He played knick- knack | on my thumb, | With a knick- knack | pad- dy- whack, give a dog a _ | bone, This old man | rol- ling home!"
   },
   {
     "id": "old-macdonald",
@@ -413,7 +439,8 @@
     "lhF": "5 | 2 5 | 5 1 | 5 | 5 | 5 | 5 | 2 5 | 5 1 | 5",
     "dyads": "C4+E4:1 C4+E4:1 C4+E4:1 G3+B3:1 | F3+A3:1 F3+A3:1 G3+B3:2 | C4+E4:1 C4+E4:1 G3+D4:1 G3+D4:1 | C4+E4:4 | G3+B3:1 G3+B3:1 C4+E4:1 C4+E4:1 | G3+B3:1 G3+B3:1 C4+E4:2 | C4+E4:1 C4+E4:1 C4+E4:1 G3+B3:1 | F3+A3:1 F3+A3:1 G3+B3:2 | C4+E4:1 C4+E4:1 G3+D4:1 G3+D4:1 | C4+E4:4",
     "dyadsF": "2+4 2+4 2+4 1+3 | 1+3 1+3 1+3 | 1+3 1+3 1+2 1+2 | 1+3 | 1+3 1+3 2+4 2+4 | 1+3 1+3 2+4 | 2+4 2+4 2+4 1+3 | 1+3 1+3 1+3 | 1+3 1+3 1+2 1+2 | 1+3",
-    "tip": "Steps cleanly down from C4 to dominant low G3 and submediant A3 before the bright E-D-C tag."
+    "tip": "Steps cleanly down from C4 to dominant low G3 and submediant A3 before the bright E-D-C tag.",
+    "lyrics": "Old Mac- Don- ald | had a farm, | E- I- E- I- | O! | With a moo- moo | here, moo- moo | Old Mac- Don- ald | had a farm, | E- I- E- I- | O!"
   },
   {
     "id": "london-bridge",
@@ -428,7 +455,8 @@
     "lhF": "5 | 5 | 1 | 5 | 5 | 5 | 1 1 | 5",
     "dyads": "C4+G4:1.5 C4+A4:0.5 C4+G4:1 D4+F4:1 | C4+E4:1 D4+F4:1 E4+G4:2 | G3+D4:1 C4+E4:1 D4+F4:2 | C4+E4:1 D4+F4:1 E4+G4:2 | C4+G4:1.5 C4+A4:0.5 C4+G4:1 D4+F4:1 | C4+E4:1 D4+F4:1 E4+G4:2 | G3+D4:2 C4+G4:2 | C4+E4:2 C4:2",
     "dyadsF": "1+5 1+5 1+5 2+4 | 1+3 2+4 3+5 | 1+2 1+3 2+4 | 1+3 2+4 3+5 | 1+5 1+5 1+5 2+4 | 1+3 2+4 3+5 | 1+2 1+5 | 1+3 1",
-    "tip": "A smooth cascading sequence down through the middle three fingers."
+    "tip": "A smooth cascading sequence down through the middle three fingers.",
+    "lyrics": "Lon- don Bridge is | fal- ling down, | fal- ling down, | fal- ling down. | Lon- don Bridge is | fal- ling down, | My fair | la- dy!"
   },
   {
     "id": "row-row-boat",
@@ -443,7 +471,8 @@
     "lhF": "5 | 5 | 5 | 5 | 5 | 5 | 5 | 5",
     "dyads": "C4+E4:1.5 C4+E4:1.5 | C4+E4:1 D4+F4:0.5 E4+G4:1.5 | E4+G4:1 D4+F4:0.5 E4+G4:1 F4+A4:0.5 | E4+G4:3 | G4+C5:0.5 G4+C5:0.5 G4+C5:0.5 E4+G4:0.5 E4+G4:0.5 E4+G4:0.5 | C4+E4:0.5 C4+E4:0.5 C4+E4:0.5 C4:0.5 C4:0.5 C4:0.5 | E4+G4:1 D4+F4:0.5 C4+E4:1 G3+D4:0.5 | C4+E4:3",
     "dyadsF": "1+3 1+3 | 1+3 2+4 3+5 | 3+5 2+4 3+5 4+5 | 3+5 | 3+5 3+5 3+5 2+4 2+4 2+4 | 1+3 1+3 1+3 1 1 1 | 3+5 2+4 1+3 1+2 | 1+3",
-    "tip": "The triplet waterfall in measure 3 teaches rapid octave displacement."
+    "tip": "The triplet waterfall in measure 3 teaches rapid octave displacement.",
+    "lyrics": "Row, row, | row your boat, | Gent- ly down the | stream. | Mer- ri- ly, mer- ri- ly, | mer- ri- ly, mer- ri- ly, | Life is but a | dream!"
   },
   {
     "id": "the-can-can",
@@ -458,7 +487,8 @@
     "lhF": "5 5 | 1 5 | 1 1 | 5 2 | 1 1 | 5 5 | 1 5 | 1 1 | 5 1 5",
     "dyads": "C4+E4:2 B3+D4:0.5 D4+F4:0.5 C4+E4:0.5 B3+D4:0.5 | E4+G4:1 E4+G4:1 E4+G4:0.5 F4+A4:0.5 C4+E4:0.5 D4+F4:0.5 | B3+D4:1 B3+D4:1 B3+D4:0.5 D4+F4:0.5 C4+E4:0.5 B3+D4:0.5 | G3+C4:1 E4+C5:1 D4+B4:1 C4+A4:1 | B3+G4:1 B3+F4:1 G3+E4:1 G3+D4:1 | C4+E4:2 B3+D4:0.5 D4+F4:0.5 C4+E4:0.5 B3+D4:0.5 | E4+G4:1 E4+G4:1 E4+G4:0.5 F4+A4:0.5 C4+E4:0.5 D4+F4:0.5 | B3+D4:1 B3+D4:1 B3+D4:0.5 D4+F4:0.5 C4+E4:0.5 B3+D4:0.5 | C4+E4:1 G3+B3:1 C4+E4:2",
     "dyadsF": "1+3 1+2 2+4 1+3 1+2 | 3+5 3+5 3+5 3+5 1+3 2+4 | 1+2 1+2 1+2 2+4 1+3 1+2 | 1+4 1+5 1+4 1+3 | 1+5 1+4 1+3 1+2 | 1+3 1+2 2+4 1+3 1+2 | 3+5 3+5 3+5 3+5 1+3 2+4 | 1+2 1+2 1+2 2+4 1+3 1+2 | 1+3 1+3 1+3",
-    "tip": "Offenbach's Galop Infernal: Keep the wrist light and springy through the fast eighth-note turns."
+    "tip": "Offenbach's Galop Infernal: Keep the wrist light and springy through the fast eighth-note turns.",
+    "lyrics": "[Galop_A] _ _ _ _ | [Jump] _ _ _ _ _ | [Turn] _ _ _ _ _ | [High_C] _ _ _ | [Cascade] _ _ _ | [Galop_A'] _ _ _ _ | [Jump] _ _ _ _ _ | [Turn] _ _ _ _ _ | [Finale] _ _"
   },
   {
     "id": "yankee-doodle",
@@ -473,7 +503,8 @@
     "lhF": "5 | 5 1 | 5 | 5 1 | 5 | 2 5 | 1 | 5 5",
     "dyads": "C4+E4:1 C4+E4:1 C4+D4:1 C4+E4:1 | C4+E4:1 C4+E4:1 G3+D4:2 | C4+E4:1 C4+E4:1 C4+D4:1 C4+E4:1 | C4+E4:2 G3+B3:2 | C4+E4:1 C4+E4:1 C4+D4:1 C4+E4:1 | D4+F4:1 C4+E4:1 G3+D4:1 C4:1 | G3+B3:1 G3+G4:1 A3+C4:1 G3+B3:1 | C4+E4:2 C4+E4:2",
     "dyadsF": "1+3 1+3 1+2 1+3 | 1+3 1+3 1+2 | 1+3 1+3 1+2 1+3 | 1+3 1+3 | 1+3 1+3 1+2 1+3 | 2+4 1+3 1+2 1 | 1+3 1+5 1+3 1+3 | 1+3 1+3",
-    "tip": "Reaching thumb (1) down one half-step below Middle C to strike B3."
+    "tip": "Reaching thumb (1) down one half-step below Middle C to strike B3.",
+    "lyrics": "Yan- kee Doo- dle | went to town, | Ri- ding on a | po- ny, | Stuck a fea- ther | in his cap and | called it ma- ca- | ro- ni!"
   },
   {
     "id": "lavenders-blue",
@@ -488,7 +519,8 @@
     "lhF": "5 | 1 | 2 | 5 | 5 | 1 | 2 1 | 5",
     "dyads": "C4+E4:1 C4+G4:1 C4+G4:1 | B3+G4:1 B3+F4:0.5 C4+E4:0.5 B3+D4:1 | C4:1 F4+A4:1 F4+A4:1 | C4+G4:3 | C4+E4:1 C4+G4:1 C4+G4:1 | B3+G4:1 B3+F4:0.5 C4+E4:0.5 B3+D4:1 | C4+E4:1 D4+F4:1 B3+D4:1 | C4+E4:3",
     "dyadsF": "1+3 1+5 1+5 | 1+5 1+4 1+3 1+2 | 1 2+4 2+4 | 1+5 | 1+3 1+5 1+5 | 1+5 1+4 1+3 1+2 | 1+3 2+4 1+2 | 1+3",
-    "tip": "A classic English 3/4 folk waltz featuring sweet leaps from C4 up to G4 and A4."
+    "tip": "A classic English 3/4 folk waltz featuring sweet leaps from C4 up to G4 and A4.",
+    "lyrics": "La- ven- der's | blue, dil- ly, dil- | La- ven- der's | green. | When I am | king, dil- ly, dil- | You shall be | queen."
   },
   {
     "id": "star-wars-theme",
@@ -503,7 +535,8 @@
     "lhF": "5 | 1 | 5 1 | 5 1 | 5 | 1",
     "dyads": "G3:0.33 G3:0.33 G3:0.34 | G3+C4:2 C4+G4:2 | A3+F4:0.33 G3+E4:0.33 G3+D4:0.34 E4+C5:2 C4+G4:1 | A3+F4:0.33 G3+E4:0.33 G3+D4:0.34 E4+C5:2 C4+G4:1 | A3+F4:0.33 G3+E4:0.33 A3+F4:0.34 G3+D4:3 | C4+E4:4",
     "dyadsF": "1 1 1 | 1+3 1+5 | 1+4 1+3 1+2 1+5 1+5 | 1+4 1+3 1+2 1+5 1+5 | 1+4 1+3 1+4 1+2 | 1+3",
-    "tip": "Heroic brass triplet pickup (G3) launching into the open fifth (C to G) and towering C5 octave."
+    "tip": "Heroic brass triplet pickup (G3) launching into the open fifth (C to G) and towering C5 octave.",
+    "lyrics": "[Triplet] _ _ | [Heroic_5th] _ | [Leap_C5] _ _ _ _ | [Repeat] _ _ _ _ | [Fanfare] _ _ _ | [Resolve]"
   },
   {
     "id": "fur-elise-motif",
@@ -512,13 +545,14 @@
     "category": "Minor / Modal",
     "tempo": 90,
     "timeSig": "3/4",
-    "rh": "E4:0.5 D#4:0.5 E4:0.5 D#4:0.5 E4:0.5 B3:0.5 | D4:0.5 C4:0.5 A3:2 | C4:0.5 E4:0.5 A4:0.5 B4:1.5 | E4:0.5 G#4:0.5 B4:0.5 C5:1.5",
-    "rhF": "5 4 5 4 5 2 | 4 3 1 | 1 2 4 5 | 1 2 4 5",
-    "lh": "-:1 A2:2 | A2:2 A2:1 | A2:3 | E2:2 A2:1",
-    "lhF": "- 1 | 1 1 | 1 | 1 1",
-    "dyads": "E4:0.5 D#4:0.5 E4:0.5 D#4:0.5 E4:0.5 B3:0.5 | D4:0.5 C4:0.5 C3+A3:2 | C4:0.5 E4:0.5 A4:0.5 E4+B4:1.5 | E4:0.5 G#4:0.5 B4:0.5 E4+C5:1.5",
-    "dyadsF": "5 4 5 4 5 2 | 4 3 1+3 | 1 2 4 1+5 | 1 2 4 1+5",
-    "tip": "Piano's most famous motif: Keep the E–D# oscillation crisp and sweep smoothly up C–E–A–B."
+    "rh": "E4:0.5 D#4:0.5 | E4:0.5 D#4:0.5 E4:0.5 B3:0.5 D4:0.5 C4:0.5 | A3:1.5 C4:0.5 E4:0.5 A4:0.5 | B4:1.5 E4:0.5 G#4:0.5 B4:0.5 | C5:3",
+    "rhF": "5 4 | 5 4 5 2 4 3 | 1 1 2 4 | 5 1 2 4 | 5",
+    "lh": "-:1 | -:3 | A2:2 A2:1 | E2:2 E2:1 | A2:3",
+    "lhF": "- | - | 5 5 | 5 5 | 5",
+    "dyads": "E4:0.5 D#4:0.5 | E4:0.5 D#4:0.5 E4:0.5 B3:0.5 D4:0.5 C4:0.5 | E3+A3:1.5 C4:0.5 E4:0.5 C4+A4:0.5 | E4+B4:1.5 E4:0.5 G#4:0.5 E4+B4:0.5 | E4+C5:3",
+    "dyadsF": "5 4 | 5 4 5 2 4 3 | 1+4 1 2 1+5 | 1+5 1 2 1+5 | 1+5",
+    "tip": "Piano's most famous motif: Keep the E–D# oscillation crisp and sweep smoothly up C–E–A–B.",
+    "lyrics": "[Pickup] _ | [Motif] _ _ _ _ _ | [Am_Arp] _ _ _ | [E7_Arp] _ _ _ | [Resolve]"
   },
   {
     "id": "hedwigs-theme",
@@ -533,7 +567,8 @@
     "lhF": "- | 5 | 5 | 1 | 1 | 5 | 1 | 5",
     "dyads": "B3:1 | E4:1.5 G4:0.5 F#4:1 | E4:2 B4:1 | C4+A4:3 | B3+F#4:3 | E4:1.5 G4:0.5 F#4:1 | B3+D#4:2 B3+F4:1 | E3+B3:3",
     "dyadsF": "1 | 2 4 3 | 2 5 | 1+4 | 1+4 | 2 4 3 | 1+3 1+4 | 1+5",
-    "tip": "Mysterious 3/4 waltz time: Hold the lyrical dotted-half F#4 in measure 5 with steady tone."
+    "tip": "Mysterious 3/4 waltz time: Hold the lyrical dotted-half F#4 in measure 5 with steady tone.",
+    "lyrics": "[Pickup] | [Theme_A] _ _ | [High_B] _ | [Waltz_Peak] | [F#_Hold] | [Theme_A'] _ _ | [Chromatic] _ | [Resolve]"
   },
   {
     "id": "pink-panther",
@@ -548,7 +583,8 @@
     "lhF": "- 5 | - 5 | 5 | 5 | 5 1",
     "dyads": "-:2 D#4+B4:0.5 E4+C5:1.5 | -:2 F#4+D5:0.5 G4+E5:1.5 | D#4+B4:0.5 E4+C5:0.5 F#4+D5:0.5 G4+E5:0.5 G4+C5:0.5 F#4+B4:1.5 | -:0.5 E4+B4:0.5 G4+D5:0.5 B4+F#5:0.5 A#4+F5:2 | A4+E5:0.5 G4+D5:0.5 E4+B4:0.5 D4+A4:0.5 E4+G4:2",
     "dyadsF": "- 1+4 2+5 | - 2+4 3+5 | 1+4 2+5 3+5 4+5 4+5 3+5 | - 1+4 2+5 4+5 3+5 | 2+5 2+5 1+4 1+4 1+3",
-    "tip": "Henry Mancini's iconic jazz sneak: Finish smoothly down the blue-note chromatic slide A4–G4–E4–D4–E4."
+    "tip": "Henry Mancini's iconic jazz sneak: Finish smoothly down the blue-note chromatic slide A4–G4–E4–D4–E4.",
+    "lyrics": "_ [Sneak_1] _ | _ [Sneak_2] _ | [Climb] _ _ _ _ _ | _ [Tritone] _ _ _ | [Blues_Slide] _ _ _ _"
   },
   {
     "id": "scarborough-fair-primer",
@@ -563,7 +599,8 @@
     "lhF": "5 | 1 | 5 | 5 | 5 | 1 | 4 | 5 | 5 | 1 | 4 1 | 5",
     "dyads": "D4+F4:2 D4+F4:1 | F4+A4:2 F4+A4:1 | C4+E4:1.5 D4+F4:0.5 C4+E4:1 | D4+F4:3 | F4+A4:1 G4+C5:1 A4+D5:1 | G4+C5:2 F4+A4:1 | G4+B4:1 D4+G4:1 F4+A4:1 | F4+A4:3 | A4+D5:2 A4+D5:1 | G4+C5:2 F4+A4:1 | D4+G4:1.5 D4+F4:0.5 C4+E4:1 | D4+F4:3",
     "dyadsF": "1+3 1+3 | 2+4 2+4 | 1+3 1+3 1+3 | 1+3 | 1+3 1+4 1+4 | 1+4 1+3 | 2+4 1+4 2+4 | 2+4 | 2+5 2+5 | 1+4 1+3 | 1+4 1+3 1+3 | 1+3",
-    "tip": "Complete D Dorian ballad: Notice the characteristic raised natural sixth (B natural) in measure 7."
+    "tip": "Complete D Dorian ballad: Notice the characteristic raised natural sixth (B natural) in measure 7.",
+    "lyrics": "Are you | go- ing | Scar- bo- rough | Fair? | Par- sley, sage, | rose- ma- | ry _ and | thyme. | Re- mem- | ber me | one who lives | there."
   },
   {
     "id": "greensleeves-primer",
@@ -578,7 +615,8 @@
     "lhF": "- | 5 5 | 1 1 | 2 2 | 3 3 | 5",
     "dyads": "A4:0.5 | A4+C5:1 B4+D5:0.5 C5+E5:0.75 D5+F5:0.25 C5+E5:0.5 | G4+D5:1 G4+B4:0.5 D4+G4:0.75 F4+A4:0.25 G4+B4:0.5 | F4+C5:1 F4+A4:0.5 F4+A4:0.75 E4+G#4:0.25 F4+A4:0.5 | E4+B4:1 E4+G#4:0.5 B3+E4:1 E4+A4:0.5 | E4+A4:3",
     "dyadsF": "1 | 1+3 2+4 3+5 3+5 3+5 | 1+5 1+3 1+4 1+3 1+3 | 1+5 1+3 1+3 1+3 1+3 | 1+5 1+3 1+4 1+4 | 1+4",
-    "tip": "Traditional English folk ballad in rolling 6/8 pulse with parallel thirds in Dyads mode."
+    "tip": "Traditional English folk ballad in rolling 6/8 pulse with parallel thirds in Dyads mode.",
+    "lyrics": "A- | las, my love, _ you | do me wrong, _ To | cast me off _ dis- | cour- te- ous- ly. | _"
   },
   {
     "id": "korobeiniki-tetris",
@@ -593,7 +631,8 @@
     "lhF": "1 5 | 4 2 | 1 5 | 4 4 | 2 1 | 3 5 | 1 5 | 4 4",
     "dyads": "E4:1 G#3+B3:0.5 A3+C4:0.5 B3+D4:1 A3+C4:0.5 G#3+B3:0.5 | A3:1 A3+C4:0.5 C4:0.5 C4+E4:1 B3+D4:0.5 A3+C4:0.5 | G#3+B3:1.5 A3+C4:0.5 B3+D4:1 C4+E4:1 | A3+C4:1 A3:1 A3:2 | -:0.5 A3+D4:1 D4+F4:0.5 F4+A4:1 E4+G4:0.5 D4+F4:0.5 | C4+E4:1.5 G3+C4:0.5 C4+E4:1 B3+D4:0.5 A3+C4:0.5 | G#3+B3:1 G#3+B3:0.5 A3+C4:0.5 B3+D4:1 C4+E4:1 | A3+C4:1 E3+A3:1 E3+A3:2",
     "dyadsF": "3 1+2 1+2 1+3 1+2 1+2 | 1 1+2 2 1+3 1+2 1+2 | 1+2 1+2 1+3 1+3 | 1+2 1 1 | - 1+3 1+3 2+4 2+4 1+3 | 1+3 1+4 1+3 1+2 1+3 | 1+2 1+2 1+2 1+3 1+3 | 1+2 1+4 1+4",
-    "tip": "Full A+B Korobeiniki folk dance: Keep the chiptune rhythm crisp through the B-section Dm-C-E-Am turnaround."
+    "tip": "Full A+B Korobeiniki folk dance: Keep the chiptune rhythm crisp through the B-section Dm-C-E-Am turnaround.",
+    "lyrics": "[Theme_A] _ _ _ _ _ | [Descend] _ _ _ _ _ | [Turn] _ _ _ | [Cadence] _ _ | _ [Theme_B] _ _ _ _ | [Answer] _ _ _ _ | [Turn_2] _ _ _ _ | [Resolve] _ _"
   },
   {
     "id": "bella-ciao",
@@ -602,13 +641,14 @@
     "category": "Minor / Modal",
     "tempo": 120,
     "timeSig": "4/4",
-    "rh": "E4:0.5 A4:0.5 B4:0.5 C5:0.5 | A4:2 E4:0.5 A4:0.5 B4:0.5 C5:0.5 | A4:2 E4:0.5 A4:0.5 B4:0.5 C5:0.5 | B4:0.5 A4:0.5 C5:0.5 B4:0.5 A4:1 E5:0.5 E5:0.5 | D5:0.5 E5:0.5 F5:0.5 F5:0.5 F5:1.5 F5:0.5 | E5:0.5 D5:0.5 F5:0.5 E5:1.5 E5:0.5 D5:0.5 | C5:0.5 B4:0.5 E4:1 B4:1 G#4:1 | A4:4",
-    "rhF": "1 2 3 4 | 2 1 2 3 4 | 2 1 2 3 4 | 3 2 4 3 2 5 5 | 3 4 5 5 5 5 | 4 3 5 4 4 3 | 3 2 1 3 2 | 3",
+    "rh": "E4:0.5 A4:0.5 B4:0.5 C5:0.5 | A4:2 E4:0.5 A4:0.5 B4:0.5 C5:0.5 | A4:2 E4:0.5 A4:0.5 B4:0.5 C5:0.5 | B4:0.5 A4:0.5 C5:0.5 B4:0.5 A4:1 E5:0.5 E5:0.5 | D5:0.5 E5:0.5 F5:0.5 F5:0.5 F5:1.5 F5:0.5 | E5:0.5 D5:0.5 F5:0.5 E5:1.5 E5:0.5 D5:0.5 | C5:0.5 B4:0.5 E5:1 B4:1 C5:1 | A4:4",
+    "rhF": "1 2 3 4 | 2 1 2 3 4 | 2 1 2 3 4 | 3 2 4 3 2 5 5 | 3 4 5 5 5 5 | 4 3 5 4 4 3 | 3 2 5 2 3 | 1",
     "lh": "-:2 | A2:4 | A2:4 | A2:2 A2:2 | D3:4 | A2:4 | E2:4 | A2:4",
     "lhF": "- | 5 | 5 | 5 5 | 2 | 5 | 1 | 5",
-    "dyads": "E4:0.5 C4+A4:0.5 D4+B4:0.5 E4+C5:0.5 | C4+A4:2 E4:0.5 C4+A4:0.5 D4+B4:0.5 E4+C5:0.5 | C4+A4:2 E4:0.5 C4+A4:0.5 D4+B4:0.5 E4+C5:0.5 | D4+B4:0.5 C4+A4:0.5 E4+C5:0.5 D4+B4:0.5 C4+A4:1 C5+E5:0.5 C5+E5:0.5 | F4+D5:0.5 G4+E5:0.5 A4+F5:0.5 A4+F5:0.5 A4+F5:1.5 A4+F5:0.5 | G4+E5:0.5 F4+D5:0.5 A4+F5:0.5 C5+E5:1.5 G4+E5:0.5 F4+D5:0.5 | E4+C5:0.5 D4+B4:0.5 E4:1 D4+B4:1 E4+G#4:1 | C4+A4:4",
-    "dyadsF": "1 1+4 1+4 1+4 | 1+4 1 1+4 1+4 1+4 | 1+4 1 1+4 1+4 1+4 | 1+4 1+4 1+4 1+4 1+4 1+3 1+3 | 1+5 1+5 1+5 1+5 1+5 1+5 | 1+5 1+5 1+5 1+3 1+5 1+5 | 1+5 1+5 1 1+5 1+3 | 1+4",
-    "tip": "Ascending Italian anthem: Keep the energetic A–B–C pickup agile and drive cleanly up to F5."
+    "dyads": "E4:0.5 C4+A4:0.5 D4+B4:0.5 E4+C5:0.5 | C4+A4:2 E4:0.5 C4+A4:0.5 D4+B4:0.5 E4+C5:0.5 | C4+A4:2 E4:0.5 C4+A4:0.5 D4+B4:0.5 E4+C5:0.5 | D4+B4:0.5 C4+A4:0.5 E4+C5:0.5 D4+B4:0.5 C4+A4:1 C5+E5:0.5 C5+E5:0.5 | F4+D5:0.5 G4+E5:0.5 A4+F5:0.5 A4+F5:0.5 A4+F5:1.5 A4+F5:0.5 | G4+E5:0.5 F4+D5:0.5 A4+F5:0.5 C5+E5:1.5 G4+E5:0.5 F4+D5:0.5 | E4+C5:0.5 D4+B4:0.5 B4+E5:1 G#4+B4:1 A4+C5:1 | C4+A4:4",
+    "dyadsF": "1 1+4 1+4 1+4 | 1+4 1 1+4 1+4 1+4 | 1+4 1 1+4 1+4 1+4 | 1+4 1+4 1+4 1+4 1+4 1+3 1+3 | 1+5 1+5 1+5 1+5 1+5 1+5 | 1+5 1+5 1+5 1+3 1+5 1+5 | 1+5 1+5 2+5 1+3 1+3 | 1+4",
+    "tip": "Ascending Italian anthem: Keep the energetic A–B–C pickup agile and drive cleanly up to F5.",
+    "lyrics": "U- na mat- ti- | na _ mi son sve- | glia- to, o bel- la | ciao, bel- la ciao, bel- la ciao, | ciao! U- na mat- ti- na | mi son sve- glia- to, e | ho tro- va- to l'in- | va-sor!"
   },
   {
     "id": "the-entertainer",
@@ -623,7 +663,8 @@
     "lhF": "- | 5 5 | 5 1 | 5 1 | 5",
     "dyads": "D4+F4:0.5 D#4+F#4:0.5 | E4+G4:0.5 E4+C5:1 E4+G4:0.5 E4+C5:1 E4+G4:0.5 E4+C5:0.5~ | E4+C5:2 E4+C5:0.5 F4+D5:0.5 F#4+D#5:0.5 G4+E5:0.5 | E4+C5:0.5 F4+D5:0.5 G4+E5:1 F4+B4:0.5 G4+D5:1 E4+C5:0.5~ | E4+C5:2 -:2",
     "dyadsF": "1+2 1+2 | 1+3 1+5 1+3 1+5 1+3 1+5 | 1+5 1+5 1+5 1+5 1+5 | 1+5 1+5 1+5 1+4 1+5 1+5 | 1+5 -",
-    "tip": "Scott Joplin's ragtime syncopation: Hold each tied C5 smoothly across barlines before finishing cleanly."
+    "tip": "Scott Joplin's ragtime syncopation: Hold each tied C5 smoothly across barlines before finishing cleanly.",
+    "lyrics": "[Pickup] _ | [Rag_Sync] _ _ _ _ _ | _ [Chromatic] _ _ _ | [Turnaround] _ _ _ _ _ | _ _"
   },
   {
     "id": "hot-cross-buns",
@@ -638,7 +679,8 @@
     "lhF": "5 | 5 | 5 1 | 5",
     "dyads": "C4+E4:1 G3+D4:1 C4:2 | C4+E4:1 G3+D4:1 C4:2 | C4:0.5 C4:0.5 C4:0.5 C4:0.5 G3+D4:0.5 G3+D4:0.5 G3+D4:0.5 G3+D4:0.5 | C4+E4:1 G3+D4:1 C4+E4:2",
     "dyadsF": "1+3 1+2 1 | 1+3 1+2 1 | 1 1 1 1 1+2 1+2 1+2 1+2 | 1+3 1+2 1+3",
-    "tip": "Stepwise 3-finger foundational piece for pure pulse consistency."
+    "tip": "Stepwise 3-finger foundational piece for pure pulse consistency.",
+    "lyrics": "Hot cross buns! | Hot cross buns! | One a pen- ny, two a pen- ny, | Hot cross buns!"
   },
   {
     "id": "brahms-lullaby",
@@ -653,7 +695,8 @@
     "lhF": "- | 5 | 5 | 2 | 5 | 1 | 1 | 1 | 5",
     "dyads": "C4+E4:0.5 C4+E4:0.5 | C4+G4:1.5 C4+E4:0.5 C4+E4:1 | C4+G4:2 C4+E4:0.5 C4+G4:0.5 | E4+C5:1 D4+B4:1.5 C4+A4:0.5 | C4+A4:1 C4+G4:1 B3+D4:0.5 C4+E4:0.5 | B3+F4:1 B3+D4:1 B3+D4:0.5 C4+E4:0.5 | B3+F4:2 B3+D4:0.5 B3+F4:0.5 | D4+B4:0.5 D4+A4:0.5 B3+G4:1 D4+B4:1 | E4+C5:3",
     "dyadsF": "1+3 1+3 | 1+5 1+3 1+3 | 1+5 1+3 1+5 | 1+5 1+4 1+3 | 1+3 1+5 1+2 1+3 | 1+4 1+2 1+2 1+3 | 1+4 1+2 1+4 | 1+5 1+4 1+3 1+5 | 1+5",
-    "tip": "Authentic Brahms waltz cradle song: Enter gently on beat 3 (two eighth-note pickup) and soar up to C5."
+    "tip": "Authentic Brahms waltz cradle song: Enter gently on beat 3 (two eighth-note pickup) and soar up to C5.",
+    "lyrics": "Lul- la- | by, and good- | night, with _ | ro- ses be- | dight, _ With _ | li- lies _ o'er- | spread is _ | ba- _ by's wee | bed."
   },
   {
     "id": "rain-rain-go-away",
@@ -668,7 +711,8 @@
     "lhF": "5 | 5 | 5 2 | 5 | 5 2 | 5 | 5 | 5",
     "dyads": "C4+G4:2 C4+E4:2 | C4+G4:1 C4+G4:1 C4+E4:2 | C4+G4:1 C4+G4:1 C4+E4:1 F4+A4:1 | C4+G4:1 C4+G4:1 C4+E4:2 | C4+G4:1 C4+G4:1 C4+E4:1 F4+A4:1 | C4+G4:1 C4+G4:1 C4+E4:2 | C4+G4:2 C4+E4:2 | C4+G4:1 C4+G4:1 C4+E4:2",
     "dyadsF": "1+4 1+2 | 1+4 1+4 1+2 | 1+4 1+4 1+2 2+5 | 1+4 1+4 1+2 | 1+4 1+4 1+2 2+5 | 1+4 1+4 1+2 | 1+4 1+2 | 1+4 1+4 1+2",
-    "tip": "Simple minor-third and sixth playground chants: Keep steady 4/4 beats across every measure."
+    "tip": "Simple minor-third and sixth playground chants: Keep steady 4/4 beats across every measure.",
+    "lyrics": "Rain, rain, | go a- way, | Come a- gain some | o- ther day. | Lit- tle John- ny | wants to play, | Rain, rain, | go a- way!"
   },
   {
     "id": "chariots-of-fire",
@@ -683,7 +727,8 @@
     "lhF": "- | 5 | 5 | 5 | 2 1 | 5 | 5 | 1 5 | 5",
     "dyads": "C4:0.5 | C4+F4:0.5 C4+G4:0.5 C4+A4:0.5 C4+G4:1.5 C4+E4:0.5 C4:0.5 | C4+F4:0.5 C4+G4:0.5 C4+A4:0.5 C4+G4:2 C4:0.5 | C4+F4:0.5 C4+G4:0.5 C4+A4:0.5 C4+G4:1.5 C4+E4:0.5 C4+E4:0.5 | C4+F4:0.5 C4+E4:0.5 A3+C4:1 B3+D4:1.5 C4:0.5 | C4+F4:0.5 C4+G4:0.5 C4+A4:0.5 C4+G4:1.5 C4+E4:0.5 C4:0.5 | C4+F4:0.5 C4+G4:0.5 C4+A4:0.5 C4+G4:2 C4+E4:0.5 | A3+F4:0.5 A3+E4:0.5 G3+C4:1 B3+D4:2 | C4+E4:4",
     "dyadsF": "1 | 1+2 1+3 1+4 1+3 1+2 1 | 1+2 1+3 1+4 1+3 1 | 1+2 1+3 1+4 1+3 1+2 1+2 | 1+3 1+2 1+2 1+3 1 | 1+2 1+3 1+4 1+3 1+2 1 | 1+2 1+3 1+4 1+3 1+2 | 1+4 1+3 1+2 1+3 | 1+3",
-    "tip": "Vangelis' iconic synth hymn: Let the ascending F-G-A-G motif soar over a steady C3 pedal bass."
+    "tip": "Vangelis' iconic synth hymn: Let the ascending F-G-A-G motif soar over a steady C3 pedal bass.",
+    "lyrics": "[Pickup] | [Anthem_A] _ _ _ _ _ | [Soar] _ _ _ _ | [Anthem_A'] _ _ _ _ _ | [Cadence] _ _ _ _ | [Anthem_B] _ _ _ _ _ | [Soar_2] _ _ _ _ | [Resolve] _ _ _ | [Tonic]"
   },
   {
     "id": "go-tell-aunt-rhody",
@@ -698,7 +743,8 @@
     "lhF": "5 | 5 | 1 | 5 | 5 2 | 5 | 1 | 5",
     "dyads": "C4+E4:2 C4+E4:1 G3+D4:1 | C4+E4:2 C4+E4:2 | G3+D4:2 G3+D4:1 D4+F4:1 | C4+E4:1 G3+D4:1 C4+E4:2 | C4+G4:2 C4+G4:1 D4+F4:1 | C4+E4:2 C4+E4:1 C4+E4:1 | G3+D4:1 A3+C4:1 G3+D4:1 G3+E4:1 | C4+E4:4",
     "dyadsF": "1+3 1+3 1+2 | 1+3 1+3 | 1+2 1+2 2+4 | 1+3 1+2 1+3 | 1+5 1+5 2+4 | 1+3 1+3 1+3 | 1+2 1+2 1+2 1+3 | 1+3",
-    "tip": "Authentic American folk tune reinforcing smooth C position finger transitions between 1, 2, 3, 4, and 5."
+    "tip": "Authentic American folk tune reinforcing smooth C position finger transitions between 1, 2, 3, 4, and 5.",
+    "lyrics": "Go tell Aunt | Rho- dy, | Go tell Aunt | Rho- _ dy, | Go tell Aunt | Rho- dy, the | old grey goose is | dead."
   },
   {
     "id": "william-tell",
@@ -713,7 +759,8 @@
     "lhF": "- | 5 | 5 1 | 5 | 1 | 5 | 5 1 | 1 | 5",
     "dyads": "G3:0.5 G3:0.5 | G3+C4:1 G3+C4:0.5 G3+C4:0.5 G3+C4:1 G3+C4:0.5 G3+C4:0.5 | G3+C4:1 C4+E4:1 G3+D4:1 C4+E4:1 | G3+C4:0.5 G3+C4:0.5 G3+C4:1 G3+C4:0.5 G3+C4:0.5 C4+E4:1 | C4+E4:1 G3+D4:1 G3+B3:1 G3:0.5 G3:0.5 | G3+C4:1 G3+C4:0.5 G3+C4:0.5 G3+C4:1 G3+C4:0.5 G3+C4:0.5 | G3+C4:1 C4+E4:1 G3+D4:1 C4+E4:1 | C4+G4:1 A3+F4:1 G3+D4:1 G3+B3:1 | C4+E4:4",
     "dyadsF": "1 1 | 1+2 1+2 1+2 1+2 1+2 1+2 | 1+2 1+3 1+2 1+3 | 1+2 1+2 1+2 1+2 1+2 1+3 | 1+3 1+2 1+2 1 1 | 1+2 1+2 1+2 1+2 1+2 1+2 | 1+2 1+3 1+2 1+3 | 1+5 1+4 1+2 1+2 | 1+3",
-    "tip": "Rossini's galloping finale: Use light, crisp wrist bounces on repeated G3 eighth-note pickups."
+    "tip": "Rossini's galloping finale: Use light, crisp wrist bounces on repeated G3 eighth-note pickups.",
+    "lyrics": "[Gallop] _ | [Charge_1] _ _ _ _ _ | [Fanfare] _ _ _ | [Charge_2] _ _ _ _ _ | [Turn] _ _ _ _ | [Charge_3] _ _ _ _ _ | [Fanfare_2] _ _ _ | [Descend] _ _ _ | [Finish]"
   },
   {
     "id": "happy-birthday",
@@ -728,7 +775,8 @@
     "lhF": "- | 5 | 1 | 1 | 5 | 5 | 2 | 5 1 | 5",
     "dyads": "G3:0.5 G3:0.5 | A3+C4:1 G3+B3:1 C4+E4:1 | G3+B3:2 G3:0.5 G3:0.5 | A3+C4:1 G3+B3:1 B3+D4:1 | G3+C4:2 G3:0.5 G3:0.5 | C4+G4:1 C4+E4:1 A3+C4:1 | G3+B3:1 F3+A3:1 A3+F4:0.5 A3+F4:0.5 | G3+E4:1 A3+C4:1 B3+D4:1 | G3+C4:3",
     "dyadsF": "1 1 | 1+3 1+3 1+3 | 1+3 1 1 | 1+3 1+3 1+3 | 1+4 1 1 | 1+5 1+3 1+3 | 1+3 1+3 1+5 1+5 | 1+5 1+3 1+3 | 1+4",
-    "tip": "Aligned with the classic beat-3 pickup so every downbeat lands naturally on 'Birth-day' and the bright G4 octave leap."
+    "tip": "Aligned with the classic beat-3 pickup so every downbeat lands naturally on 'Birth-day' and the bright G4 octave leap.",
+    "lyrics": "Hap- py | birth- day to | you, Hap- py | birth- day to | you, Hap- py | birth- day dear | friend, _ Hap- py | birth- day to | you!"
   },
   {
     "id": "fur-elise",
@@ -743,7 +791,8 @@
     "lhF": "- | - | 5 2 1 - | 5 2 1 - | 5 2 1 - | - | 5 2 1 - | 5 2 1 - | 5",
     "dyads": "E5:0.25 D#5:0.25 | E5:0.25 D#5:0.25 E5:0.25 B4:0.25 D5:0.25 C5:0.25 | C4+A4:0.5 -:0.25 C4:0.25 E4:0.25 C4+A4:0.25 | E4+B4:0.5 -:0.25 E4:0.25 G#4:0.25 E4+B4:0.25 | E4+C5:0.5 -:0.25 E4:0.25 E5:0.25 D#5:0.25 | E5:0.25 D#5:0.25 E5:0.25 B4:0.25 D5:0.25 C5:0.25 | C4+A4:0.5 -:0.25 C4:0.25 E4:0.25 C4+A4:0.25 | E4+B4:0.5 -:0.25 E4:0.25 E4+C5:0.25 D4+B4:0.25 | C4+A4:1.5",
     "dyadsF": "5 4 | 5 4 5 2 4 3 | 1+5 - 1 2 1+5 | 1+5 - 1 2 1+5 | 1+5 - 1 5 4 | 5 4 5 2 4 3 | 1+5 - 1 2 1+5 | 1+5 - 1 1+5 1+5 | 1+5",
-    "tip": "Beethoven's WoO 59 with true 3/8 barlines, interlocking LH arpeggios, and the second-ending cadence E4–C5–B4–A4."
+    "tip": "Beethoven's WoO 59 with true 3/8 barlines, interlocking LH arpeggios, and the second-ending cadence E4–C5–B4–A4.",
+    "lyrics": "[Pickup] _ | [Motif_1] _ _ _ _ _ | [Am] _ _ _ _ | [E7] _ _ _ _ | [Am_2] _ _ _ _ | [Motif_2] _ _ _ _ _ | [Am_3] _ _ _ _ | [Cadence] _ _ _ _ | [Resolve]"
   },
   {
     "id": "bach-minuet-g",
@@ -758,7 +807,8 @@
     "lhF": "1 2 | 1 3 | 5 4 | 3 5 | 4 5 | 3 5 | 5 1 | 1 | 1 2 | 1 3 | 5 4 | 3 5 | 4 5 | 3 2 | 2 1 | 5",
     "dyads": "G4+D5:1 G4:0.5 A4:0.5 B4:0.5 C5:0.5 | G4+D5:1 G4:1 G4:1 | G4+E5:1 C5:0.5 D5:0.5 E5:0.5 F#5:0.5 | G4+G5:1 G4:1 G4:1 | E4+C5:1 D5:0.5 C5:0.5 B4:0.5 A4:0.5 | D4+B4:1 C5:0.5 B4:0.5 A4:0.5 G4:0.5 | D4+F#4:1 G4:0.5 A4:0.5 B4:0.5 G4:0.5 | D4+A4:3 | G4+D5:1 G4:0.5 A4:0.5 B4:0.5 C5:0.5 | G4+D5:1 G4:1 G4:1 | G4+E5:1 C5:0.5 D5:0.5 E5:0.5 F#5:0.5 | G4+G5:1 G4:1 G4:1 | E4+C5:1 D5:0.5 C5:0.5 B4:0.5 A4:0.5 | D4+B4:1 C5:0.5 B4:0.5 A4:0.5 G4:0.5 | C4+A4:1 B4:0.5 A4:0.5 G4:0.5 F#4:0.5 | B3+G4:3",
     "dyadsF": "1+5 1 2 3 4 | 1+5 1 1 | 1+5 1 2 3 4 | 1+5 1 1 | 1+3 4 3 2 1 | 1+3 3 2 1 1 | 1+3 3 4 5 3 | 1+4 | 1+5 1 2 3 4 | 1+5 1 1 | 1+5 1 2 3 4 | 1+5 1 1 | 1+3 4 3 2 1 | 1+3 3 2 1 1 | 1+4 4 3 2 1 | 1+5",
-    "tip": "Complete 16-bar Christian Petzold / J.S. Bach Minuet in G: Notice the authentic tonic resolution on G4 in measure 16."
+    "tip": "Complete 16-bar Christian Petzold / J.S. Bach Minuet in G: Notice the authentic tonic resolution on G4 in measure 16.",
+    "lyrics": "[Theme_A] _ _ _ _ | [Staccato] _ _ | [Climb] _ _ _ _ | [High_G] _ _ | [Step_Down] _ _ _ _ | [Sequence] _ _ _ _ | [Turn] _ _ _ _ | [Half_Cad] | [Theme_A'] _ _ _ _ | [Staccato] _ _ | [Climb_2] _ _ _ _ | [High_G] _ _ | [Step_Down] _ _ _ _ | [Sequence] _ _ _ _ | [Final_Turn] _ _ _ _ | [Tonic_G]"
   },
   {
     "id": "canon-in-d",
@@ -773,7 +823,8 @@
     "lhF": "1 4 | 3 5 | 2 5 | 2 1 | 1 4 | 3 5 | 2 5 | 2 1 | 1",
     "dyads": "D4+F#4:2 C#4+E4:2 | B3+D4:2 A3+C#4:2 | G3+B3:2 F#3+A3:2 | G3+B3:2 A3+C#4:2 | F#3+D4:1 E3+C#4:1 D3+B3:1 C#3+A3:1 | B2+G3:1 A2+F#3:1 B2+G3:1 F#3+A3:1 | F#3+D4:1 A3+F#4:1 C#4+A4:1 B3+G4:1 | A3+F#4:1 F#3+D4:1 G3+E4:2 | A3+D4:4",
     "dyadsF": "1+3 1+2 | 1+3 1+2 | 1+3 1+3 | 1+3 1+2 | 1+4 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 | 1+4",
-    "tip": "Johann Pachelbel's famous ground bass cycle ending cleanly on a glowing D major resolution."
+    "tip": "Johann Pachelbel's famous ground bass cycle ending cleanly on a glowing D major resolution.",
+    "lyrics": "[Theme_1] _ | [Descend] _ | [Low_Turn] _ | [Rise] _ | [Quarters] _ _ _ | [Step] _ _ _ | [Arpeggio] _ _ _ | [Cadence] _ _ | [Resolve]"
   },
   {
     "id": "gymnopedie-1",
@@ -788,7 +839,8 @@
     "lhF": "5 1+2 | 5 1+2 | 5 1+2 | 5 1+2 | 5 1+2 | 5 1+2 | 5 1+2 | 5 1+2",
     "dyads": "D4+F#4:3 | F#4+A4:2 E4+G4:1 | D4+F#4:2 A3+C#4:1 | G3+B3:3 | A3+C#4:2 B3+D4:1 | C#4+E4:2 B3+D4:1 | A3+C#4:2 G3+B3:1 | F#3+A3:3",
     "dyadsF": "1+3 | 3+5 2+4 | 1+3 1+2 | 1+3 | 1+2 1+3 | 1+3 1+2 | 1+2 1+3 | 1+3",
-    "tip": "Erik Satie's luminous Gmaj7 → Dmaj7 contemplation: Let both sharps (F# & C#) shimmer peacefully."
+    "tip": "Erik Satie's luminous Gmaj7 → Dmaj7 contemplation: Let both sharps (F# & C#) shimmer peacefully.",
+    "lyrics": "[Gmaj7] | [Dmaj7] _ | [Float] _ | [Rest_B] | [Rise] _ | [Sway] _ | [Descend] _ | [Resolve]"
   },
   {
     "id": "hanon-ex-1",
@@ -803,7 +855,8 @@
     "lhF": "5 4 3 2 1 2 3 4 | 5 4 3 2 1 2 3 4 | 5 4 3 2 1 2 3 4 | 5",
     "dyads": "C4+E4:0.5 E4+G4:0.5 F4+A4:0.5 G4+B4:0.5 A4+C5:0.5 G4+B4:0.5 F4+A4:0.5 E4+G4:0.5 | D4+F4:0.5 F4+A4:0.5 G4+B4:0.5 A4+C5:0.5 B4+D5:0.5 A4+C5:0.5 G4+B4:0.5 F4+A4:0.5 | E4+G4:0.5 G4+B4:0.5 A4+C5:0.5 B4+D5:0.5 C5+E5:0.5 B4+D5:0.5 A4+C5:0.5 G4+B4:0.5 | C4+E4:4",
     "dyadsF": "1+3 2+4 3+5 3+5 3+5 3+5 3+5 2+4 | 1+3 2+4 3+5 3+5 3+5 3+5 3+5 2+4 | 1+3 2+4 3+5 3+5 3+5 3+5 3+5 2+4 | 1+3",
-    "tip": "C.L. Hanon's essential dexterity study. Stretches fingers 1 and 2 while lifting fingers 4 and 5 high."
+    "tip": "C.L. Hanon's essential dexterity study. Stretches fingers 1 and 2 while lifting fingers 4 and 5 high.",
+    "lyrics": "[Pattern_C] _ _ _ _ _ _ _ | [Pattern_D] _ _ _ _ _ _ _ | [Pattern_E] _ _ _ _ _ _ _ | [Finish]"
   },
   {
     "id": "scarborough-fair",
@@ -818,7 +871,8 @@
     "lhF": "5 | 1 | 5 | 5 | 5 | 1 | 4 | 5 | 5 | 1 | 4 1 | 5",
     "dyads": "D4+F4:2 D4+F4:1 | F4+A4:2 F4+A4:1 | C4+E4:1.5 D4+F4:0.5 C4+E4:1 | D4+F4:3 | F4+A4:1 G4+C5:1 A4+D5:1 | G4+C5:2 F4+A4:1 | G4+B4:1 D4+G4:1 F4+A4:1 | F4+A4:3 | A4+D5:2 A4+D5:1 | G4+C5:2 F4+A4:1 | D4+G4:1.5 D4+F4:0.5 C4+E4:1 | D4+F4:3",
     "dyadsF": "1+3 1+3 | 2+4 2+4 | 1+3 1+3 1+3 | 1+3 | 1+3 1+4 1+4 | 1+4 1+3 | 2+4 1+4 2+4 | 2+4 | 2+5 2+5 | 1+4 1+3 | 1+4 1+3 1+3 | 1+3",
-    "tip": "Complete D Dorian ballad: Practice hearing the bright B natural over open fifth harmonies."
+    "tip": "Complete D Dorian ballad: Practice hearing the bright B natural over open fifth harmonies.",
+    "lyrics": "Are you | go- ing | Scar- bo- rough | Fair? | Par- sley, sage, | rose- ma- | ry _ and | thyme. | Re- mem- | ber me | one who lives | there."
   },
   {
     "id": "amazing-grace",
@@ -833,7 +887,8 @@
     "lhF": "5 | 5 | 5 | 1 | 5 | 5 | 5 | 2 | 5 | 5 | 1 | 5 | 5 | 2 | 5",
     "dyads": "D4:1 | G4+B4:2 B4+D5:0.5 G4+B4:0.5 | G4+B4:2 F#4+A4:1 | E4+G4:2 C4+E4:1 | B3+D4:2 B3+D4:1 | G4+B4:2 B4+D5:0.5 G4+B4:0.5 | G4+B4:2 F#4+A4:1 | F#4+D5:3 | G4+B4:2 B4+D5:0.5 G4+B4:0.5 | D4+G4:2 B3+D4:1 | C4+E4:2 E4+G4:0.5 C4+E4:0.5 | B3+D4:2 B3+D4:1 | G4+B4:2 B4+D5:0.5 G4+B4:0.5 | G4+B4:2 F#4+A4:1 | D4+G4:3",
     "dyadsF": "1 | 2+4 3+5 2+4 | 2+4 1+3 | 2+4 1+3 | 1+3 1+3 | 2+4 3+5 2+4 | 2+4 1+3 | 1+5 | 2+4 3+5 2+4 | 1+3 1+2 | 1+3 2+4 1+3 | 1+2 1+2 | 2+4 3+5 2+4 | 2+4 1+3 | 1+4",
-    "tip": "Pure pentatonic gospel melody. Focus on singing tone through the soaring leap to high D5."
+    "tip": "Pure pentatonic gospel melody. Focus on singing tone through the soaring leap to high D5.",
+    "lyrics": "A- | ma- zing _ | grace, how | sweet the | sound, That | saved a _ | wretch like | me. | I once _ | was lost, | but now _ | found, Was | blind, but _ | now I | see."
   },
   {
     "id": "greensleeves",
@@ -848,7 +903,8 @@
     "lhF": "- | 5 5 | 1 1 | 2 2 | 3 3 | 5 5 | 1 1 | 2 3 | 5",
     "dyads": "A4:0.5 | A4+C5:1 B4+D5:0.5 C5+E5:0.75 D5+F5:0.25 C5+E5:0.5 | G4+D5:1 G4+B4:0.5 D4+G4:0.75 F4+A4:0.25 G4+B4:0.5 | F4+C5:1 F4+A4:0.5 F4+A4:0.75 E4+G#4:0.25 F4+A4:0.5 | E4+B4:1 E4+G#4:0.5 B3+E4:1 E4+A4:0.5 | A4+C5:1 B4+D5:0.5 C5+E5:0.75 D5+F5:0.25 C5+E5:0.5 | G4+D5:1 G4+B4:0.5 D4+G4:0.75 F4+A4:0.25 G4+B4:0.5 | F4+C5:0.75 G4+B4:0.25 E4+A4:0.5 E4+G#4:0.75 D4+F#4:0.25 E4+G#4:0.5 | C4+A4:3",
     "dyadsF": "1 | 1+3 2+4 3+5 3+5 3+5 | 1+5 1+3 1+4 1+3 1+3 | 1+5 1+3 1+3 1+3 1+3 | 1+5 1+3 1+4 1+4 | 1+3 2+4 3+5 3+5 3+5 | 1+5 1+3 1+4 1+3 1+3 | 1+5 2+4 1+4 1+3 1+3 1+3 | 1+5",
-    "tip": "Full 16th-century English melody in A Minor / Melodic minor with Renaissance 3rds & 6ths dyads."
+    "tip": "Full 16th-century English melody in A Minor / Melodic minor with Renaissance 3rds & 6ths dyads.",
+    "lyrics": "A- | las, my love, _ you | do me wrong, _ To | cast me off _ dis- | cour- te- ous- ly. | For I have loved _ | you so long, _ De- | light- ing _ in your _ | heart."
   },
   {
     "id": "jaws-theme",
@@ -863,7 +919,8 @@
     "lhF": "2 1 | 2 1 | 2 1 2 1 | 2 1 2 1 | 2 1 | 2 1 | 2 1 | 2",
     "dyads": "E4+B4:2 F4+C5:2 | E4+B4:2 F4+C5:2 | E4+B4:1.5 F4+C5:0.5 E4+B4:1.5 F4+C5:0.5 | E4+B4:1 F4+C5:1 E4+B4:1 F4+C5:1 | E4+G4:0.5 F4+A4:0.5 E4+G4:0.5 F4+A4:0.5 E4+G4:0.5 F4+A4:0.5 E4+G4:0.5 F4+A4:0.5 | E4+G4:0.5 F4+A4:0.5 E4+G4:0.5 F4+A4:0.5 E4+B4:1 G4+B4:1 | E4+G4:0.5 F4+A4:0.5 E4+G4:0.5 F4+A4:0.5 E4+B4:1 G4+B4:0.5 E4+B4:0.5 | E4+B4:4",
     "dyadsF": "1+4 1+4 | 1+4 1+4 | 1+4 1+4 1+4 1+4 | 1+4 1+4 1+4 1+4 | 1+3 2+4 1+3 2+4 1+3 2+4 1+3 2+4 | 1+3 2+4 1+3 2+4 1+4 3+5 | 1+3 2+4 1+3 2+4 1+4 3+5 1+4 | 1+4",
-    "tip": "Demonstrates the suspenseful natural half-step (semitone) between E and F inside C position—speeding up smoothly like cello bowing."
+    "tip": "Demonstrates the suspenseful natural half-step (semitone) between E and F inside C position—speeding up smoothly like cello bowing.",
+    "lyrics": "[Slow_1] _ | [Slow_2] _ | [Creep] _ _ _ | [Faster] _ _ _ | [Chase_1] _ _ _ _ _ _ _ | [Chase_2] _ _ _ _ _ | [Strike] _ _ _ _ _ _ | [Hold]"
   },
   {
     "id": "scales-warmup-c",
@@ -878,7 +935,8 @@
     "lhF": "5 | 1 | 5 | 1 5 | 5 | 2 | 1 | 5",
     "dyads": "C4+E4:1 D4+F4:1 E4+G4:1 F4+A4:1 | G4+B4:1 A4+C5:1 B4+D5:1 C5+E5:1 | C5+E5:1 B4+D5:1 A4+C5:1 G4+B4:1 | F4+A4:1 E4+G4:1 D4+F4:1 C4+E4:1 | C4+E4:1 E4+G4:1 C4+G4:1 E4+G4:1 | C4+F4:1 F4+A4:1 C4+A4:1 F4+A4:1 | B3+D4:1 D4+G4:1 B3+G4:1 D4+G4:1 | C4+E4:4",
     "dyadsF": "1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 2+4 1+5 2+4 | 1+3 2+4 1+5 2+4 | 1+2 2+5 1+5 2+5 | 1+3",
-    "tip": "Master the conservatory thumb-under transition on F4 (1-2-3-1-2-3-4-5) followed by broken I, IV, and V7 chords."
+    "tip": "Master the conservatory thumb-under transition on F4 (1-2-3-1-2-3-4-5) followed by broken I, IV, and V7 chords.",
+    "lyrics": "[Ascend] _ _ _ | [Thumb_Tuck] _ _ _ | [Descend] _ _ _ | [Cross_3] _ _ _ | [C_Arp] _ _ _ | [F_Arp] _ _ _ | [G7_Arp] _ _ _ | [Tonic]"
   },
   {
     "id": "french-folk-song",
@@ -893,7 +951,8 @@
     "lhF": "5 | 1 | 5 | 1 | 5 | 5 | 1 | 5",
     "dyads": "C4+G4:1 C4+G4:1 C4+G4:1 | B3+G4:1 B3+F4:1 C4+E4:1 | C4+E4:1 C4+E4:1 C4+E4:1 | G3+E4:1 G3+D4:1 C4+E4:1 | C4+E4:1 D4+F4:1 E4+G4:1 | C4+E4:1 D4+F4:1 E4+G4:1 | G3+D4:1 C4+E4:1 B3+F4:1 | C4+E4:3",
     "dyadsF": "1+5 1+5 1+5 | 1+5 1+4 1+3 | 1+3 1+3 1+3 | 1+5 1+2 1+3 | 1+3 2+4 3+5 | 1+3 2+4 3+5 | 1+2 1+3 1+4 | 1+3",
-    "tip": "Classic beginner 3/4 waltz etude: Breathe smoothly on the third beat and drop lightly into each downbeat."
+    "tip": "Classic beginner 3/4 waltz etude: Breathe smoothly on the third beat and drop lightly into each downbeat.",
+    "lyrics": "[Waltz_1] _ _ | [Step_Down] _ _ | [Waltz_2] _ _ | [Step_Down] _ _ | [Climb_1] _ _ | [Climb_2] _ _ | [Turn] _ _ | [Resolve]"
   },
   {
     "id": "good-king-wenceslas",
@@ -908,7 +967,8 @@
     "lhF": "5 | 5 1 | 2 1 | 5 | 5 1 | 5 2 | 2 1 | 5",
     "dyads": "C4+E4:1 C4+E4:1 C4+E4:1 G3+D4:1 | C4+E4:1 C4+E4:1 G3+B3:2 | F3+A3:1 E3+G3:1 F3+A3:1 G3+B3:1 | C4+E4:2 C4+E4:2 | E4+G4:1 D4+F4:1 C4+E4:1 G3+D4:1 | C4+E4:1 G3+D4:1 A3+C4:2 | F3+A3:1 E3+G3:1 F3+A3:1 G3+B3:1 | C4+E4:2 C4+E4:2",
     "dyadsF": "1+3 1+3 1+3 1+2 | 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+3 | 3+5 2+4 1+3 1+2 | 1+3 1+2 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+3",
-    "tip": "Renaissance carol with sturdy processional quarter notes and uplifting choral organ harmonies."
+    "tip": "Renaissance carol with sturdy processional quarter notes and uplifting choral organ harmonies.",
+    "lyrics": "Good King Wen- ces- | las looked out, | On the Feast of | Ste- phen, | When the snow lay | round a- bout, | Deep and crisp and | e- ven."
   },
   {
     "id": "imagine-motif",
@@ -917,13 +977,14 @@
     "category": "Harmonic / Dyads",
     "tempo": 76,
     "timeSig": "4/4",
-    "rh": "E4+G4:0.5 C4:0.5 E4+G4:0.5 C4:0.5 E4+G4:0.5 C4:0.5 E4+B4:0.5 C4:0.5 | F4+A4:0.5 C4:0.5 F4+A4:0.5 C4:0.5 F4+A4:0.5 C4:0.5 A4:0.5 Bb4:0.5 | E4+G4:0.5 C4:0.5 E4+G4:0.5 C4:0.5 E4+G4:0.5 C4:0.5 E4+B4:0.5 C4:0.5 | F4+A4:0.5 C4:0.5 F4+A4:0.5 C4:0.5 F4+A4:1 B4:1 | G4:1 E4:1 E4:1 G4:1 | A4:1 G4:1 E4:2 | F4:1 G4:1 A4:1 G4:1 | C4:4",
-    "rhF": "2+4 1 2+4 1 2+4 1 2+5 1 | 2+4 1 2+4 1 2+4 1 3 4 | 2+4 1 2+4 1 2+4 1 2+5 1 | 2+4 1 2+4 1 2+4 5 | 4 2 2 4 | 5 4 2 | 2 3 4 3 | 1",
-    "lh": "C3:4 | F2:4 | C3:4 | F2:4 | C3:2 E3:2 | F2:4 | G2:4 | C3:4",
-    "lhF": "5 | 2 | 5 | 2 | 5 2 | 2 | 1 | 5",
-    "dyads": "E4+G4:0.5 C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 E4+B4:0.5 C4+E4:0.5 | F4+A4:0.5 C4+F4:0.5 F4+A4:0.5 C4+F4:0.5 F4+A4:0.5 C4+F4:0.5 F4+A4:0.5 G4+Bb4:0.5 | E4+G4:0.5 C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 E4+B4:0.5 C4+E4:0.5 | F4+A4:0.5 C4+F4:0.5 F4+A4:0.5 C4+F4:0.5 F4+A4:1 G4+B4:1 | C4+G4:1 C4+E4:1 C4+E4:1 C4+G4:1 | F4+A4:1 E4+G4:1 C4+E4:2 | D4+F4:1 E4+G4:1 F4+A4:1 D4+G4:1 | C4+E4:4",
-    "dyadsF": "2+4 1+2 2+4 1+2 2+4 1+2 2+5 1+2 | 2+4 1+2 2+4 1+2 2+4 1+2 2+4 2+5 | 2+4 1+2 2+4 1+2 2+4 1+2 2+5 1+2 | 2+4 1+2 2+4 1+2 2+4 2+5 | 1+5 1+3 1+3 1+5 | 2+4 1+3 1+3 | 1+3 2+4 3+5 1+4 | 1+3",
-    "tip": "John Lennon's signature rocking piano vamp: Keep thumb C4 anchored while alternating dyads C → Cmaj7 → F."
+    "rh": "E4+G4:0.5 C4:0.5 E4+G4:0.5 C4:0.5 E4+G4:0.5 C4:0.5 E4+B4:0.5 C4:0.5 | F4+A4:0.5 C4:0.5 F4+A4:0.5 C4:0.5 F4+A4:0.5 C4:0.5 A4:0.5 Bb4:0.5 | E4+G4:0.5 C4:0.5 E4+G4:0.5 C4:0.5 E4+G4:0.5 C4:0.5 E4+B4:0.5 C4:0.5 | F4+A4:0.5 C4:0.5 F4+A4:0.5 C4:0.5 F4+A4:1 B4:1 | E4:0.5 E4:0.5 G4:0.5 G4:0.5 B4:1 B4:1 | A4:2 -:2 | E4:0.5 G4:0.5 G4:0.5 G4:0.5 B4:1 B4:1 | A4:2 C4:2",
+    "rhF": "2+4 1 2+4 1 2+4 1 2+5 1 | 2+4 1 2+4 1 2+4 1 3 4 | 2+4 1 2+4 1 2+4 1 2+5 1 | 2+4 1 2+4 1 2+4 5 | 1 1 2 2 4 4 | 3 - | 1 2 2 2 4 4 | 3 1",
+    "lh": "C3:4 | F2:4 | C3:4 | F2:4 | C3:4 | F2:4 | C3:4 | F2:2 C3:2",
+    "lhF": "5 | 2 | 5 | 2 | 5 | 2 | 5 | 2 5",
+    "dyads": "E4+G4:0.5 C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 E4+B4:0.5 C4+E4:0.5 | F4+A4:0.5 C4+F4:0.5 F4+A4:0.5 C4+F4:0.5 F4+A4:0.5 C4+F4:0.5 F4+A4:0.5 G4+Bb4:0.5 | E4+G4:0.5 C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 E4+G4:0.5 C4+E4:0.5 E4+B4:0.5 C4+E4:0.5 | F4+A4:0.5 C4+F4:0.5 F4+A4:0.5 C4+F4:0.5 F4+A4:1 G4+B4:1 | C4+E4:0.5 C4+E4:0.5 E4+G4:0.5 E4+G4:0.5 G4+B4:1 G4+B4:1 | F4+A4:2 -:2 | C4+E4:0.5 E4+G4:0.5 E4+G4:0.5 E4+G4:0.5 G4+B4:1 G4+B4:1 | F4+A4:2 C4+E4:2",
+    "dyadsF": "2+4 1+2 2+4 1+2 2+4 1+2 2+5 1+2 | 2+4 1+2 2+4 1+2 2+4 1+2 2+4 2+5 | 2+4 1+2 2+4 1+2 2+4 1+2 2+5 1+2 | 2+4 1+2 2+4 1+2 2+4 2+5 | 1+3 1+3 2+4 2+4 3+5 3+5 | 2+4 - | 1+3 2+4 2+4 2+4 3+5 3+5 | 2+4 1+3",
+    "tip": "John Lennon's signature rocking piano vamp: Keep thumb C4 anchored while alternating dyads C → Cmaj7 → F.",
+    "lyrics": "[Intro_C] _ _ _ _ _ _ _ | [Intro_F] _ _ _ _ _ _ _ | [Vamp_C] _ _ _ _ _ _ _ | [Vamp_F] _ _ _ _ _ | I- ma- gine there's no hea- | ven, _ | It's ea- sy if you try, | _ _"
   },
   {
     "id": "auld-lang-syne",
@@ -938,7 +999,8 @@
     "lhF": "- | 5 | 1 | 5 | 2 | 5 | 1 | 2 1 | 5",
     "dyads": "G3:1 | G3+C4:1.5 G3+C4:0.5 G3+C4:1 C4+E4:1 | G3+D4:1.5 G3+C4:0.5 G3+D4:1 G3+E4:1 | G3+C4:1.5 G3+C4:0.5 C4+E4:1 C4+G4:1 | F4+A4:3 F4+A4:1 | C4+G4:1.5 C4+E4:0.5 C4+E4:1 G3+C4:1 | G3+D4:1.5 G3+C4:0.5 G3+D4:1 G3+E4:1 | A3+C4:1.5 F3+A3:0.5 F3+A3:1 D3+G3:1 | C4+E4:4",
     "dyadsF": "1 | 1+3 1+3 1+3 1+3 | 1+4 1+3 1+4 1+5 | 1+3 1+3 1+3 1+5 | 2+4 2+4 | 1+5 1+3 1+3 1+3 | 1+4 1+3 1+4 1+5 | 1+3 1+3 1+3 1+4 | 1+3",
-    "tip": "Pure Scottish pentatonic anthem: Sing through the warm dotted rhythms with gentle sustaining pedal."
+    "tip": "Pure Scottish pentatonic anthem: Sing through the warm dotted rhythms with gentle sustaining pedal.",
+    "lyrics": "Should | auld ac- quain- tance | be for- got, And | ne- ver brought to | mind? Should | auld ac- quain- tance | be for- got, And | auld _ lang _ | syne!"
   },
   {
     "id": "country-roads",
@@ -947,13 +1009,14 @@
     "category": "Harmonic / Dyads",
     "tempo": 86,
     "timeSig": "4/4",
-    "rh": "C4:1 D4:1 E4:2 | E4:1 D4:1 D4:2 | E4:1 G4:1 A4:2 | A4:1 G4:1 E4:2 | G4:1 E4:1 D4:1 C4:1 | D4:1 E4:1 D4:2 | E4:1 D4:1 C4:1 A3:1 | D4:1 C4:1 C4:2",
-    "rhF": "1 2 3 | 3 2 2 | 1 3 4 | 4 3 1 | 5 3 2 1 | 2 3 2 | 4 3 2 1 | 3 2 2",
+    "rh": "C4:1 D4:1 E4:2 | E4:1 D4:1 D4:2 | E4:1 G4:1 A4:2 | A4:1 A4:0.5 G4:0.5 E4:2 | G4:1 A4:1 G4:1 E4:1 | A4:1 G4:1 E4:1 D4:1 | E4:1 D4:1 C4:2 | D4:1 C4:1 C4:2",
+    "rhF": "1 2 3 | 3 2 2 | 1 3 4 | 4 4 3 1 | 3 4 3 1 | 4 3 2 1 | 3 2 1 | 2 1 1",
     "lh": "C3:4 | G2:4 | A2:4 | F2:4 | C3:4 | G2:4 | F2:4 | C3:4",
     "lhF": "5 | 1 | 3 | 4 | 5 | 1 | 4 | 5",
-    "dyads": "C4:1 G3+D4:1 C4+E4:2 | B3+E4:1 G3+D4:1 G3+D4:2 | C4+E4:1 E4+G4:1 C4+A4:2 | F4+A4:1 E4+G4:1 C4+E4:2 | E4+G4:1 C4+E4:1 B3+D4:1 G3+C4:1 | B3+D4:1 C4+E4:1 G3+D4:2 | C4+E4:1 A3+D4:1 F3+C4:1 F3+A3:1 | G3+D4:1 C4+E4:1 C4+E4:2",
-    "dyadsF": "1 1+4 1+3 | 1+4 1+4 1+4 | 1+3 2+4 1+5 | 2+4 1+3 1+3 | 3+5 1+3 1+3 1+3 | 1+3 1+4 1+4 | 1+3 1+3 1+4 1+3 | 1+4 1+3 1+3",
-    "tip": "Classic folk-pop anthem tracing the golden C – G – Am – F progression across every chorus phrase."
+    "dyads": "C4:1 G3+D4:1 C4+E4:2 | B3+E4:1 G3+D4:1 G3+D4:2 | C4+E4:1 E4+G4:1 C4+A4:2 | F4+A4:1 F4+A4:0.5 E4+G4:0.5 C4+E4:2 | E4+G4:1 F4+A4:1 E4+G4:1 C4+E4:1 | F4+A4:1 D4+G4:1 C4+E4:1 B3+D4:1 | C4+E4:1 A3+D4:1 A3+C4:2 | B3+D4:1 C4+E4:1 C4+E4:2",
+    "dyadsF": "1 1+4 1+3 | 1+4 1+4 1+4 | 1+3 2+4 1+5 | 2+4 2+4 1+3 1+3 | 2+4 3+5 2+4 1+3 | 3+5 1+4 1+3 1+2 | 1+3 1+3 1+3 | 1+3 1+3 1+3",
+    "tip": "Classic folk-pop anthem tracing the golden C – G – Am – F progression across every chorus phrase.",
+    "lyrics": "Coun- try roads, | take me home, | To the place | I be- _ long, | West Vir- gi- nia, | moun- tain ma- ma, | Take me home, | coun- try roads!"
   },
   {
     "id": "piano-man-waltz",
@@ -968,7 +1031,8 @@
     "lhF": "1 | 2 | 3 | 4 | 2 | 3 | 4 | 5 | 1",
     "dyads": "E4+G4:2 C4+E4:1 | D4+G4:2 B3+D4:1 | C4+E4:2 A3+C4:1 | C4+E4:3 | C4+F4:2 A3+C4:1 | C4+E4:2 G3+C4:1 | A3+D4:1 D4+F#4:1 F#4+A4:1 | B3+G4:1 B3+F4:1 G3+D4:1 | C4+E4:3",
     "dyadsF": "3+5 1+3 | 2+5 1+3 | 2+4 1+3 | 2+4 | 1+4 1+3 | 2+4 1+3 | 1+3 1+3 2+4 | 1+5 1+4 1+2 | 1+3",
-    "tip": "Signature Billy Joel 3/4 walking bassline descending smoothly step-by-step from C3 down to D2 before V–I."
+    "tip": "Signature Billy Joel 3/4 walking bassline descending smoothly step-by-step from C3 down to D2 before V–I.",
+    "lyrics": "[Waltz_C] _ | [Bass_B] _ | [Bass_Am] _ | [Bass_G] | [Bass_F] _ | [Bass_E] _ | [D7_Turn] _ _ | [G7_Walk] _ _ | [Resolve]"
   },
   {
     "id": "over-the-rainbow",
@@ -983,7 +1047,8 @@
     "lhF": "1 3 | 5 3 | 4 | 1 | 4 | 1 3 | 1 5 | 1",
     "dyads": "C4+E4:2 E4+C5:2 | D4+B4:1 D4+G4:0.5 D4+A4:0.5 E4+B4:1 E4+C5:1 | A3+C4:2 F4+A4:2 | C4+G4:4 | F3+A3:2 D4+F4:2 | C4+E4:1 G3+C4:0.5 A3+D4:0.5 B3+E4:1 C4+F4:1 | A3+D4:1 G3+B3:0.5 A3+C4:0.5 G3+D4:1 G3+E4:1 | C4+E4:4",
     "dyadsF": "1+3 1+5 | 1+5 1+4 1+5 1+5 1+5 | 1+3 2+4 | 1+5 | 1+3 2+4 | 2+4 1+3 1+3 1+3 1+4 | 1+3 1+3 1+3 1+4 1+5 | 1+3",
-    "tip": "Harold Arlen's timeless ballad: Practice opening your hand gracefully across the luminous C4–C5 octave leap."
+    "tip": "Harold Arlen's timeless ballad: Practice opening your hand gracefully across the luminous C4–C5 octave leap.",
+    "lyrics": "Some- where | o- ver the rain- bow, | Way up | high, | There's a | land that I heard of | Once in a lul- la- | by."
   },
   {
     "id": "my-bonnie-lies-over-the-ocean",
@@ -992,13 +1057,14 @@
     "category": "Extended Scale",
     "tempo": 126,
     "timeSig": "3/4",
-    "rh": "G4:1 | E5:2 D5:1 | C5:1 D5:1 C5:1 | A4:1 G4:1 E4:1 | G4:2 G4:1 | E5:2 D5:1 | C5:1 D5:1 E5:1 | D5:2 G4:1 | E5:2 D5:1 | C5:1 D5:1 C5:1 | A4:1 G4:1 E4:1 | G4:2 G4:1 | A4:1 D5:1 C5:1 | B4:1 A4:1 B4:1 | C5:3",
-    "rhF": "1 | 5 4 | 3 4 3 | 2 2 1 | 2 1 | 5 4 | 3 4 5 | 4 1 | 5 4 | 3 4 3 | 2 2 1 | 2 2 | 1 4 3 | 3 2 3 | 4",
+    "rh": "G4:1 | E5:2 D5:1 | C5:1 D5:1 C5:1 | A4:1 G4:1 E4:1 | G4:2 G4:1 | E5:2 D5:1 | C5:1 B4:1 C5:1 | D5:2 G4:1 | E5:2 D5:1 | C5:1 D5:1 C5:1 | A4:1 G4:1 E4:1 | G4:2 G4:1 | A4:1 D5:1 C5:1 | B4:1 A4:1 B4:1 | C5:3",
+    "rhF": "1 | 5 4 | 3 4 3 | 2 2 1 | 2 1 | 5 4 | 3 2 3 | 4 1 | 5 4 | 3 4 3 | 2 2 1 | 2 2 | 1 4 3 | 3 2 3 | 4",
     "lh": "-:1 | C3:3 | C3:3 | F2:3 | C3:3 | C3:3 | C3:3 | G2:3 | C3:3 | C3:3 | F2:3 | C3:3 | F2:3 | G2:3 | C3:3",
     "lhF": "- | 5 | 5 | 2 | 5 | 5 | 5 | 1 | 5 | 5 | 2 | 5 | 2 | 1 | 5",
-    "dyads": "G4:1 | C5+E5:2 G4+D5:1 | E4+C5:1 F4+D5:1 E4+C5:1 | C4+A4:1 B3+G4:1 C4+E4:1 | D4+G4:2 D4+G4:1 | C5+E5:2 G4+D5:1 | E4+C5:1 F4+D5:1 G4+E5:1 | G4+D5:2 D4+G4:1 | C5+E5:2 G4+D5:1 | E4+C5:1 F4+D5:1 E4+C5:1 | C4+A4:1 B3+G4:1 C4+E4:1 | D4+G4:2 D4+G4:1 | F4+A4:1 F4+D5:1 E4+C5:1 | D4+B4:1 D4+A4:1 D4+B4:1 | E4+C5:3",
-    "dyadsF": "1 | 2+4 1+4 | 1+5 1+5 1+5 | 1+5 1+5 1+3 | 1+4 1+4 | 2+4 1+4 | 1+5 1+5 1+5 | 1+4 1+4 | 2+4 1+4 | 1+5 1+5 1+5 | 1+5 1+5 1+3 | 1+4 1+4 | 1+3 1+5 1+5 | 1+5 1+4 1+5 | 1+5",
-    "tip": "Trains ear recognition of the uplifting Major 6th interval ('My BON-nie' = G4 up to E5) in brisk waltz time."
+    "dyads": "G4:1 | C5+E5:2 G4+D5:1 | E4+C5:1 F4+D5:1 E4+C5:1 | C4+A4:1 B3+G4:1 C4+E4:1 | D4+G4:2 D4+G4:1 | C5+E5:2 G4+D5:1 | E4+C5:1 G4+B4:1 E4+C5:1 | G4+D5:2 D4+G4:1 | C5+E5:2 G4+D5:1 | E4+C5:1 F4+D5:1 E4+C5:1 | C4+A4:1 B3+G4:1 C4+E4:1 | D4+G4:2 D4+G4:1 | F4+A4:1 F4+D5:1 E4+C5:1 | D4+B4:1 D4+A4:1 D4+B4:1 | E4+C5:3",
+    "dyadsF": "1 | 2+4 1+4 | 1+5 1+5 1+5 | 1+5 1+5 1+3 | 1+4 1+4 | 2+4 1+4 | 1+5 1+3 1+5 | 1+4 1+4 | 2+4 1+4 | 1+5 1+5 1+5 | 1+5 1+5 1+3 | 1+4 1+4 | 1+3 1+5 1+5 | 1+5 1+4 1+5 | 1+5",
+    "tip": "Trains ear recognition of the uplifting Major 6th interval ('My BON-nie' = G4 up to E5) in brisk waltz time.",
+    "lyrics": "My | Bon- nie | lies o- ver | the o- cean, | My Bon- | nie lies | o- ver the | sea. My | Bon- nie | lies o- ver | the o- cean, | Oh bring | back my Bon- | nie to me, | home!"
   },
   {
     "id": "danny-boy",
@@ -1007,13 +1073,14 @@
     "category": "Extended Scale",
     "tempo": 68,
     "timeSig": "4/4",
-    "rh": "B3:0.5 C4:0.5 D4:0.5 | E4:1.5 D4:0.5 E4:1 A4:1 | G4:1 E4:0.5 D4:0.5 C4:2 | A4:0.5 C5:0.5 D5:1.5 C5:0.5 A4:1 | G4:1 E4:0.5 C4:0.5 D4:2 | E4:1.5 D4:0.5 E4:1 A4:1 | G4:1 E4:0.5 D4:0.5 C4:2 | D4:1 E4:1 F4:1 D4:1 | C4:4",
-    "rhF": "1 2 3 | 4 3 4 5 | 4 3 2 1 | 2 3 4 3 2 | 4 3 1 2 | 4 3 4 5 | 4 3 2 1 | 2 3 4 2 | 1",
-    "lh": "-:1.5 | C3:4 | F2:4 | F2:2 C3:2 | G2:4 | C3:4 | F2:4 | G2:4 | C3:4",
-    "lhF": "- | 5 | 2 | 2 5 | 1 | 5 | 2 | 1 | 5",
-    "dyads": "B3:0.5 C4:0.5 D4:0.5 | C4+E4:1.5 B3+D4:0.5 C4+E4:1 C4+A4:1 | B3+G4:1 C4+E4:0.5 B3+D4:0.5 A3+C4:2 | F4+A4:0.5 G4+C5:0.5 F4+D5:1.5 E4+C5:0.5 C4+A4:1 | B3+G4:1 C4+E4:0.5 A3+C4:0.5 G3+D4:2 | C4+E4:1.5 B3+D4:0.5 C4+E4:1 C4+A4:1 | B3+G4:1 C4+E4:0.5 B3+D4:0.5 A3+C4:2 | A3+D4:1 G3+E4:1 A3+F4:1 G3+D4:1 | G3+C4:4",
-    "dyadsF": "1 2 3 | 1+3 1+3 1+3 1+5 | 1+5 1+3 1+3 1+3 | 1+3 1+4 1+5 1+5 1+5 | 1+5 1+3 1+3 1+4 | 1+3 1+3 1+3 1+5 | 1+5 1+3 1+3 1+3 | 1+3 1+5 1+5 1+4 | 1+4",
-    "tip": "Lush Irish cantabile ballad: Sustain the melody smoothly with finger substitution and expressive breath."
+    "rh": "B3:0.5 C4:0.5 D4:0.5 | E4:1.5 D4:0.5 E4:1 A4:1 | G4:1 E4:0.5 D4:0.5 C4:1 A3:1 | G4:1.5 A4:0.5 G4:1 E4:1 | C4:1 E4:0.5 C4:0.5 D4:2 | E4:1.5 D4:0.5 E4:1 A4:1 | G4:1 E4:0.5 D4:0.5 C4:2 | D4:1 E4:1 F4:1 D4:1 | C4:4",
+    "rhF": "1 2 3 | 4 3 4 5 | 4 3 2 1 1 | 3 4 3 2 | 1 3 1 2 | 4 3 4 5 | 4 3 2 1 | 2 3 4 2 | 1",
+    "lh": "-:1.5 | C3:4 | F2:4 | C3:4 | G2:4 | C3:4 | F2:4 | G2:4 | C3:4",
+    "lhF": "- | 5 | 2 | 5 | 1 | 5 | 2 | 1 | 5",
+    "dyads": "B3:0.5 C4:0.5 D4:0.5 | C4+E4:1.5 B3+D4:0.5 C4+E4:1 C4+A4:1 | B3+G4:1 C4+E4:0.5 B3+D4:0.5 A3+C4:1 F3+A3:1 | E4+G4:1.5 F4+A4:0.5 E4+G4:1 C4+E4:1 | G3+C4:1 C4+E4:0.5 G3+C4:0.5 B3+D4:2 | C4+E4:1.5 B3+D4:0.5 C4+E4:1 C4+A4:1 | B3+G4:1 C4+E4:0.5 B3+D4:0.5 A3+C4:2 | A3+D4:1 G3+E4:1 A3+F4:1 G3+D4:1 | G3+C4:4",
+    "dyadsF": "1 2 3 | 1+3 1+3 1+3 1+5 | 1+5 1+3 1+3 1+3 1+3 | 2+4 3+5 2+4 1+3 | 1+4 1+3 1+4 1+3 | 1+3 1+3 1+3 1+5 | 1+5 1+3 1+3 1+3 | 1+3 1+5 1+5 1+4 | 1+4",
+    "tip": "Lush Irish cantabile ballad: Sustain the melody smoothly with finger substitution and expressive breath.",
+    "lyrics": "Oh, Dan- ny | Boy, the pipes, the | pipes are call- ing, _ | From glen to glen, | down the moun- tain | The sum- mer's gone, | all the ro- ses | fall- ing, 'tis you | go."
   },
   {
     "id": "maple-leaf-rag",
@@ -1028,7 +1095,8 @@
     "lhF": "1 5 1 5 | 1 5 1 5 | 3 1 3 1 | 1 5 1",
     "dyads": "-:0.5 G4:0.5 C5+E5:0.5 G4:0.5 G4+C5:0.5 G4:0.5 C5+D#5:0.5 C5+E5:0.5 | -:0.5 G4:0.5 C5+E5:0.5 G4:0.5 G4+C5:0.5 G4:0.5 C5+D#5:0.5 C5+E5:0.5 | -:0.5 G4:0.5 Eb4+Ab4:0.5 Ab4+C5:0.5 C5+Eb5:0.5 Eb5+G5:0.5 Eb5+Ab5:0.5 G5+C6:0.5 | E5+G5:1 C5+E5:1 G4+C5:2",
     "dyadsF": "- 1 2+4 1 1+3 1 2+4 2+5 | - 1 2+4 1 1+3 1 2+4 2+5 | - 1 1+4 1+3 1+3 1+3 1+4 2+5 | 3+5 2+4 1+4",
-    "tip": "Scott Joplin's classic stride ragtime hook reaching cleanly up to High C6 with flat-6 Ab color."
+    "tip": "Scott Joplin's classic stride ragtime hook reaching cleanly up to High C6 with flat-6 Ab color.",
+    "lyrics": "_ [Stride_1] _ _ _ _ _ _ | _ [Stride_2] _ _ _ _ _ _ | _ [Ab_Color] _ _ _ _ _ _ | [Cadence] _ _"
   },
   {
     "id": "house-of-the-rising-sun",
@@ -1037,13 +1105,14 @@
     "category": "Minor / Modal",
     "tempo": 108,
     "timeSig": "6/8",
-    "rh": "E4:0.5 | A4:1 A4:0.5 A4:1 B4:0.5 | C5:1.5 G4:1 C5:0.5 | D5:1.5 A4:1 D5:0.5 | F5:3 | E5:1 E5:0.5 E5:1 C5:0.5 | E5:1.5 C5:1 A4:0.5 | B4:2 G#4:1 | A4:3",
-    "rhF": "1 | 2 2 2 3 | 4 1 4 | 5 2 5 | 5 | 4 4 4 2 | 4 2 1 | 3 2 | 2",
+    "rh": "E4:0.5 | A4:1 A4:0.5 B4:1 C5:0.5 | E5:1.5 D5:1 C5:0.5 | D5:1.5 A4:1.5 | F5:1.5 -:1 E5:0.5 | E5:1 E5:0.5 E5:1 D5:0.5 | C5:1.5 A4:1 C5:0.5 | B4:1.5 E4:1.5 | A4:3",
+    "rhF": "1 | 2 2 3 4 | 5 4 3 | 4 1 | 5 - 4 | 4 4 4 3 | 3 1 3 | 2 1 | 2",
     "lh": "-:0.5 | A2:1.5 E3:1.5 | C3:1.5 G3:1.5 | D3:1.5 A3:1.5 | F2:1.5 C3:1.5 | A2:1.5 E3:1.5 | C3:1.5 G3:1.5 | E2:1.5 E3:1.5 | A2:3",
     "lhF": "- | 5 1 | 5 1 | 5 1 | 5 1 | 5 1 | 5 1 | 5 1 | 5",
-    "dyads": "E4:0.5 | E4+A4:1 E4+A4:0.5 E4+A4:1 G4+B4:0.5 | G4+C5:1.5 E4+G4:1 G4+C5:0.5 | A4+D5:1.5 F#4+A4:1 A4+D5:0.5 | C5+F5:3 | C5+E5:1 C5+E5:0.5 C5+E5:1 A4+C5:0.5 | C5+E5:1.5 G4+C5:1 E4+A4:0.5 | G#4+B4:2 E4+G#4:1 | E4+A4:3",
-    "dyadsF": "1 | 1+4 1+4 1+4 2+4 | 2+5 1+3 2+5 | 1+4 1+3 1+4 | 2+5 | 2+5 2+5 2+5 1+3 | 2+5 1+4 1+4 | 2+4 1+3 | 1+4",
-    "tip": "Iconic 6/8 A-Minor progression (Am – C – D – F | Am – C – E – Am) with rolling arpeggio feel."
+    "dyads": "E4:0.5 | E4+A4:1 E4+A4:0.5 G4+B4:1 G4+C5:0.5 | C5+E5:1.5 B4+D5:1 G4+C5:0.5 | A4+D5:1.5 F#4+A4:1.5 | C5+F5:1.5 -:1 C5+E5:0.5 | C5+E5:1 C5+E5:0.5 C5+E5:1 B4+D5:0.5 | G4+C5:1.5 E4+A4:1 G4+C5:0.5 | G#4+B4:1.5 B3+E4:1.5 | E4+A4:3",
+    "dyadsF": "1 | 1+4 1+4 2+4 2+5 | 2+5 1+4 1+4 | 1+4 1+3 | 2+5 - 2+5 | 2+5 2+5 2+5 1+4 | 1+4 1+4 1+4 | 2+4 1+4 | 1+4",
+    "tip": "Iconic 6/8 A-Minor progression (Am – C – D – F | Am – C – E – Am) with rolling arpeggio feel.",
+    "lyrics": "There | is a house in | New Or- leans, | They call | the _ Sun, | And it's been the | ru- in of | poor _ | boy."
   },
   {
     "id": "hall-of-the-mountain-king",
@@ -1058,7 +1127,8 @@
     "lhF": "5 1 5 1 | 5 1 5 1 | 5 1 5 1 | 1 5 1 | 5 1 5 1 | 5 1 5 1 | 5 1 5 2 | 5 2",
     "dyads": "A3+C4:0.5 B3+D4:0.5 C4+E4:0.5 D4+F4:0.5 E4+G#4:0.5 C4+E4:0.5 C4+E4:1 | B3+D#4:0.5 G#3+B3:0.5 B3+D#4:1 Bb3+D4:0.5 G3+Bb3:0.5 Bb3+D4:1 | A3+C4:0.5 B3+D4:0.5 C4+E4:0.5 D4+F4:0.5 E4+G#4:0.5 C4+E4:0.5 C4+E4:0.5 E4+A4:0.5 | E4+G4:0.5 C4+E4:0.5 G3+C4:0.5 C4+E4:0.5 E4+G4:2 | A3+C4:0.5 B3+D4:0.5 C4+E4:0.5 D4+F4:0.5 E4+G#4:0.5 C4+E4:0.5 C4+E4:1 | B3+D#4:0.5 G#3+B3:0.5 B3+D#4:1 Bb3+D4:0.5 G3+Bb3:0.5 Bb3+D4:1 | A3+C4:0.5 B3+D4:0.5 C4+E4:0.5 D4+F4:0.5 E4+G#4:0.5 C4+E4:0.5 C4+E4:0.5 F4+A4:0.5 | E4+G4:0.5 C4+E4:0.5 G#3+B3:0.5 E3+G#3:0.5 E3+A3:2",
     "dyadsF": "1+3 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 1+3 1+4 | 1+3 1+3 1+4 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+4",
-    "tip": "Edvard Grieg's menacing troll march in A minor: Keep fingers clipped like pizzicato strings as the motif loops."
+    "tip": "Edvard Grieg's menacing troll march in A minor: Keep fingers clipped like pizzicato strings as the motif loops.",
+    "lyrics": "[Sneak_A] _ _ _ _ _ _ | [Chromatic] _ _ _ _ _ | [Climb_A] _ _ _ _ _ _ _ | [Pause_C] _ _ _ _ | [Sneak_A'] _ _ _ _ _ _ | [Chromatic] _ _ _ _ _ | [Climb_2] _ _ _ _ _ _ _ | [Cadence] _ _ _ _"
   },
   {
     "id": "imperial-march",
@@ -1073,7 +1143,8 @@
     "lhF": "3 3 3 5 1 | 3 1 | 3 3 3 5 1 | 5 3 | 3 3 | 1 2 | 1 5 | 5 3",
     "dyads": "D4+G4:1 D4+G4:1 D4+G4:1 Bb3+Eb4:0.75 G4+Bb4:0.25 | D4+G4:1 Bb3+Eb4:0.75 G4+Bb4:0.25 D4+G4:2 | A4+D5:1 A4+D5:1 A4+D5:1 G4+Eb5:0.75 D4+Bb4:0.25 | D4+F#4:1 Bb3+Eb4:0.75 G4+Bb4:0.25 D4+G4:2 | Bb4+G5:1 Bb3+G4:0.75 Bb3+G4:0.25 Bb4+G5:1 A4+F#5:0.75 Ab4+F5:0.25 | G4+E5:0.25 G4+Eb5:0.25 G4+E5:0.5 -:0.5 Eb4+Ab4:0.5 A4+C#5:1 Ab4+C5:0.75 G4+B4:0.25 | G4+Bb4:0.25 F4+A4:0.25 G4+Bb4:0.5 -:0.5 Bb3+Eb4:0.5 C4+F#4:1 Bb3+Eb4:0.75 G4+Bb4:0.25 | D4+G4:1 Bb3+Eb4:0.75 G4+Bb4:0.25 D4+G4:2",
     "dyadsF": "1+4 1+4 1+4 1+4 1+3 | 1+4 1+4 1+3 1+4 | 1+4 1+4 1+4 1+5 1+5 | 1+3 1+4 1+3 1+4 | 1+5 1+5 1+5 1+5 1+5 1+5 | 1+5 1+5 1+5 - 1+4 1+3 1+3 1+3 | 1+3 1+3 1+3 - 1+4 1+4 1+4 1+3 | 1+4 1+4 1+3 1+4",
-    "tip": "John Williams' menacing G minor ostinato: Snap crisp dotted-eighth + 16th-note rhythms onto E♭ and B♭!"
+    "tip": "John Williams' menacing G minor ostinato: Snap crisp dotted-eighth + 16th-note rhythms onto E♭ and B♭!",
+    "lyrics": "[March_1] _ _ _ _ | [Motif_A] _ _ _ | [High_D] _ _ _ _ | [Motif_B] _ _ _ | [Octave_G] _ _ _ _ _ | [Chromatic_1] _ _ _ _ _ _ _ | [Chromatic_2] _ _ _ _ _ _ _ | [Finale] _ _ _"
   },
   {
     "id": "autumn-leaves-jazz",
@@ -1082,13 +1153,14 @@
     "category": "Minor / Modal",
     "tempo": 112,
     "timeSig": "4/4",
-    "rh": "-:1 A3:1 B3:1 C4:1 | F4:4 | -:1 G3:1 A3:1 B3:1 | E4:4 | -:1 F3:1 G3:1 A3:1 | D4:4 | -:1 G#3:1 A3:1 B3:1 | A3:4",
-    "rhF": "- 1 2 3 | 5 | - 1 2 3 | 5 | - 1 2 3 | 5 | - 1 2 3 | 2",
-    "lh": "D3:4 | G2:4 | C3:4 | F2:4 | B2:4 | E2:4 | A2:4 | A2:4",
-    "lhF": "1 | 5 | 2 | 5 | 3 | 5 | 4 | 4",
-    "dyads": "-:1 A3:1 B3:1 C4:1 | C4+F4:4 | -:1 G3:1 A3:1 B3:1 | B3+E4:4 | -:1 F3:1 G3:1 A3:1 | A3+D4:4 | -:1 G#3:1 A3:1 B3:1 | C4+A4:4",
-    "dyadsF": "- 1 2 3 | 1+4 | - 1 2 3 | 1+4 | - 1 2 3 | 1+4 | - 1 2 3 | 1+5",
-    "tip": "Essential jazz ii–V–I–IV–viiø–V–i progression: Lean into the warm sustained seventh chord guide tones."
+    "rh": "-:1 A3:1 B3:1 C4:1 | F4:4 | -:1 G3:1 A3:1 B3:1 | E4:4 | -:1 F3:1 G3:1 A3:1 | D4:4 | -:1 E3:1 G#3:1 B3:1 | C4:4",
+    "rhF": "- 1 2 3 | 5 | - 1 2 3 | 5 | - 1 2 3 | 5 | - 1 2 4 | 5",
+    "lh": "D3:4 | G2:4 | C3:4 | F2:4 | B2:4 | E2:4 | E2:4 | A2:4",
+    "lhF": "1 | 5 | 2 | 5 | 3 | 5 | 5 | 4",
+    "dyads": "-:1 A3:1 B3:1 C4:1 | C4+F4:4 | -:1 G3:1 A3:1 B3:1 | B3+E4:4 | -:1 F3:1 G3:1 A3:1 | A3+D4:4 | -:1 E3:1 G#3:1 B3:1 | A3+C4:4",
+    "dyadsF": "- 1 2 3 | 1+4 | - 1 2 3 | 1+4 | - 1 2 3 | 1+4 | - 1 2 4 | 1+3",
+    "tip": "Essential jazz ii–V–I–IV–viiø–V–i progression: Lean into the warm sustained seventh chord guide tones.",
+    "lyrics": "_ The fal- ling | leaves | _ drift by the | win-dow, | _ The au- tumn | leaves | _ of red and | gold."
   },
   {
     "id": "c-minor-blues-riff",
@@ -1103,7 +1175,8 @@
     "lhF": "5 2 1 2 | 5 2 1 2 | 5 2 1 2 | 5 2 1 2 | 5 1 | 5 1 | 5 1 2 1 | 5",
     "dyads": "C4+Eb4:1.5 Eb4+G4:0.5 F4+Ab4:1 G4+Bb4:1 | G4+Bb4:1 Eb4+G4:1 F4+Ab4:0.5 Eb4+G4:0.5 C4+Eb4:1 | F4+Ab4:1.5 Ab4+C5:0.5 Bb4+Db5:1 C5+Eb5:1 | C5+Eb5:1.5 G4+Bb4:0.5 Eb4+G4:1 D4+F4:1 | D4+G4:1 C4+F#4:0.5 D4+F4:0.5 Bb3+Eb4:1 G3+C4:1 | C4+F4:1 Bb3+Eb4:1 G3+D4:1 F3+G3:1 | C4+Eb4:1 Eb4+G4:1 F4+Ab4:0.5 C4+F#4:0.5 G4+Bb4:1 | Bb3+Eb4:1 G3+C4:3",
     "dyadsF": "1+3 2+4 2+4 3+5 | 3+5 2+4 2+4 2+4 1+3 | 1+3 2+4 3+5 3+5 | 3+5 2+4 1+3 1+3 | 1+4 1+4 1+4 1+3 1+4 | 1+4 1+3 1+5 1+2 | 1+3 2+4 2+4 1+4 3+5 | 1+4 1+4",
-    "tip": "Gritty C minor blues shuffle showcasing the F# chromatic blue note slipping smoothly between F and G."
+    "tip": "Gritty C minor blues shuffle showcasing the F# chromatic blue note slipping smoothly between F and G.",
+    "lyrics": "[Blues_I] _ _ _ | [Riff_1] _ _ _ _ | [Blues_IV] _ _ _ | [Riff_2] _ _ _ | [Turn_V] _ _ _ _ | [Walk_IV] _ _ _ | [Blue_Note] _ _ _ _ | [Resolve] _"
   },
   {
     "id": "prelude-in-c-bach",
@@ -1118,7 +1191,8 @@
     "lhF": "5 2 | 5 3 | 5 2 | 5 2 | 5 2 | 5 3 | 5 2 | 5",
     "dyads": "C4+E4:0.5 E4+G4:0.5 G4+C5:0.5 C5+E5:0.5 E5:0.5 G4+C5:0.5 C5+E5:0.5 E5:0.5 | C4+D4:0.5 D4+A4:0.5 A4+D5:0.5 D5+F5:0.5 F5:0.5 A4+D5:0.5 D5+F5:0.5 F5:0.5 | B3+D4:0.5 D4+G4:0.5 G4+D5:0.5 D5+F5:0.5 F5:0.5 G4+D5:0.5 D5+F5:0.5 F5:0.5 | C4+E4:0.5 E4+G4:0.5 G4+C5:0.5 C5+E5:0.5 E5:0.5 G4+C5:0.5 C5+E5:0.5 E5:0.5 | C4+E4:0.5 E4+A4:0.5 A4+E5:0.5 E5+A5:0.5 A5:0.5 A4+E5:0.5 E5+A5:0.5 A5:0.5 | C4+D4:0.5 D4+F#4:0.5 F#4+A4:0.5 A4+D5:0.5 D5:0.5 F#4+A4:0.5 A4+D5:0.5 D5:0.5 | B3+D4:0.5 D4+G4:0.5 G4+B4:0.5 B4+D5:0.5 D5:0.5 G4+B4:0.5 B4+D5:0.5 D5:0.5 | C4+E4:0.5 E4+G4:0.5 G4+C5:0.5 C5+E5:0.5 C5+E5:2",
     "dyadsF": "1+3 1+3 1+4 1+3 5 1+4 1+3 5 | 1+2 1+4 1+4 1+3 5 1+4 1+3 5 | 1+3 1+4 1+5 1+3 5 1+4 1+3 5 | 1+3 1+3 1+4 1+3 5 1+4 1+3 5 | 1+3 1+4 1+5 1+4 5 1+5 1+4 5 | 1+2 1+3 1+3 1+4 5 1+3 1+4 5 | 1+3 1+4 1+3 1+3 5 1+3 1+3 5 | 1+3 1+3 1+4 1+3 1+3",
-    "tip": "J.S. Bach's crystalline Well-Tempered Clavier prelude: Trace each four-bar harmonic progression evenly without rushing."
+    "tip": "J.S. Bach's crystalline Well-Tempered Clavier prelude: Trace each four-bar harmonic progression evenly without rushing.",
+    "lyrics": "[C_Maj] _ _ _ _ _ _ _ | [Dm7/C] _ _ _ _ _ _ _ | [G7/B] _ _ _ _ _ _ _ | [C_Maj] _ _ _ _ _ _ _ | [Am/C] _ _ _ _ _ _ _ | [D7/C] _ _ _ _ _ _ _ | [G/B] _ _ _ _ _ _ _ | [Resolve] _ _ _ _"
   },
   {
     "id": "moonlight-sonata-mvt1",
@@ -1133,7 +1207,8 @@
     "lhF": "5 | 2 | 3 5 | 4 | 5 | 4 | 5",
     "dyads": "G#3:0.33 C#4:0.33 G#3+E4:0.34 G#3:0.33 C#4:0.33 G#3+E4:0.34 G#3:0.33 C#4:0.33 G#3+E4:0.34 G#3:0.33 C#4:0.33 G#3+E4:0.34 | G#3:0.33 C#4:0.33 G#3+E4:0.34 G#3:0.33 C#4:0.33 G#3+E4:0.34 G#3:0.33 C#4:0.33 G#3+E4:0.34 G#3:0.33 C#4:0.33 G#3+E4:0.34 | A3:0.33 C#4:0.33 A3+E4:0.34 A3:0.33 C#4:0.33 A3+E4:0.34 A3:0.33 D4:0.33 A3+F#4:0.34 A3:0.33 D4:0.33 A3+F#4:0.34 | G#3:0.33 C#4:0.33 G#3+E4:0.34 G#3:0.33 C#4:0.33 G#3+D#4:0.34 F#3:0.33 C4:0.33 F#3+D#4:0.34 G#3:0.33 C4:0.33 G#3+D#4:0.34 | C#4+E4:2 -:1 C#4+G#4:0.75 C#4+G#4:0.25 | D#4+G#4:1.5 D#4+G#4:0.5 C#4+A4:1.5 C4+F#4:0.5 | C#4+E4:4",
     "dyadsF": "1 2 1+4 1 2 1+4 1 2 1+4 1 2 1+4 | 1 2 1+4 1 2 1+4 1 2 1+4 1 2 1+4 | 1 2 1+4 1 2 1+4 1 2 1+4 1 2 1+4 | 1 2 1+4 1 2 1+4 1 3 1+5 1 3 1+5 | 1+3 - 1+5 1+5 | 1+4 1+4 1+5 1+4 | 1+3",
-    "tip": "Beethoven's Adagio sostenuto in C# Minor (4 sharps): Whisper the triplet arpeggios seamlessly beneath the haunting G#4 cantabile."
+    "tip": "Beethoven's Adagio sostenuto in C# Minor (4 sharps): Whisper the triplet arpeggios seamlessly beneath the haunting G#4 cantabile.",
+    "lyrics": "[Triplets_1] _ _ _ _ _ _ _ _ _ _ _ | [Bass_B] _ _ _ _ _ _ _ _ _ _ _ | [A_to_F#m] _ _ _ _ _ _ _ _ _ _ _ | [G#7_Turn] _ _ _ _ _ _ _ _ _ _ _ | [Theme_Enters] _ _ _ | [Cantabile] _ _ _ | [Resolve]"
   },
   {
     "id": "turkish-march-mozart",
@@ -1148,7 +1223,8 @@
     "lhF": "- | 5 2 3 2 | 5 2 4 2 | 5 2 5 2 | 5 2 1 3 | 3 1 3 5 | 4 1 2 | 5 2",
     "dyads": "B4:0.5 A4:0.5 | G#4:0.5 A4:0.5 A4+C5:1 -:1 B4+D5:0.5 A4+C5:0.5 | G#4+B4:0.5 A4+C5:0.5 C5+E5:1 -:1 D5+F5:0.5 C5+E5:0.5 | B4+D#5:0.5 C5+E5:0.5 G#5+B5:0.5 F#5+A5:0.5 E5+G#5:0.5 F#5+A5:0.5 G#5+B5:0.5 F#5+A5:0.5 | E5+G#5:0.5 F#5+A5:0.5 A5+C6:1 E5+A5:0.5 A5+C6:0.5 E5+G5:0.5 F#5+A5:0.5 | G5+B5:0.5 F#5+A5:0.5 E5+G5:0.5 F#5+A5:0.5 A5+C6:1 E5+G5:0.5 F#5+A5:0.5 | G5+B5:0.5 F#5+A5:0.5 E5+G5:0.5 D#5+F#5:0.5 B4+E5:2 | C5+E5:1 G#4+B4:0.5 A4+C5:0.5 C4+A4:2",
     "dyadsF": "3 2 | 1 2 1+3 - 2+4 1+3 | 1+3 1+3 1+3 - 2+4 1+3 | 1+3 1+3 3+5 2+4 1+3 2+4 3+5 2+4 | 1+3 2+4 3+5 1+4 3+5 1+3 2+4 | 3+5 2+4 1+3 2+4 3+5 1+3 2+4 | 3+5 2+4 1+3 1+3 1+4 | 1+3 1+3 1+3 1+5",
-    "tip": "Mozart's dazzling K. 331 finale: Flick finger-wrist grace strokes crisply across all turns up to C6."
+    "tip": "Mozart's dazzling K. 331 finale: Flick finger-wrist grace strokes crisply across all turns up to C6.",
+    "lyrics": "[Pickup] _ | [Theme_A] _ _ _ _ _ | [Sequence] _ _ _ _ _ | [Run_Up] _ _ _ _ _ _ _ | [High_C6] _ _ _ _ _ _ | [Turn] _ _ _ _ _ _ | [Half_Cad] _ _ _ _ | [Resolve] _ _ _"
   },
   {
     "id": "clair-de-lune-debussy",
@@ -1157,13 +1233,14 @@
     "category": "Classical Mastery",
     "tempo": 64,
     "timeSig": "3/4",
-    "rh": "-:1 F5:1 Db5:1 | Bb4:1.5 Ab4:0.5 Bb4:0.5 Ab4:0.5~ | Ab4:1 Gb4:1 Ab4:0.5 Gb4:0.5~ | Gb4:1 F4:1 Gb4:0.5 F4:0.5~ | F4:1 Eb4:1 Db4:1 | Eb4:2 F4:1 | Gb4:1.5 F4:0.5 Eb4:1 | Db4:3",
-    "rhF": "- 5 4 | 3 2 3 2 | 2 1 2 1 | 2 1 2 1 | 3 2 1 | 2 3 | 4 3 2 | 1",
+    "rh": "-:1 F5:1 Db5:1 | Bb4:1.5 Db5:0.5 Bb4:0.5 Ab4:0.5~ | Ab4:1 Bb4:1 Ab4:0.5 Gb4:0.5~ | Gb4:1 Ab4:1 Gb4:0.5 F4:0.5~ | F4:1 Gb4:1 F4:1 | Eb4:2 F4:1 | Gb4:1.5 F4:0.5 Eb4:1 | Db4:3",
+    "rhF": "- 5 4 | 2 4 2 1 | 2 3 2 1 | 2 3 2 1 | 2 3 2 | 2 3 | 4 3 2 | 1",
     "lh": "Db2+Ab2:3 | F3+Ab3:3 | Gb2+Db3:3 | F3+Ab3:3 | Gb2+Eb3:3 | Ab2+Eb3:3 | Ab2+Eb3:3 | Db2+Ab2:3",
     "lhF": "5+1 | 2+1 | 5+1 | 2+1 | 5+1 | 5+1 | 5+1 | 5+1",
-    "dyads": "-:1 Db5+F5:1 Ab4+Db5:1 | F4+Bb4:1.5 F4+Ab4:0.5 F4+Bb4:0.5 F4+Ab4:0.5~ | F4+Ab4:1 Eb4+Gb4:1 F4+Ab4:0.5 Eb4+Gb4:0.5~ | Eb4+Gb4:1 Db4+F4:1 Eb4+Gb4:0.5 Db4+F4:0.5~ | Db4+F4:1 Bb3+Eb4:1 Ab3+Db4:1 | Bb3+Eb4:2 Db4+F4:1 | C4+Gb4:1.5 Db4+F4:0.5 C4+Eb4:1 | F3+Db4:3",
-    "dyadsF": "- 2+5 1+4 | 1+4 1+3 1+4 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+4 1+4 | 1+4 1+3 | 1+5 1+3 1+3 | 1+5",
-    "tip": "Claude Debussy's luminous Impressionist nocturne in D♭ Major (5 flats): Hold tied voices silkily beneath shifting thirds."
+    "dyads": "-:1 Db5+F5:1 Ab4+Db5:1 | F4+Bb4:1.5 Ab4+Db5:0.5 F4+Bb4:0.5 F4+Ab4:0.5~ | F4+Ab4:1 F4+Bb4:1 F4+Ab4:0.5 Eb4+Gb4:0.5~ | Eb4+Gb4:1 F4+Ab4:1 Eb4+Gb4:0.5 Db4+F4:0.5~ | Db4+F4:1 Eb4+Gb4:1 Db4+F4:1 | Bb3+Eb4:2 Db4+F4:1 | C4+Gb4:1.5 Db4+F4:0.5 C4+Eb4:1 | F3+Db4:3",
+    "dyadsF": "- 2+5 1+4 | 1+4 2+5 1+4 1+3 | 1+3 1+4 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 | 1+4 1+3 | 1+5 1+3 1+3 | 1+5",
+    "tip": "Claude Debussy's luminous Impressionist nocturne in D♭ Major (5 flats): Hold tied voices silkily beneath shifting thirds.",
+    "lyrics": "_ [Opening] _ | [Sigh_1] _ _ _ | [Sigh_2] _ _ _ | [Sigh_3] _ _ _ | [Warmth] _ _ | [Float] _ | [Turn] _ _ | [Db_Rest]"
   },
   {
     "id": "spring-vivaldi",
@@ -1178,7 +1255,8 @@
     "lhF": "- | 1 | 1 | 1 | 1 5 | 5 4 | 1",
     "dyads": "E4:1 | E4+G#4:1 E4+G#4:1 E4+G#4:1 D#4+F#4:0.5 B3+E4:0.5 | G#4+B4:2~ G#4+B4:1 F#4+A4:0.5 E4+G#4:0.5 | E4+G#4:1 E4+G#4:1 E4+G#4:1 D#4+F#4:0.5 B3+E4:0.5 | G#4+B4:2~ G#4+B4:1 F#4+A4:0.5 E4+G#4:0.5 | E4+A4:1 G#4+B4:0.5 F#4+A4:0.5 E4+G#4:1 B3+F#4:1 | B3+E4:4",
     "dyadsF": "1 | 1+3 1+3 1+3 1+3 1+4 | 1+3 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 1+4 | 1+3 1+3 1+3 1+3 | 1+4 1+3 1+3 1+3 1+4 | 1+4",
-    "tip": "Antonio Vivaldi's radiant E Major Baroque concerto (4 sharps): Drive each repeated G# note cleanly toward B4."
+    "tip": "Antonio Vivaldi's radiant E Major Baroque concerto (4 sharps): Drive each repeated G# note cleanly toward B4.",
+    "lyrics": "[Pickup] | [Birds_1] _ _ _ _ | [Sustain_B] _ _ _ | [Birds_2] _ _ _ _ | [Sustain_B] _ _ _ | [Cadence] _ _ _ _ | [Resolve]"
   },
   {
     "id": "nocturne-op9-no2",
@@ -1193,7 +1271,8 @@
     "lhF": "- | 5 4+1 | 5 4+1 | 5 4+1 | 5 4+1 | 5 4+1 | 5",
     "dyads": "Bb4:0.5 | Bb4+G5:1.5~ Bb4+G5:0.5 Bb4+F5:0.5 Bb4+G5:0.5 | G4+F5:1.5 G4+Eb5:1 G4+Bb4:0.5 | C5+G5:1 Ab4+C5:1.5 C5+Ab5:0.5 | Bb4+G5:1.5~ Bb4+G5:0.5 Bb4+F5:0.5 G4+Eb5:0.5 | F4+D5:1 G4+Eb5:1 Ab4+F5:0.5 F4+D5:0.5 | G4+Eb5:3",
     "dyadsF": "1 | 1+5 1+5 1+4 1+5 | 1+5 1+4 1+3 | 1+5 1+3 1+5 | 1+5 1+5 1+4 1+5 | 1+5 1+5 1+5 1+5 | 1+5",
-    "tip": "Chopin's beloved E♭ Major nocturne: Sing the bel canto soprano line over gently rolling left-hand chords."
+    "tip": "Chopin's beloved E♭ Major nocturne: Sing the bel canto soprano line over gently rolling left-hand chords.",
+    "lyrics": "[Pickup] | [Bel_Canto] _ _ _ | [Sigh] _ _ | [Soar_Ab5] _ _ | [Float] _ _ _ | [Turn] _ _ _ | [Eb_Rest]"
   },
   {
     "id": "swan-lake-theme",
@@ -1202,13 +1281,14 @@
     "category": "Classical Mastery",
     "tempo": 88,
     "timeSig": "4/4",
-    "rh": "E5:2 A4:0.5 B4:0.5 C5:0.5 D5:0.5 | E5:1.5 C5:0.5 E5:1.5 C5:0.5 | E5:1.5 A4:0.5 C5:1 A4:0.5 F4:0.5 | D4:1.5 E4:0.5 C4:1 B3:1 | A4:1 B4:1 C5:1 D5:1 | E5:1.5 C5:0.5 E5:1.5 C5:0.5 | E5:1.5 B4:0.5 D5:1 G#4:1 | A4:4",
-    "rhF": "5 1 2 3 4 | 5 3 5 3 | 5 1 3 1 1 | 1 2 1 1 | 1 2 3 4 | 5 3 5 3 | 5 2 4 1 | 2",
-    "lh": "A2:2 E3:2 | A2:2 F3:2 | A2:2 D3:2 | G2:2 E2:2 | A2:2 D3:2 | C3:2 F3:2 | E2:2 B2:2 | A2:4",
+    "rh": "E5:2 A4:0.5 B4:0.5 C5:0.5 D5:0.5 | E5:1.5 C5:0.5 E5:1.5 C5:0.5 | E5:1.5 A4:0.5 C5:1 A4:0.5 F4:0.5 | C5:2 A4:2 | A4:1 B4:1 C5:1 D5:1 | E5:1.5 C5:0.5 E5:1.5 C5:0.5 | E5:1.5 B4:0.5 D5:1 G#4:1 | A4:4",
+    "rhF": "5 1 2 3 4 | 5 3 5 3 | 5 1 3 1 1 | 4 2 | 1 2 3 4 | 5 3 5 3 | 5 2 4 1 | 2",
+    "lh": "A2:2 E3:2 | A2:2 F3:2 | A2:2 D3:2 | F2:2 E2:2 | A2:2 D3:2 | C3:2 F3:2 | E2:2 B2:2 | A2:4",
     "lhF": "5 1 | 5 1 | 5 2 | 4 5 | 5 2 | 3 1 | 5 1 | 5",
-    "dyads": "C5+E5:2 E4+A4:0.5 G4+B4:0.5 A4+C5:0.5 B4+D5:0.5 | C5+E5:1.5 A4+C5:0.5 C5+E5:1.5 A4+C5:0.5 | C5+E5:1.5 E4+A4:0.5 A4+C5:1 F4+A4:0.5 D4+F4:0.5 | B3+D4:1.5 C4+E4:0.5 A3+C4:1 G#3+B3:1 | C4+A4:1 D4+B4:1 E4+C5:1 F4+D5:1 | C5+E5:1.5 A4+C5:0.5 C5+E5:1.5 A4+C5:0.5 | B4+E5:1.5 G#4+B4:0.5 B4+D5:1 E4+G#4:1 | C4+A4:4",
-    "dyadsF": "3+5 1+4 1+3 1+3 1+3 | 3+5 1+3 3+5 1+3 | 3+5 1+4 1+3 1+3 1+3 | 1+3 1+3 1+3 1+3 | 1+5 1+5 1+5 1+5 | 3+5 1+3 3+5 1+3 | 2+5 1+3 2+4 1+3 | 1+5",
-    "tip": "Tchaikovsky's dramatic Act II oboe theme in A Minor: Arch smoothly from low B3 back up through soaring E5 lines."
+    "dyads": "C5+E5:2 E4+A4:0.5 G4+B4:0.5 A4+C5:0.5 B4+D5:0.5 | C5+E5:1.5 A4+C5:0.5 C5+E5:1.5 A4+C5:0.5 | C5+E5:1.5 E4+A4:0.5 A4+C5:1 F4+A4:0.5 D4+F4:0.5 | A4+C5:2 E4+A4:2 | C4+A4:1 D4+B4:1 E4+C5:1 F4+D5:1 | C5+E5:1.5 A4+C5:0.5 C5+E5:1.5 A4+C5:0.5 | B4+E5:1.5 G#4+B4:0.5 B4+D5:1 E4+G#4:1 | C4+A4:4",
+    "dyadsF": "3+5 1+4 1+3 1+3 1+3 | 3+5 1+3 3+5 1+3 | 3+5 1+4 1+3 1+3 1+3 | 2+4 1+4 | 1+5 1+5 1+5 1+5 | 3+5 1+3 3+5 1+3 | 2+5 1+3 2+4 1+3 | 1+5",
+    "tip": "Tchaikovsky's dramatic Act II oboe theme in A Minor: Arch smoothly from low B3 back up through soaring E5 lines.",
+    "lyrics": "[Oboe_Theme] _ _ _ _ | [Arch_1] _ _ _ | [Arch_2] _ _ _ _ | [Pause] _ | [Rise] _ _ _ | [Arch_3] _ _ _ | [Cadence] _ _ _ | [Resolve]"
   }
-  ];
+];
 });
